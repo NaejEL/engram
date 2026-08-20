@@ -41,6 +41,16 @@ class EngramConfig:
     track_keys: bool = False
     track_keys_max: int = 4096  # taille du buffer de clés (FIFO circulaire)
 
+    # --- X8 : gate de lecture à deux facteurs (voir EXTENSIONS.md §X8) ---
+    # g = soft-OR(incertitude du cortex, pertinence du match mémoire). Le cap
+    # max_read_norm reste en PLANCHER de sécurité (décision D10). "none" = cap seul
+    # (comportement X1b) ; "entropy"/"keysim" = baselines d'ablation.
+    read_gate: str = "none"          # "none" | "entropy" | "keysim" | "two_factor"
+    gate_entropy_mid: float = 2.0    # nats — centre du sigmoïde d'incertitude
+    gate_entropy_tau: float = 0.5
+    gate_keysim_mid: float = 0.6     # centre du sigmoïde de pertinence (calibré par X9)
+    gate_keysim_tau: float = 0.05
+
     # --- Gating par surprise ---
     surprise_threshold: float = 4.0  # NLL en nats au-dessus de laquelle on écrit
 
@@ -52,9 +62,15 @@ class EngramConfig:
     seed: int = 0
     notes: str = field(default="", repr=False)  # libre, pour taguer un run dans le journal
 
+    def __post_init__(self) -> None:
+        if self.read_gate in ("keysim", "two_factor") and not self.track_keys:
+            # Le facteur pertinence lit le buffer de clés I1 : l'activer d'office.
+            self.track_keys = True
+
     def summary(self) -> str:
         """Ligne compacte pour les logs et le journal d'expériences."""
         dg = f"dg={self.dg_dim}/{self.dg_topk}" if self.dg_dim else "dg=off"
+        dg += f" gate={self.read_gate}" if self.read_gate != "none" else ""
         return (
             f"model={self.model_name} layer={self.layer_index} lam={self.lam} "
             f"eta={self.eta} decay={self.decay} thr={self.surprise_threshold} "

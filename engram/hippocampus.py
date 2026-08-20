@@ -56,6 +56,10 @@ class FastWeightMemory:
             self._key_count = 0
         self.write_similarities: list[float] = []
 
+        # X8 — entropie du cortex au pas courant, fournie par l'engine avant chaque
+        # forward (None = pas de logits antérieurs dans ce contexte).
+        self.gate_entropy: float | None = None
+
     # ------------------------------------------------------------------ util
 
     def phi(self, h: torch.Tensor) -> torch.Tensor:
@@ -78,10 +82,42 @@ class FastWeightMemory:
 
     # ------------------------------------------------------------------ read
 
+    def _read_gate(self, k: torch.Tensor) -> float:
+        """X8 : gain de lecture g ∈ [0, 1] = soft-OR(incertitude, pertinence).
+
+        - Incertitude : sigmoïde sur l'entropie du cortex au pas courant (« ai-je
+          besoin d'aide ? »). Premier token d'un contexte : pas d'info → 1.0.
+        - Pertinence : sigmoïde sur le cos max entre la clé de requête et le buffer
+          de clés I1 (« ai-je quelque chose de pertinent ? »). Ce facteur peut
+          FORCER le passage à basse entropie — c'est la réponse au cas « confiance
+          erronée » (fait périmé que le cortex croit encore connaître).
+        """
+        mode = self.cfg.read_gate
+        if mode == "none":
+            return 1.0
+        if self.gate_entropy is None:
+            g_h = 1.0
+        else:
+            x = (self.gate_entropy - self.cfg.gate_entropy_mid) / self.cfg.gate_entropy_tau
+            g_h = float(torch.sigmoid(torch.tensor(x)))
+        g_k = 0.0
+        n = min(self._key_count, self.cfg.track_keys_max) if self.cfg.track_keys else 0
+        if n > 0:
+            x = ((self._key_buf[:n] @ k).max().item() - self.cfg.gate_keysim_mid) / self.cfg.gate_keysim_tau
+            g_k = float(torch.sigmoid(torch.tensor(x)))
+        if mode == "entropy":
+            return g_h
+        if mode == "keysim":
+            return g_k
+        return 1.0 - (1.0 - g_h) * (1.0 - g_k)  # soft-OR : l'un OU l'autre suffit
+
     @torch.no_grad()
     def read(self, h: torch.Tensor) -> torch.Tensor:
-        """Vecteur à ajouter au flux résiduel, plafonné en norme, redescendu au dtype de h."""
-        r = self.cfg.lam * (self.M @ self.phi(h))
+        """Vecteur à ajouter au flux résiduel : gate X8 éventuel, puis plafond de
+        norme (le cap reste en plancher de sécurité — décision D10), dtype de h."""
+        k = self.phi(h)
+        g = self._read_gate(k)
+        r = (self.cfg.lam * g) * (self.M @ k)
         cap = self.cfg.max_read_norm * h.float().norm()
         n = r.norm()
         if n > cap:

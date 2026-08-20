@@ -163,7 +163,13 @@ C'est l'état actuel du code. Aucun flag.
   garde-t-il en plancher de sécurité ? À décider à l'implémentation, en le notant
   dans les Décisions.
 
-### X9 — Courbe de capacité — *quasi gratuit, peut précéder X8*
+### X9 — Courbe de capacité — *MESURÉ (2026-08-21) : pas de falaise à 80 faits*
+
+**Verdict** : +0.710 ± 0.61 à N=80 (91 % de la référence N=5, 71/80 positifs) — la
+falaise n'existe pas à cette échelle, d² est un problème théorique, factorisations
+écartées définitivement. Prédicteur par fait mort (keysim max sature à ~1.0 sur les
+mots-outils partagés — collisions inoffensives, la delta rule converge sur clés
+identiques). Détail : journal du 2026-08-21. Protocole d'origine ci-dessous.
 
 - **Origine** : revue externe post-v1.2. I1 a montré que 10 faits à indices
   distincts tiennent sans coût et que keysim est une jauge de RÉGIME ; X9 étend en

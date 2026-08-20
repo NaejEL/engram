@@ -77,6 +77,14 @@ class EngramEngine:
         surprised = force_write or (nll is not None and nll > self.cfg.surprise_threshold)
         prev_h = self.cortex.last_h_pre if self._context_len > 0 else None
 
+        # X8 : fournir l'entropie du pas courant au gate de lecture (gratuit hors gate).
+        if self.cfg.read_gate != "none":
+            if self._last_logits is None:
+                self.memory.gate_entropy = None
+            else:
+                p = F.softmax(self._last_logits, dim=-1)
+                self.memory.gate_entropy = float(-(p * torch.log(p + 1e-12)).sum())
+
         self.cortex.read_enabled = read
         self._last_logits, self._past = self.cortex.forward_one(token_id, self._past)
         self._context_len += 1

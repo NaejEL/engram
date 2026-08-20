@@ -414,6 +414,40 @@ Modèle d'entrée :
   rangs de 20k → 15k mais ne peut pas hisser un token au sommet. Piste v2+ : valeurs
   stockées dans l'espace d'unembedding (v = u_token) ou tête de lecture apprise.
 
+## 2026-08-21 — X9 : pas de falaise à 80 faits — d² est un problème théorique
+
+- **Config** : défauts X1b, GPT-2 ; pool de 80 gabarits combinatoires distincts
+  (`eval/pool.py`, 16 possesseurs × 20 entités × 5 verbes) + 80 secrets ;
+  `eval/capacity.py`, N ∈ {5, 10, 20, 40, 80} dans la même M.
+- **Résultat** :
+
+  | N | Δlogp | positifs | keysim max (méd) |
+  | --- | --- | --- | --- |
+  | 5 | +0.781 ± 0.64 | 4/5 | 0.987 |
+  | 10 | +0.763 ± 0.45 | 9/10 | 0.994 |
+  | 20 | +0.742 ± 0.48 | 18/20 | 1.000 |
+  | 40 | +0.702 ± 0.61 | 35/40 | 1.000 |
+  | 80 | **+0.710 ± 0.61** | 71/80 | 1.000 |
+
+  Seuil de falaise (50 % de N=5 = +0.391) : jamais approché. corr(Δ, keysim max)
+  poolée : −0.04.
+- **Conclusion** :
+  1. **Pas de falaise jusqu'à 80 faits** (91 % de rétention, 720 writes dans M).
+     Le critère pré-enregistré tranche : d² est un problème THÉORIQUE à cette
+     échelle — les factorisations de M restent écartées, et la capacité ne bloque
+     pas un cortex plus gros (décision « scaling » débloquée côté mémoire).
+  2. **Le prédicteur par fait est mort, avec diagnostic** : keysim max sature à
+     ~1.0 partout — les gabarits partagent des mots-outils (« is called », « The »)
+     dont les clés collisionnent à cos ≈ 1 entre faits… sans nuire au rappel. Les
+     collisions sur transitions génériques sont INOFFENSIVES (la delta rule
+     converge sur clés identiques, elle n'interfère pas) ; la statistique max
+     mesure « un token s'est-il répété », pas « l'indice discriminant
+     collisionne-t-il ». La jauge de RÉGIME d'I1 (keysim moyen) reste valide.
+  3. Mise en garde X8 : un gate keysim-max risque de s'ouvrir sur du texte
+     générique pour la même raison. Alternative en poche si E3 le confirme : la
+     force de récupération ‖M·φ(h)‖ comme facteur de pertinence.
+- **Suite** : banc d'essai X8 (4 modes × E1/E3/E1c) — en cours.
+
 ## 2026-08-20 — v0 : squelette posé
 
 - **Commit** : (initial)

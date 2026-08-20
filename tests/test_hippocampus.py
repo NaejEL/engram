@@ -194,6 +194,44 @@ def test_track_keys_cleared_on_reset():
     assert mem.write_similarities == []
 
 
+def test_read_gate_entropy_mode():
+    # max_read_norm haut : c'est le gate qu'on teste, pas le plancher de sécurité.
+    mem = make_memory(read_gate="entropy", track_keys=True, max_read_norm=100.0)
+    k, v = unit(1), unit(2)
+    for _ in range(20):
+        mem.write(k, v)
+    mem.gate_entropy = 5.0  # cortex incertain → lecture pleine
+    open_norm = mem.read(k).norm().item()
+    mem.gate_entropy = 0.5  # cortex confiant → lecture coupée
+    closed_norm = mem.read(k).norm().item()
+    assert open_norm > 10 * max(closed_norm, 1e-9)
+
+
+def test_read_gate_two_factor_keysim_forces_passage():
+    """Le cas « confiance erronée » : entropie basse MAIS match mémoire fort —
+    le facteur pertinence doit forcer le passage (soft-OR)."""
+    mem = make_memory(read_gate="two_factor", track_keys=True, gate_keysim_mid=0.6,
+                      max_read_norm=100.0)
+    k, v = unit(1), unit(2)
+    for _ in range(20):
+        mem.write(k, v)
+    mem.gate_entropy = 0.5           # confiant…
+    forced = mem.read(k).norm().item()          # …mais requête = clé connue (cos ≈ 1)
+    stranger = mem.read(unit(9)).norm().item()  # requête inconnue : les deux facteurs bas
+    assert forced > 10 * max(stranger, 1e-9)
+
+
+def test_read_gate_none_is_x1b_behaviour():
+    gated = make_memory(read_gate="none")
+    k, v = unit(1), unit(2)
+    for _ in range(20):
+        gated.write(k, v)
+    plain = make_memory()
+    for _ in range(20):
+        plain.write(k, v)
+    assert torch.allclose(gated.read(k), plain.read(k))
+
+
 def test_read_preserves_query_dtype():
     """Le cortex est en fp16 sur GPU : read doit rendre le dtype de la requête,
     même si M calcule en fp32 (décision D2)."""
