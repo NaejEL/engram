@@ -102,6 +102,47 @@ C'est l'état actuel du code. Aucun flag.
   contrainte, la distinctivité des indices l'est. Débouché ouvert : X6, gating
   d'écriture par similarité (refuser/alerter quand cos max > ~0.6).
 
+### X7 — Gate de lecture à deux facteurs (incertitude × pertinence) — *absorbe X6*
+
+- **Origine** : convergence de trois observations indépendantes — tambourine négatif
+  partout, corr(Δlogp, prior) = −0.50, taxe E3 sur texte confiant — vers une seule
+  hypothèse : l'injection `λ·M·φ(h)` agit en partie comme un **aplatisseur de
+  distribution** (aide la queue, casse le sommet). Si la loi tient en haut de la
+  distribution, le mécanisme actuel ne peut PAS atteindre le rappel top-10 : il
+  dégrade précisément le régime où le rappel devrait aboutir.
+- **Mesure décisive avant tout mécanisme** (`eval/flattening.py`) : décomposer la
+  lecture r = λ·M·φ(h) par projection sur la direction d'unembedding du token cible
+  (logit lens) — fraction alignée = rappel, fraction orthogonale = bruit. Répondre :
+  « r contient X % de signal, Y % de bruit, et le bruit domine quand le prior est
+  haut » plutôt que « M aplatit ». Complément : entropie de sortie avec/sans M.
+- **Protocole de la courbe** : ~24 cibles échantillonnées agressivement dans les
+  rangs 1–500 (aujourd'hui, tambourine est l'UNIQUE témoin du régime probable — la
+  loi en corr −0.50 est ajustée sur un nuage au flanc vide) + sous-ensemble
+  multi-tokens dont seul le token de tête est probable (l'aplatissement frappe-t-il
+  au point d'entrée seulement ?).
+- **Mécanisme si l'hypothèse tient** : gain de lecture = f(incertitude du cortex,
+  keysim du match). Le terme incertitude seul a un angle mort nommé : la **confiance
+  erronée** (fait périmé — le cortex pousse l'ancien mot de passe à basse entropie,
+  et un gate par entropie seule ferait taire M au moment exact où il détient la mise
+  à jour ; biologiquement : le réflexe confiant qui court-circuite le rappel, d'où
+  la difficulté de corriger une habitude). Le second facteur keysim répond : un
+  match très fort force le passage même à basse entropie (« non, attends, je *sais*
+  que ça a changé »). X6 (gating d'écriture par keysim) fusionne ici : un seul
+  mécanisme à deux facteurs, pas deux gates empilés.
+- **Portée** : « quand écouter sa mémoire plutôt que son modèle du monde » est la
+  question de tout système à mémoire externe (RAG compris, qui la tranche à la
+  hache en concaténant tout). Une réponse continue calibrée incertitude × pertinence,
+  mesurable et ablatable, dépasse le cadre du PoC.
+- **MESURÉ (2026-08-21, journal)** : hypothèse raffinée par les données — (1)
+  l'aplatissement est un **coût fixe** (+0.141 nats d'entropie, uniforme) ; (2) la
+  lecture n'a **aucune composante directionnelle** vers la cible (cos ≈ 0 vs 0.136
+  de base) : le rappel opère par recomputation indirecte des couches aval ; (3) pas
+  de régime de pénalité active — le gain tend vers 0 aux rangs bas sans devenir
+  négatif (tambourine reste un outlier inexpliqué par le prior seul). **Feu vert
+  renforcé pour le gate** : coût fixe + gain nul en régime confiant = tout à gagner.
+  Le verrou top-10 est requalifié : absence de signal directionnel, pas pénalité —
+  piste v2+ : valeurs dans l'espace d'unembedding ou tête de lecture apprise.
+
 ### V2 — Replay / sharp-wave ripples (consolidation M → LoRA) — *hors v1*
 
 - **Bio** : replay de séquences compressées (jusqu'à 20×), parfois inversées, parfois

@@ -370,6 +370,50 @@ Modèle d'entrée :
 - **Suite** : candidats — X6 (gating d'écriture par keysim), piste tambourine,
   ou consolidation v2 (replay génératif depuis M → LoRA).
 
+## 2026-08-21 — X7 : protocole pré-enregistré (avant toute mesure)
+
+- **Hypothèse** : l'injection de lecture aplatit la distribution de sortie — un seul
+  mécanisme derrière tambourine, corr −0.50 et taxe E3 (voir EXTENSIONS §X7).
+- **Campagne** (`eval/flattening.py`, GPT-2 d'abord) : courbe Δlogp vs prior sur
+  ~24 cibles (échantillonnage top-heavy, rangs 1–500 sur-représentés), projection
+  logit-lens de r sur W_U[cible] (fraction signal vs bruit), entropie avec/sans M,
+  per-token sur les 10 secrets multi-tokens.
+- **Prédictions posées avant mesure** :
+  P1. Δlogp décroît avec le prior et **croise zéro** quelque part dans les rangs
+      ~50–1000 (la loi corr −0.50 extrapolée).
+  P2. La composante de r alignée sur la cible est petite devant sa norme (le bruit
+      domine), et c'est le bruit qui coûte quand le prior est haut — l'entropie
+      avec M monte sur les prompts où le modèle était confiant.
+  P3. Sur les secrets multi-tokens, la pénalité liée au prior porte sur le token de
+      tête ; les tokens suivants (conditionnés au premier) sont épargnés.
+- **Résultat** (GPT-2, 20 cibles rangs 3–35000 + 10 multi-tokens) :
+  - **P1 à moitié falsifiée, en mieux** : le gradient existe (corr Δlogp/prior =
+    −0.66) mais il n'y a PAS de régime de pénalité — même les cibles de rang 3–10
+    restent ≥ 0 (le gain tend vers zéro, il ne devient pas négatif). La loi est
+    « M cesse d'aider le probable », pas « M combat le probable ». tambourine
+    (Δ −0.41) est en-dessous de ce que la courbe prédit : outlier non expliqué par
+    le prior seul.
+  - **P2 confirmée avec un twist majeur** : ΔH = **+0.141 nats partout** (aplatissement
+    uniforme, indépendant de la cible) ET cos(r, W_U[cible]) = **−0.01 en moyenne**
+    contre 0.136 de base aléatoire — la lecture ne contient AUCUNE composante
+    dirigée vers la cible dans le chemin direct. Le rappel fonctionne donc
+    entièrement par **recomputation indirecte** : r déplace l'état à la couche 6 et
+    les couches suivantes re-routent le calcul. « M contient ~0 % de signal
+    directionnel et ~100 % de déplacement d'état » — l'aplatissement est le coût
+    fixe de ce déplacement.
+  - **P3 falsifiée sur le point intéressant** : le gain se concentre sur la tête
+    (+0.567 vs +0.172, la suite étant souvent saturée à ~0), mais la pénalité de
+    tambourine porte sur TOUTE la séquence (tête −0.414, suite −0.407).
+- **Conséquence pour le gate X7 — feu vert renforcé** : l'injection coûte un
+  aplatissement FIXE (+0.14 nats d'entropie) mais ne rapporte quasi rien quand le
+  cortex est confiant (Δ→0 aux rangs bas). Gater la lecture par l'incertitude
+  devrait donc conserver ~tout le bénéfice et éliminer ~tout le coût E3 — le
+  mécanisme à deux facteurs (incertitude × keysim) a sa cible chiffrée.
+- **Question ouverte** : le verrou top-10 n'est pas une pénalité active mais
+  l'absence de composante directionnelle — un déplacement d'état diffus déplace les
+  rangs de 20k → 15k mais ne peut pas hisser un token au sommet. Piste v2+ : valeurs
+  stockées dans l'espace d'unembedding (v = u_token) ou tête de lecture apprise.
+
 ## 2026-08-20 — v0 : squelette posé
 
 - **Commit** : (initial)
