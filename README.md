@@ -1,0 +1,92 @@
+# engram
+
+> *engramme (n.m.) : trace physique laissée par un souvenir dans le tissu neuronal.*
+
+PoC d'une architecture **hippocampe / néocortex** pour LLM : un petit modèle gelé
+(le néocortex) augmenté d'une matrice de *fast weights* plastique (l'hippocampe) qui
+apprend **pendant l'inférence** — sans backprop, par règle locale — et qui survit au
+vidage du contexte.
+
+## L'idée en trois phrases
+
+Un transformer n'apprend rien pendant l'inférence : quand il « comprend » en cours de
+route qu'une approche échoue, la leçon n'existe que dans le cache KV et s'évapore avec
+lui. Ici, un module minuscule (~600k paramètres pour GPT-2) intercepte le flux résiduel
+à une couche intermédiaire, y lit une mémoire associative (`h ← h + λ·M·φ(h)`) et
+l'écrit par delta rule (`M ← M + η·(v − M·k)·kᵀ`) **uniquement quand le modèle est
+surpris** (NLL en ligne au-dessus d'un seuil). Le decay et l'élagage top-k jouent le
+rôle du sommeil ; `M ← 0` redonne un espace latent vierge sans toucher au cortex.
+
+Inspirations directes : *complementary learning systems* (McClelland et al.),
+fast weight programmers (Schmidhuber ; Schlag et al. 2021), Titans (Google 2024,
+« Learning to Memorize at Test Time »), lignée test-time training. L'angle original
+tenté ici : la séparation **explicite** cortex/hippocampe avec reset et consolidation,
+à une échelle où l'on peut tout ablater sur un laptop.
+
+## Ce que le PoC doit prouver (ou tuer)
+
+Trois évaluations, chacune avec son contrôle :
+
+1. **Injection de fait** (`eval/fact_injection.py`) — on stream « le mot de passe est X »
+   avec écriture active, on **vide le cache KV** (crucial : ça élimine l'explication
+   « c'est juste le contexte »), on pose la question, et on compare la log-prob de X
+   avec M actif vs M remis à zéro. Signal attendu : Δlog-prob > 0, reproductible.
+2. **Dérive de domaine** (`eval/domain_drift.py`) — on stream un long document technique
+   et on mesure si la NLL de la seconde moitié baisse davantage avec M actif que sans
+   (l'interaction, pas la baisse brute : le cache KV aide déjà).
+3. **Dommage collatéral** (`eval/collateral.py`) — une M chargée d'un fait dégrade-t-elle
+   la NLL sur un texte neutre sans rapport ? C'est le dilemme stabilité/plasticité
+   chiffré : un gain sur E1 payé au-delà de +0.05 nats/token ici ne compte pas.
+
+Si les deux sont nuls après réglage honnête de λ/η/seuil → l'idée est morte à cette
+échelle, et c'est un résultat aussi.
+
+## Installation
+
+```powershell
+python -m venv .venv
+.venv\Scripts\pip install -r requirements.txt -e .
+# Tests unitaires (CPU, aucun téléchargement) :
+.venv\Scripts\python -m pytest tests/ -q
+# Première éval (télécharge GPT-2 124M au premier lancement) :
+.venv\Scripts\python eval\fact_injection.py
+```
+
+Matériel cible : RTX 3060 laptop 6 Go. Le cortex (GPT-2 124M fp16) + M (fp32) tiennent
+très large ; aucun gradient n'est jamais stocké.
+
+## Structure
+
+```text
+engram/            le package
+  config.py        EngramConfig — tous les hyperparamètres, rien en dur ailleurs
+  hippocampus.py   FastWeightMemory : delta rule, decay, prune, reset, stats
+  cortex.py        chargement du LLM gelé + hook d'injection à la couche L
+  engine.py        la boucle token-par-token : step / observe / stream / generate
+eval/              les expériences falsifiables (E1 injection, E2 dérive, E3 collatéral)
+tests/             tests unitaires CPU-only de l'hippocampe
+docs/
+  ARCHITECTURE.md  maths, décisions de design, pièges connus — LA référence
+  JOURNAL.md       journal d'expériences daté
+```
+
+## Feuille de route
+
+La méthode d'évolution est le pas-à-pas mesuré : un mécanisme à la fois, benchmarké
+sur E1/E2/E3, avec un « poids » chiffré par ajout — voir `docs/EXTENSIONS.md`.
+
+- [x] v0 — squelette : hippocampe + hook + boucle + évals + tests (2026-08-20)
+- [x] v1 X0 — run baseline naïve + balayage λ/η/couche : +0.735 ± 0.886 nats sur E1,
+      couche 6 confirmée, variance = interférence (2026-08-20)
+- [x] v1 X1 — projection gyrus denté : **+1.361 ± 1.588 nats** sur E1 (+0.63 vs X0),
+      retenue par défaut — sous réserve E3 (2026-08-20)
+- [x] v1 X1b — éval E3 écrite et lancée : dommage réel (+0.135 à λ=2, seuil 0.05
+      dépassé) ; compromis λ×cap → point conforme λ=1/cap=0.25 : E1 +0.740, E3 +0.023.
+      Enseignement : le cap de lecture est un gating doux (2026-08-20)
+- [x] v1 E1b/E2 — le rappel généralise (ratio paraphrases/exact 0.68, pas de par-cœur)
+      et la dérive de domaine est réelle : interaction −0.055 nats/token (≈ −5.4 % de
+      perplexité) sur RFC 9293, gain absolu en fin de document (2026-08-20)
+- [ ] v1.1 — ablations (delta rule vs Hebb pur, gating vs toujours-écrire, dg on/off sur E2)
+- [ ] v1.2 — passage à SmolLM2-360M si le signal tient
+- [ ] v2 — « sommeil » : distillation périodique de M dans un LoRA du cortex, puis reset
+        (c'est là que l'oubli catastrophique redevient un dragon — hors scope v1)

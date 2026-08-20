@@ -1,0 +1,8 @@
+# torch CUDA pour Windows : les wheels PyPI sont CPU-only, d'où l'extra index PyTorch.
+# cu126 et pas cu124 : l'index cu124 s'arrête à torch 2.6, et pip préférerait alors le
+# 2.13 CPU de PyPI (piège vécu le 2026-08-20). cu126 fournit 2.13.0+cu126, qui gagne
+# la résolution (PEP 440 : 2.13.0+cu126 > 2.13.0). RTX 3060 = sm_86, driver ≥ 560 requis.
+--extra-index-url https://download.pytorch.org/whl/cu126
+torch>=2.13
+transformers>=4.44
+pytest>=8

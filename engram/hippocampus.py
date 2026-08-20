@@ -1,0 +1,127 @@
+"""L'hippocampe : mémoire associative à fast weights, sans aucun backprop.
+
+Une seule structure d'état : M (d×key_dim, fp32 ; key_dim = d en mode X0, dg_dim
+quand la projection gyrus denté est active). Lecture par produit matrice-vecteur,
+écriture par delta rule (hebbien corrigé), oubli par decay + élagage top-k.
+
+Invariants à ne pas casser (voir docs/ARCHITECTURE.md, Décisions D1/D2 et §4) :
+- M et toute la chaîne d'update restent en float32, même si le cortex est en fp16 :
+  les incréments η·(v − M·k)·kᵀ partent en underflow en demi-précision, et la mémoire
+  cesse d'apprendre *silencieusement*. Les casts .float() sont volontaires.
+- Les clés/valeurs fournies par l'appelant doivent être des états PRÉ-injection
+  (c'est l'engine qui garantit ça ; l'hippocampe ne peut pas le vérifier).
+"""
+
+from __future__ import annotations
+
+import torch
+
+from .config import EngramConfig
+
+_EPS = 1e-8
+
+
+class FastWeightMemory:
+    """Matrice de fast weights M : lecture λ·M·φ(h), écriture delta rule.
+
+    Sémantique prédictive : on écrit v = h_t sous la clé k = φ(h_{t-1}), donc M
+    apprend des *transitions* d'états latents. Au rappel, un état ressemblant à un
+    ancien h_{t-1} réinjecte un souvenir de ce qui avait suivi.
+    """
+
+    def __init__(self, d_model: int, cfg: EngramConfig, device: str | torch.device = "cpu"):
+        self.cfg = cfg
+        self.d = d_model
+        self.device = torch.device(device)
+
+        # X1 — gyrus denté : projection aléatoire GELÉE d → dg_dim (jamais apprise,
+        # seedée par cfg.seed pour être identique d'un run à l'autre). Les clés
+        # deviennent creuses en haute dimension ; M devient rectangulaire d×dg_dim.
+        if cfg.dg_dim:
+            gen = torch.Generator().manual_seed(cfg.seed)
+            self.G = torch.randn(cfg.dg_dim, d_model, generator=gen).to(self.device)
+            self.key_dim = cfg.dg_dim
+        else:
+            self.G = None
+            self.key_dim = d_model
+
+        self.M = torch.zeros(d_model, self.key_dim, dtype=torch.float32, device=self.device)
+        self.write_count = 0
+
+    # ------------------------------------------------------------------ util
+
+    def phi(self, h: torch.Tensor) -> torch.Tensor:
+        """Feature map des clés, normalisée L2 dans les deux modes (borne l'énergie,
+        rend η interprétable).
+
+        - X0 (dg_dim=0) : identité normalisée, clé dense de dimension d.
+        - X1 : topk(G·h) — projection haute dimension puis sparsification par
+          magnitude : deux états proches en dimension d se recouvrent beaucoup moins
+          après top-k, c'est la séparation de patterns du gyrus denté.
+        """
+        h = h.float()
+        if self.G is None:
+            return h / (h.norm() + _EPS)
+        z = self.G @ h
+        idx = z.abs().topk(self.cfg.dg_topk).indices
+        sparse = torch.zeros_like(z)
+        sparse[idx] = z[idx]
+        return sparse / (sparse.norm() + _EPS)
+
+    # ------------------------------------------------------------------ read
+
+    @torch.no_grad()
+    def read(self, h: torch.Tensor) -> torch.Tensor:
+        """Vecteur à ajouter au flux résiduel, plafonné en norme, redescendu au dtype de h."""
+        r = self.cfg.lam * (self.M @ self.phi(h))
+        cap = self.cfg.max_read_norm * h.float().norm()
+        n = r.norm()
+        if n > cap:
+            r = r * (cap / (n + _EPS))
+        return r.to(h.dtype)
+
+    # ----------------------------------------------------------------- write
+
+    @torch.no_grad()
+    def write(self, key_h: torch.Tensor, value_h: torch.Tensor) -> None:
+        """Une mise à jour delta rule : M ← M + η·(v − M·k)·kᵀ, puis decay, puis élagage éventuel.
+
+        Le terme correctif −M·k n'écrit que l'erreur de prédiction de la mémoire :
+        pas d'accumulation divergente sur les répétitions, et une clé connue peut
+        être réécrite avec une nouvelle valeur. `hebbian_only` (ablation) le retire.
+        """
+        k = self.phi(key_h)
+        v = value_h.float()
+        if self.cfg.hebbian_only:
+            delta = torch.outer(v, k)
+        else:
+            delta = torch.outer(v - self.M @ k, k)
+        self.M += self.cfg.eta * delta
+        self.M *= 1.0 - self.cfg.decay
+        self.write_count += 1
+        if self.cfg.prune_every and self.write_count % self.cfg.prune_every == 0:
+            self.prune()
+
+    # ------------------------------------------------------- oubli / hygiène
+
+    @torch.no_grad()
+    def prune(self) -> None:
+        """Ne garde que la fraction `prune_keep` des coefficients de plus grande magnitude."""
+        keep = max(1, int(self.cfg.prune_keep * self.M.numel()))
+        threshold = torch.topk(self.M.abs().flatten(), keep).values.min()
+        self.M[self.M.abs() < threshold] = 0.0
+
+    def reset(self) -> None:
+        """M ← 0 : l'« espace latent presque vierge ». Ne touche pas au cache KV."""
+        self.M.zero_()
+        self.write_count = 0
+
+    # ----------------------------------------------------------------- infos
+
+    def stats(self) -> dict:
+        return {
+            "frobenius": self.M.norm().item(),
+            "density": (self.M != 0).float().mean().item(),
+            "writes": self.write_count,
+            "key_dim": self.key_dim,
+        }

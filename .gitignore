@@ -1,0 +1,12 @@
+# Environnement
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+
+# Données et sorties d'expériences (jamais commitées ; les résultats vont dans docs/JOURNAL.md)
+data/
+runs/
+*.pt
+*.safetensors
