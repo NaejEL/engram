@@ -85,6 +85,7 @@ def main() -> None:
     parser.add_argument("--dg-dim", type=int, default=None, help="X1 : dimension gyrus denté (0 = off)")
     parser.add_argument("--dg-topk", type=int, default=None)
     parser.add_argument("--cap", type=float, default=None, help="max_read_norm (fraction de ‖h‖)")
+    parser.add_argument("--hebbian", action="store_true", help="ablation D5 : Hebb pur (sans terme correctif)")
     args = parser.parse_args()
 
     cfg = EngramConfig()
@@ -102,6 +103,8 @@ def main() -> None:
         cfg.dg_topk = args.dg_topk
     if args.cap is not None:
         cfg.max_read_norm = args.cap
+    if args.hebbian:
+        cfg.hebbian_only = True
 
     print(f"[E1 fact injection] {cfg.summary()}")
     engine = EngramEngine(cfg)

@@ -6,7 +6,7 @@ divergent, c'est un bug de documentation à corriger immédiatement.
 
 ## 1. Vue d'ensemble
 
-```
+```text
                     ┌─────────────────────────────────────────┐
                     │  Cortex (LLM gelé, fp16, aucun gradient) │
   token ──────────▶ │  blocs 0..L-1                            │
@@ -102,12 +102,12 @@ M (c'est l'op des évals), `reset_memory()` fait l'inverse.
 ## 3. Décisions de design (et leurs raisons)
 
 | # | Décision | Raison |
-|---|----------|--------|
+| --- | --- | --- |
 | D1 | Clés/valeurs = états latents **pré-injection** | Éviter la boucle de rétroaction M→h→M : si on écrivait les états post-injection, M apprendrait ses propres sorties (divergence quasi garantie). |
 | D2 | M en fp32, cortex en fp16 | Les incréments `η·(v−Mk)kᵀ` sont petits ; en fp16 ils partent en underflow et la mémoire n'apprend rien. 2,4 Mo, le coût est nul. |
 | D3 | Couche d'insertion L au milieu du réseau (défaut : 6/12 pour GPT-2) | Trop tôt : représentations pas assez sémantiques (quasi lexicales). Trop tard : plus assez de blocs après L pour intégrer l'injection dans les logits. À balayer empiriquement — `cfg.layer_index`. |
 | D4 | Boucle token-par-token, pas de prefill parallèle | L'écriture au pas t dépend de l'état de M au pas t-1 : le traitement parallèle d'un prompt casserait la causalité des writes. Uniforme et honnête, au prix du débit (acceptable : PoC). |
-| D5 | Delta rule plutôt que Hebb pur | Voir 2.2. Hebb pur gardé comme ablation (`cfg.hebbian_only`) pour quantifier ce que le terme correctif apporte. |
+| D5 | Delta rule plutôt que Hebb pur | Voir 2.2. Hebb pur gardé comme ablation (`cfg.hebbian_only`). **Nuance (2026-08-21, journal)** : Hebb bat la delta sur E2 (−0.095 vs −0.055, et ce n'est pas un effet de η) car le terme correctif éteint les writes répétés — delta reste le défaut pour son bornage et sa capacité de réécriture ; Hebb = régime de forte adaptation, arbitrage final sur E2 long horizon. |
 | D6 | Gating par NLL plutôt que par norme d'erreur latente | La NLL est le seul signal qui mesure une erreur **de tâche** (prédire le token) et elle est gratuite. La norme de `v−Mk` mesure la nouveauté pour M, pas l'utilité — gardée comme critère secondaire possible. |
 | D7 | `eval/` vide le cache KV avant le rappel | Sans ça, impossible de distinguer la contribution de M du in-context learning ordinaire. C'est LE contrôle qui rend le PoC falsifiable. |
 | D8 | Pas de backprop nulle part en v1 | C'est l'hypothèse testée : une règle locale + un cortex gelé suffisent-ils à un effet mesurable ? Introduire du gradient brouillerait la réponse. |

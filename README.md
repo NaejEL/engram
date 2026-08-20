@@ -86,7 +86,9 @@ sur E1/E2/E3, avec un « poids » chiffré par ajout — voir `docs/EXTENSIONS.m
 - [x] v1 E1b/E2 — le rappel généralise (ratio paraphrases/exact 0.68, pas de par-cœur)
       et la dérive de domaine est réelle : interaction −0.055 nats/token (≈ −5.4 % de
       perplexité) sur RFC 9293, gain absolu en fin de document (2026-08-20)
-- [ ] v1.1 — ablations (delta rule vs Hebb pur, gating vs toujours-écrire, dg on/off sur E2)
+- [x] v1.1 — ablations : le gating porte ~92 % de l'effet E2 ; DG +57 % d'interaction ;
+      Hebb pur bat la delta sur E2 (−0.095 vs −0.055) mais delta reste le défaut
+      (bornage, réécriture) — arbitrage final sur E2 long horizon (2026-08-21)
 - [ ] v1.2 — passage à SmolLM2-360M si le signal tient
 - [ ] v2 — « sommeil » : distillation périodique de M dans un LoRA du cortex, puis reset
         (c'est là que l'oubli catastrophique redevient un dragon — hors scope v1)

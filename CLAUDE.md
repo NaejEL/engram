@@ -43,9 +43,13 @@ Ce n'est PAS un produit — c'est une expérience falsifiable sur un laptop RTX 
   rapporter plus qu'elle ne coûte dans le domaine. **Le tableau des poids est complet
   au point X1b — les trois questions falsifiables du PoC ont une réponse positive**
   sur GPT-2 124M.
-- Prochaines étapes possibles : ablations de fond (delta vs Hebb pur `hebbian_only`,
-  gating vs toujours-écrire, dg on/off sur E2) ; SmolLM2-360M (v1.2) ; piste
-  « tambourine » (les tokens déjà probables sont pénalisés par la lecture).
+- **Ablations v1.1 faites** (2026-08-21, tableau dans EXTENSIONS.md §4) : le gating
+  porte ~92 % de l'effet E2 ; DG +57 % d'interaction ; **Hebb pur bat la delta rule
+  sur E2 (−0.095 vs −0.055, pas un effet de η)** mais delta reste le défaut
+  (bornage, réécriture — D5 nuancée, voir journal du 2026-08-21).
+- Prochaines étapes possibles : E2 long horizon (≥ 20k tokens) pour l'arbitrage
+  delta/Hebb ; SmolLM2-360M (v1.2) ; piste « tambourine » (les tokens déjà probables
+  sont pénalisés par la lecture — verrou probable vers le rappel top-10).
 - La phase « sommeil » (distillation de M dans un LoRA du cortex) est explicitement v2.
 
 ## Environnement

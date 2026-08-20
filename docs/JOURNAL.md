@@ -204,6 +204,61 @@ Modèle d'entrée :
   dg on/off sur E2), puis SmolLM2-360M (v1.2). Le cas « tambourine » (token déjà
   probable pénalisé) reste la meilleure piste d'amélioration du mécanisme de lecture.
 
+## 2026-08-20 — Ablations v1.1 : le gating est le héros silencieux
+
+- **Config** : défauts X1b partout, un flag inversé par run (`--hebbian`, `--thr 0`,
+  `--dg-dim 0` — flags CLI ajoutés à cet effet).
+- **Résultat** :
+
+  | Ablation | Métrique | Référence X1b | Ablatée |
+  | --- | --- | --- | --- |
+  | A1 Hebb pur (E1) | Δlogp exact | +0.740 ± 0.80 | +0.693 ± 0.80 |
+  | A2 toujours-écrire (E2) | interaction | −0.0551 (1401 writes) | **−0.0045** (5988 writes) |
+  | A3 clés denses (E2) | interaction | −0.0551 | −0.0352 |
+
+- **Conclusion** :
+  - **A2, le résultat majeur : le gating par surprise porte ~92 % de l'effet E2.**
+    Écrire chaque token noie M d'associations redondantes ET accélère le decay
+    (appliqué par write : ×4.3 d'érosion des traces utiles). D6 validée in situ —
+    le « j'apprends quand je suis surpris » n'est pas une économie, c'est la
+    condition du fonctionnement.
+  - A3 : DG apporte +57 % d'interaction sur E2 (−0.035 → −0.055). X1 est maintenant
+    gagnant sur les trois évals (E1 marge λ/η, E3 −32 % de dommage, E2 +57 %).
+  - A1 : Hebb ≈ delta sur E1 (+0.693 vs +0.740) — attendu a posteriori : une
+    injection unique ne sollicite pas le terme correctif (rien à réécrire, pas
+    d'accumulation). Le juge pertinent est un long stream → A1b (E2 Hebb) lancée.
+- **Suite** : A1b, puis commit v1.1.
+
+## 2026-08-21 — A1b + contrôles : Hebb pur, le challenger inattendu
+
+- **Config** : défauts X1b, E2 (6000 tokens) et E3 ; runs `--hebbian` et `--eta 0.4`.
+- **Résultat** :
+
+  | Règle | E2 interaction | E2 NLL 2ᵉ moitié (abs.) | E3 |
+  | --- | --- | --- | --- |
+  | delta η=0.2 (défaut) | −0.0551 | 2.3174 | +0.0228 ✓ |
+  | delta η=0.4 (contrôle C1) | −0.0488 | 2.3062 | — |
+  | **Hebb pur η=0.2 (A1b)** | **−0.0948** | **2.3034** | +0.0331 ✓ (C2) |
+
+  (contrôle sans M : 2ᵉ moitié 2.3236 ; E1 Hebb ≈ delta : +0.693 vs +0.740)
+- **Conclusion** :
+  - Hebb pur bat nettement la delta rule sur E2 et ce n'est **pas** un effet de pas
+    d'apprentissage (delta η=0.4 régresse : −0.0488). Mécanisme : sur un stream
+    homogène, le terme correctif éteint progressivement les writes répétés
+    (l'erreur v−M·k → 0) — c'est sa fonction (bornage, réécriture) et son coût
+    (adaptation amortie). Hebb renforce à pleine force, paie plus cher en début de
+    document (2.4035 vs 2.3778) et en E3 (+45 %), mais reste conforme partout.
+  - **D5 nuancée, pas renversée** : la delta rule reste le défaut pour ses vertus
+    prouvées hors E2 — bornage (test unitaire : Hebb croît linéairement, son seul
+    garde-fou réel est le cap de lecture + decay) et capacité de réécriture (E1
+    « le mot de passe a changé », non testée par E2 où rien ne se contredit).
+    Hebb est consigné comme **régime de forte adaptation** légitime.
+- **Question ouverte** (déclencheur du prochain arbitrage) : E2 long horizon
+  (≥ 20k tokens) — si Hebb sature/diverge quand ‖M‖ atteint son équilibre η/δ,
+  la delta rule gagne au fond ; s'il tient, un mode hybride (Hebb + decay fort,
+  ou delta avec plancher d'erreur) mérite une entrée X6 dans EXTENSIONS.
+- **Suite** : commit v1.1 (flags d'ablation + résultats).
+
 ## 2026-08-20 — v0 : squelette posé
 
 - **Commit** : (initial)

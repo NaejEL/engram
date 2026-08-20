@@ -65,6 +65,13 @@ def main() -> None:
     parser.add_argument("--chunk", type=int, default=512, help="taille de chunk (cache KV vidé entre)")
     parser.add_argument("--model", default=None)
     parser.add_argument("--layer", type=int, default=None)
+    parser.add_argument("--thr", type=float, default=None, help="seuil de surprise (0 = toujours écrire)")
+    parser.add_argument("--lam", type=float, default=None)
+    parser.add_argument("--eta", type=float, default=None)
+    parser.add_argument("--cap", type=float, default=None, help="max_read_norm (fraction de ‖h‖)")
+    parser.add_argument("--dg-dim", type=int, default=None, help="X1 : dimension gyrus denté (0 = off)")
+    parser.add_argument("--dg-topk", type=int, default=None)
+    parser.add_argument("--hebbian", action="store_true", help="ablation D5 : Hebb pur")
     args = parser.parse_args()
 
     cfg = EngramConfig()
@@ -72,6 +79,20 @@ def main() -> None:
         cfg.model_name = args.model
     if args.layer is not None:
         cfg.layer_index = args.layer
+    if args.thr is not None:
+        cfg.surprise_threshold = args.thr
+    if args.lam is not None:
+        cfg.lam = args.lam
+    if args.eta is not None:
+        cfg.eta = args.eta
+    if args.cap is not None:
+        cfg.max_read_norm = args.cap
+    if args.dg_dim is not None:
+        cfg.dg_dim = args.dg_dim
+    if args.dg_topk is not None:
+        cfg.dg_topk = args.dg_topk
+    if args.hebbian:
+        cfg.hebbian_only = True
 
     print(f"[E2 domain drift] {cfg.summary()}")
     engine = EngramEngine(cfg)

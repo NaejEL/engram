@@ -121,4 +121,14 @@ Les deltas se lisent **contre la ligne précédente retenue**, pas contre X0.
 | **X1b compromis λ×cap (dg=8192/64, λ=1.0, η=0.2, cap=0.25)** | **+0.740 ± 0.799** (N=10) | 0/10 | **−0.0551 ✓** (writes 23 %) | **+0.0228 ± 0.0056 ✓** | **référence courante** — premier point conforme, tableau complet ; cap = gating doux (λ contrôle le bruit, cap le signal) |
 | X1 gyrus denté | | | | | |
 
-*(les lignes suivantes s'ajoutent quand leur déclencheur est observé)*
+Ablations mesurées au point X1b (détails : journal des 2026-08-20/21) — chacune
+retire un mécanisme de la référence, aucune n'est retenue comme nouveau défaut :
+
+| Ablation | E1 exact | E2 interaction | E3 | Enseignement |
+| --- | --- | --- | --- | --- |
+| Hebb pur (sans terme correctif) | +0.693 | **−0.0948** | +0.0331 ✓ | régime de forte adaptation ; delta reste le défaut (bornage, réécriture) — arbitrage sur E2 long horizon |
+| toujours-écrire (thr=0) | — | −0.0045 | — | **le gating porte ~92 % de l'effet E2** |
+| clés denses (dg off) | — | −0.0352 | — | DG apporte +57 % d'interaction |
+| delta η=0.4 | — | −0.0488 | — | contrôle C1 : l'avantage Hebb ≠ pas plus grand |
+
+*(les lignes suivantes du tableau principal s'ajoutent quand leur déclencheur est observé)*
