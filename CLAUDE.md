@@ -55,9 +55,14 @@ Ce n'est PAS un produit — c'est une expérience falsifiable sur un laptop RTX 
 - **E2n narratif fait** (2026-08-21) : l'adaptation survit sur la fiction
   (−0.030 nats/token) → pas un pur cache de n-grammes ; l'avantage Hebb s'évapore
   hors régime redondant → **delta rule confirmée par défaut, D5 quasi close**.
-- Prochaines étapes : I1 (instrumentation similarité de clés, EXTENSIONS.md) ;
-  v1.2 SmolLM2-360M (juge de paix « artefact d'échelle ? ») ; piste « tambourine »
-  (tokens déjà probables pénalisés — verrou probable vers le rappel top-10).
+- **I1 fait** (2026-08-21) : keysim = jauge de saturation calibrée (0.23 sain,
+  0.78 saturé, falaise ~0.5). **La capacité de M n'est pas la contrainte** : 10 faits
+  à indices distincts dans une même M → +0.770, comme un fait seul ; 10 faits au même
+  gabarit → +0.025 (collision d'indices). E1 a les modes `--multi` / `--varied`.
+- Prochaines étapes : v1.2 SmolLM2-360M (juge de paix « artefact d'échelle ? ») ;
+  X6 candidat = gating d'écriture par keysim (seuil ~0.6) ; piste « tambourine »
+  (corr Δlogp/prior = −0.50 : M aide l'improbable, pénalise le probable — verrou
+  probable vers le rappel top-10).
 - La phase « sommeil » (distillation de M dans un LoRA du cortex) est explicitement v2.
 
 ## Environnement

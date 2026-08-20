@@ -96,6 +96,11 @@ C'est l'état actuel du code. Aucun flag.
   quand M va échouer** — presque aussi précieux qu'une réparation, et un critère de
   gating d'écriture potentiel (refuser d'écraser une clé trop proche).
 - **Coût** : instrumentation pure, aucun changement de mécanisme. Bon candidat v1.1+.
+- **FAIT (2026-08-21, journal)** : hypothèse falsifiée telle que formulée (corr
+  intra-régime positive), mais keysim est une **jauge de saturation calibrée** :
+  0.23/0.45/0.78 → rappel +0.74/+0.77/+0.03. La capacité de M n'est pas la
+  contrainte, la distinctivité des indices l'est. Débouché ouvert : X6, gating
+  d'écriture par similarité (refuser/alerter quand cos max > ~0.6).
 
 ### V2 — Replay / sharp-wave ripples (consolidation M → LoRA) — *hors v1*
 

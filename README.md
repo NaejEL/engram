@@ -92,8 +92,10 @@ sur E1/E2/E3, avec un « poids » chiffré par ajout — voir `docs/EXTENSIONS.m
 - [x] v1.1b — E2 narratif (fiction) : l'adaptation survit (−0.030 nats/token, ~55 % du
       niveau RFC) → pas un pur cache de n-grammes ; l'avantage Hebb s'évapore sur la
       fiction → delta rule confirmée par défaut, arbitrage D5 quasi clos (2026-08-21)
-- [ ] v1.1c — instrumentation I1 : similarité de clés comme prédicteur d'échec du
-      rappel (EXTENSIONS.md)
+- [x] v1.1c — instrumentation I1 : keysim = jauge de saturation calibrée
+      (0.23 sain / 0.78 saturé) ; découverte majeure : 10 faits à indices distincts
+      dans une même M se rappellent sans coût (+0.770) — la capacité n'est pas la
+      contrainte, la distinctivité des indices l'est (2026-08-21)
 - [ ] v1.2 — passage à SmolLM2-360M : le juge de paix « artefact d'échelle ou début
       de quelque chose »
 - [ ] v2 — « sommeil » : distillation périodique de M dans un LoRA du cortex, puis reset

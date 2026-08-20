@@ -48,6 +48,14 @@ class FastWeightMemory:
         self.M = torch.zeros(d_model, self.key_dim, dtype=torch.float32, device=self.device)
         self.write_count = 0
 
+        # I1 — instrumentation : buffer circulaire des clés écrites + similarité cos
+        # max de chaque nouvelle clé vs les précédentes (les clés sont unitaires,
+        # cos = produit scalaire). Diagnostic pur, inactif par défaut.
+        if cfg.track_keys:
+            self._key_buf = torch.zeros(cfg.track_keys_max, self.key_dim, device=self.device)
+            self._key_count = 0
+        self.write_similarities: list[float] = []
+
     # ------------------------------------------------------------------ util
 
     def phi(self, h: torch.Tensor) -> torch.Tensor:
@@ -92,6 +100,8 @@ class FastWeightMemory:
         """
         k = self.phi(key_h)
         v = value_h.float()
+        if self.cfg.track_keys:
+            self._track(k)
         if self.cfg.hebbian_only:
             delta = torch.outer(v, k)
         else:
@@ -101,6 +111,17 @@ class FastWeightMemory:
         self.write_count += 1
         if self.cfg.prune_every and self.write_count % self.cfg.prune_every == 0:
             self.prune()
+
+    @torch.no_grad()
+    def _track(self, k: torch.Tensor) -> None:
+        """I1 : enregistre la similarité cos max de k vs les clés déjà écrites,
+        puis range k dans le buffer circulaire. La toute première clé n'a pas de
+        référence : rien n'est enregistré pour elle."""
+        n = min(self._key_count, self.cfg.track_keys_max)
+        if n > 0:
+            self.write_similarities.append((self._key_buf[:n] @ k).max().item())
+        self._key_buf[self._key_count % self.cfg.track_keys_max] = k
+        self._key_count += 1
 
     # ------------------------------------------------------- oubli / hygiène
 
@@ -115,6 +136,9 @@ class FastWeightMemory:
         """M ← 0 : l'« espace latent presque vierge ». Ne touche pas au cache KV."""
         self.M.zero_()
         self.write_count = 0
+        if self.cfg.track_keys:
+            self._key_count = 0
+        self.write_similarities = []
 
     # ----------------------------------------------------------------- infos
 

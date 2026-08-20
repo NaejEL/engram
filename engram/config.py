@@ -35,6 +35,12 @@ class EngramConfig:
     dg_dim: int = 8192   # dimension de projection ; 0 = désactivé (mode X0 dense)
     dg_topk: int = 64    # composantes gardées (64/8192 ≈ 0.8 %, ordre bio ; 128 ≈ pareil)
 
+    # --- I1 : instrumentation — prédicteur d'échec par similarité de clés ---
+    # Logge à chaque write la similarité cos max entre la nouvelle clé et les clés
+    # déjà écrites (buffer circulaire). Diagnostic pur : ne change aucun mécanisme.
+    track_keys: bool = False
+    track_keys_max: int = 4096  # taille du buffer de clés (FIFO circulaire)
+
     # --- Gating par surprise ---
     surprise_threshold: float = 4.0  # NLL en nats au-dessus de laquelle on écrit
 

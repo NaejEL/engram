@@ -164,6 +164,36 @@ def test_dg_reduces_interference_between_similar_keys():
     assert dg > dense
 
 
+def test_track_keys_off_by_default():
+    mem = make_memory()
+    mem.write(unit(1), unit(2))
+    mem.write(unit(3), unit(4))
+    assert mem.write_similarities == []
+
+
+def test_track_keys_records_max_cosine():
+    mem = make_memory(track_keys=True)
+    k = unit(1)
+    mem.write(k, unit(2))            # première clé : pas de référence, rien enregistré
+    assert mem.write_similarities == []
+    mem.write(k, unit(3))            # même clé : cos ≈ 1
+    mem.write(unit(4), unit(5))      # clé quasi orthogonale : cos faible
+    assert len(mem.write_similarities) == 2
+    assert mem.write_similarities[0] > 0.99
+    assert abs(mem.write_similarities[1]) < 0.5
+
+
+def test_track_keys_cleared_on_reset():
+    mem = make_memory(track_keys=True)
+    mem.write(unit(1), unit(2))
+    mem.write(unit(1), unit(3))
+    assert mem.write_similarities
+    mem.reset()
+    assert mem.write_similarities == []
+    mem.write(unit(4), unit(5))      # le buffer est bien vide : pas de référence
+    assert mem.write_similarities == []
+
+
 def test_read_preserves_query_dtype():
     """Le cortex est en fp16 sur GPU : read doit rendre le dtype de la requête,
     même si M calcule en fp32 (décision D2)."""

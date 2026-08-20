@@ -285,6 +285,43 @@ Modèle d'entrée :
   (vs 23 % RFC) : le narratif surprend plus souvent au seuil 4.0.
 - **Suite** : I1 (prédicteur d'échec par similarité de clés), puis v1.2 SmolLM2-360M.
 
+## 2026-08-21 — I1 : la jauge de saturation — le mur n'est pas la capacité
+
+- **Config** : défauts X1b ; instrumentation `track_keys` (buffer circulaire de clés,
+  cos max par write) ; E1 en trois régimes : mono-fait, multi partagé (`--multi`,
+  10 faits même gabarit dans une seule M), multi varié (`--multi --varied`,
+  10 faits à contextes distincts).
+- **Résultat** :
+
+  | Régime | keysim (étendue) | E1 Δlogp | Lecture |
+  | --- | --- | --- | --- |
+  | mono-fait (référence) | 0.21–0.26 | +0.740 ± 0.80 | sain |
+  | multi, gabarit commun | 0.68–0.87 | **+0.025 ± 0.80** | rappel détruit |
+  | multi, contextes variés | 0.26–0.52 | **+0.770 ± 0.72** | 10 faits sans coût |
+
+- **Conclusion** :
+  1. **La capacité de M n'est pas la contrainte** : 10 faits simultanés se rappellent
+     aussi bien qu'un seul dès que leurs indices diffèrent. Le mur du régime
+     « gabarit commun » est une collision d'indices — cohérent avec la théorie DG
+     (la séparation de patterns ne peut rien pour des entrées identiques).
+  2. **keysim est une jauge de saturation calibrée** (0.23/0.45/0.78 →
+     +0.74/+0.77/+0.03, falaise au-delà de ~0.5) — c'est un détecteur de RÉGIME.
+     L'hypothèse AFTER_v1 (corrélation négative par fait) est falsifiée dans les
+     trois régimes (corr intra-régime +0.2 à +0.5) : le prédicteur utile est le
+     niveau absolu, pas le gradient intra-régime. Débouché : gating d'écriture
+     (alerter/refuser quand cos max > ~0.6) — candidat X6.
+  3. Pattern prior confirmé en gradué : corr(Δlogp, logp a priori) = −0.50 en
+     mono-fait — M aide l'improbable, pénalise le déjà-probable (tambourine négatif
+     dans TOUS les régimes). Piste mécanistique pour le verrou top-10.
+  4. Pas d'effet de récence net en régime collision (corr −0.05) : les faits en
+     conflit ne se résolvent pas par « le dernier gagne » — ils se superposent en
+     bruit (les clés ne sont pas assez identiques pour la réécriture propre de la
+     delta rule).
+- **Bug corrigé au passage** : les similarités étaient collectées après le
+  `reset_memory()` du contrôle (toujours vides) — capture déplacée juste après
+  l'injection.
+- **Suite** : v1.2 — SmolLM2-360M, avec la jauge keysim en main.
+
 ## 2026-08-20 — v0 : squelette posé
 
 - **Commit** : (initial)
