@@ -85,6 +85,18 @@ C'est l'état actuel du code. Aucun flag.
 - **Esquisse** : remplacer M par un store (K, V) explicite + recherche par similarité,
   même point d'injection. Interface commune avec FastWeightMemory pour swap propre.
 
+### I1 — Prédicteur d'échec par similarité de clés — *instrumentation, pas un mécanisme*
+
+- **Origine** : AFTER_v1_THOUGHTS — la variance E1 (±0.8 même avec DG) dit que
+  l'orthogonalisation est inégale selon les faits : certaines clés tombent bien
+  séparées, d'autres non.
+- **Idée** : logger, à chaque write, la similarité cosinus max entre la nouvelle clé
+  φ(h) et les clés déjà écrites (ou leur approximation via les colonnes actives de M).
+  Si la variance E1 par secret corrèle avec cette similarité, on a un **prédicteur de
+  quand M va échouer** — presque aussi précieux qu'une réparation, et un critère de
+  gating d'écriture potentiel (refuser d'écraser une clé trop proche).
+- **Coût** : instrumentation pure, aucun changement de mécanisme. Bon candidat v1.1+.
+
 ### V2 — Replay / sharp-wave ripples (consolidation M → LoRA) — *hors v1*
 
 - **Bio** : replay de séquences compressées (jusqu'à 20×), parfois inversées, parfois
@@ -126,7 +138,7 @@ retire un mécanisme de la référence, aucune n'est retenue comme nouveau défa
 
 | Ablation | E1 exact | E2 interaction | E3 | Enseignement |
 | --- | --- | --- | --- | --- |
-| Hebb pur (sans terme correctif) | +0.693 | **−0.0948** | +0.0331 ✓ | régime de forte adaptation ; delta reste le défaut (bornage, réécriture) — arbitrage sur E2 long horizon |
+| Hebb pur (sans terme correctif) | +0.693 | **−0.0948** (RFC) / −0.0335 (narratif) | +0.0331 ✓ | son avantage RFC était du n-gramme : égalité avec delta sur fiction (E2n, 2026-08-21) — **arbitrage D5 quasi clos, delta confirmée par défaut** |
 | toujours-écrire (thr=0) | — | −0.0045 | — | **le gating porte ~92 % de l'effet E2** |
 | clés denses (dg off) | — | −0.0352 | — | DG apporte +57 % d'interaction |
 | delta η=0.4 | — | −0.0488 | — | contrôle C1 : l'avantage Hebb ≠ pas plus grand |

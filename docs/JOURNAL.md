@@ -259,6 +259,32 @@ Modèle d'entrée :
   ou delta avec plancher d'erreur) mérite une entrée X6 dans EXTENSIONS.
 - **Suite** : commit v1.1 (flags d'ablation + résultats).
 
+## 2026-08-21 — E2n narratif : l'adaptation est réelle, l'avantage Hebb était du n-gramme
+
+- **Config** : défauts X1b ; *Pride and Prejudice* (Gutenberg, en-tête/pied retirés →
+  `data/pnp_narrative.txt`), 6000 tokens, chunks 512 ; delta puis `--hebbian`.
+- **Résultat** (réf. RFC 9293 entre parenthèses) :
+
+  | Règle | Interaction narratif | Interaction RFC | Rétention |
+  | --- | --- | --- | --- |
+  | delta η=0.2 | **−0.0304** (writes 2218) | −0.0551 | ~55 % |
+  | Hebb pur | −0.0335 (writes 2250) | −0.0948 | ~35 % |
+
+- **Conclusion** — les deux questions d'AFTER_v1_THOUGHTS ont leur réponse :
+  1. **Pas un pur cache de n-grammes** : l'effet survit sur de la fiction
+     (−0.030 nats/token, ~55 % du niveau RFC). Une partie du gain RFC était bien de
+     l'exploitation de redondance technique, mais le cœur est de l'adaptation.
+  2. **L'avantage Hebb s'évapore hors régime redondant** : −0.0335 vs −0.0304 pour
+     delta — égalité (runs uniques). Son +72 % sur la RFC venait précisément du
+     renforcement à pleine force des motifs répétés. **Arbitrage D5 quasi clos** :
+     delta ≈ Hebb sur texte général, et delta garde bornage + réécriture → la delta
+     rule reste le défaut, avec confiance cette fois. L'E2 long horizon passe de
+     « nécessaire » à « optionnel ».
+- **Note** : la 2ᵉ moitié de P&P est intrinsèquement plus dure (contrôle +0.46) —
+  c'est le contrôle qui absorbe ça, l'interaction reste propre. Taux d'écriture 37 %
+  (vs 23 % RFC) : le narratif surprend plus souvent au seuil 4.0.
+- **Suite** : I1 (prédicteur d'échec par similarité de clés), puis v1.2 SmolLM2-360M.
+
 ## 2026-08-20 — v0 : squelette posé
 
 - **Commit** : (initial)

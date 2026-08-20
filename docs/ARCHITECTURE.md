@@ -46,6 +46,11 @@ divergent, c'est un bug de documentation à corriger immédiatement.
   signal du cortex et le modèle divague ; trop petit → pas d'effet mesurable.
 - `clip` : la norme du vecteur injecté est plafonnée à `cfg.max_read_norm` fois la norme
   de h. Garde-fou de stabilité n°1 : même si M devient énorme, l'injection reste bornée.
+  Mesuré le 2026-08-20 (journal, X1b) : le cap agit comme **gating doux** — les
+  récupérations pertinentes le saturent, les parasites restent dessous ; λ contrôle le
+  bruit, le cap le signal. Écho biologique (AFTER_v1_THOUGHTS) : c'est fonctionnellement
+  de la neuromodulation — le cerveau ne coupe pas la mémoire, il module son *gain*
+  d'influence sur le cortex (acétylcholine).
 
 ### 2.2 Écriture (delta rule, PAS Hebb pur)
 

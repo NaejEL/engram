@@ -23,6 +23,11 @@ Ce n'est PAS un produit — c'est une expérience falsifiable sur un laptop RTX 
 - `README.md` — vue d'ensemble + protocole d'évaluation.
 - `docs/POSSIBLE_APPROACH.md` — notes brutes de Jean (mécanismes bio) ; formalisées
   dans EXTENSIONS.md, ne pas modifier.
+- `docs/AFTER_v1_THOUGHTS.md` — relecture critique post-v1 (écrite AVANT v1.1, ne pas
+  modifier). Son pari « Hebb = E3 catastrophique » a été falsifié par v1.1 ; ses deux
+  pistes reprises dans la feuille de route : E2 narratif (n-grammes vs adaptation) et
+  I1 (prédicteur d'échec par similarité de clés). Point mis en avant : le ratio de
+  généralisation 0.68 est le chiffre-titre du PoC (mémoire associative, pas un grep).
 
 ## État du projet (2026-08-20)
 
@@ -47,9 +52,12 @@ Ce n'est PAS un produit — c'est une expérience falsifiable sur un laptop RTX 
   porte ~92 % de l'effet E2 ; DG +57 % d'interaction ; **Hebb pur bat la delta rule
   sur E2 (−0.095 vs −0.055, pas un effet de η)** mais delta reste le défaut
   (bornage, réécriture — D5 nuancée, voir journal du 2026-08-21).
-- Prochaines étapes possibles : E2 long horizon (≥ 20k tokens) pour l'arbitrage
-  delta/Hebb ; SmolLM2-360M (v1.2) ; piste « tambourine » (les tokens déjà probables
-  sont pénalisés par la lecture — verrou probable vers le rappel top-10).
+- **E2n narratif fait** (2026-08-21) : l'adaptation survit sur la fiction
+  (−0.030 nats/token) → pas un pur cache de n-grammes ; l'avantage Hebb s'évapore
+  hors régime redondant → **delta rule confirmée par défaut, D5 quasi close**.
+- Prochaines étapes : I1 (instrumentation similarité de clés, EXTENSIONS.md) ;
+  v1.2 SmolLM2-360M (juge de paix « artefact d'échelle ? ») ; piste « tambourine »
+  (tokens déjà probables pénalisés — verrou probable vers le rappel top-10).
 - La phase « sommeil » (distillation de M dans un LoRA du cortex) est explicitement v2.
 
 ## Environnement

@@ -89,6 +89,12 @@ sur E1/E2/E3, avec un « poids » chiffré par ajout — voir `docs/EXTENSIONS.m
 - [x] v1.1 — ablations : le gating porte ~92 % de l'effet E2 ; DG +57 % d'interaction ;
       Hebb pur bat la delta sur E2 (−0.095 vs −0.055) mais delta reste le défaut
       (bornage, réécriture) — arbitrage final sur E2 long horizon (2026-08-21)
-- [ ] v1.2 — passage à SmolLM2-360M si le signal tient
+- [x] v1.1b — E2 narratif (fiction) : l'adaptation survit (−0.030 nats/token, ~55 % du
+      niveau RFC) → pas un pur cache de n-grammes ; l'avantage Hebb s'évapore sur la
+      fiction → delta rule confirmée par défaut, arbitrage D5 quasi clos (2026-08-21)
+- [ ] v1.1c — instrumentation I1 : similarité de clés comme prédicteur d'échec du
+      rappel (EXTENSIONS.md)
+- [ ] v1.2 — passage à SmolLM2-360M : le juge de paix « artefact d'échelle ou début
+      de quelque chose »
 - [ ] v2 — « sommeil » : distillation périodique de M dans un LoRA du cortex, puis reset
         (c'est là que l'oubli catastrophique redevient un dragon — hors scope v1)
