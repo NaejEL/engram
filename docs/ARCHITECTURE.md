@@ -99,7 +99,24 @@ Le seuil est un hyperparamètre central des ablations (gating vs toujours-écrir
   C'est la version pauvre de la consolidation pendant le sommeil : on ne garde que les
   traces fortes. (La vraie consolidation — distiller M dans un LoRA — est v2.)
 
-### 2.5 Reset
+### 2.5 Coût et capacité de M
+
+Le scaling de M est en k·d² (clés en dimension k·d via DG, valeurs en d) et c'est
+**assumé** : à d = 4096 et k = 4, M ferait ~64M paramètres / ~270 Mo fp32 —
+négligeable devant le cortex correspondant. La capacité EST la raison d'être du
+quadratique, exactement comme pour le gyrus denté biologique (l'expansion
+dimensionnelle est le mécanisme, pas un accident d'implémentation). Corollaire acté
+dans EXTENSIONS §X9 : pas de factorisation de M (block-diagonal, Kronecker, rang
+faible) par défaut — elles plafonnent la capacité que le quadratique achète, et les
+updates rang-1 de la delta rule ne vivent pas sur la variété de Kronecker.
+
+Sortie de secours documentée si d ET le nombre de souvenirs persistants explosaient
+un jour : la mémoire à slots (lignée Titans). Compromis connu à ne pas oublier : les
+slots perdent la **superposition** — or le ratio de généralisation 0.68 (E1b) est
+probablement une propriété de la superposition distribuée ; une mémoire à slots
+rappellerait mieux l'exact et moins bien la paraphrase.
+
+### 2.6 Reset
 
 `M ← 0`. Le cache KV et M sont indépendants : `clear_context()` vide le cache en gardant
 M (c'est l'op des évals), `reset_memory()` fait l'inverse.

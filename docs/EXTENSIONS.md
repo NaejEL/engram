@@ -102,7 +102,7 @@ C'est l'état actuel du code. Aucun flag.
   contrainte, la distinctivité des indices l'est. Débouché ouvert : X6, gating
   d'écriture par similarité (refuser/alerter quand cos max > ~0.6).
 
-### X7 — Gate de lecture à deux facteurs (incertitude × pertinence) — *absorbe X6*
+### X7 — Loi prior/rappel et hypothèse d'aplatissement — *MESURÉ (2026-08-21)*
 
 - **Origine** : convergence de trois observations indépendantes — tambourine négatif
   partout, corr(Δlogp, prior) = −0.50, taxe E3 sur texte confiant — vers une seule
@@ -120,15 +120,7 @@ C'est l'état actuel du code. Aucun flag.
   loi en corr −0.50 est ajustée sur un nuage au flanc vide) + sous-ensemble
   multi-tokens dont seul le token de tête est probable (l'aplatissement frappe-t-il
   au point d'entrée seulement ?).
-- **Mécanisme si l'hypothèse tient** : gain de lecture = f(incertitude du cortex,
-  keysim du match). Le terme incertitude seul a un angle mort nommé : la **confiance
-  erronée** (fait périmé — le cortex pousse l'ancien mot de passe à basse entropie,
-  et un gate par entropie seule ferait taire M au moment exact où il détient la mise
-  à jour ; biologiquement : le réflexe confiant qui court-circuite le rappel, d'où
-  la difficulté de corriger une habitude). Le second facteur keysim répond : un
-  match très fort force le passage même à basse entropie (« non, attends, je *sais*
-  que ça a changé »). X6 (gating d'écriture par keysim) fusionne ici : un seul
-  mécanisme à deux facteurs, pas deux gates empilés.
+- **Mécanisme découlant de la mesure** : voir X8 (gate de lecture à deux facteurs).
 - **Portée** : « quand écouter sa mémoire plutôt que son modèle du monde » est la
   question de tout système à mémoire externe (RAG compris, qui la tranche à la
   hache en concaténant tout). Une réponse continue calibrée incertitude × pertinence,
@@ -142,6 +134,71 @@ C'est l'état actuel du code. Aucun flag.
   renforcé pour le gate** : coût fixe + gain nul en régime confiant = tout à gagner.
   Le verrou top-10 est requalifié : absence de signal directionnel, pas pénalité —
   piste v2+ : valeurs dans l'espace d'unembedding ou tête de lecture apprise.
+
+### X8 — Gate de lecture à deux facteurs (incertitude × pertinence) — *absorbe X6, dépend de X7 (fait)*
+
+- **Origine** : X7 a chiffré le feu vert — l'injection coûte un aplatissement FIXE
+  (+0.141 nats d'entropie) et ne rapporte quasi rien quand le cortex est confiant
+  (Δ→0 aux rangs bas). Couper la lecture en régime confiant ne sacrifie ~rien et
+  économise ~tout.
+- **Esquisse** : remplacer le gain de lecture constant par
+  `g = f(entropie du cortex, keysim de lecture)` — où le keysim de lecture est le
+  cos max entre la clé de requête φ(h) et les clés du buffer I1 (côté lecture,
+  distinct du keysim d'écriture). Angle mort nommé AVANT implémentation : la
+  **confiance erronée** — le cortex peut être sûr ET avoir tort (fait périmé) ; un
+  gate par entropie seule ferait taire M au moment exact où il détient la mise à
+  jour. Le facteur keysim répond : un match très fort force le passage même à basse
+  entropie (« non, attends, je *sais* que ça a changé »). X6 fusionne ici : un seul
+  mécanisme à deux facteurs, pas deux gates empilés.
+- **Éval dédiée E1c (correction de fait)** : rendre X fortement prédit (l'injecter,
+  ou choisir X à rang naturellement bas), puis injecter « The password has changed.
+  It is now Y. » ; mesurer le rappel de Y. Critère : le gate à deux facteurs rappelle
+  Y là où le gate entropie-seule échoue (c'est le test discriminant entre les deux).
+- **Benchmark contre trois baselines** : cap global actuel, gating entropie seule,
+  gating keysim seul. **Cibles chiffrées (échec explicite si manquées)** :
+  E3 ≤ 0.05 ; E1 > le point conforme actuel (+0.494 SmolLM2 / +0.740 GPT-2) ;
+  E2 SmolLM2 ≥ −0.025 (récupérer au moins la moitié du −0.050 perdu à cap 0.1).
+- **Point de vigilance (pas un conflit tranché)** : X1b a acté le cap comme gating
+  doux et point de conformité (ARCHITECTURE §2.1). X8 le remplace-t-il ou le
+  garde-t-il en plancher de sécurité ? À décider à l'implémentation, en le notant
+  dans les Décisions.
+
+### X9 — Courbe de capacité — *quasi gratuit, peut précéder X8*
+
+- **Origine** : revue externe post-v1.2. I1 a montré que 10 faits à indices
+  distincts tiennent sans coût et que keysim est une jauge de RÉGIME ; X9 étend en
+  courbe : E1-multi varié à 5 / 10 / 20 / 40 / 80 faits, d fixe, défauts.
+- **Objectif** : localiser la **falaise d'interférence** (critère : le rang N où le
+  Δlogp moyen tombe sous 50 % du mono-fait), et tester le prédicteur par fait :
+  corrélation entre échec de rappel et cos max de sa clé vs les clés déjà écrites.
+  Réserve honnête posée avant mesure : I1 a trouvé cette corrélation POSITIVE
+  intra-régime (+0.2/+0.5 hors saturation) — X9 la re-teste en charge graduée ;
+  si elle reste non-négative, le prédicteur par fait est mort, seule la jauge de
+  régime survit.
+- **Contrainte de protocole** : il faut ≥ 80 gabarits à contextes distincts (le pool
+  actuel en a 10) — les étendre AVANT de mesurer, sinon les collisions de gabarit
+  confondent la mesure de capacité (leçon de I1).
+- **Décision par défaut, actée ici** : aucune restructuration de M (block-diagonal,
+  Kronecker, rang faible) avant ce résultat — et probablement pas après : la
+  capacité d'une mémoire matricielle est bornée par sa dimension, les
+  factorisations la PLAFONNENT, et les updates rang-1 de la delta rule ne vivent
+  pas sur la variété de Kronecker. Ce chiffre décide si d² est un problème réel ou
+  théorique.
+
+### X10 — Comparatif de kernels d'adressage — *dépend de X9*
+
+- **Origine** : revue externe. La projection DG est déjà un kernel d'adressage ; la
+  question est lequel repousse la falaise de X9 le plus loin, gratuitement.
+- **Protocole** : à taille de M ÉGALE, comparer (1) DG actuelle (aléatoire + top-k),
+  (2) DPFP (Schlag et al. 2021), (3) DG apprise offline. Métriques : position de la
+  falaise X9 + E1/E3 standard.
+- **CONFLIT À SIGNALER (non tranché)** : la variante « DG apprise offline » heurte
+  D8 (aucun backprop en v1) et D9 (G aléatoire gelée, jamais apprise —
+  justification : JL suffit, une G apprise exigerait du gradient). Une G apprise
+  hors ligne puis gelée au test respecte la lettre de « pas de gradient à
+  l'inférence » mais introduit l'entraînement dans le projet. À arbitrer
+  explicitement (amendement de D8/D9 ou variante hors-protocole) avant de lancer
+  cette branche de X10 ; les branches (1)-(2) ne posent aucun conflit.
 
 ### V2 — Replay / sharp-wave ripples (consolidation M → LoRA) — *hors v1*
 

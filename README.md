@@ -100,5 +100,22 @@ sur E1/E2/E3, avec un « poids » chiffré par ajout — voir `docs/EXTENSIONS.m
       la règle du milieu se transpose), multi-faits +0.817 avec σ÷3, point conforme
       E3 recalibré (cap 0.1 → E1 +0.494, E3 +0.042 ✓). Mécanisme universel,
       calibration (λ, cap) par-modèle (2026-08-21)
+- [x] v1.3 X7 — hypothèse d'aplatissement mesurée (courbe top-heavy, projection W_U,
+      multi-tokens) : coût d'entropie FIXE (+0.141 nats), zéro composante
+      directionnelle (cos ≈ 0), gain → 0 à prior haut sans pénalité active. Feu vert
+      chiffré pour le gate (2026-08-21)
+- [ ] v1.3 X8 — gate de lecture à deux facteurs (entropie × keysim) : E1c
+      « confiance erronée » + benchmark vs 3 baselines ; cibles : E3 ≤ 0.05,
+      E1 > point conforme, E2 SmolLM2 ≥ −0.025 (protocole : EXTENSIONS.md)
+- [ ] v1.3 X9 — courbe de capacité : falaise d'interférence à 5→80 faits (étendre le
+      pool de gabarits d'abord) ; décide si d² est un problème réel — factorisations
+      de M écartées par défaut (EXTENSIONS.md)
+- [ ] v1.4 X10 — comparatif de kernels d'adressage (DG vs DPFP vs DG apprise
+      offline — cette dernière en conflit D8/D9 à arbitrer) à taille de M égale
+- [ ] long terme — test « règle du milieu » sur un 3ᵉ modèle à ratio de couches
+      différent (couche ≈ n/2 : structurel ou accidentel ? indice v1.2 : couche
+      tardive activement nocive)
 - [ ] v2 — « sommeil » : distillation périodique de M dans un LoRA du cortex, puis reset
-        (c'est là que l'oubli catastrophique redevient un dragon — hors scope v1)
+        (c'est là que l'oubli catastrophique redevient un dragon — hors scope v1) ;
+        piste rappel directionnel (valeurs en espace d'unembedding ou tête de
+        lecture apprise — le verrou top-10 requalifié par X7)

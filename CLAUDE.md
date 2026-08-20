@@ -65,9 +65,16 @@ Ce n'est PAS un produit — c'est une expérience falsifiable sur un laptop RTX 
   SmolLM2 = **cap 0.1** (E1 +0.494, E3 +0.042 ✓). Verdict : mécanisme universel,
   calibration (λ, cap) PAR-MODÈLE. Le signe AFTER_v1 (corr keysim négative) émerge
   à l'échelle. Runs SmolLM2 : `--model HuggingFaceTB/SmolLM2-360M --layer 16 --cap 0.1`.
-- Prochaines étapes candidates : X6 = gating d'écriture par keysim (seuil ~0.6) ;
-  piste « tambourine » (M aide l'improbable, pénalise le probable — verrou du
-  top-10) ; v2 consolidation (replay génératif depuis M → LoRA).
+- **X7 mesuré** (2026-08-21, `eval/flattening.py`) : aplatissement = coût FIXE
+  (+0.141 nats d'entropie), lecture sans composante directionnelle (cos ≈ 0 vs
+  0.136 base) — le rappel opère par recomputation indirecte. Gain → 0 à prior haut,
+  sans pénalité active (tambourine reste un outlier).
+- Feuille de route v1.3+ (protocoles pré-enregistrés dans EXTENSIONS.md, issus
+  d'une revue externe intégrée le 2026-08-21) : **X8** gate de lecture à deux
+  facteurs (E1c + 3 baselines, cibles chiffrées) ; **X9** courbe de capacité
+  (étendre le pool de gabarits à ≥ 80 d'abord) ; **X10** kernels d'adressage
+  (variante « DG apprise » en conflit D8/D9, à arbitrer avant de lancer).
+  Ordre recommandé : X9 (quasi gratuit, calibre le facteur keysim) → X8 → X10.
 - La phase « sommeil » (distillation de M dans un LoRA du cortex) est explicitement v2.
 
 ## Environnement
