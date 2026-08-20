@@ -96,7 +96,9 @@ sur E1/E2/E3, avec un « poids » chiffré par ajout — voir `docs/EXTENSIONS.m
       (0.23 sain / 0.78 saturé) ; découverte majeure : 10 faits à indices distincts
       dans une même M se rappellent sans coût (+0.770) — la capacité n'est pas la
       contrainte, la distinctivité des indices l'est (2026-08-21)
-- [ ] v1.2 — passage à SmolLM2-360M : le juge de paix « artefact d'échelle ou début
-      de quelque chose »
+- [x] v1.2 — SmolLM2-360M : **le signal passe l'échelle** — E1 +0.852 (couche 16/32,
+      la règle du milieu se transpose), multi-faits +0.817 avec σ÷3, point conforme
+      E3 recalibré (cap 0.1 → E1 +0.494, E3 +0.042 ✓). Mécanisme universel,
+      calibration (λ, cap) par-modèle (2026-08-21)
 - [ ] v2 — « sommeil » : distillation périodique de M dans un LoRA du cortex, puis reset
         (c'est là que l'oubli catastrophique redevient un dragon — hors scope v1)

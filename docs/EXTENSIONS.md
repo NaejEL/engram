@@ -135,7 +135,8 @@ Les deltas se lisent **contre la ligne précédente retenue**, pas contre X0.
 | X0 naïve (défauts initiaux : λ=0.5, η=0.05) | +0.219 ± 0.271 (N=10, 9/10 > 0) | 0/10 | *(à venir)* | *(éval à écrire)* | signal faible mais directionnel |
 | X0 naïve, point retenu (layer=6, λ=1.0, η=0.1) | +0.735 ± 0.886 (N=10) | 0/10 | *(à venir)* | +0.1991 ± 0.0241 (> seuil) | référence pour X1 — variance = interférence, déclencheur X1 observé |
 | X1 gyrus denté (dg=8192/64, λ=2.0, η=0.2) | +1.361 ± 1.588 (N=10) | 0/10 | *(à venir)* | +0.1354 ± 0.0147 (> seuil ×2.7) | mécanisme retenu (+0.63 E1, −0.06 E3 vs X0) mais point NON conforme E3 |
-| **X1b compromis λ×cap (dg=8192/64, λ=1.0, η=0.2, cap=0.25)** | **+0.740 ± 0.799** (N=10) | 0/10 | **−0.0551 ✓** (writes 23 %) | **+0.0228 ± 0.0056 ✓** | **référence courante** — premier point conforme, tableau complet ; cap = gating doux (λ contrôle le bruit, cap le signal) |
+| **X1b compromis λ×cap (dg=8192/64, λ=1.0, η=0.2, cap=0.25)** | **+0.740 ± 0.799** (N=10) | 0/10 | **−0.0551 ✓** (writes 23 %) | **+0.0228 ± 0.0056 ✓** | **référence GPT-2** — premier point conforme, tableau complet ; cap = gating doux (λ contrôle le bruit, cap le signal) |
+| **v1.2 SmolLM2-360M (layer=16, cap=0.1, reste identique)** | **+0.494 ± 0.245** (N=10) ; multi varié +0.817 ± 0.214 (cap 0.25) | 0/10 | −0.0500 (cap 0.25) ; **−0.0170 ✓ au point conforme** | **+0.0415 ± 0.0029 ✓** | **le signal passe l'échelle** — mécanisme universel, calibration (λ, cap) par-modèle ; couche tardive nocive ; signe AFTER_v1 émerge (corr keysim −0.4) |
 | X1 gyrus denté | | | | | |
 
 Ablations mesurées au point X1b (détails : journal des 2026-08-20/21) — chacune

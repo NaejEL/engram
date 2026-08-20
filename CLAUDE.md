@@ -59,10 +59,15 @@ Ce n'est PAS un produit — c'est une expérience falsifiable sur un laptop RTX 
   0.78 saturé, falaise ~0.5). **La capacité de M n'est pas la contrainte** : 10 faits
   à indices distincts dans une même M → +0.770, comme un fait seul ; 10 faits au même
   gabarit → +0.025 (collision d'indices). E1 a les modes `--multi` / `--varied`.
-- Prochaines étapes : v1.2 SmolLM2-360M (juge de paix « artefact d'échelle ? ») ;
-  X6 candidat = gating d'écriture par keysim (seuil ~0.6) ; piste « tambourine »
-  (corr Δlogp/prior = −0.50 : M aide l'improbable, pénalise le probable — verrou
-  probable vers le rappel top-10).
+- **v1.2 SmolLM2-360M FAIT** (2026-08-21) : le signal passe l'échelle — E1 +0.852 à
+  la couche 16/32 (règle du milieu transposée ; couche tardive NOCIVE : −0.375),
+  multi-faits +0.817 ± 0.214 (σ÷3 vs GPT-2). Frontière E3 déplacée : point conforme
+  SmolLM2 = **cap 0.1** (E1 +0.494, E3 +0.042 ✓). Verdict : mécanisme universel,
+  calibration (λ, cap) PAR-MODÈLE. Le signe AFTER_v1 (corr keysim négative) émerge
+  à l'échelle. Runs SmolLM2 : `--model HuggingFaceTB/SmolLM2-360M --layer 16 --cap 0.1`.
+- Prochaines étapes candidates : X6 = gating d'écriture par keysim (seuil ~0.6) ;
+  piste « tambourine » (M aide l'improbable, pénalise le probable — verrou du
+  top-10) ; v2 consolidation (replay génératif depuis M → LoRA).
 - La phase « sommeil » (distillation de M dans un LoRA du cortex) est explicitement v2.
 
 ## Environnement

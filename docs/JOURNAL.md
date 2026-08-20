@@ -322,6 +322,54 @@ Modèle d'entrée :
   l'injection.
 - **Suite** : v1.2 — SmolLM2-360M, avec la jauge keysim en main.
 
+## 2026-08-21 — v1.2 : protocole pré-enregistré (avant toute mesure)
+
+- **Modèle** : HuggingFaceTB/SmolLM2-360M (base) — 32 couches, d=960, entraîné
+  ~11T tokens (vs 12 couches, d=768, ~10B pour GPT-2 124M).
+- **Protocole** : (1) balayage couche ∈ {8, 16, 24} sur E1, autres hyperparamètres
+  aux défauts X1b ; (2) à la meilleure couche : E1 complet (+multi varié), E3, E2 RFC.
+- **Questions posées avant mesure** :
+  Q1. Le signal E1 survit-il au changement d'échelle ? (« artefact d'échelle ou
+      début de quelque chose » — AFTER_v1)
+  Q2. La règle « couche du milieu » (D3, confirmée sur GPT-2) se transpose-t-elle ?
+  Q3. Un modèle mieux entraîné a des NLL plus basses partout → moins de writes au
+      seuil 4.0, et le pattern « M aide l'improbable » (corr −0.50) prédit un
+      bénéfice PLUS FAIBLE. Pari honnête : Δlogp E1 positif mais < +0.740.
+  Q4. La jauge keysim garde-t-elle sa falaise (~0.5) dans un espace latent différent ?
+- **Résultat** (mesuré les 2026-08-21, détail ci-dessous) :
+
+  | Mesure (SmolLM2-360M) | Valeur | Réf. GPT-2 |
+  | --- | --- | --- |
+  | E1 balayage couche : 8 / 16 / 24 | +0.554 / **+0.852** / **−0.375** | couche 6/12 : +0.740 |
+  | E1-multi varié (couche 16, cap 0.25) | +0.817 ± **0.214** | +0.770 ± 0.716 |
+  | E3 (cap 0.25 → 0.15 → 0.1) | +0.079 / +0.067 / **+0.042 ✓** | +0.023 ✓ (cap 0.25) |
+  | E1 au point conforme (cap 0.1) | **+0.494 ± 0.245** | +0.740 (cap 0.25) |
+  | E2 RFC (cap 0.25) | −0.0500 (writes 1140) | −0.0551 |
+
+- **Réponses aux questions pré-enregistrées** :
+  Q1. **Pas un artefact d'échelle** — le signal survit et se renforce (+0.852 mono,
+      +0.817 multi avec σ divisé par 3). Le rappel multi-faits est plus NET à 360M.
+  Q2. **La règle du milieu se transpose exactement** (16/32 comme 6/12) — et
+      l'injection tardive devient activement nocive (couche 24 : −0.375, là où
+      GPT-2 couche 9 était juste plus faible).
+  Q3. Pari perdu dans le bon sens : le signal brut est PLUS FORT. Mais la frontière
+      E3 s'est déplacée — les distributions plus pointues du modèle rendent la même
+      injection plus coûteuse (E3 ×3.5 à cap égal). Nouveau point conforme :
+      **cap=0.1** → E1 +0.494, E3 +0.042. La calibration λ/cap est PAR-MODÈLE,
+      le mécanisme et la méthode de calibration se transposent tels quels.
+  Q4. La corrélation keysim devient NÉGATIVE à la couche 16 (−0.34 à −0.40) :
+      le signe prédit par AFTER_v1, invisible sur GPT-2, émerge à l'échelle.
+- **Conclusion v1.2** : le PoC tient sur deux modèles d'échelles différentes
+  (124M/12 couches/10B tokens vs 360M/32 couches/11T tokens). Ce qui est universel :
+  delta rule + DG + gating + couche du milieu. Ce qui est par-modèle : le point
+  (λ, cap) sur la frontière E1/E3.
+- **Complément (E2 au point conforme, cap 0.1)** : interaction −0.0170, coût
+  initial quasi nul (+0.019 en 1ʳᵉ moitié, parité absolue en fin de document).
+  Le cap serré échange du gain d'adaptation contre l'innocuité — cohérent avec
+  « λ contrôle le bruit, le cap contrôle le signal ».
+- **Suite** : candidats — X6 (gating d'écriture par keysim), piste tambourine,
+  ou consolidation v2 (replay génératif depuis M → LoRA).
+
 ## 2026-08-20 — v0 : squelette posé
 
 - **Commit** : (initial)
