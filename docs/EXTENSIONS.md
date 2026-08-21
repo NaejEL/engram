@@ -236,6 +236,40 @@ Détail : journal du 2026-08-21. Protocole d'origine ci-dessous.
   chargées dans M — la discrimination ne doit PAS augmenter (élimine l'effet
   « M pleine »).
 
+### V2-D — Canal de sortie directionnel (M_out) — *LE chantier v2 prioritaire*
+
+- **Origine** : le mur mesuré en X7 (cos(r, W_U[cible]) ≈ −0.01, sous la base
+  aléatoire 0.136 — le chemin direct est activement orthogonal à la cible) et ses
+  quatre visages : E1c, verrou top-10, E4, E4s. M actuelle fait de l'**amorçage**
+  (priming) : elle teinte le calcul (d'où E1/E2, l'adaptation, la paraphrase) mais
+  ne peut pas **nommer** un token.
+- **Précédent à étudier avant tout design : kNN-LM** (Khandelwal et al. 2020) —
+  mémoire non-paramétrique de paires (état caché → token suivant) interpolée
+  DIRECTEMENT dans la distribution de sortie ; son résultat historique est
+  précisément le rappel des tokens rares que le modèle seul ne hisse jamais.
+- **Esquisse (la version delta rule, compressée et en ligne, de kNN-LM)** : une
+  seconde matrice M_out qui stocke `φ(h) → u_token` (valeurs = lignes de
+  l'unembedding W_U du token OBSERVÉ, pas l'état caché), écrite par la même delta
+  rule au même signal de surprise, lue en **biais additif sur les logits** :
+  `logits += g·W_U·(M_out·φ(h))` — soit une correction linéaire en ligne de la
+  tête de sortie. Même taille que M (d×dg_dim), même gate keysim, aucun backprop.
+- **Architecture résultante — deux canaux de lecture** : un canal d'ÉTAT
+  (l'existant : diffus, généralisant, ratio 0.38–0.68) et un canal de SORTIE
+  (directionnel, précis, pour le rappel exact). C'est la hiérarchie
+  registre/cache dessinée pour l'usage par-projet, mais À L'INTÉRIEUR du
+  mécanisme — et la vieille distinction familiarité vs recollection de la
+  psychologie de la mémoire, qui semblent aussi être deux processus séparés
+  dans le cerveau.
+- **Évals de verdict** : E1 top-10 (le canal de sortie doit débloquer des rangs
+  que l'amorçage ne peut pas atteindre), E1c (renverser « Paris »), E4s (la
+  préférence token-niveau), chacune avec le canal d'état seul / sortie seul /
+  les deux — E3 toujours ≤ 0.05.
+- **Principe consigné (dépasse engram)** : dans une mémoire test-time, **les
+  gates ne sont pas des optimisations, ce sont les organes qui rendent le
+  mécanisme viable** — écriture gatée = spécificité (E4 mode force), lecture
+  gatée = innocuité (E3 +0.57 sans gate), et le rappel précis exige un troisième
+  organe, directionnel.
+
 ### V2 — Replay / sharp-wave ripples (consolidation M → LoRA) — *hors v1, basse priorité actée*
 
 - **Bio** : replay de séquences compressées (jusqu'à 20×), parfois inversées, parfois

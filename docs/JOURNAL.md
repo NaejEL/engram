@@ -570,8 +570,7 @@ Modèle d'entrée :
 - **Suite** : E4b (token décisif) + cortex Qwen = le même run, prochaine étape
   naturelle.
 
-## 2026-08-21 — E4s : le jugement de conformité résiste à la mémoire — et toutes
-## les pistes convergent vers le même mur
+## 2026-08-21 — E4s : le jugement de conformité résiste à la mémoire (un seul mur)
 
 - **Config** : `eval/conventions_simple.py` — conventions ARBITRAIRES d'un projet
   fictif (Zephyr) en anglais simple, scoring au token décisif, requêtes
@@ -621,6 +620,80 @@ Modèle d'entrée :
   adaptation), pas le jugement de conformité.
 - **Suite** : Qwen (téléchargement en reprise) pour E4-dur — dernier test avant
   verdict final ; puis arbitrage v2 (directionnel d'abord).
+
+## 2026-08-21 — Campagne Qwen2.5-1.5B : l'amorçage s'amplifie avec le cortex
+
+- **Config** : Qwen2.5-1.5B (d=1536, 28 couches → layer 14), défauts X8 ; fumée E1
+  (2 secrets), E4s, E4-dur. Le cortex avale l'architecture Qwen2 sans modification.
+- **Résultat** :
+  1. **E1 : +4.18 ± 1.76 nats** (swordfish +5.42, rang 14770 → 2317 — rang ÷6, le
+     plus grand mouvement jamais mesuré). La série 124M → 360M → 1.5B donne
+     +0.74 → +0.85 → +4.18 : **l'amorçage de rappel s'AMPLIFIE avec la qualité du
+     cortex**, là où l'adaptation E2 sature — un meilleur cortex re-route mieux à
+     partir du même déplacement d'état. Le pari « artefact d'échelle » est enterré
+     dans l'autre sens.
+  2. **E4s : première double dissociation correctement signée** — baseline +0.076
+     (sain, comme conçu), Zephyr +0.018 (positif, une première), Boreas −0.010
+     (négatif comme prédit), E3 ≈ 0. La préférence token-niveau existe sur un juge
+     fort — famélique, mais des deux bons côtés. Writes = 33 (stockage mince,
+     seuil 4.0 sur de l'anglais simple — piste : seuil adaptatif à la NLL moyenne
+     du cortex).
+  3. **E4-dur : échec même sur Qwen** (gain −0.011, 3/10) — ET baseline encore
+     inversé (−0.148) : même un juge multilingue préfère nos phrases « violantes ».
+     Diagnostic : l'instrument est cassé — la NLL moyenne de phrase mesure la
+     FLUIDITÉ, pas la conformité (nos violantes sont du français plus naturel).
+     **E4-dur est retiré au profit d'E4s** (token décisif, baseline ≈ 0 par
+     construction) comme instrument de la famille conventions.
+- **Note technique** : keysim d'écriture ≈ 0.14 sur Qwen (vs ~0.23 GPT-2) — les
+  statistiques de similarité dépendent de d ; `gate_keysim_mid=0.6` est calibré
+  sur GPT-2 et mérite un re-balayage par modèle (E1 fonctionne, donc le gate
+  s'ouvre sur les requêtes pertinentes, mais le point d'opération est à vérifier).
+- **Conclusion** : le canal d'amorçage vaut cher sur un bon cortex (E1), le canal
+  de préférence token-niveau reste le mur (E4s +0.018) — la hiérarchie des
+  chantiers ne change pas : V2-D (canal de sortie directionnel) d'abord.
+
+## 2026-08-21 — Diagnostics : théorie à quatre observations, non-monotonie des gates
+
+- **Diagnostic 1 — anomalie entropie** (`eval/gate_anomaly.py`, 2×2 : mode ×
+  lecture-pendant-injection, GPT-2, régime λ2/cap0.5) :
+
+  | mode | inject read on | inject read off | ‖M‖ |
+  | --- | --- | --- | --- |
+  | none | +0.1354 | +0.1354 | 65.06 |
+  | entropy | +0.2520 | +0.2520 | 65.06 |
+
+  (Contrôle de cohérence : none à λ2/cap0.5 reproduit le +0.1354 de X1 à
+  l'identique.)
+  - **Hypothèse « boucle lecture→écriture » : RÉFUTÉE** — M est identique au
+    centième près dans les 4 conditions, l'anomalie persiste à M égale. (Notre E3
+    mesure déjà writes gelés ; le canal injection est nul aussi.)
+  - **Résolution — la fonction de dommage est NON MONOTONE en g** : trois points
+    la dessinent — g≈0.02 (keysim/neutre) → E3 ≈ 0 ; g≈1 (none) → +0.135 ;
+    g intermédiaire/mixte (entropy) → +0.252. Scaler un vecteur de lecture quasi
+    constant (voir diag. 2) ne donne pas une injection « plus douce » mais un
+    déplacement d'état DIFFÉRENT, que les couches avales gèrent plus mal.
+  - **Règle de design consignée : les gates de lecture doivent être quasi
+    BINAIRES.** keysim l'est de fait (tau 0.05 → g ≈ 0 ou 1) — c'est
+    rétrospectivement une des raisons de sa victoire au banc X8 ; l'entropie
+    (tau 0.5) produisait exactement la zone toxique intermédiaire. Réhabiliter le
+    facteur entropie = le durcir (seuil franc), pas le retirer. two_factor à
+    rejouer en version binaire.
+- **Diagnostic 2 — traction vers le marginal** (`eval/marginal_pull.py`, GPT-2,
+  120 positions de texte neutre, M chargée d'un fait) :
+  - **corr(W_U·r, log-fréquence unigramme) = +0.484 ± 0.002** — la lecture
+    projette systématiquement vers les tokens FRÉQUENTS, avec une direction quasi
+    CONSTANTE d'une position à l'autre (σ = 0.002 !). corr(W_U·r, logits
+    courants) = +0.6. Norme de r : 24.8 brut vs 0.48 sous gate keysim (×50
+    d'atténuation sur texte neutre — le mécanisme exact de la protection E3).
+  - **La dérive non spécifique d'E4s est expliquée** : les tokens conformes
+    étaient souvent les options rares ; la traction vers le fréquent les pénalise
+    mécaniquement. **Quatrième observation ramenée à X7** (avec la loi du prior,
+    la taxe E3, le verrou top-10) : ce n'est plus un bug, c'est une théorie —
+    la lecture de M est un vecteur quasi fixe orienté « prior générique », et
+    tout son bénéfice passe par la recomputation aval.
+- **Suite** : X8.1 (gates binaires, two_factor durci) ; V2-D reste le chantier
+  prioritaire — il attaque la racine que ces deux diagnostics viennent de
+  confirmer.
 
 ## 2026-08-20 — v0 : squelette posé
 
