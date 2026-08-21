@@ -482,6 +482,42 @@ Modèle d'entrée :
 - **Suite** : ajouts roadmap intégrés le même jour (vision engram-par-projet →
   README ; E4 conventions ; LoRA v2 basse priorité actée par le verdict X9).
 
+## 2026-08-21 — X8 validation : le gate rouvre le régime agressif — sauf E2 SmolLM2
+
+- **Config** : gate keysim + λ=2.0/cap=0.5 (nouveaux défauts), GPT-2 et SmolLM2.
+- **Résultat** :
+
+  | Mesure | GPT-2 | SmolLM2 (layer 16) |
+  | --- | --- | --- |
+  | E1 | **+1.353 ± 1.58** (vs +0.740 ancien conforme) | **+0.755 ± 0.94** (vs +0.494) |
+  | E3 | **−0.014 ✓** | **+0.003 ✓** |
+  | E2 RFC | interaction +0.002, mais **absolu −0.055 sur les DEUX moitiés** | interaction +0.018, **absolu +0.03/+0.05 : ÉCHEC** |
+
+- **Conclusions** :
+  1. **Cibles E1/E3 dépassées sur les deux modèles, sans recalibration** : le gate
+     élimine le dommage inter-domaines (E3) et rend le régime agressif au signal
+     (+83 % GPT-2, +53 % SmolLM2 vs anciens points conformes).
+  2. **Subtilité de métrique E2 (GPT-2)** : l'interaction tombe à ~0 parce que M
+     aide DÈS la première moitié (−0.055 absolu partout) — plus de coût
+     d'échauffement, donc plus de différentiel. La métrique honnête devient le
+     bénéfice absolu ; l'interaction était conçue pour une mémoire qui paie avant
+     de gagner.
+  3. **Échec E2 SmolLM2 au régime agressif** : en domaine, le gate keysim est
+     ouvert en permanence (les clés viennent du document lui-même) — il ne protège
+     que HORS domaine. SmolLM2 subit donc λ=2/cap=0.5 non modulé en intra-domaine,
+     que ses distributions pointues encaissent mal. C'est la signature du **second
+     facteur manquant** (moduler par la confiance intra-domaine — le rôle prévu du
+     facteur entropie, disqualifié pour anomalie). Le two_factor reste motivé,
+     suspendu à la résolution de l'anomalie entropie.
+  4. Coût du gate mesuré au passage : ratio paraphrases 0.68 → 0.38 (la
+     sélectivité se paie en généralisation ; bouton `gate_keysim_mid`).
+- **Verdict X8** : gate keysim RETENU (défauts : gate=keysim, λ=2, cap=0.5) —
+  2 cibles sur 3 dépassées ; la 3ᵉ (E2 SmolLM2) documentée en échec au régime
+  agressif, balayage caps intermédiaires en cours pour situer le point E2
+  par-modèle. E4 est débloquée (X8 tient sur E1/E3).
+- **Suite** : caps intermédiaires E2 SmolLM2 ; anomalie entropie à investiguer
+  (préalable au two_factor) ; E4.
+
 ## 2026-08-20 — v0 : squelette posé
 
 - **Commit** : (initial)
