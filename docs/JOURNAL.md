@@ -527,6 +527,49 @@ Modèle d'entrée :
   prochaine mesure utile est E4, doublement motivée.
 - **Suite** : E4 ; anomalie entropie à investiguer (préalable au two_factor).
 
+## 2026-08-21 — E4 : critère non atteint à cette échelle — le juge est en cause
+
+- **Config** : défauts X8 ; `eval/conventions.py` — CLAUDE.md d'engram (~2.8k
+  tokens) streamé en chunks, gating normal ; 10 paires minimales ; contrôles :
+  autre-projet (spécificité), E3, mode force (sensibilité).
+- **Résultat** :
+
+  | Mesure | GPT-2 | SmolLM2 |
+  | --- | --- | --- |
+  | discrimination M vierge | **−0.135** (inversée !) | **−0.131** (inversée !) |
+  | gain avec M conventions | +0.020 (6/10) | +0.012 (6/10) |
+  | gain contrôle autre-projet | +0.004 ✓ | −0.013 ✓ |
+  | E3 | −0.049 ✓ | +0.008 ✓ |
+  | mode force (GPT-2) | gain +0.028 mais contrôle +0.036 : **spécificité PERDUE** | — |
+
+- **Verdict selon les critères pré-enregistrés** : gain non significatif
+  (+0.01/+0.02 pour σ inter-paires ~0.12, N=10) → **le critère de succès n'est
+  pas atteint à cette échelle, et on le note** — comme le protocole l'exigeait.
+- **Mais l'échec a une structure qui désigne le coupable** :
+  1. **Le juge est cassé avant l'expérience** : les DEUX cortex trouvent les
+     phrases violantes PLUS probables que les conformes (baseline −0.13) — un
+     modèle qui ne peut pas juger la conformité ne peut pas montrer un gain de
+     jugement, quelle que soit M. GPT-2 et SmolLM2 sont trop faibles en français
+     technique. Le juge naturel de E4 est un cortex multilingue — Qwen2.5-1.5B,
+     déjà sur la feuille de route.
+  2. **Par paires, M fait exactement ce qu'on sait d'elle** : les paires
+     quasi-verbatim du document (« clear_context vide le cache KV… » +0.095,
+     « reset_memory remet M à zéro… » +0.178, cortex/hippocampe +0.148) gagnent
+     nettement et spécifiquement ; les paires normatives abstraites (« tout
+     hyperparamètre passe par EngramConfig ») perdent. Mémoire associative
+     diffuse, pas inférence normative — cohérent avec 0.38–0.68.
+  3. **Découverte collatérale (mode force, GPT-2)** : en écriture forcée, le
+     contrôle autre-projet gagne PLUS que le document cible — le gating par
+     surprise n'est pas une économie, c'est ce qui préserve la SPÉCIFICITÉ de la
+     mémoire (écho direct de l'ablation A2).
+- **Affinements avant de rejouer E4 sur un juge valide** : (a) scorer la NLL au
+  token décisif de chaque paire (fp32/fp16…) plutôt qu'en moyenne de phrase —
+  le signal est dilué ; (b) cortex Qwen2.5-1.5B (d=1536, ~3.1 Go fp16, tient sur
+  la 3060). La vision par-projet n'est ni validée ni tuée : elle est EN ATTENTE
+  D'UN JUGE.
+- **Suite** : E4b (token décisif) + cortex Qwen = le même run, prochaine étape
+  naturelle.
+
 ## 2026-08-20 — v0 : squelette posé
 
 - **Commit** : (initial)

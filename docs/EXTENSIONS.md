@@ -206,7 +206,17 @@ identiques). Détail : journal du 2026-08-21. Protocole d'origine ci-dessous.
   explicitement (amendement de D8/D9 ou variante hors-protocole) avant de lancer
   cette branche de X10 ; les branches (1)-(2) ne posent aucun conflit.
 
-### E4 — Éval « conventions de projet » — *test direct de la vision engram-par-projet*
+### E4 — Éval « conventions de projet » — *MESURÉ (2026-08-21) : critère non atteint, juge en cause*
+
+**Verdict** : gain de discrimination non significatif (+0.01/+0.02, 6/10 paires) sur
+GPT-2 ET SmolLM2 — mais les deux cortex ont un baseline INVERSÉ (ils préfèrent les
+phrases violantes, −0.13) : un juge qui ne sait pas juger ne peut pas montrer de
+gain de jugement. Spécificité et E3 tiennent (en gating ; le mode force PERD la
+spécificité — le gating préserve la spécificité, écho A2). Les paires quasi-verbatim
+gagnent fort (+0.09 à +0.18), les normatives perdent : mémoire associative, pas
+inférence. **Vision par-projet ni validée ni tuée : en attente d'un juge valide.**
+À rejouer en E4b : scoring au token décisif + cortex multilingue (Qwen2.5-1.5B).
+Détail : journal du 2026-08-21. Protocole d'origine ci-dessous.
 
 - **Origine** : vision d'usage (README §« Vision d'usage ») — M comme cache chaud du
   contexte diffus d'un projet. E4 teste exactement ça, rien d'autre.

@@ -33,10 +33,13 @@ re-paye aujourd'hui en préambule type CLAUDE.md à chaque session, et qui ne se
 pas par son exactitude mais parce qu'il teinte le modèle (`h ← h + λ·M·φ(h)`,
 littéralement).
 
-- **Prérequis** : X8 (fait sous réserve E2) + E4 (rédigée, en attente).
-- **Tué par** : échec E4 (pas de gain de discrimination, ou gain payé en E3), ou
-  une falaise X9 trop précoce sans consolidation v2 — ce second risque est déjà
-  largement écarté (X9 : aucune dégradation à 80 faits).
+- **Prérequis** : X8 (fait) + E4. **Statut E4 (2026-08-21)** : critère non atteint
+  sur GPT-2/SmolLM2, mais leurs baselines de jugement sont inversés (juges
+  invalides en français technique) — ni validé ni tué, en attente d'E4b (scoring
+  au token décisif) sur un cortex multilingue (Qwen2.5-1.5B).
+- **Tué par** : échec E4b sur un juge au baseline sain (pas de gain de
+  discrimination, ou gain payé en E3), ou une falaise X9 trop précoce sans
+  consolidation v2 — ce second risque est déjà écarté (X9 : rien à 80 faits).
 
 ## b) Personnalisation edge respectueuse de la vie privée
 
