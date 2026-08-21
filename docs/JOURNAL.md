@@ -949,6 +949,67 @@ Modèle d'entrée :
 - *Modèles : director.interpretation fable, math fable, neuro inherit, builder inherit,
   verifier inherit.*
 
+## 2026-08-21 — V2-D(a) kNN-LM nu : expérience invalidée — portes V0/V1 rendues incohérentes par la consolidation
+
+- **Commit** : non commité (nouveau : `eval/knn_ceiling.py`, `tests/test_knn_ceiling.py` ;
+  modifiés : `engram/config.py` (champs `knn_*`, défaut inerte), `engram/cortex.py`
+  (capture pré-lm_head, inerte par défaut) ; bruts dans
+  `experiments/results/knn-borne-logits/`)
+- **Config** : défauts EngramConfig + knn_lambda balayé {0.02, 0.0488, 0.05, 0.10, 0.25},
+  knn_k=8, T = c·med_j(d²_j − d²_min) c ∈ {0.3, 1, 3}, M=0 en principale, gpt2, layer=6
+- **Run** : `python eval/knn_ceiling.py --phase gpu` (passes V0, V-cap, A, D exécutées ;
+  B, C, E non lancées) ; tests **55 passed**, device cuda, 0 NaN/OOM/repli CPU
+- **Protocole pré-enregistré** : `experiments/EXP-2026-08-21-knn-borne-logits.md`
+- **Résultat** :
+
+  | Clause | Pré-enregistré | Mesuré | Verdict |
+  | --- | --- | --- | --- |
+  | Baseline E1 / top-10 / E3 | +1.353 / 0/10 / −0.014 | +1.353 ± 1.583 / 0/10 / −0.0136 | ✓ |
+  | Baseline ΔMarseille | ≈ −0.38 | **−1.8896** (cap 0.5) ; −0.3295 (cap 0.25) | ✗ → anomalie A1 |
+  | Porte V-cap | capture = entrée de lm_head | \|lm_head(h) − logits\|_max = **0.000e+00** | ✓ |
+  | V0 — récupération | rang 1, R1 = 1 | rang 1 ; **R1 = 1 sur 10/10** ; **d²_min = 0.0 exact 10/10** | ✓ (arbitrage PI) |
+  | V0 — R3 ≥ 0.9 | ≥ 0.9 | max 0.5899 ; 0.53/0.27/0.17 selon c ; **0/10 ∀c** ; c requis 0.065-0.120 | ✗ |
+  | **V1 — intégrité** | écart ≤ 5 % à −log(0.90) = 0.105361 | 0.097770 / 0.098466 / 0.098871 → **7.20 / 6.54 / 6.16 %** | ✗ sur toute la grille ⇒ invalidation §6 |
+  | V1 — attribution | — | **94.46 %** des positions (p_kNN=0) : ΔNLL = −log(1−λ) à **1.3e-15** ; déficit **intégralement** porté par les **5.54 %** où la cible ∈ tokens-valeurs du store (`.`, ` it`) : soulagement, monotone en c | l'implémentation **fait bien un mélange** |
+  | P1..P8, G, frontière, table d'attribution | — | **non mesurés** (arrêt avant) | — |
+
+- **Acquis techniques réels du cycle** : (i) identité du mélange **vérifiée à 1.3e-15** — le
+  code est correct ; (ii) récupération exacte parfaite (d²_min = 0.0 bit-à-bit 10/10 ;
+  2ᵉ voisin à 818-2077 ; ‖clés‖ 79-263) ; (iii) acquis analytiques : E3 = −log(1−λ) sur
+  texte hors sujet ⇒ **λ\* = 0.0488** ; renversement E1c ⇒ **λ_renv ≳ 0.33** ; (iv) point de
+  capture pré-lm_head validé exactement ; (v) bruts hashés
+  (`raw/gpu_raw.npz`, 20.1 Mo, SHA-256 `0ef6f9914fad18ec` ; `data/rfc9293.txt`
+  `6d9ac8be4b0286f8`). Choix d'implémentation consignés : agrégation de T = médiane
+  intra-requête puis médiane par bras ; τ = quantile 0.95 des d²_min requêtes-fait ;
+  P5B_VAR_GATE = 1e-6 ; store = une entrée par token (8-11), même compte que `force_write`.
+- **Conclusion** : **INCONCLUSIF — expérience invalidée**, cause : **incohérences internes du
+  protocole consolidé, imputables au Directeur**. Deux portes écrites au stade du brouillon
+  (R3 ≥ 0.9 sous hypothèse one-hot ; V1 à 5 % sous hypothèse d'identité pure) ont été
+  conservées alors que la consolidation intégrait des amendements qui changeaient le régime
+  (température relative de Math ; mécanisme de soulagement T2 de Neuro — **prédit dans le
+  protocole**, jusqu'au log de confondant « tokens communs » rendu obligatoire au §5.9).
+  La porte d'intégrité a donc mesuré un phénomène que le protocole prédisait, et l'a compté
+  comme preuve de non-mélange. Cause racine : *un pré-enregistrement n'est pas une somme de
+  clauses, c'est un système — le tableau d'arbitrage garde la trace de ce qui entre, rien ne
+  garde la trace de ce que chaque entrée périme* ; aggravant : aucun des deux seuils ne
+  portait sa dérivation. Le PI a refusé un troisième amendement en cours de route : amender
+  les portes après lecture des données est exactement ce qui détruit la valeur d'un
+  pré-enregistrement. **Rien ici ne parle pour ou contre H : P1 n'a pas été mesurée.** Le
+  journal consigne les erreurs des experts ; il consigne celle-ci : erreur de consolidation
+  du Directeur, ni du Builder (implémentation démontrée correcte) ni des experts (leurs
+  amendements étaient fondés). Décision de méthode candidate **D14** soumise au PI.
+- **Suite** : re-pré-enregistrement `EXP-knn-borne-logits-v2` — même expérience, portes
+  re-dérivées (V1 conditionnée par partition : identité à 1e-6 sur p_kNN = 0, signe seul
+  sur p_kNN > 0 ; V0 réduite à la récupération, R3 dérivé de la grille ; chaque seuil porte
+  sa dérivation), trois ambiguïtés d'implémentation fixées après chiffre de Math
+  (agrégation de T, τ, var-gate), P2 re-dérivée **au point courant** (ancre E1c −1.89, le
+  prior y est 5× plus verrouillé qu'au point X1b). **Décision du PI : re-collecte
+  intégrale à neuf**, sans réutiliser les bruts gelés — le forward est déterministe
+  (seed=0) mais la propreté épistémologique prime ; les 20 Mo restent archivés et hashés
+  comme référence de reproductibilité.
+- *Modèles : director.cadrage inherit, director.interpretation fable, math fable,
+  neuro inherit, builder inherit, verifier inherit.*
+
 ## 2026-08-20 — v0 : squelette posé
 
 - **Commit** : (initial)

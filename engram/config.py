@@ -54,6 +54,23 @@ class EngramConfig:
                                      # d'écriture ≈ 0.14 sur Qwen vs ~0.23 GPT-2)
     gate_keysim_tau: float = 0.05
 
+    # --- V2-D(a) : kNN-LM nu, borne de l'étage des logits ---
+    # Protocole pré-enregistré experiments/EXP-2026-08-21-knn-borne-logits.md, §10
+    # et décision PI §13.5 : « champs knn_* dans EngramConfig, défaut = comportement
+    # actuel (knn_lambda: float = 0.0) ». INSTRUMENT, pas un mécanisme retenu : la
+    # ligne va au tableau des ablations/instruments (§4).
+    # Le datastore lui-même vit dans le script d'éval (eval/knn_ceiling.py), JAMAIS
+    # dans engram/ — et les clés kNN ne passent JAMAIS par G/DG (§5.8, D9).
+    knn_lambda: float = 0.0     # λ du mélange p = (1−λ)·p_LM + λ·p_kNN ; 0.0 = inerte
+    knn_k: int = 8              # nombre de voisins (k = 8, §7)
+    knn_temp_c: float = 1.0     # c de T = c·med_j(d²_j − d²_min), calibrée PAR BRAS
+    knn_key_layer: str = "final"  # "final" (état pré-lm_head) | "inject" (layer_index)
+    knn_gate_tau: float = 0.0   # bras G : α = 1[d²_min ≤ τ] ; 0.0 = gate désactivé
+
+    # --- V2-D(a) : second point de capture (état final, pré-lm_head) ---
+    # Inerte par défaut (§10) : le hook n'est même pas posé quand le flag est faux.
+    capture_final_state: bool = False
+
     # --- Gating par surprise ---
     surprise_threshold: float = 4.0  # NLL en nats au-dessus de laquelle on écrit
 
@@ -74,8 +91,16 @@ class EngramConfig:
         """Ligne compacte pour les logs et le journal d'expériences."""
         dg = f"dg={self.dg_dim}/{self.dg_topk}" if self.dg_dim else "dg=off"
         dg += f" gate={self.read_gate}" if self.read_gate != "none" else ""
+        # knn_* n'apparaît QUE s'il est armé : à knn_lambda=0.0 (défaut) la ligne de
+        # résumé est bit-à-bit celle d'avant V2-D(a).
+        knn = ""
+        if self.knn_lambda:
+            knn = (f" knn=λ{self.knn_lambda}/k{self.knn_k}/c{self.knn_temp_c}"
+                   f"/{self.knn_key_layer}"
+                   + (f"/τ{self.knn_gate_tau}" if self.knn_gate_tau else ""))
         return (
             f"model={self.model_name} layer={self.layer_index} lam={self.lam} "
             f"eta={self.eta} decay={self.decay} thr={self.surprise_threshold} "
             f"prune={self.prune_every}/{self.prune_keep} hebb_only={self.hebbian_only} {dg}"
+            f"{knn}"
         )

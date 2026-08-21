@@ -41,6 +41,21 @@ def _find_blocks(model) -> list:
     )
 
 
+def _find_final_norm(model):
+    """Le module dont la sortie alimente DIRECTEMENT `lm_head` — la normalisation
+    finale (`transformer.ln_f` pour GPT-2, `model.norm` pour les Llama-style).
+    C'est le « second point de capture » du protocole V2-D(a) §10 : l'état final,
+    pré-`lm_head`, celui qui sert de clé au datastore kNN."""
+    if hasattr(model, "transformer") and hasattr(model.transformer, "ln_f"):
+        return model.transformer.ln_f
+    if hasattr(model, "model") and hasattr(model.model, "norm"):
+        return model.model.norm
+    raise ValueError(
+        f"Normalisation finale non trouvée pour {type(model).__name__} : "
+        "ajouter son chemin dans cortex._find_final_norm()."
+    )
+
+
 class Cortex:
     def __init__(self, cfg: EngramConfig):
         self.cfg = cfg
@@ -67,8 +82,14 @@ class Cortex:
         # État caché (dernière position, PRÉ-injection) du dernier forward — la
         # matière première des writes.
         self.last_h_pre: torch.Tensor | None = None
+        # V2-D(a) : état final (dernière position, sortie de la normalisation finale,
+        # c.-à-d. l'entrée de lm_head). INERTE par défaut : le hook n'est posé que si
+        # cfg.capture_final_state est vrai — coût strictement nul sinon.
+        self.last_h_final: torch.Tensor | None = None
 
         blocks[cfg.layer_index].register_forward_hook(self._hook)
+        if getattr(cfg, "capture_final_state", False):
+            _find_final_norm(self.model).register_forward_hook(self._hook_final)
 
     def _hook(self, _module, _inputs, output):
         # Les blocs HF renvoient un tuple dont l'élément 0 est hidden_states.
@@ -84,6 +105,14 @@ class Cortex:
         if isinstance(output, tuple):
             return (injected,) + output[1:]
         return injected
+
+    def _hook_final(self, _module, _inputs, output):
+        """Capture PURE (aucune injection, aucun retour modifié) de l'état final de
+        la dernière position, en fp32. Clé du datastore kNN — jamais projetée par
+        G/DG (contrainte §5.8 du protocole)."""
+        hidden = output[0] if isinstance(output, tuple) else output
+        self.last_h_final = hidden[0, -1, :].detach().float().clone()
+        return output
 
     @torch.no_grad()
     def forward_one(self, token_id: int, past_key_values):
