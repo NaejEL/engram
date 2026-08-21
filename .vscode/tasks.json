@@ -1,0 +1,49 @@
+{
+  "version": "2.0.0",
+  "inputs": [
+    {
+      "id": "labProtocol",
+      "type": "promptString",
+      "description": "Chemin du protocole pré-enregistré (experiments/EXP-*.md)",
+      "default": "experiments/"
+    }
+  ],
+  "tasks": [
+    {
+      "label": "Lab: run headless",
+      "type": "shell",
+      "command": "./ci/lab.sh ${input:labProtocol}",
+      "windows": {
+        "command": "pwsh -File ci/lab.ps1 ${input:labProtocol}"
+      },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+    {
+      "label": "Lab: run headless (YOLO)",
+      "type": "shell",
+      "command": "./ci/lab.sh ${input:labProtocol} --yolo",
+      "windows": {
+        "command": "pwsh -File ci/lab.ps1 ${input:labProtocol} -Yolo"
+      },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+    {
+      "label": "Lab: tests unitaires",
+      "type": "shell",
+      "command": ".venv/bin/python -m pytest tests/ -q",
+      "windows": {
+        "command": ".venv\\Scripts\\python -m pytest tests/ -q"
+      },
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Lab: nouvelle expérience (session)",
+      "type": "shell",
+      "command": "echo 'Ouvrir Claude Code et taper : /lab-run \"<votre question>\"  ou  /lab-run suivant'",
+      "problemMatcher": []
+    }
+  ]
+}

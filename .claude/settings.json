@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(./.venv/**)",
+      "Read(./venv/**)",
+      "Read(./**/__pycache__/**)",
+      "Read(./.pytest_cache/**)",
+      "Read(./**/*.egg-info/**)",
+      "Read(./lab-logs/**)",
+      "Read(./experiments/results/**)",
+      "Read(./.git/objects/**)",
+      "Read(./data/**)",
+      "Read(./runs/**)",
+      "Read(./**/*.pt)",
+      "Read(./**/*.safetensors)",
+      "Read(./**/.cache/**)"
+    ]
+  }
+}

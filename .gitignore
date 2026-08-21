@@ -10,3 +10,7 @@ data/
 runs/
 *.pt
 *.safetensors
+
+# Laboratoire IA (/lab-run) : logs headless et résultats bruts — les protocoles experiments/EXP-*.md restent versionnés
+lab-logs/
+experiments/results/
