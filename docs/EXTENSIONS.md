@@ -133,6 +133,72 @@ C'est l'état actuel du code. Aucun flag.
   discriminants) n'a été observé qu'en gabarit commun artificiel. Réouverture :
   ce symptôme en usage réaliste.
 
+### I2 — Profilage par couche du cortex (`layer_profile`) — *instrumentation, pas un mécanisme*
+
+**Ce que c'est.** Un forward pass instrumenté, hooks sur **toutes** les couches
+simultanément (profiler L couches coûte UN passage, pas L), qui produit deux courbes
+par modèle. Aucune injection, aucune écriture, `M = 0` partout, `engram/` non modifié.
+Coût : XS.
+
+**Pourquoi maintenant.** Trois sources convergentes, et c'est la convergence qui est
+l'argument — aucune ne suffit seule :
+
+- **P6** (interne) : au run v2 **invalidé**, la clé couche 6 donnait h = 1.00 contre
+  h = 0.33 pour l'état final. `N_eff = 3` : c'est une **observation qui motive un
+  design**, jamais une prédiction (D14-R). I2 la généralise avec un N réel et sans
+  injection.
+- **D3** (interne) : la règle du milieu (6/12 → 16/32 → 14/28, tardif nocif) est une
+  **régularité empirique sans prédicteur mécanique**. Le passage à Qwen (instruct,
+  RLHF qui sculpte les dernières couches) rend le report aveugle de `n/2` risqué.
+- **Externe** : Skean, Arefin, LeCun & Shwartz-Ziv, *Does Representation Matter?
+  Exploring Intermediate Layers in Large Language Models*, **arXiv:2412.09563**
+  (NeurIPS 2024 Workshop on ML and Compression) — les couches intermédiaires
+  fournissent les meilleures représentations, vallée de compression au milieu mesurée
+  par entropie matricielle, couches finales spécialisées décodage. Référence
+  secondaire : Lad, Gurnee & Tegmark, *The Remarkable Robustness of LLMs: Stages of
+  Inference?*, **arXiv:2406.19384** (quatre stades : détokenisation, ingénierie de
+  traits, ensemblage de prédiction, affûtage résiduel). *Le numéro 2404.xxxx annoncé
+  en note de cadrage était faux — vérifié le 2026-08-22.*
+  Métrique : leur Eq. 1 = entropie matricielle d'ordre α (Giraldo et al. 2014), cas
+  α → 1 ≡ RankMe (Garrido et al., ICML 2023).
+
+**Les deux quantités, par couche.**
+
+1. **Score contrastif d'invariance à la paraphrase** = (similarité cosinus
+   intra-fait entre paraphrases) / (similarité inter-faits), à la position de fin
+   d'indice. Candidate **« couche-clé »**. Le **ratio** est la bonne forme, pas le
+   cosinus brut : les états cachés sont fortement anisotropes et le décalage de mode
+   commun s'annule dans un contraste — c'est l'argument exact de Math sur la clause
+   multi-clé de V2-D(a) v3, transposé.
+2. **Entropie matricielle par couche** (Eq. 1, α → 1). Localise la vallée de
+   compression. Candidate **« couche-injection »**.
+
+**Distinction maintenue de bout en bout** : « couche-clé » (lecture / reconnaissance —
+le rôle qui subsiste dans M_out, qui injecte aux logits) et « couche-injection »
+(écriture dans le flux résiduel, mécanisme v1) sont **deux rôles distincts**. Leur
+coïncidence éventuelle est une **SORTIE** de l'instrument, jamais une hypothèse. Le
+cas « une quantité près de D3, l'autre loin » n'est pas un échec : c'est le résultat
+le plus informatif du lot — *qualité représentationnelle ≠ tolérance à l'injection*,
+une distinction que Skean et al. ne font pas.
+
+**Rapport à V2-D.** I2 **ne motive pas** le bras L6 de v3 : ce bras vient de P6 et v3
+était rédigé avant. I2 en **prédit** l'issue. Le balayage Qwen {7, 14, 21} déjà prévu
+(Q-08) devient le **JUGE** de l'instrument, pas la méthode de sélection — à condition
+que la désignation de I2 soit consignée avant.
+
+**Conformité.** D8 (aucun gradient) · D11 (sans objet : aucun canal, aucune injection)
+· D13 (antipodes pré-enregistrés) · D14 / **D14-S** (les portes passent au banc de
+satisfiabilité comme toute porte de v3 — **aucune exemption**, l'instrument arrive
+après le cycle méthode, pas à côté) · D14-R (aucun chiffre de P6 dans une porte).
+
+**Décision candidate pour le PI** (à graver ou refuser, non tranchée par le labo) :
+si P-B **et** P-C tiennent, D3 gagne un prédicteur mécanique et cesse d'être une
+règle du pouce ; si elles échouent conjointement, la décision candidate devient
+l'inverse — *la qualité représentationnelle ne prédit pas la tolérance à
+l'injection*, et le balayage empirique de D3 reste la seule méthode.
+
+Protocole : `experiments/EXP-2026-08-22-layer-profile.md`.
+
 ### X7 — Loi prior/rappel et hypothèse d'aplatissement — *MESURÉ (2026-08-21)*
 
 - **Origine** : convergence de trois observations indépendantes — tambourine négatif
