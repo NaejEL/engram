@@ -515,8 +515,17 @@ Modèle d'entrée :
   2 cibles sur 3 dépassées ; la 3ᵉ (E2 SmolLM2) documentée en échec au régime
   agressif, balayage caps intermédiaires en cours pour situer le point E2
   par-modèle. E4 est débloquée (X8 tient sur E1/E3).
-- **Suite** : caps intermédiaires E2 SmolLM2 ; anomalie entropie à investiguer
-  (préalable au two_factor) ; E4.
+- **Complément (caps intermédiaires E2 SmolLM2, gate actif)** : λ2/cap0.25 →
+  interaction +0.001, absolu ≈ parité ; λ1/cap0.25 → interaction −0.002, absolu ≈
+  parité. Sur SmolLM2, AUCUN point testé ne donne de gain E2 absolu net — le
+  meilleur régime atteint la parité. Lecture : la RFC est largement DANS la
+  compétence d'un modèle entraîné sur 11T tokens (NLL 1.88 vs 2.33 pour GPT-2) —
+  la loi du prior encore : M aide où le cortex est faible. **E2-sur-RFC sature à
+  mesure que les modèles s'améliorent** ; pour un cortex fort, le test pertinent
+  du contexte diffus est un texte réellement étranger à son entraînement — c'est
+  précisément E4 (conventions d'un projet spécifique). Convergence propre : la
+  prochaine mesure utile est E4, doublement motivée.
+- **Suite** : E4 ; anomalie entropie à investiguer (préalable au two_factor).
 
 ## 2026-08-20 — v0 : squelette posé
 
