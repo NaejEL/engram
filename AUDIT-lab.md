@@ -87,6 +87,13 @@ Tri : sévérité décroissante puis taille croissante. Pas de specs (factory ab
 - **Lancer** : `/lab-run "Le dommage E3 par position est-il plus grand aux positions où l'écriture aurait déclenché (surprise > 4 nats) qu'aux autres ?"`
 - **Statut** : A_FAIRE
 
+## Questions issues des cycles /lab-run (hors audit initial)
+
+| ID | Question | Statut |
+| --- | --- | --- |
+| Q-01b | L'écart de remise de congruence entre textes A et B s'explique-t-il par la log-fréquence des cibles aux positions confiantes ? | **FAIT (2026-08-21) — verdict REJETE** : pas de canal lexical (signe opposé sur les deux opérationnalisations) ; le signe positif est une propriété de la borne ΔNLL ; l'anomalie A/B de Q-01 est dissoute (pseudo-réplication). Voir `experiments/EXP-2026-08-21-congruence-lexicale.md` et le journal. |
+| Q-01c | Décomposer l'écart A/B sur ~12 textes (1-1.5 h GPU) | **RETIRÉ (2026-08-21, décision PI)** — D2 de Q-01b montre que l'écart tient dans le bruit d'échantillonnage d'items : il n'y a plus d'effet à décomposer. |
+
 ## Réserve / file d'attente (hors plafond, prêtes pour /lab-run)
 
 | ID | Question | Raison |

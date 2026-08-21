@@ -875,6 +875,80 @@ Modèle d'entrée :
   renversement A/B) ; requalifier Q-05 avant lancement (pré-approuvé) ; puis Q-03
   (ordre de l'audit).
 
+## 2026-08-21 — Q-01b : pas de canal de congruence lexicale — le signe positif est une propriété de la borne ΔNLL, et l'anomalie A/B se dissout
+
+- **Commit** : non commité (nouveau : `eval/lexical_congruence.py`, tests associés ;
+  correctif de sérialisation `eval/perturb_position.py` — `sum_r`/`rbar_unit` persistés,
+  V6 prouve l'iso-comportement ; sorties dans `experiments/results/congruence-lexicale/`,
+  manifeste SHA-256 intact, Verifier APPROVED itération 2 : re-run 1e-12, recalculs
+  indépendants < 1e-6, 40 tests verts)
+- **Config** : model=gpt2, layer=6, défauts EngramConfig SAUF read_gate=none (bruts
+  hérités de Q-01, aucun défaut modifié, moteur intact) ; analyse CPU sur les JSON de
+  `experiments/results/specificite-dommage-incertaines/` + ~5 min GPU (replay r̄, porte V6).
+- **Run** : `python eval/lexical_congruence.py --with-instrument --rbar-file experiments/results/congruence-lexicale/replay-rbar/rbar_unit.json`
+- **Protocole pré-enregistré** : `experiments/EXP-2026-08-21-congruence-lexicale.md` —
+  P1 décisionnelle unique (H1a si ρ̂ ≤ −0.20 IC excl. 0 sur A ET B ; absente si ρ̂ ≥ +0.10
+  sur un texte) ; F rétrogradée en estimation sous porte P3 ; P8b porte d'interprétation ;
+  clause d'asymétrie (protège un résultat BAS, pas un signe inversé) ; N-P1..N-P5, D1-D4.
+  Arbitrages PI en cours de cycle (résolution d'ambiguïté, pas de prédiction modifiée) :
+  V5 partielle → P8 requalifié non fiable, P8b seule porte ; V3 = 0.871 < 0.95 →
+  poursuite avec « proxy affaibli » consigné (écart au STOP pré-enregistré, assumé).
+- **Résultat** :
+  - Portes : V0 σ_pos 1.15/0.88 (F reste estimation) ; V1 ✓ (identités ~1e-17) ; V2 ✓
+    (+ V2.align : corr(NLL_base, logfreq) −0.56/−0.61 aligné vs +0.28/+0.32 décalé) ;
+    V3b : pnp_narrative ⊂ pg1342 → retiré ; V3c 18.77 % ; V4 ✓ (L=25) ; V6 ✓ (+0.13536,
+    cos(r̄_A,r̄_B)=0.99992).
+  - **P1 : ρ_S = +0.1785 [+0.054, +0.289] (A) / +0.2237 [+0.133, +0.306] (B)**, perm.
+    p < 10⁻³, détrend Δρ ≤ 0.007, Fisher-z poolé +0.204 → cellule « canal absent », et
+    au-delà : SIGNE OPPOSÉ à H1. **P8b : β_s* = +0.0447 [+0.027, +0.066] / +0.0275
+    [+0.015, +0.041]**, p < 10⁻³ — même signe sur l'opérationnalisation EXACTE
+    (corr(s*, logfreq)=+0.90/+0.89 : l'échappatoire « proxy grossier » est fermée).
+  - P3 ÉCHOUE (Δ_z −0.0002/−0.057) → **F et F′ non rapportées** (0/0), H1b sans objet.
+  - N-P1 échec franc ; N-P1b dans la bande (+0.308/+0.253) mais D1 montre que le
+    contraste est porté par H (β_H·ΔH +0.615/+0.430 vs β_lf·Δlf −0.172/−0.152), β_H
+    POSITIF — non créditable à la théorie ; N-P4 échec des deux côtés ; N-P5 : signe
+    échoué (pentes +0.197/+0.096 et +0.345/+0.163), forme réussie (rapport 0.570/0.586,
+    interaction ≈ 0) ; rapport β_lf/β_H significativement < 1 (100 %/99.9 % des
+    réplicats) là où l'identité pré-enregistrée imposait 1 — le terme KL omis est le
+    candidat modérateur (non testé, bivarié impair~KL interdit).
+  - **Test de la borne (règle Neuro PRÉ-DÉCLARÉE avant le chiffre, analyses marquées
+    POSTHOC_NON_PREENREGISTRE)** : écart modérateur répétées−nouvelles +0.3177/+0.3193
+    → **+0.0035/+0.0497 apparié par décile de NLL_base** ; zone non mordante
+    NLL_base ∈ [1,3] : ρ_S → +0.037/−0.019, β_s* → +0.0004 (p=0.94)/−0.013 (p=0.07).
+    Mécanisme du confondant mesuré : corr(logfreq, NLL_base) −0.56/−0.61 ; gain borné
+    par D_t ≥ −NLL_base, dommage non borné. Absorption : corr(rep, logfreq)
+    +0.78/+0.72, ΔR² unique de rep ≈ 0 ; Simpson : intra-strates +0.134/+0.121 poolé,
+    part de composition 0.37/0.63.
+  - **D2 (lecture H2 gratuite)** : sd intra-texte 0.2652/0.1255 vs |Δ_raw| = 0.0947
+    (rapport 0.65, df=3) → **l'écart A/B tient dans le bruit d'échantillonnage
+    d'items ; le t=20.6 de Q-01 était de la pseudo-réplication sur graines
+    quasi-doublons (P4=0.988), interdite par la clause §7(i)**.
+  - Erreurs d'experts, consignées : Neuro — chiffrage d'atténuation r² ≈ 0.23 faux
+    d'un facteur ~3.5 (réel ≈ 0.80) ; sa prédiction du modérateur était juste par
+    annulation de deux erreurs (« une prédiction signée confirmée ne valide pas la
+    chaîne qui l'a produite »). Math — inférence corr(logfreq, H) ≈ 0 à −0.1 fausse
+    (mesuré −0.30/−0.33) ; sa règle de bloc indéfinie pour ρ̂₁ ≤ 0 (observé
+    −0.19/−0.22) → amendement « si ρ̂₁ ≤ 0 : L = 25 ». Directeur — la grille §4
+    n'énumérait pas la cellule de l'antipode : c'est le trou par lequel le run est passé.
+- **Conclusion** : **H1a REJETÉE dans ses deux opérationnalisations** (proxy et
+  direction réelle r̄) — la clause d'asymétrie ne couvre pas un renversement de signe
+  confirmé. Le signe positif n'établit PAS un « canal inverse » : la règle de borne
+  pré-déclarée l'effondre (appariement NLL_base + zone non mordante) → **ce que le run
+  établit positivement est une propriété de la métrique ΔNLL (le gain est borné, pas
+  le dommage) et la dissolution de l'anomalie A/B (D2)**. Le « biais de prior additif
+  sur les log-odds » (§13.6 de Q-01b) est falsifié par P8b → seul survit le descriptif
+  « composante impaire signée de la lecture », qui se comporte en compensateur d'excès
+  de confiance (un effet, pas une intention). Loi 2 inchangée et renforcée (D1),
+  portée précisée : elle gouverne la composante paire. Ablation de la direction de
+  fréquence : déclencheur NON ARMÉ (condition : pente négative sur s* ; mesuré
+  +0.0447/+0.0275) — les données argumentent contre. H2 soutenue par parcimonie ;
+  Q-01c retiré par décision du PI (il perdait son objet : décomposer un 0/0).
+- **Suite** : V2-D candidat 1 (kNN-LM nu, instrument de plafond — chantier prioritaire) ;
+  requalification Q-05 (documentaire, pré-approuvée, débloquée par ce verdict) ;
+  revérifier l'explication E4s « traction vers le fréquent » (désormais non étayée).
+- *Modèles : director.interpretation fable, math fable, neuro inherit, builder inherit,
+  verifier inherit.*
+
 ## 2026-08-20 — v0 : squelette posé
 
 - **Commit** : (initial)

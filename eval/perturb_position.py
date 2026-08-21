@@ -588,6 +588,11 @@ def main() -> None:
                "metrics": {**{k: v for k, v in met.items()},
                            "D": D_full, "H": base["ents"], "rnorm": rnorms},
                "stdout": line}
+        # Correctif de sérialisation (Q-01b §10) : Σ r_t doit être PERSISTÉ, pas
+        # seulement attaché au dict en mémoire après l'appel — c'est le bug qui a
+        # rendu r̄ irrécupérable après Q-01. Aucun effet sur le comportement mesuré.
+        if isinstance(reader, RecordingReader) and reader.sum_r is not None:
+            run["metrics"]["sum_r"] = reader.sum_r.detach().cpu().tolist()
         if extra:
             run.update(extra)
         save_run_json(out_dir, name, run)
@@ -689,6 +694,14 @@ def main() -> None:
               f"cos(r̄_A, r̄_B) = {cos_ab:+.4f}")
     else:
         cos_ab = None
+
+    # Correctif de sérialisation (Q-01b §10) : r̄ unitaire persisté par texte.
+    if rbar_unit:
+        with open(out_dir / "rbar_unit.json", "w", encoding="utf-8") as f:
+            json.dump({"cos_rbar_AB": cos_ab, "d_model": d_model,
+                       "rbar_unit": {t: v.detach().cpu().float().tolist()
+                                     for t, v in rbar_unit.items()}},
+                      f, ensure_ascii=False)
 
     for text in texts_sel:
         T = len(ids[text])
