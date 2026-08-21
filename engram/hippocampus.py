@@ -60,6 +60,9 @@ class FastWeightMemory:
         # X8 — entropie du cortex au pas courant, fournie par l'engine avant chaque
         # forward (None = pas de logits antérieurs dans ce contexte).
         self.gate_entropy: float | None = None
+        # X8.1 — collecteur optionnel des gains g appliqués (diagnostic ; une éval
+        # l'active en l'initialisant à []).
+        self.gate_log: list[float] | None = None
 
     # ------------------------------------------------------------------ util
 
@@ -107,10 +110,14 @@ class FastWeightMemory:
             x = ((self._key_buf[:n] @ k).max().item() - self.cfg.gate_keysim_mid) / self.cfg.gate_keysim_tau
             g_k = float(torch.sigmoid(torch.tensor(x)))
         if mode == "entropy":
-            return g_h
-        if mode == "keysim":
-            return g_k
-        return 1.0 - (1.0 - g_h) * (1.0 - g_k)  # soft-OR : l'un OU l'autre suffit
+            g = g_h
+        elif mode == "keysim":
+            g = g_k
+        else:
+            g = 1.0 - (1.0 - g_h) * (1.0 - g_k)  # soft-OR : l'un OU l'autre suffit
+        if self.gate_log is not None:
+            self.gate_log.append(g)
+        return g
 
     @torch.no_grad()
     def read(self, h: torch.Tensor) -> torch.Tensor:

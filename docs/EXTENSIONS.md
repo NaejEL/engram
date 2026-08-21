@@ -125,6 +125,14 @@ C'est l'état actuel du code. Aucun flag.
   question de tout système à mémoire externe (RAG compris, qui la tranche à la
   hache en concaténant tout). Une réponse continue calibrée incertitude × pertinence,
   mesurable et ablatable, dépasse le cadre du PoC.
+- **X8.1/X8.1b/P5 (2026-08-21, journal)** : le two_factor est ENTERRÉ par une
+  chaîne de trois interventions — binarisation (réfute « g intermédiaire »),
+  créneaux forcés (réfute « volatilité temporelle »), analyse par position
+  (confirme : dommage concentré aux positions incertaines, corr +0.394,
+  confiantes −0.099 vs incertaines +0.364). **Loi finale : un gate de lecture
+  déclenché par l'incertitude du cortex est adversarial par construction — gater
+  côté mémoire (pertinence), jamais côté détresse du cortex.** Le cas
+  « confiance erronée » relève de V2-D, pas d'un gate.
 - **MESURÉ (2026-08-21, journal)** : hypothèse raffinée par les données — (1)
   l'aplatissement est un **coût fixe** (+0.141 nats d'entropie, uniforme) ; (2) la
   lecture n'a **aucune composante directionnelle** vers la cible (cos ≈ 0 vs 0.136

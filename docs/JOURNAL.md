@@ -695,6 +695,82 @@ Modèle d'entrée :
   prioritaire — il attaque la racine que ces deux diagnostics viennent de
   confirmer.
 
+## 2026-08-21 — X8.1 : protocole pré-enregistré (test CAUSAL de la loi 2)
+
+- **Contexte** : la loi « les gates de lecture doivent être binaires » est
+  observationnelle — entropie lisse (tau 0.5) perd, keysim raide (tau 0.05) gagne,
+  mais les deux gates diffèrent AUSSI par leur signal. Intervention propre : même
+  facteur entropie, même seuil (mid 2.0), seule la PENTE change (tau 0.5 → 0.02).
+- **Instrumentation** : fraction des lectures dans la zone toxique g ∈ [0.05, 0.95]
+  par config (collecteur `gate_log`) — relie l'intervention au mécanisme.
+- **Prédictions posées avant mesure** (E3 GPT-2, régime λ2/cap0.5, M contrôlée ;
+  repères : none = +0.135, entropy tau 0.5 = +0.252, keysim ≈ 0) :
+  P1. entropy tau 0.02 → E3 ≤ +0.135 (l'excès +0.117 disparaît : il était
+      entièrement dû aux g intermédiaires). La loi passe de corrélation à
+      causalité si P1 tient.
+  P2. La fraction toxique s'effondre avec tau 0.02 (>50 % → <10 %), et l'excès
+      d'E3 est ordonné par cette fraction à travers les configs.
+  P3. two_factor durci (tau_H 0.02) : E3 ≈ keysim (le OR avec un facteur binaire
+      n'introduit plus de zone molle) ET E1 ≥ keysim seul (rien perdu).
+- **Résultat** :
+
+  | config | E3 | zone toxique | E1 exact |
+  | --- | --- | --- | --- |
+  | none | +0.1354 | — | |
+  | entropy tau 0.5 | +0.2520 | 27.6 % | |
+  | entropy tau 0.02 | **+0.2745** | **0.7 %** | |
+  | keysim (réf) | −0.0136 | 0.0 % | +1.353 |
+  | two_factor dur | +0.2738 | 0.7 % | +1.361 |
+
+- **Verdict : P1 et P2 RÉFUTÉES par intervention propre** — la binarisation
+  fonctionne mécaniquement (zone toxique 27.6 % → 0.7 %) et E3 EMPIRE. La théorie
+  « g intermédiaire = poison » est morte. P3 réfutée côté E3 (E1 intact).
+- **Nouvelle hypothèse, désignée par le tableau** : avec un gate dur, g ∈ {0, 1} —
+  si le dommage était par-token, E3(dur) ≤ E3(none) ; il est au DOUBLE. Le dommage
+  passe par le cache KV : un gate qui BASCULE token par token remplit le cache
+  d'états incohérents (biaisés/non mélangés). Le poison n'est pas l'amplitude de
+  g mais sa **volatilité temporelle**. keysim gagne parce que son signal est une
+  propriété du TEXTE (stable sur un domaine), pas du token. Loi 2 réécrite en
+  candidate : « gater sur des signaux LENTS ».
+- **Test causal scellant, pré-enregistré** : gate forcé en créneaux, duty 50 %
+  constant, seule la période varie — k ∈ {1, 4, 16, 64} tokens. Prédiction P4 :
+  E3 décroît de façon monotone avec k (moins de bascules à duty égal) ; à grand k,
+  E3 → ~50 % du dommage de none. Si P4 tient, l'incohérence temporelle est
+  démontrée par intervention.
+
+## 2026-08-21 — X8.1b + P5 : anomalie résolue — le dommage vit aux positions incertaines
+
+- **X8.1b, créneaux forcés** (`eval/gate_cycle.py`, duty 50 %, période k variable,
+  indépendant du contenu) : none +0.1354 ; k=1 → **+0.0393** ; k=4 → +0.0396 ;
+  k=16 → +0.0800 ; k=64 → +0.0546. **P4 RÉFUTÉE** : aucune monotonie en k, et la
+  bascule maximale (k=1) est la MEILLEURE — sous-proportionnelle au duty. La
+  théorie « incohérence temporelle du cache KV » meurt à son tour.
+- **Par élimination** : les créneaux sont indépendants du contenu ; le gate
+  entropie ouvre précisément sur les tokens incertains. Hypothèse P5 : le dommage
+  par lecture est concentré sur les positions FRAGILES.
+- **P5, test par position** (343 positions de texte neutre, M chargée, gate none) :
+  **corr(dommage, entropie baseline) = +0.394** ; partage à la médiane :
+  positions confiantes **−0.099** (l'injection y aide légèrement !), incertaines
+  **+0.364**. Confirmée sans ambiguïté.
+- **L'anomalie entropie est entièrement résolue** — et chaque observation tombe
+  en place : tau 0.5 (+0.252) = lectures pondérées vers l'incertain ; tau 0.02
+  (+0.274, pire !) = lectures EXCLUSIVEMENT aux positions incertaines, le ciblage
+  le plus pur des points fragiles ; créneaux (≤ proportionnel) = ciblage nul ;
+  keysim (≈0) = lectures corrélées à la pertinence mémoire, décorrélées de la
+  fragilité sur texte neutre.
+- **Loi 2, forme finale (trois interventions : pente, période, ciblage)** :
+  le dommage de lecture est concentré aux positions incertaines du cortex — un
+  gate déclenché par l'incertitude est donc **adversarial par construction** (il
+  lit exactement là où lire coûte). Gater la lecture côté MÉMOIRE (pertinence du
+  match), jamais côté détresse du cortex. Le two_factor est enterré
+  définitivement — et le cas « confiance erronée » qu'il visait relève de V2-D,
+  pas d'un gate.
+- **Note pour le papier** : l'arc entier (anomalie → 2 fausses théories réfutées
+  par intervention → résolution par position) est le chapitre méthode rêvé — la
+  loi finale est contre-intuitive (« ne lisez PAS quand le modèle hésite ») et
+  chaque théorie morte est documentée avec son expérience tueuse.
+- **Suite** : arc écriture (« Priming, not recall ») — v1 est close, X8.1 scellé.
+
 ## 2026-08-20 — v0 : squelette posé
 
 - **Commit** : (initial)
