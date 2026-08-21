@@ -570,6 +570,58 @@ Modèle d'entrée :
 - **Suite** : E4b (token décisif) + cortex Qwen = le même run, prochaine étape
   naturelle.
 
+## 2026-08-21 — E4s : le jugement de conformité résiste à la mémoire — et toutes
+## les pistes convergent vers le même mur
+
+- **Config** : `eval/conventions_simple.py` — conventions ARBITRAIRES d'un projet
+  fictif (Zephyr) en anglais simple, scoring au token décisif, requêtes
+  reformulées ; contrôle signé : document Boreas aux conventions OPPOSÉES ;
+  8 variantes (2 modèles × gating/force × gate on/off × docs avec/sans négation).
+- **Résultat (gain de discrimination vs M vierge, critère : > 0)** :
+
+  | Variante | GPT-2 | SmolLM2 |
+  | --- | --- | --- |
+  | gating (base) | −0.076 (5/10) | −0.391 (2/10) |
+  | force | −0.355 | −0.694 |
+  | force + gate none | — | −0.807, **E3 +0.57 !** |
+  | docs positifs (sans négation) | −0.068 | −0.386 |
+
+  Boreas (contrôle signé) : TOUJOURS plus bas que Zephyr (différentiel +0.07 à
+  +0.13, 8-10/10 paires ↓) — la trace spécifique existe, correctement signée.
+- **Conclusions** :
+  1. **Critère échoué dans les 8 variantes** — et cette fois le juge est hors de
+     cause (baseline = pur biais de prior, anglais simple, token décisif). C'est
+     un négatif de MÉCANISME : la teinte diffuse de M ne se traduit pas en
+     préférence token-niveau pour la convention, même dans le cadre le plus
+     favorable. Ce qui existe : une trace spécifique faible (~+0.05 par direction,
+     le différentiel Zephyr/Boreas), noyée sous une dérive non spécifique.
+  2. **Hypothèse « aveuglement à la négation » : RÉFUTÉE** — les docs sans
+     négation ne changent rien. (L'argument théorique reste vrai — une mémoire
+     associative encode la co-occurrence, pas l'affirmation — mais il n'explique
+     PAS ce résultat.)
+  3. **La dérive non spécifique n'est pas expliquée** : candidat naturel = la
+     traction vers le marginal (X7 : perturbation d'état → distribution moins
+     conditionnelle → tokens fréquents favorisés, or nos tokens conformes sont
+     souvent les rares) — mais le pattern par-paire est brouillé, on le note
+     comme candidat, pas comme conclusion.
+  4. **Découverte collatérale majeure** : sans gate, E3 explose à +0.57 nats/token
+     au régime λ2/cap0.5 — le gate keysim ne « réduit » pas la taxe, il retient
+     un torrent. Sa valeur est bien plus grande que mesurée à cap 0.25.
+  5. **Synthèse — un seul mur, plusieurs visages** : échec E1c (renverser un
+     prior confiant), verrou top-10, échec E4/E4s (préférence token-niveau) ont
+     la même racine, mesurée en X7 : **la lecture n'a aucune composante
+     directionnelle** (cos(r, W_U) ≈ 0). M déplace l'état, ne désigne pas de
+     token. Tout usage exigeant une préférence token-précise passera par le
+     rappel directionnel (v2 : valeurs en espace d'unembedding ou tête de
+     lecture apprise) — désormais LE chantier prioritaire de v2, devant la
+     consolidation.
+- **Statut vision par-projet** : sévèrement dégradée à cette échelle — E4-dur
+  attend encore Qwen (juge multilingue) mais E4s retire l'excuse du juge. Ce qui
+  survit : l'association quasi-verbatim (E4 §2) et le régime E1/E2 (rappel et
+  adaptation), pas le jugement de conformité.
+- **Suite** : Qwen (téléchargement en reprise) pour E4-dur — dernier test avant
+  verdict final ; puis arbitrage v2 (directionnel d'abord).
+
 ## 2026-08-20 — v0 : squelette posé
 
 - **Commit** : (initial)

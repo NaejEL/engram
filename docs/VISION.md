@@ -33,13 +33,17 @@ re-paye aujourd'hui en préambule type CLAUDE.md à chaque session, et qui ne se
 pas par son exactitude mais parce qu'il teinte le modèle (`h ← h + λ·M·φ(h)`,
 littéralement).
 
-- **Prérequis** : X8 (fait) + E4. **Statut E4 (2026-08-21)** : critère non atteint
-  sur GPT-2/SmolLM2, mais leurs baselines de jugement sont inversés (juges
-  invalides en français technique) — ni validé ni tué, en attente d'E4b (scoring
-  au token décisif) sur un cortex multilingue (Qwen2.5-1.5B).
-- **Tué par** : échec E4b sur un juge au baseline sain (pas de gain de
-  discrimination, ou gain payé en E3), ou une falaise X9 trop précoce sans
-  consolidation v2 — ce second risque est déjà écarté (X9 : rien à 80 faits).
+- **Prérequis** : X8 (fait) + E4. **Statut (2026-08-21, E4 puis E4s)** : sévèrement
+  dégradé. E4s (conventions arbitraires, anglais simple, token décisif — l'excuse
+  du juge éliminée) échoue dans ses 8 variantes : la teinte diffuse ne produit pas
+  de préférence token-niveau pour la convention (trace spécifique ~+0.05, noyée
+  sous une dérive non spécifique). Racine identifiée : l'absence de composante
+  directionnelle de la lecture (X7) — le même mur que E1c et le top-10. Ce qui
+  survit : l'association quasi-verbatim et le régime rappel/adaptation (E1/E2).
+  Dernier test en attente : E4-dur sur Qwen. Le sauvetage plausible passe par le
+  rappel directionnel (v2).
+- **Tué par** : échec E4-dur sur Qwen ET absence de rappel directionnel en v2 —
+  la falaise X9 est, elle, déjà écartée (rien à 80 faits).
 
 ## b) Personnalisation edge respectueuse de la vie privée
 
