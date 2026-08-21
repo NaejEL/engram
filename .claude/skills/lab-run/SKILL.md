@@ -2,7 +2,7 @@
 name: lab-run
 description: Lance un cycle du laboratoire IA (Director + experts Neuro/Math → protocole pré-enregistré avec gate humaine → Builder implémente et exécute → Verifier adversarial avec boucle de correction → interprétation croisée → journal) sur une question de recherche, le mot-clé "suivant", ou un protocole approuvé.
 disable-model-invocation: true
-argument-hint: "<question de recherche | suivant | chemin d'un protocole approuvé>"
+argument-hint: "<question de recherche | suivant | chemin d'un protocole approuvé> [--models \"role=modele;...\"]"
 ---
 
 # /lab-run — un cycle du laboratoire `engram`
@@ -23,7 +23,35 @@ GPU RTX 3060 6 Go. Date du jour : utiliser la date système.
 
 Argument reçu : `$ARGUMENTS`.
 
+## 0. Affectation des modèles
+
+Lire `.claude/lab-models.json` (absent → tous les rôles en `inherit`). Clés :
+`director.cadrage`, `director.interpretation`, `neuro`, `math`, `builder`,
+`verifier`, `validator`. Valeurs : `inherit`, `opus`, `fable`, `sonnet`, `haiku` — toute clé absente ou valeur
+inconnue vaut `inherit`.
+
+Si `$ARGUMENTS` contient `--models "role=modele;..."`, appliquer ces paires **pour ce
+cycle uniquement**, sans réécrire le fichier ; une valeur hors de la liste ci-dessus
+est refusée avec un message explicite, jamais ignorée en silence.
+
+À chaque lancement d'un sous-agent, passer le paramètre `model` de l'outil Agent avec
+la valeur du rôle correspondant — **sauf si elle vaut `inherit`**, auquel cas ne pas
+passer le paramètre du tout (l'agent suit alors le modèle de la session).
+
+Annoncer l'affectation retenue en une ligne (rôle → modèle, et sa provenance : fichier
+ou `--models`) **avant la première dépense**, pour que le PI puisse interrompre.
+
+**Économie du modèle le plus cher.** Tout rôle affecté à autre chose qu'`inherit` est
+une ressource rare : ne lui passer que le protocole, le compte rendu et les entrées de
+journal réellement citées — jamais `docs/JOURNAL.md` entier ni les fichiers de
+`experiments/results/` (ils restent au Builder et au Verifier) ; ne jamais le relancer
+pour une reformulation cosmétique ; l'interprétation croisée (étape 6) n'a lieu
+**qu'une fois par cycle**, après approbation du Verifier — jamais à chaque itération de
+la boucle de correction.
+
 ## 1. Entrée
+
+`$ARGUMENTS` privé de l'option `--models` :
 
 - Si `$ARGUMENTS` est le chemin d'un fichier existant sous `experiments/` dont une
   ligne vaut exactement `Statut : PRE-ENREGISTRE` → aller directement à l'étape 4.
@@ -34,12 +62,13 @@ Argument reçu : `$ARGUMENTS`.
 
 ## 2. Phase Cadrage
 
-1. Lancer `lab-director` (Agent, subagent_type `lab-director`) en **mode cadrage**
-   avec la question (ou `suivant`). Récupérer le brouillon de protocole.
-2. Lancer **en parallèle, dans le même message**, `lab-neuro` et `lab-math`, chacun
-   avec le brouillon complet et les questions qui lui sont adressées. Récupérer les
-   deux avis.
-3. Relancer `lab-director` avec son brouillon et les deux avis ; il rend le
+1. Lancer `lab-director` (Agent, subagent_type `lab-director`, modèle du rôle
+   `director.cadrage`) en **mode cadrage** avec la question (ou `suivant`).
+   Récupérer le brouillon de protocole.
+2. Lancer **en parallèle, dans le même message**, `lab-neuro` et `lab-math` (modèles
+   des rôles `neuro` et `math`), chacun avec le brouillon complet et les questions
+   qui lui sont adressées. Récupérer les deux avis.
+3. Relancer `lab-director` (rôle `director.cadrage`) avec son brouillon et les deux avis ; il rend le
    **protocole consolidé** (section « Arbitrage » + sections 1-13 + `Statut : PROPOSE`).
 
 ## 3. Gate humaine — pré-enregistrement
@@ -70,7 +99,7 @@ Argument reçu : `$ARGUMENTS`.
 
 ## 4. Phase Build & Run
 
-Lancer `lab-builder` (contexte frais) avec : le chemin du protocole pré-enregistré,
+Lancer `lab-builder` (contexte frais, modèle du rôle `builder`) avec : le chemin du protocole pré-enregistré,
 le rappel « exécuter toutes les conditions et contrôles, enregistrer les bruts dans
 `experiments/results/<slug>/`, rendre un compte rendu brut sans interprétation ».
 Récupérer le compte rendu brut. Ne pas lire les fichiers bruts toi-même : le compte
@@ -80,7 +109,7 @@ rendu suffit à la session.
 
 Initialiser `iteration = 1`.
 
-1. Lancer un **nouveau** `lab-verifier` (contexte vierge) avec le chemin du protocole
+1. Lancer un **nouveau** `lab-verifier` (contexte vierge, modèle du rôle `verifier`) avec le chemin du protocole
    et le compte rendu brut courant. Récupérer son bloc JSON final.
 2. Si `verdict == "APPROVED"` **et** `tests_passed`, `protocol_followed`,
    `rerun_consistent` valent tous `true` → sortir de la boucle.
@@ -97,10 +126,12 @@ Initialiser `iteration = 1`.
 
 ## 6. Phase Interprétation croisée
 
-1. Lancer **en parallèle** `lab-neuro` et `lab-math` avec : le protocole, le compte
+1. Lancer **en parallèle** `lab-neuro` et `lab-math` (modèles des rôles `neuro` et
+   `math`) avec : le protocole, le compte
    rendu brut vérifié, le JSON du Verifier. Math recalcule au moins un chiffre clé ;
    Neuro confronte les courbes à ce que la biologie prédisait.
-2. Lancer `lab-director` en **mode interprétation** avec le protocole, le compte
+2. Lancer `lab-director` en **mode interprétation** (modèle du rôle
+   `director.interpretation`) avec le protocole, le compte
    rendu brut, le JSON du Verifier et les deux avis. Récupérer : le verdict
    (`RETENU` / `REJETE` / `INCONCLUSIF`), le tableau prédit-vs-mesuré, l'entrée de
    journal rédigée, la ligne de tableau proposée, l'éventuelle décision D<n> candidate
@@ -112,6 +143,10 @@ Initialiser `iteration = 1`.
    ligne de tableau. AskUserQuestion : « Consigner » / « Modifier la rédaction » /
    « Ne pas consigner ».
 2. Sur « Consigner » :
+   - compléter l'entrée par une dernière ligne `*Modèles : director.interpretation
+     <modèle>, math <modèle>, neuro <modèle>, builder <modèle>, verifier <modèle>.*`
+     — quel modèle a rendu le jugement fait partie des conditions de reproductibilité,
+     au même titre que les seeds ;
    - insérer l'entrée dans `docs/JOURNAL.md` **juste avant** la ligne
      `## 2026-08-20 — v0 : squelette posé` (ordre chronologique respecté, format
      exact de l'entrée modèle) ; créer le fichier avec l'en-tête du modèle s'il
@@ -141,6 +176,7 @@ Afficher, sans commiter :
 - fichiers modifiés (`git status --short`) ;
 - résultat de la commande de test (exit code) ;
 - nombre d'itérations Builder/Verifier ;
+- affectation des modèles effectivement utilisée (rôle → modèle, provenance) ;
 - emplacement des résultats bruts (`experiments/results/<slug>/`) ;
 - décisions/documents que le PI doit mettre à jour lui-même, le cas échéant ;
 - prochaine expérience suggérée avec la commande exacte :

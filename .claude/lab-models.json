@@ -1,0 +1,9 @@
+{
+  "director.cadrage": "inherit",
+  "director.interpretation": "fable",
+  "neuro": "inherit",
+  "math": "fable",
+  "builder": "inherit",
+  "verifier": "inherit",
+  "validator": "haiku"
+}
