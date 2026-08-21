@@ -30,7 +30,8 @@ le RAG/grep est le **disque** (exact, adressé explicitement) — M est le **cac
 chaud** : approximatif, avec éviction (decay/élagage). M sérialisée = un fichier de
 quelques Mo par projet, chargé/déchargé au changement de repo (le reset devient un
 switch). M ne remplace PAS le contexte exact — signatures, chemins, noms de
-registres : le ratio paraphrases 0.68, notre meilleure qualité, y deviendrait un
+registres : le ratio paraphrases ~0.68 (IC 95 % [0.56, 0.99] — journal
+2026-08-21), notre meilleure qualité, y deviendrait un
 générateur d'hallucinations plausibles. M porte le contexte **diffus** : conventions
 de code, décisions d'architecture récurrentes, corrections répétées, vocabulaire du
 domaine — ce qu'on re-paye aujourd'hui en préambule type CLAUDE.md à chaque session,
@@ -119,21 +120,35 @@ sur E1/E2/E3, avec un « poids » chiffré par ajout — voir `docs/EXTENSIONS.m
       multi-tokens) : coût d'entropie FIXE (+0.141 nats), zéro composante
       directionnelle (cos ≈ 0), gain → 0 à prior haut sans pénalité active. Feu vert
       chiffré pour le gate (2026-08-21)
-- [ ] v1.3 X8 — gate de lecture à deux facteurs (entropie × keysim) : E1c
-      « confiance erronée » + benchmark vs 3 baselines ; cibles : E3 ≤ 0.05,
-      E1 > point conforme, E2 SmolLM2 ≥ −0.025 (protocole : EXTENSIONS.md)
-- [ ] v1.3 X9 — courbe de capacité : falaise d'interférence à 5→80 faits (étendre le
-      pool de gabarits d'abord) ; décide si d² est un problème réel — factorisations
-      de M écartées par défaut (EXTENSIONS.md)
-- [ ] v1.4 X10 — comparatif de kernels d'adressage (DG vs DPFP vs DG apprise
-      offline — cette dernière en conflit D8/D9 à arbitrer) à taille de M égale
+- [x] v1.3 X9 — courbe de capacité : PAS de falaise à 80 faits (91 % de rétention,
+      71/80 positifs) — d² est un problème théorique, factorisations écartées ;
+      prédicteur par fait mort (2026-08-21)
+- [x] v1.3 X8 — gate de lecture : facteur entropie disqualifié (anomalie résolue
+      par X8.1/X8.1b/P5 : le dommage vit aux positions incertaines — gater côté
+      mémoire, jamais côté détresse du cortex) ; **keysim seul RETENU**, nouveaux
+      défauts gate=keysim/λ=2/cap=0.5 → GPT-2 E1 +1.353, E3 −0.014 ✓ ; SmolLM2
+      +0.755, +0.003 ✓ ; coût : ratio paraphrases 0.68 → 0.38 (2026-08-21)
+- [x] v1.3 E4/E4s — conventions de projet : critère non atteint sur GPT-2 et
+      SmolLM2 ; sur Qwen (juge fort), signes conformes non significatifs ;
+      E4-dur retiré (la NLL de phrase mesure la fluidité) — E4s est l'instrument
+      de la famille ; racine commune : pas de composante directionnelle (X7)
+      (2026-08-21)
+- [x] v1.3 Qwen2.5-1.5B — fumée E1 +4.18 (N=2, régime X8 — non comparable aux
+      points historiques ; l'E1 complet au même régime est la question Q-08 de
+      l'audit) ; keysim d'écriture ≈ 0.14 : `gate_keysim_mid` à recalibrer par
+      modèle (2026-08-21)
+- [x] audit externe — 22 corrections + 6 questions de recherche priorisées :
+      voir `AUDIT-lab.md` (2026-08-21)
+- [ ] v1.4 X10 — comparatif de kernels d'adressage : GELÉ (sa métrique était la
+      falaise X9, qui n'existe pas à cette échelle) ; réouverture sur falaise
+      observée ou 3ᵉ modèle où DG régresse ; branche « DG apprise » retirée
 - [ ] long terme — test « règle du milieu » sur un 3ᵉ modèle à ratio de couches
       différent (couche ≈ n/2 : structurel ou accidentel ? indice v1.2 : couche
       tardive activement nocive)
-- [ ] v2 — « sommeil » : distillation périodique de M dans un LoRA du cortex, puis reset
-        (c'est là que l'oubli catastrophique redevient un dragon — hors scope v1) ;
-        piste rappel directionnel (valeurs en espace d'unembedding ou tête de
-        lecture apprise — le verrou top-10 requalifié par X7)
+- [ ] v2 — priorité 1 : **rappel directionnel V2-D** (valeurs en espace
+      d'unembedding ou tête de lecture apprise) — la réponse au mur X7 (top-10,
+      E1c, E4s) ; priorité 2 (basse, actée par le verdict X9) : « sommeil » —
+      distillation de M dans un LoRA puis reset, replay génératif depuis M
 
 ## Licence
 

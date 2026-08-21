@@ -3,9 +3,13 @@
 Ce document décrit où le mécanisme pourrait aller SI les verrous tombent. Chaque
 usage cite ses prérequis (numéros d'expérience) et ce qui le tuerait — même
 honnêteté que le journal : des mécanismes et des conditions, pas de marketing.
-État des verrous au 2026-08-21 : X9 mesuré (pas de falaise à 80 faits), X8 en
-validation finale (E1/E3 conformes sur GPT-2 et SmolLM2, E2 SmolLM2 en cours),
-E4 rédigée en attente du verdict X8.
+État des verrous au 2026-08-21 (mis à jour post-audit) : X9 mesuré (pas de
+falaise à 80 faits) ; X8 RETENU (gate keysim, nouveaux défauts λ=2/cap=0.5 —
+E1/E3 conformes sur GPT-2 et SmolLM2 ; E2 : bénéfice absolu GPT-2, parité au
+mieux SmolLM2) ; famille conventions : E4 puis E4s mesurées (critère non
+atteint), E4-dur joué sur Qwen, échoué et RETIRÉ comme instrument — E4s est
+l'instrument de la famille ; sur Qwen, E4s donne des signes conformes non
+significatifs. La survie du cas a) repose sur le rappel directionnel (V2-D).
 
 ## Principe directeur
 
@@ -13,7 +17,8 @@ Ce qui distingue M n'est pas la performance, ce sont ses propriétés d'**artefa
 
 - **apprentissage sans backprop** — viable sur hardware faible (tout ce repo tourne
   sur un laptop RTX 3060) ;
-- **mémoire diffuse** — sémantique, pas exacte (ratio paraphrases 0.68, E1b) ;
+- **mémoire diffuse** — sémantique, pas exacte (ratio paraphrases ~0.68,
+  IC 95 % [0.56, 0.99], E1b + recalcul du 2026-08-21) ;
 - **sérialisable** — un fichier de quelques Mo (25 Mo fp32 pour GPT-2, moins en fp16) ;
 - **effaçable totalement et vérifiablement** — M ← 0 est une opération, pas une
   promesse ;
@@ -40,10 +45,14 @@ littéralement).
   sous une dérive non spécifique). Racine identifiée : l'absence de composante
   directionnelle de la lecture (X7) — le même mur que E1c et le top-10. Ce qui
   survit : l'association quasi-verbatim et le régime rappel/adaptation (E1/E2).
-  Dernier test en attente : E4-dur sur Qwen. Le sauvetage plausible passe par le
-  rappel directionnel (v2).
-- **Tué par** : échec E4-dur sur Qwen ET absence de rappel directionnel en v2 —
-  la falaise X9 est, elle, déjà écartée (rien à 80 faits).
+  Dernier test joué (2026-08-21) : Qwen, juge fort — E4-dur y échoue encore et
+  est RETIRÉ (la NLL moyenne de phrase mesure la fluidité, pas la conformité) ;
+  E4s y donne les premiers signes correctement signés, non significatifs
+  (+0.018/−0.010, N=10). Le sauvetage plausible passe par le rappel
+  directionnel (V2-D).
+- **Tué par** : l'absence de rappel directionnel en v2 (la voie « meilleur
+  juge » est consommée : E4-dur retiré, E4s Qwen n.s.) — la falaise X9 est,
+  elle, déjà écartée (rien à 80 faits).
 
 ## b) Personnalisation edge respectueuse de la vie privée
 

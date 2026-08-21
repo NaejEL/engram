@@ -6,8 +6,10 @@ PoC de recherche personnelle (Jean) : une architecture à deux étages inspirée
 *complementary learning systems* —
 
 - **Néocortex** : un petit LLM gelé (GPT-2 124M pour itérer vite, SmolLM2-360M ensuite).
-- **Hippocampe** : une matrice de fast weights `M` (d×d), branchée par hook PyTorch à une
-  couche intermédiaire, mise à jour **pendant l'inférence** par delta rule (hebbien corrigé,
+- **Hippocampe** : une matrice de fast weights `M` (d×dg_dim avec la projection
+  gyrus denté, le défaut ; d×d en mode dense), branchée par hook PyTorch à une
+  couche intermédiaire, lue à travers un gate keysim (X8), mise à jour
+  **pendant l'inférence** par delta rule (hebbien corrigé,
   zéro backprop), avec gating par surprise (NLL en ligne), decay, élagage top-k, et reset.
 
 Objectif : montrer qu'un module plastique minuscule permet à un modèle gelé de retenir de
@@ -30,55 +32,51 @@ Ce n'est PAS un produit — c'est une expérience falsifiable sur un laptop RTX 
   modifier). Son pari « Hebb = E3 catastrophique » a été falsifié par v1.1 ; ses deux
   pistes reprises dans la feuille de route : E2 narratif (n-grammes vs adaptation) et
   I1 (prédicteur d'échec par similarité de clés). Point mis en avant : le ratio de
-  généralisation 0.68 est le chiffre-titre du PoC (mémoire associative, pas un grep).
+  généralisation 0.68 est le chiffre-titre du PoC (mémoire associative, pas un
+  grep) — recalculé avec incertitude le 2026-08-21 (COR-02) : IC 95 % [0.56,
+  0.99], médiane par secret 0.59 [0.45, 0.75] ; à citer « ~0.6–0.7, N=10 ».
 
-## État du projet (2026-08-20)
+## État du projet (2026-08-21)
 
-- Squelette v1 posé et **validé sur GPU** (torch 2.13+cu126, 9/9 tests, GPT-2 en cache).
-- **X0 → X1 (gyrus denté, retenu) → E3 → X1b** : parcours complet documenté dans
-  JOURNAL.md (2026-08-20). Point de fonctionnement courant = défauts de config :
-  **dg=8192/64, layer=6, λ=1.0, η=0.2, cap=0.25** → E1 +0.740 ± 0.799 nats,
-  E3 +0.023 (seuil 0.05) — premier point conforme aux trois contraintes du PoC.
-- Enseignements clés : (1) DG réduit l'interférence ET le dommage collatéral ;
-  (2) le cap de lecture est un gating doux — λ contrôle le bruit, le cap le signal ;
-  (3) toujours 0/10 top-10 sur E1 : on amplifie une trace, pas encore de rappel
-  fonctionnel.
-- **E1b (paraphrase) faite** : généralisation 0.68, dégradation graduelle par
-  recouvrement sémantique → c'est de l'association, pas du par-cœur. Déclencheur X2
-  (CA3) non observé.
-- **E2 faite : interaction −0.0551 nats/token** (≈ −5.4 % de perplexité) sur RFC 9293.
-  La 1ʳᵉ moitié paie la taxe collatérale, la 2ᵉ passe sous le contrôle : M finit par
-  rapporter plus qu'elle ne coûte dans le domaine. **Le tableau des poids est complet
-  au point X1b — les trois questions falsifiables du PoC ont une réponse positive**
-  sur GPT-2 124M.
-- **Ablations v1.1 faites** (2026-08-21, tableau dans EXTENSIONS.md §4) : le gating
-  porte ~92 % de l'effet E2 ; DG +57 % d'interaction ; **Hebb pur bat la delta rule
-  sur E2 (−0.095 vs −0.055, pas un effet de η)** mais delta reste le défaut
-  (bornage, réécriture — D5 nuancée, voir journal du 2026-08-21).
-- **E2n narratif fait** (2026-08-21) : l'adaptation survit sur la fiction
-  (−0.030 nats/token) → pas un pur cache de n-grammes ; l'avantage Hebb s'évapore
-  hors régime redondant → **delta rule confirmée par défaut, D5 quasi close**.
-- **I1 fait** (2026-08-21) : keysim = jauge de saturation calibrée (0.23 sain,
-  0.78 saturé, falaise ~0.5). **La capacité de M n'est pas la contrainte** : 10 faits
-  à indices distincts dans une même M → +0.770, comme un fait seul ; 10 faits au même
-  gabarit → +0.025 (collision d'indices). E1 a les modes `--multi` / `--varied`.
-- **v1.2 SmolLM2-360M FAIT** (2026-08-21) : le signal passe l'échelle — E1 +0.852 à
-  la couche 16/32 (règle du milieu transposée ; couche tardive NOCIVE : −0.375),
-  multi-faits +0.817 ± 0.214 (σ÷3 vs GPT-2). Frontière E3 déplacée : point conforme
-  SmolLM2 = **cap 0.1** (E1 +0.494, E3 +0.042 ✓). Verdict : mécanisme universel,
-  calibration (λ, cap) PAR-MODÈLE. Le signe AFTER_v1 (corr keysim négative) émerge
-  à l'échelle. Runs SmolLM2 : `--model HuggingFaceTB/SmolLM2-360M --layer 16 --cap 0.1`.
-- **X7 mesuré** (2026-08-21, `eval/flattening.py`) : aplatissement = coût FIXE
-  (+0.141 nats d'entropie), lecture sans composante directionnelle (cos ≈ 0 vs
-  0.136 base) — le rappel opère par recomputation indirecte. Gain → 0 à prior haut,
-  sans pénalité active (tambourine reste un outlier).
-- Feuille de route v1.3+ (protocoles pré-enregistrés dans EXTENSIONS.md, issus
-  d'une revue externe intégrée le 2026-08-21) : **X8** gate de lecture à deux
-  facteurs (E1c + 3 baselines, cibles chiffrées) ; **X9** courbe de capacité
-  (étendre le pool de gabarits à ≥ 80 d'abord) ; **X10** kernels d'adressage
-  (variante « DG apprise » en conflit D8/D9, à arbitrer avant de lancer).
-  Ordre recommandé : X9 (quasi gratuit, calibre le facteur keysim) → X8 → X10.
-- La phase « sommeil » (distillation de M dans un LoRA du cortex) est explicitement v2.
+- Squelette v1 posé et **validé sur GPU** (torch 2.13+cu126 ; GPT-2, SmolLM2 et
+  Qwen2.5-1.5B en cache). Parcours complet dans JOURNAL.md : X0 → X1 (gyrus
+  denté) → E3 → X1b → E1b/E2 → ablations v1.1 → E2n → I1 → v1.2 SmolLM2 → X7 →
+  X9 → X8 (banc + validation) → E4/E4s → campagne Qwen → X8.1/X8.1b/P5.
+- **Point de fonctionnement courant = défauts de config (verdict X8,
+  2026-08-21)** : dg=8192/64, **read_gate=keysim, λ=2.0, cap=0.5**, η=0.2 →
+  GPT-2 : E1 +1.353 ± 1.58, E3 −0.014 ✓ ; SmolLM2 (layer 16) : E1 +0.755 ± 0.94,
+  E3 +0.003 ✓. L'ancien point conforme sans gate (λ=1.0, cap=0.25 → E1 +0.740,
+  E3 +0.023) est la **référence d'ablation `read_gate="none"`**.
+- Acquis v1 (détail : JOURNAL, tableau EXTENSIONS §4) : E1 rappel post-vidage KV
+  sur trois modèles ; E1b généralisation 0.68 au point X1b (IC 95 % [0.56, 0.99],
+  médiane par secret 0.59 — recalcul COR-02, journal 2026-08-21 ; 0.38 sous gate —
+  coût de sélectivité, calibration `gate_keysim_mid` par modèle à faire) ; E2
+  adaptation réelle (−0.055 RFC, −0.030 fiction ; depuis X8, la métrique honnête
+  est le ΔNLL absolu par moitié) ; E3 sous seuil. Toujours 0/10 top-10 : de
+  l'amorçage, pas du rappel fonctionnel.
+- Ablations v1.1 : le gating porte ~92 % de l'effet E2 ; DG +57 % ; l'avantage
+  Hebb sur E2 RFC s'évapore sur la fiction (E2n) → delta rule par défaut, D5
+  quasi close (runs uniques, variance non estimée — Q-02/Q-09 de l'audit).
+- I1/X9 : keysim = jauge de saturation de RÉGIME ; pas de falaise de capacité à
+  80 faits (91 % de rétention) — d² est un problème théorique ; prédicteur par
+  fait mort (corrélations par fait n.s. à N=10).
+- X7 (mesuré) : aplatissement = coût FIXE (+0.141 nats d'entropie), lecture SANS
+  composante directionnelle (cos ≈ 0) → rappel par recomputation indirecte.
+  C'est LE mur commun : top-10, E1c, E4/E4s.
+- X8.1 → X8.1b → P5 : anomalie entropie résolue — le dommage de lecture vit aux
+  positions incertaines du cortex (corr +0.394) ; **loi 2 : gater côté mémoire,
+  jamais côté détresse du cortex** (la prédiction du modèle cholinergique de
+  Hasselmo) ; two_factor enterré.
+- Famille conventions : E4/E4s = critère non atteint (pas de préférence
+  token-niveau) ; E4-dur RETIRÉ (il mesure la fluidité) ; Qwen : E4s signes
+  conformes n.s., E1 fumée +4.18 (N=2, régime X8 — non comparable aux points
+  historiques, Q-08 de l'audit).
+- **Audit externe 2026-08-21 : voir `AUDIT-lab.md`** — 22 corrections traitées,
+  6 questions priorisées prêtes pour /lab-run (+ 2 en réserve). **v2 : chantier
+  prioritaire = V2-D (canal de sortie directionnel)** ; sommeil/LoRA basse
+  priorité actée (verdict X9).
+- Runs : SmolLM2 `--model HuggingFaceTB/SmolLM2-360M --layer 16` ; Qwen
+  `--model Qwen/Qwen2.5-1.5B --layer 14`.
 
 ## Environnement
 

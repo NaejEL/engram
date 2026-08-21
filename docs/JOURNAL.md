@@ -306,9 +306,11 @@ Modèle d'entrée :
      (la séparation de patterns ne peut rien pour des entrées identiques).
   2. **keysim est une jauge de saturation calibrée** (0.23/0.45/0.78 →
      +0.74/+0.77/+0.03, falaise au-delà de ~0.5) — c'est un détecteur de RÉGIME.
-     L'hypothèse AFTER_v1 (corrélation négative par fait) est falsifiée dans les
-     trois régimes (corr intra-régime +0.2 à +0.5) : le prédicteur utile est le
-     niveau absolu, pas le gradient intra-régime. Débouché : gating d'écriture
+     L'hypothèse AFTER_v1 (corrélation négative par fait) n'est PAS soutenue
+     dans les trois régimes — corr intra-régime +0.2 à +0.5, **n.s. à N=10**
+     (requalifié à l'audit du 2026-08-21 : « falsifiée » était trop fort pour
+     cette puissance) : le prédicteur utile est le niveau absolu, pas le
+     gradient intra-régime. Débouché : gating d'écriture
      (alerter/refuser quand cos max > ~0.6) — candidat X6.
   3. Pattern prior confirmé en gradué : corr(Δlogp, logp a priori) = −0.50 en
      mono-fait — M aide l'improbable, pénalise le déjà-probable (tambourine négatif
@@ -352,15 +354,23 @@ Modèle d'entrée :
   Q2. **La règle du milieu se transpose exactement** (16/32 comme 6/12) — et
       l'injection tardive devient activement nocive (couche 24 : −0.375, là où
       GPT-2 couche 9 était juste plus faible).
-  Q3. Pari perdu dans le bon sens : le signal brut est PLUS FORT. Mais la frontière
-      E3 s'est déplacée — les distributions plus pointues du modèle rendent la même
-      injection plus coûteuse (E3 ×3.5 à cap égal). Nouveau point conforme :
-      **cap=0.1** → E1 +0.494, E3 +0.042. La calibration λ/cap est PAR-MODÈLE,
-      le mécanisme et la méthode de calibration se transposent tels quels.
-  Q4. La corrélation keysim devient NÉGATIVE à la couche 16 (−0.34 à −0.40) :
-      le signe prédit par AFTER_v1, invisible sur GPT-2, émerge à l'échelle.
+  Q3. **Pari TENU au point conforme** *(reformulé à l'audit du 2026-08-21 — la
+      version initiale disait « pari perdu dans le bon sens »)* : le pari
+      pré-enregistré (« Δlogp positif mais < +0.740 ») se juge au point conforme
+      E3, où E1 = **+0.494 < +0.740 ✓**. Le +0.852 qui l'aurait « perdu » est
+      mesuré sans σ, à cap 0.25 NON conforme (E3 +0.079) — pas comparable. La
+      frontière E3 s'est déplacée — les distributions plus pointues du modèle
+      rendent la même injection plus coûteuse (E3 ×3.5 à cap égal). Nouveau
+      point conforme : **cap=0.1** → E1 +0.494, E3 +0.042. La calibration λ/cap
+      est PAR-MODÈLE, le mécanisme et la méthode de calibration se transposent
+      tels quels.
+  Q4. La corrélation keysim est négative à la couche 16 (−0.34 à −0.40) — le
+      signe prédit par AFTER_v1 — mais **n.s. à N=10** (p ≈ 0.25 ; requalifié à
+      l'audit du 2026-08-21) : une indication à re-tester en puissance, pas une
+      émergence établie.
 - **Conclusion v1.2** : le PoC tient sur deux modèles d'échelles différentes
-  (124M/12 couches/10B tokens vs 360M/32 couches/11T tokens). Ce qui est universel :
+  (124M/12 couches/10B tokens vs 360M/32 couches/11T tokens) — corrélations
+  keysim par fait : voir Q4, n.s. à N=10. Ce qui est universel :
   delta rule + DG + gating + couche du milieu. Ce qui est par-modèle : le point
   (λ, cap) sur la frontière E1/E3.
 - **Complément (E2 au point conforme, cap 0.1)** : interaction −0.0170, coût
@@ -626,16 +636,23 @@ Modèle d'entrée :
 - **Config** : Qwen2.5-1.5B (d=1536, 28 couches → layer 14), défauts X8 ; fumée E1
   (2 secrets), E4s, E4-dur. Le cortex avale l'architecture Qwen2 sans modification.
 - **Résultat** :
-  1. **E1 : +4.18 ± 1.76 nats** (swordfish +5.42, rang 14770 → 2317 — rang ÷6, le
-     plus grand mouvement jamais mesuré). La série 124M → 360M → 1.5B donne
-     +0.74 → +0.85 → +4.18 : **l'amorçage de rappel s'AMPLIFIE avec la qualité du
-     cortex**, là où l'adaptation E2 sature — un meilleur cortex re-route mieux à
-     partir du même déplacement d'état. Le pari « artefact d'échelle » est enterré
-     dans l'autre sens.
-  2. **E4s : première double dissociation correctement signée** — baseline +0.076
-     (sain, comme conçu), Zephyr +0.018 (positif, une première), Boreas −0.010
-     (négatif comme prédit), E3 ≈ 0. La préférence token-niveau existe sur un juge
-     fort — famélique, mais des deux bons côtés. Writes = 33 (stockage mince,
+  1. **E1 (fumée, N=2) : +4.18 ± 1.76 nats** (swordfish +5.42, rang 14770 → 2317
+     — rang ÷6, le plus grand mouvement jamais mesuré). *(Requalifié à l'audit
+     du 2026-08-21 — la version initiale promouvait une « série qui
+     s'amplifie ».)* La « série » +0.74 → +0.85 → +4.18 mélange trois régimes
+     (les deux premiers points = anciens points conformes SANS gate ; le
+     troisième = défauts X8, régime où GPT-2 fait +1.353) et repose sur 2
+     secrets : c'est une fumée prometteuse, pas une loi d'échelle. L'hypothèse
+     « l'amorçage s'amplifie avec la qualité du cortex » reste OUVERTE — à
+     trancher par un E1 à 10 secrets, même régime, mêmes couches relatives, sur
+     les trois modèles (Q-08 de l'audit).
+  2. **E4s : signes conformes, non significatifs** *(retitré à l'audit du
+     2026-08-21 — « première double dissociation » était trop fort :
+     +0.018/−0.010 à N=10 sans σ rapporté, et deux signes conformes = 1 chance
+     sur 4 sous le hasard)* — baseline +0.076 (sain, comme conçu), Zephyr +0.018
+     (positif, une première), Boreas −0.010 (négatif comme prédit), E3 ≈ 0. Une
+     préférence token-niveau sur un juge fort reste À ÉTABLIR — les signes sont
+     du bon côté des deux contrôles, rien de plus. Writes = 33 (stockage mince,
      seuil 4.0 sur de l'anglais simple — piste : seuil adaptatif à la NLL moyenne
      du cortex).
   3. **E4-dur : échec même sur Qwen** (gain −0.011, 3/10) — ET baseline encore
@@ -648,9 +665,10 @@ Modèle d'entrée :
   statistiques de similarité dépendent de d ; `gate_keysim_mid=0.6` est calibré
   sur GPT-2 et mérite un re-balayage par modèle (E1 fonctionne, donc le gate
   s'ouvre sur les requêtes pertinentes, mais le point d'opération est à vérifier).
-- **Conclusion** : le canal d'amorçage vaut cher sur un bon cortex (E1), le canal
-  de préférence token-niveau reste le mur (E4s +0.018) — la hiérarchie des
-  chantiers ne change pas : V2-D (canal de sortie directionnel) d'abord.
+- **Conclusion** : le canal d'amorçage SEMBLE valoir cher sur un bon cortex (E1,
+  fumée N=2 — Q-08 pour le confirmer), le canal de préférence token-niveau reste
+  le mur (E4s +0.018, n.s.) — la hiérarchie des chantiers ne change pas : V2-D
+  (canal de sortie directionnel) d'abord.
 
 ## 2026-08-21 — Diagnostics : théorie à quatre observations, non-monotonie des gates
 
@@ -767,9 +785,43 @@ Modèle d'entrée :
   pas d'un gate.
 - **Note pour le papier** : l'arc entier (anomalie → 2 fausses théories réfutées
   par intervention → résolution par position) est le chapitre méthode rêvé — la
-  loi finale est contre-intuitive (« ne lisez PAS quand le modèle hésite ») et
+  loi finale (« ne lisez PAS quand le modèle hésite ») est contre-intuitive pour
+  l'intuition RAG, mais c'est la prédiction du modèle cholinergique de Hasselmo
+  (ACh haute en régime de nouveauté : encodage favorisé, rappel récurrent
+  supprimé) — un ancrage bio, pas une curiosité (précision d'audit, 2026-08-21) ;
   chaque théorie morte est documentée avec son expérience tueuse.
 - **Suite** : arc écriture (« Priming, not recall ») — v1 est close, X8.1 scellé.
+
+## 2026-08-21 — Audit externe (/ai-lab-audit) + COR-02 : le 0.68 gagne son incertitude
+
+- **Contexte** : audit en lecture seule, 5 lentilles + validation adversariale —
+  39 findings bruts, 31 confirmés, **22 corrections (COR-01..22) toutes traitées
+  ce jour** et 8 questions de recherche priorisées (6 retenues + 2 en réserve).
+  Détail et statuts : `AUDIT-lab.md`. Aucune fuite dans le banc E1/E2/E3 — le
+  contrôle D7 tient, le tableau des poids n'est pas invalidé.
+- **Requalifications notables (éditées en place, marquées dans les entrées)** :
+  la « série Qwen qui s'amplifie » redevient une fumée (N=2, trois régimes
+  mélangés — Q-08 pour trancher) ; le pari v1.2 Q3 est TENU au point conforme ;
+  E4s Qwen retitrée « signes conformes, non significatifs » ; corrélations
+  keysim par fait : n.s. à N=10 ; la « loi 2 contre-intuitive » est la
+  prédiction du modèle cholinergique de Hasselmo. Docs remis au 2026-08-21
+  (défauts X8, X10 gelé, décision X6 écrite, D10 au tableau, V2-D prioritaire).
+- **COR-02 — recalcul du ratio de généralisation** :
+- **Config** : X1b exact (dg=8192/64, layer=6, λ=1.0, η=0.2, cap=0.25,
+  read_gate=none) — rejoue E1b du 2026-08-20, 10 secrets × 4 questions.
+- **Run** : script d'audit (bootstrap 10 000 tirages, resampling par secret).
+- **Résultat** : run DÉTERMINISTE confirmé — exact +0.740 ± 0.799, ratio de
+  moyennes **0.684**, reproduction au millième. **IC 95 % bootstrap du ratio de
+  moyennes : [0.56, 0.99]** ; **par secret : médiane 0.59, IC 95 % [0.45,
+  0.75]**. Deux pathologies de la statistique par-secret : marmalade (exact
+  −0.011 ≈ 0 → ratio divergent) et tambourine (négatif partout → ratio +0.60
+  trompeur) ; 8/10 secrets ont un ratio entre 0.44 et 1.16.
+- **Conclusion** : la généralisation graduée est réelle (l'IC exclut largement
+  zéro) mais « 0.68 » était un ratio de deux moyennes bruitées sans
+  incertitude — le citer désormais **« ~0.6–0.7 (IC large, N=10) »**. Pour
+  resserrer : plus de secrets (le pool X9 en a 80), pas plus de bootstrap.
+- **Suite** : questions de l'audit dans l'ordre Q-01 → Q-03 → Q-02 → Q-04 →
+  Q-06 → Q-05, chacune via `/lab-run` (AUDIT-lab.md).
 
 ## 2026-08-20 — v0 : squelette posé
 

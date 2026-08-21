@@ -14,7 +14,7 @@ divergent, c'est un bug de documentation à corriger immédiatement.
                     │      ▼                                   │
                     │  ┌────────────── hook ────────────────┐  │
                     │  │ stash h_t (pré-injection)           │  │
-                    │  │ h_t ← h_t + λ · M · φ(h_t)   (READ) │  │
+                    │  │ h_t ← h_t + λ·g · M · φ(h_t) (READ) │  │
                     │  └─────────────────────────────────────┘  │
                     │      │                                   │
                     │  blocs L..N-1  →  logits                 │
@@ -31,26 +31,45 @@ divergent, c'est un bug de documentation à corriger immédiatement.
 
 - La boucle est **token par token** (cache KV actif) : lent mais uniforme, et c'est ce
   qui rend l'apprentissage réellement « en ligne ». Le débit n'est pas un objectif v1.
-- `M` est une matrice pleine d×d (GPT-2 : 768×768 ≈ 590k paramètres, 2,4 Mo fp32).
-  C'est le seul état mutable du système en dehors du cache KV.
+- `M` est d×key_dim : **d×dg_dim avec la projection gyrus denté, le défaut**
+  (GPT-2 : 768×8192 ≈ 6,3M paramètres, ~25 Mo fp32), ou pleine d×d en mode dense
+  X0 (768×768 ≈ 590k, 2,4 Mo). C'est le seul état mutable du système en dehors
+  du cache KV.
+- La lecture est **gatée** (X8, défaut `read_gate="keysim"`) : g ≈ 0 hors
+  domaine, g ≈ 1 sur un match mémoire — voir §2.1 et la décision D10.
 
 ## 2. Les maths, pièce par pièce
 
-### 2.1 Lecture (rappel associatif)
+### 2.1 Lecture (rappel associatif, gatée)
 
-`h ← h + λ · clip(M · φ(h))`
+`h ← h + clip(λ · g · M · φ(h))`
 
-- `φ(h) = h / ‖h‖` : normalisation L2. Rôle : borner l'énergie des clés, rendre η
-  interprétable (les écritures ont toutes la même échelle côté clé).
+- `φ(h)` : clé de requête, normalisée L2 — `h/‖h‖` en mode dense,
+  `normalize(topk(G·h))` avec la projection gyrus denté (§2.2b, le défaut).
+  Rôle : borner l'énergie des clés, rendre η interprétable (les écritures ont
+  toutes la même échelle côté clé).
+- `g ∈ [0, 1]` : **gate de lecture X8** (défaut `read_gate="keysim"`) — sigmoïde
+  raide sur le cos max entre φ(h) et le buffer de clés I1 : la lecture ne s'ouvre
+  que si la requête ressemble à quelque chose que M a réellement écrit
+  (pertinence côté mémoire). Verdict X8 (journal 2026-08-21) : E1 intact, E3
+  éliminé, régime agressif rouvert (λ=2, cap=0.5) ; coût : ratio paraphrases
+  0.68 → 0.38. Le facteur entropie est disqualifié et le two_factor enterré
+  (X8.1/X8.1b/P5) : le dommage de lecture est concentré aux positions
+  incertaines du cortex — un gate déclenché par l'incertitude lit exactement là
+  où lire coûte. **Loi 2 : gater côté mémoire, jamais côté détresse du cortex.**
 - `λ` (`cfg.lam`) : force d'injection dans le flux résiduel. Trop grand → on écrase le
   signal du cortex et le modèle divague ; trop petit → pas d'effet mesurable.
 - `clip` : la norme du vecteur injecté est plafonnée à `cfg.max_read_norm` fois la norme
   de h. Garde-fou de stabilité n°1 : même si M devient énorme, l'injection reste bornée.
   Mesuré le 2026-08-20 (journal, X1b) : le cap agit comme **gating doux** — les
   récupérations pertinentes le saturent, les parasites restent dessous ; λ contrôle le
-  bruit, le cap le signal. Écho biologique (AFTER_v1_THOUGHTS) : c'est fonctionnellement
-  de la neuromodulation — le cerveau ne coupe pas la mémoire, il module son *gain*
-  d'influence sur le cortex (acétylcholine).
+  bruit, le cap le signal. Sous le gate X8, le cap reste en **plancher de
+  sécurité** (décision D10) : en domaine, g ≈ 1 laisse passer λ=2 plein — le cap
+  borne l'injection dans tous les cas. Écho biologique corrigé (audit
+  2026-08-21) : l'étiquette « acétylcholine » posée ici était une analogie de
+  façade — dans le modèle cholinergique (Hasselmo), l'ACh haute en régime de
+  nouveauté favorise l'encodage et SUPPRIME le rappel récurrent : son analogue
+  mesuré est la loi 2 (X8.1b/P5), pas le cap.
 
 ### 2.2 Écriture (delta rule, PAS Hebb pur)
 
@@ -111,8 +130,12 @@ faible) par défaut — elles plafonnent la capacité que le quadratique achète
 updates rang-1 de la delta rule ne vivent pas sur la variété de Kronecker.
 
 Sortie de secours documentée si d ET le nombre de souvenirs persistants explosaient
-un jour : la mémoire à slots (lignée Titans). Compromis connu à ne pas oublier : les
-slots perdent la **superposition** — or le ratio de généralisation 0.68 (E1b) est
+un jour : la mémoire à slots (lignée **kNN-LM / Memorizing Transformers** —
+attribution corrigée à l'audit 2026-08-21 : Titans n'est PAS une mémoire à slots
+mais une mémoire neuronale à gradient test-time, le plus proche parent de M, et le
+contrôle naturel de D6 : surprise par gradient vs NLL). Compromis connu à ne pas
+oublier : les
+slots perdent la **superposition** — or le ratio de généralisation ~0.68 (E1b) est
 probablement une propriété de la superposition distribuée ; une mémoire à slots
 rappellerait mieux l'exact et moins bien la paraphrase.
 
@@ -134,6 +157,7 @@ M (c'est l'op des évals), `reset_memory()` fait l'inverse.
 | D7 | `eval/` vide le cache KV avant le rappel | Sans ça, impossible de distinguer la contribution de M du in-context learning ordinaire. C'est LE contrôle qui rend le PoC falsifiable. |
 | D8 | Pas de backprop nulle part en v1 | C'est l'hypothèse testée : une règle locale + un cortex gelé suffisent-ils à un effet mesurable ? Introduire du gradient brouillerait la réponse. |
 | D9 | G (gyrus denté) aléatoire gelée, jamais apprise, seedée par cfg.seed | L'orthogonalisation ne demande aucun apprentissage (Johnson-Lindenstrauss fait le travail) ; une G apprise exigerait du gradient (contredit D8) ; la seed fixe garantit les mêmes clés d'un run à l'autre (comparabilité). Top-k par magnitude et non ReLU+top-k : conserve l'information de signe, deux fois plus de motifs distincts. |
+| D10 | Le cap `max_read_norm` reste en **plancher de sécurité sous le gate X8** (pas remplacé par lui) | En domaine, g ≈ 1 laisse passer λ=2 plein : le cap borne l'injection dans tous les cas, gate ouvert ou fermé. Tranche le « point de vigilance » noté dans EXTENSIONS §X8 ; référencée par `config.py` et `hippocampus.py`. Actée à l'implémentation X8 (2026-08-21) ; entrée ajoutée à l'audit (COR-06). |
 
 ## 4. Pièges connus (à surveiller dès les premiers runs)
 
@@ -181,6 +205,12 @@ E1-exact ≫ E1b-paraphrase, la mémoire fait du par-cœur, pas de l'association
    (baisse 2ᵉ moitié avec M) − (baisse 2ᵉ moitié sans M). Le cache KV étant borné ou
    vidé entre chunks, la baisse attribuable à M est isolée.
 
+**Note de métrique (X8, 2026-08-21 ; répercutée à l'audit, COR-14)** : au point X8
+(gate keysim, régime agressif), le coût d'échauffement de la 1ʳᵉ moitié disparaît —
+M aide dès le début et l'interaction tombe mécaniquement à ~0. Rapporter AUSSI le
+ΔNLL **absolu** par moitié vs contrôle : l'interaction était conçue pour une
+mémoire qui paie avant de gagner.
+
 ### E3 — Dommage collatéral (`eval/collateral.py`)
 
 Le scénario d'échec le plus probable n'est pas « ça ne marche pas », c'est « ça
@@ -207,7 +237,12 @@ référence), puis X1 (gyrus denté) + E3, chacun benchmarké séparément.
 
 ## 7. Hors scope v1 (notes pour v2)
 
-- **Sommeil / consolidation** : distiller périodiquement le contenu de M dans un LoRA
+- **Rappel directionnel (V2-D) — LE chantier v2 prioritaire (acté 2026-08-21)** :
+  canal de sortie M_out (valeurs en espace d'unembedding, biais additif sur les
+  logits) — la réponse au mur X7 (zéro composante directionnelle : top-10, E1c,
+  E4s). Voir EXTENSIONS.md, entrée V2-D.
+- **Sommeil / consolidation — basse priorité actée (verdict X9 : pas de
+  falaise)** : distiller périodiquement le contenu de M dans un LoRA
   du cortex, puis reset de M. Spec retenue : replay **génératif depuis M** (pas les
   données brutes) — voir EXTENSIONS.md, entrée « V2 — Replay / sharp-wave ripples ».
   C'est là que l'oubli catastrophique revient.

@@ -242,3 +242,39 @@ def test_read_preserves_query_dtype():
     mem.write(unit(1), unit(2))
     out = mem.read(unit(1).to(torch.float16))
     assert out.dtype == torch.float16
+
+
+def test_read_gate_keysim_mode():
+    """Le mode PAR DÉFAUT du projet (X8) testé seul, sans le soft-OR : la lecture
+    s'ouvre sur une clé connue, reste coupée sur une requête étrangère."""
+    mem = make_memory(read_gate="keysim", track_keys=True, max_read_norm=100.0)
+    k, v = unit(1), unit(2)
+    for _ in range(20):
+        mem.write(k, v)
+    known = mem.read(k).norm().item()
+    stranger = mem.read(unit(9)).norm().item()
+    assert known > 10 * max(stranger, 1e-9)
+
+
+def test_reset_closes_keysim_gate_even_with_nonzero_m():
+    """La propriété qui fonde le contrôle D7 sous gate : après reset(), le buffer
+    de clés est vide → g = 0 → lecture STRICTEMENT nulle, même si M était non
+    nulle (le gate ne doit pas s'ouvrir sur des clés fantômes d'avant le reset)."""
+    mem = make_memory(read_gate="keysim", track_keys=True, max_read_norm=100.0)
+    k, v = unit(1), unit(2)
+    for _ in range(20):
+        mem.write(k, v)
+    assert mem.read(k).norm().item() > 0
+    mem.reset()
+    mem.M += torch.outer(v, mem.phi(k))  # M artificiellement non nulle, buffer vide
+    assert mem.read(k).norm().item() == 0.0
+
+
+def test_write_applies_decay_after_update():
+    """Ordre documenté (ARCHITECTURE §2.4) : update PUIS decay — le decay
+    s'applique aussi au write qui vient d'être posé. Après un premier write dans
+    une M vide (clé et valeur unitaires) : ‖M‖ = (1−δ)·η."""
+    mem = make_memory(decay=0.1)
+    mem.write(unit(1), unit(2))
+    expected = (1.0 - 0.1) * 0.2  # (1−δ)·η
+    assert abs(mem.M.norm().item() - expected) < 1e-6

@@ -49,7 +49,9 @@ class EngramConfig:
     read_gate: str = "keysim"        # "none" | "entropy" | "keysim" | "two_factor"
     gate_entropy_mid: float = 2.0    # nats — centre du sigmoïde d'incertitude
     gate_entropy_tau: float = 0.5
-    gate_keysim_mid: float = 0.6     # centre du sigmoïde de pertinence (calibré par X9)
+    gate_keysim_mid: float = 0.6     # centre du sigmoïde de pertinence — réglé sur GPT-2
+                                     # (banc X8) ; à re-balayer PAR MODÈLE (keysim
+                                     # d'écriture ≈ 0.14 sur Qwen vs ~0.23 GPT-2)
     gate_keysim_tau: float = 0.05
 
     # --- Gating par surprise ---

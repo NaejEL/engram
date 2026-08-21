@@ -50,8 +50,16 @@ C'est l'état actuel du code. Aucun flag.
 - **Déclencheur** : ajouter une variante paraphrase à E1 ; si exact ≫ paraphrase.
   **Testé le 2026-08-20 : NON observé** (ratio paraphrases/exact = 0.68, dégradation
   graduelle par recouvrement sémantique — voir JOURNAL). X2 reste en poche.
+  **Mise à jour (audit 2026-08-21)** : sous le gate keysim (défaut X8), le ratio
+  tombe à **0.38** — le déclencheur se réévalue donc au point courant. Seuil
+  acté : ratio < 0.3 persistant APRÈS calibration du gate (`gate_keysim_mid`,
+  Q-06 de l'audit) — on ne compense pas par CA3 un coût réglable du gate.
 - **Esquisse** : itérer la lecture 2–3 fois : `h' = h + λ·M·φ(h)`, relire avec h',
   converger vers l'attracteur. Config : `read_iters` (défaut 1 = comportement actuel).
+  **Caveat (audit 2026-08-21)** : telle quelle, l'esquisse est INOPÉRANTE sous le
+  gate keysim — g est évalué sur φ(h) avant toute injection : une première passe
+  gatée à ~0 ne converge vers rien. Une lecture itérée devra itérer aussi le gate
+  (ou l'outrepasser explicitement).
 
 ### X3 — Alternance theta encode/retrieve — *repli*
 
@@ -62,6 +70,13 @@ C'est l'état actuel du code. Aucun flag.
 - **Déjà à moitié en place** : l'engine interdit structurellement l'écriture pendant
   `generate` et pendant le rappel d'éval (règle absolue, engine.py). La version
   complète alternerait des micro-phases read-only/write-only pendant le stream.
+- **Note (audit 2026-08-21)** : la moitié en place protège l'ÉCRITURE de la
+  lecture ; ce que la séparation theta protège d'abord (Hasselmo), c'est le
+  RAPPEL pendant l'encodage — précisément le côté que X8.1b/P5 a mesuré (le
+  dommage de lecture vit aux positions incertaines, celles où l'écriture
+  déclencherait). Cette moitié-là est aujourd'hui couverte de fait par la loi 2
+  (gate keysim) ; si un X3 complet se justifie un jour, c'est ce côté qu'il
+  formalisera.
 
 ### X4 — Néogenèse / reset de lignes — *repli*
 
@@ -70,6 +85,9 @@ C'est l'état actuel du code. Aucun flag.
 - **Problème visé** : saturation de M sur les longs streams (E2 qui plafonne puis
   régresse).
 - **Déclencheur** : courbe NLL de E2 en U (amélioration puis dégradation).
+  **Note (audit 2026-08-21)** : déclencheur NON OBSERVABLE en l'état —
+  `domain_drift.py` collecte les NLL par token mais n'imprime que deux moitiés ;
+  sortir la courbe par chunk (donnée déjà collectée) avant de pouvoir statuer.
 - **Esquisse** : tracker l'utilisation des lignes en lecture (EMA de |contribution|),
   réinitialiser périodiquement les moins utilisées. Version riche de notre top-k.
 
@@ -101,6 +119,14 @@ C'est l'état actuel du code. Aucun flag.
   0.23/0.45/0.78 → rappel +0.74/+0.77/+0.03. La capacité de M n'est pas la
   contrainte, la distinctivité des indices l'est. Débouché ouvert : X6, gating
   d'écriture par similarité (refuser/alerter quand cos max > ~0.6).
+- **Décision X6 (audit 2026-08-21)** : « X6 » a désigné deux idées distinctes
+  dans le journal — (a) un hybride Hebb/delta (A1b) et (b) le gating d'ÉCRITURE
+  par keysim (ci-dessus). Aucune n'est « absorbée par X8 », qui est un gate de
+  LECTURE. Statut acté : (a) suit l'arbitrage D5 (E2 long horizon — Q-09 de
+  l'audit) ; (b) est GELÉE sans mesure — X9 a montré les collisions génériques
+  inoffensives, et le symptôme visé (écrasement par collision d'indices
+  discriminants) n'a été observé qu'en gabarit commun artificiel. Réouverture :
+  ce symptôme en usage réaliste.
 
 ### X7 — Loi prior/rappel et hypothèse d'aplatissement — *MESURÉ (2026-08-21)*
 
@@ -143,7 +169,18 @@ C'est l'état actuel du code. Aucun flag.
   Le verrou top-10 est requalifié : absence de signal directionnel, pas pénalité —
   piste v2+ : valeurs dans l'espace d'unembedding ou tête de lecture apprise.
 
-### X8 — Gate de lecture à deux facteurs (incertitude × pertinence) — *absorbe X6, dépend de X7 (fait)*
+### X8 — Gate de lecture (keysim RETENU) — *dépend de X7 (fait) ; distinct du X6 d'écriture (voir I1)*
+
+**Verdict (2026-08-21) : gate keysim RETENU, nouveaux défauts**
+(`read_gate="keysim"`, λ=2.0, cap=0.5 — le cap reste en plancher de sécurité,
+décision D10, ARCHITECTURE §3). E1 GPT-2 +1.353 ± 1.58 / SmolLM2 +0.755 ± 0.94 ;
+E3 −0.014 / +0.003 ✓ ; E2 : bénéfice absolu GPT-2 (−0.055 sur les deux moitiés),
+échec au régime agressif SmolLM2 intra-domaine (voir la note de métrique, §4).
+Le facteur entropie est disqualifié (anomalie), puis le two_factor ENTERRÉ par
+l'arc X8.1 → X8.1b → P5 : le dommage de lecture vit aux positions incertaines du
+cortex — gater côté mémoire, jamais côté détresse. Coût mesuré : ratio
+paraphrases 0.68 → 0.38 (`gate_keysim_mid`, calibration par modèle à faire —
+Q-06 de l'audit). Détail : journal du 2026-08-21. Protocole d'origine ci-dessous.
 
 - **Origine** : X7 a chiffré le feu vert — l'injection coûte un aplatissement FIXE
   (+0.141 nats d'entropie) et ne rapporte quasi rien quand le cortex est confiant
@@ -156,8 +193,9 @@ C'est l'état actuel du code. Aucun flag.
   **confiance erronée** — le cortex peut être sûr ET avoir tort (fait périmé) ; un
   gate par entropie seule ferait taire M au moment exact où il détient la mise à
   jour. Le facteur keysim répond : un match très fort force le passage même à basse
-  entropie (« non, attends, je *sais* que ça a changé »). X6 fusionne ici : un seul
-  mécanisme à deux facteurs, pas deux gates empilés.
+  entropie (« non, attends, je *sais* que ça a changé »). L'idée keysim d'I1 est reprise
+  ici côté LECTURE ; le gating d'écriture (X6-b) reste un mécanisme distinct,
+  gelé — voir la décision X6 dans l'entrée I1.
 - **Éval dédiée E1c (correction de fait)** : rendre X fortement prédit (l'injecter,
   ou choisir X à rang naturellement bas), puis injecter « The password has changed.
   It is now Y. » ; mesurer le rappel de Y. Critère : le gate à deux facteurs rappelle
@@ -199,7 +237,14 @@ identiques). Détail : journal du 2026-08-21. Protocole d'origine ci-dessous.
   pas sur la variété de Kronecker. Ce chiffre décide si d² est un problème réel ou
   théorique.
 
-### X10 — Comparatif de kernels d'adressage — *dépend de X9*
+### X10 — Comparatif de kernels d'adressage — *GELÉ (2026-08-21)*
+
+**Gel (audit 2026-08-21)** : sa métrique principale était « la position de la
+falaise X9 » — or X9 a conclu qu'il n'y a PAS de falaise à cette échelle (80
+faits, 91 % de rétention). Déclencheur de réouverture : une falaise observée en
+charge réelle, ou un 3ᵉ modèle où l'adressage DG régresse. La branche « DG
+apprise » (conflit D8/D9, ci-dessous) est RETIRÉE tant que le gel tient —
+l'arbitrage D8/D9 n'a plus d'objet. Protocole d'origine ci-dessous.
 
 - **Origine** : revue externe. La projection DG est déjà un kernel d'adressage ; la
   question est lequel repousse la falaise de X9 le plus loin, gratuitement.
@@ -265,9 +310,12 @@ Détail : journal du 2026-08-21. Protocole d'origine ci-dessous.
   (l'existant : diffus, généralisant, ratio 0.38–0.68) et un canal de SORTIE
   (directionnel, précis, pour le rappel exact). C'est la hiérarchie
   registre/cache dessinée pour l'usage par-projet, mais À L'INTÉRIEUR du
-  mécanisme — et la vieille distinction familiarité vs recollection de la
-  psychologie de la mémoire, qui semblent aussi être deux processus séparés
-  dans le cerveau.
+  mécanisme. Rapprochement familiarité/recollection corrigé (audit
+  2026-08-21) : la carte naïve est inversée — la **recollection**
+  (réinstallation d'un pattern via un index) est le processus hippocampique,
+  dont l'analogue ici est X5 ; un canal de sortie item-spécifique type kNN-LM
+  est plus proche de la **familiarité**. X5 et V2-D partagent donc la même
+  justification bio (indexing theory), par deux chemins différents.
 - **Évals de verdict** : E1 top-10 (le canal de sortie doit débloquer des rangs
   que l'amorçage ne peut pas atteindre), E1c (renverser « Paris »), E4s (la
   préférence token-niveau), chacune avec le canal d'état seul / sortie seul /
@@ -318,6 +366,9 @@ rencontré exactement ces bugs et a shippé des fixes :
 
 Référence : config par défaut (`EngramConfig`), seeds fixes, GPT-2 124M.
 Les deltas se lisent **contre la ligne précédente retenue**, pas contre X0.
+Depuis X8, l'interaction E2 seule ne suffit plus (le coût d'échauffement
+disparaît, elle tombe à ~0 mécaniquement) : rapporter aussi le **ΔNLL absolu
+par moitié** — voir ARCHITECTURE §5 E2, note de métrique (audit, COR-14).
 
 | Étape | E1 Δlogp (nats) | E1 top-10 | E2 interaction | E3 dégradation | Verdict |
 | --- | --- | --- | --- | --- | --- |
@@ -325,8 +376,8 @@ Les deltas se lisent **contre la ligne précédente retenue**, pas contre X0.
 | X0 naïve, point retenu (layer=6, λ=1.0, η=0.1) | +0.735 ± 0.886 (N=10) | 0/10 | *(à venir)* | +0.1991 ± 0.0241 (> seuil) | référence pour X1 — variance = interférence, déclencheur X1 observé |
 | X1 gyrus denté (dg=8192/64, λ=2.0, η=0.2) | +1.361 ± 1.588 (N=10) | 0/10 | *(à venir)* | +0.1354 ± 0.0147 (> seuil ×2.7) | mécanisme retenu (+0.63 E1, −0.06 E3 vs X0) mais point NON conforme E3 |
 | **X1b compromis λ×cap (dg=8192/64, λ=1.0, η=0.2, cap=0.25)** | **+0.740 ± 0.799** (N=10) | 0/10 | **−0.0551 ✓** (writes 23 %) | **+0.0228 ± 0.0056 ✓** | **référence GPT-2** — premier point conforme, tableau complet ; cap = gating doux (λ contrôle le bruit, cap le signal) |
-| **v1.2 SmolLM2-360M (layer=16, cap=0.1, reste identique)** | **+0.494 ± 0.245** (N=10) ; multi varié +0.817 ± 0.214 (cap 0.25) | 0/10 | −0.0500 (cap 0.25) ; **−0.0170 ✓ au point conforme** | **+0.0415 ± 0.0029 ✓** | **le signal passe l'échelle** — mécanisme universel, calibration (λ, cap) par-modèle ; couche tardive nocive ; signe AFTER_v1 émerge (corr keysim −0.4) |
-| X1 gyrus denté | | | | | |
+| **v1.2 SmolLM2-360M (layer=16, cap=0.1, reste identique)** | **+0.494 ± 0.245** (N=10) ; multi varié +0.817 ± 0.214 (cap 0.25) | 0/10 | −0.0500 (cap 0.25) ; **−0.0170 ✓ au point conforme** | **+0.0415 ± 0.0029 ✓** | **le signal passe l'échelle** — mécanisme universel, calibration (λ, cap) par-modèle ; couche tardive nocive ; corr keysim −0.4 : n.s. à N=10, indication seulement (requalifiée à l'audit 2026-08-21) |
+| **X8 gate keysim (nouveaux défauts : gate=keysim, λ=2.0, cap=0.5)** | GPT-2 **+1.353 ± 1.58** ; SmolLM2 **+0.755 ± 0.94** (N=10) | 0/10 | interaction ~0 mais **absolu −0.055 sur les deux moitiés** (GPT-2) ; SmolLM2 : échec au régime agressif (parité au mieux) | GPT-2 **−0.014 ✓** ; SmolLM2 **+0.003 ✓** | **RETENU (2026-08-21)** — E3 éliminé, régime agressif rouvert ; coût : ratio paraphrases 0.68 → 0.38 ; entropie/two_factor enterrés (X8.1 → P5) |
 
 Ablations mesurées au point X1b (détails : journal des 2026-08-20/21) — chacune
 retire un mécanisme de la référence, aucune n'est retenue comme nouveau défaut :

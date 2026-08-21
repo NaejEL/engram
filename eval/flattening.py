@@ -114,6 +114,11 @@ def random_cos_baseline(engine: EngramEngine, r_vec_dim_token: int, n: int = 200
     h = engine.cortex.last_h_pre
     r_vec = engine.memory.read(h).float()
     if r_vec.norm() == 0:  # M vide à cet instant : recharger un fait quelconque
+        # COR-21 (audit 2026-08-21) : protocole E1 complet — reset + contexte
+        # vierge AVANT de streamer le fait ; sans ça, la base de cosinus était
+        # calculée hors protocole (fait streamé par-dessus un cache KV résiduel).
+        engine.reset_memory()
+        engine.clear_context()
         engine.stream(FACT_TEMPLATE.format(secret="swordfish"), force_write=True)
         engine.clear_context()
         engine.stream(QUESTION, read=True, write=False)
