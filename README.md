@@ -23,6 +23,21 @@ fast weight programmers (Schmidhuber ; Schlag et al. 2021), Titans (Google 2024,
 tenté ici : la séparation **explicite** cortex/hippocampe avec reset et consolidation,
 à une échelle où l'on peut tout ablater sur un laptop.
 
+## Vision d'usage : un engram par projet
+
+Dans une hiérarchie mémoire, le contexte est le **registre** (exact, cher, immédiat),
+le RAG/grep est le **disque** (exact, adressé explicitement) — M est le **cache
+chaud** : approximatif, avec éviction (decay/élagage). M sérialisée = un fichier de
+quelques Mo par projet, chargé/déchargé au changement de repo (le reset devient un
+switch). M ne remplace PAS le contexte exact — signatures, chemins, noms de
+registres : le ratio paraphrases 0.68, notre meilleure qualité, y deviendrait un
+générateur d'hallucinations plausibles. M porte le contexte **diffus** : conventions
+de code, décisions d'architecture récurrentes, corrections répétées, vocabulaire du
+domaine — ce qu'on re-paye aujourd'hui en préambule type CLAUDE.md à chaque session,
+et qui ne sert pas par son exactitude mais parce qu'il **teinte** le modèle.
+Teinter, c'est littéralement `h ← h + λ·M·φ(h)`. Test direct de cette vision :
+l'éval E4 (EXTENSIONS.md).
+
 ## Ce que le PoC doit prouver (ou tuer)
 
 Trois évaluations, chacune avec son contrôle :

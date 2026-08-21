@@ -448,6 +448,40 @@ Modèle d'entrée :
      force de récupération ‖M·φ(h)‖ comme facteur de pertinence.
 - **Suite** : banc d'essai X8 (4 modes × E1/E3/E1c) — en cours.
 
+## 2026-08-21 — X8 banc d'essai : keysim seul gagne, entropie anomalie, E1c révèle une limite
+
+- **Config** : GPT-2, défauts X1b (cap 0.25), 4 modes de gate ; `eval/read_gate.py`.
+- **Résultat** :
+
+  | mode | E1 Δexact | E3 (seuil 0.05) | E1c ΔMarseille |
+  | --- | --- | --- | --- |
+  | none (cap seul) | +0.740 ± 0.80 | +0.0228 ✓ | −0.378 |
+  | entropy | +0.736 ± 0.81 | **+0.0997 ✗** | −0.378 |
+  | **keysim** | **+0.741 ± 0.81** | **−0.0076 ✓** | −0.374 |
+  | two_factor | +0.738 ± 0.80 | +0.1005 ✗ | −0.378 |
+
+- **Conclusion** :
+  1. **keysim seul remporte le banc** : E1 intact, E3 ÉLIMINÉ (devient négatif).
+     La crainte X9 (saturation sur mots-outils) ne se matérialise pas : les états
+     d'un texte neutre ne matchent pas les clés d'un autre domaine — la saturation
+     X9 n'existait qu'entre gabarits similaires du même régime.
+  2. **Anomalie entropie, non résolue** : E3 *pire* qu'aucun gate (+0.0997 vs
+     +0.0228) alors qu'un gain multiplicatif g ≤ 1 devrait réduire l'injection —
+     contre-intuitif, à investiguer avant tout usage du facteur entropie. Défaut
+     structurel relevé au passage : le gate lit l'entropie DÉCALÉE d'un pas (celle
+     de la prédiction du token courant — la distribution en cours de production
+     n'existe pas encore au moment de la lecture, œuf-et-poule du forward). Le
+     two_factor hérite des deux problèmes via le soft-OR.
+  3. **E1c échoue dans TOUS les modes** (ΔMarseille ≈ −0.38, ΔParis ≈ −0.51 : M
+     aplatit les deux, ne hisse rien). Ce n'est pas un échec du gate mais du
+     MÉCANISME : sans composante directionnelle (X7), M ne peut pas renverser un
+     prior confiant. La correction de fait sous confiance erronée est hors de
+     portée de la v1 — rejoint la piste « rappel directionnel » (v2+).
+- **Verdict provisoire** : keysim = candidat par défaut, sous réserve du test
+  « régime agressif rouvert » (gate + λ2/cap 0.5 — en cours) et d'un E2.
+- **Suite** : ajouts roadmap intégrés le même jour (vision engram-par-projet →
+  README ; E4 conventions ; LoRA v2 basse priorité actée par le verdict X9).
+
 ## 2026-08-20 — v0 : squelette posé
 
 - **Commit** : (initial)

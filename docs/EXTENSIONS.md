@@ -206,7 +206,27 @@ identiques). Détail : journal du 2026-08-21. Protocole d'origine ci-dessous.
   explicitement (amendement de D8/D9 ou variante hors-protocole) avant de lancer
   cette branche de X10 ; les branches (1)-(2) ne posent aucun conflit.
 
-### V2 — Replay / sharp-wave ripples (consolidation M → LoRA) — *hors v1*
+### E4 — Éval « conventions de projet » — *test direct de la vision engram-par-projet*
+
+- **Origine** : vision d'usage (README §« Vision d'usage ») — M comme cache chaud du
+  contexte diffus d'un projet. E4 teste exactement ça, rien d'autre.
+- **Protocole** (à lancer dès que X8 tient ; NE PAS lancer avant) :
+  1. Streamer un vrai document de conventions dans M, écriture active, config
+     conforme post-X8 — le CLAUDE.md d'engram lui-même.
+  2. Vider le cache KV (comme E1 : élimine l'explication « c'est le contexte »).
+  3. Mesurer la NLL du cortex sur (a) du texte/code CONFORME aux conventions,
+     (b) du texte/code qui les VIOLE — paires minimales autant que possible
+     (même fonction, style conforme vs non conforme).
+  4. Discrimination = NLL(violant) − NLL(conforme), avec M chargée vs M vierge.
+- **Critère de succès** : la discrimination augmente significativement avec M
+  chargée, à E3 toujours ≤ 0.05 sur texte neutre.
+- **Critère d'échec explicite** : pas de gain de discrimination, ou gain payé en
+  E3 — la vision par-projet est alors réfutée à cette échelle, et on le note.
+- **Contrôle de spécificité** : même mesure avec les conventions d'un AUTRE projet
+  chargées dans M — la discrimination ne doit PAS augmenter (élimine l'effet
+  « M pleine »).
+
+### V2 — Replay / sharp-wave ripples (consolidation M → LoRA) — *hors v1, basse priorité actée*
 
 - **Bio** : replay de séquences compressées (jusqu'à 20×), parfois inversées, parfois
   *recombinées* — de la planification autant que de la consolidation.
@@ -214,6 +234,19 @@ identiques). Détail : journal du 2026-08-21. Protocole d'origine ci-dessous.
   données brutes mais des échantillons **générés depuis M** (échantillonner des clés,
   générer avec/sans M, distiller la différence). C'est ici que le dilemme
   stabilité/plasticité revient en grand.
+- **Le LoRA n'est PAS une amélioration générique** : c'est la réponse à UN problème —
+  le débordement de M sur la durée de vie d'un projet (usage engram-par-projet).
+  Déclencheur défini : la falaise X9. **Verdict X9 (2026-08-21) : falaise lointaine**
+  (aucune dégradation à 80 faits) → **basse priorité actée**. M seule couvre
+  vraisemblablement la durée de vie d'un projet ; le cycle veille/sommeil
+  (M déborde → distillation → reset) attendra un signal de débordement réel.
+- **Prérequis absolus avant toute implémentation** : X8 tient ET X9 mesuré (fait).
+  Contribution visée si un jour lancé : la version EN LIGNE nourrie automatiquement
+  par M — le LoRA-par-projet statique existe déjà ailleurs.
+- **Question ouverte (pas une spec)** : l'écriture involontaire. En usage réel, M
+  apprend aussi les erreurs et les pistes abandonnées — le gating par surprise dit
+  « c'est nouveau », pas « c'est validé ». La consolidation devra filtrer par un
+  signal de **valence** encore à définir.
 
 ## 3. Correspondance mécanisme ↔ piège
 
