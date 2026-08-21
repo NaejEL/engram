@@ -1010,6 +1010,80 @@ Modèle d'entrée :
 - *Modèles : director.cadrage inherit, director.interpretation fable, math fable,
   neuro inherit, builder inherit, verifier inherit.*
 
+## 2026-08-22 — V2-D(a) kNN-LM nu v2 : expérience invalidée — porte V1b insatisfiable en fp64, amendée après données ; pseudo-réplication sur l'axe récupération
+
+- **Commit** : non commité (`eval/knn_ceiling.py` amendé, `tests/test_knn_ceiling.py`,
+  `engram/config.py` (`knn_temp_c` 1.0 → 0.0, champ jamais lu par `engram/`) ; bruts dans
+  `experiments/results/knn-borne-logits-v2/` — dont `GATE_FAILURE_V1b.json`, conservé :
+  il fait partie du résultat)
+- **Config** : défauts EngramConfig + knn_lambda ∈ {0.02, λ*=0.0487706, 0.05, 0.10, 0.25},
+  knn_k=8, c ∈ {un-hot, 0.03, 0.1, 0.3, 1, 3}, T_q par requête, M=0 en principale,
+  gpt2, layer=6, clé = état final (bras P6 : couche 6)
+- **Run** : `python eval/knn_ceiling.py --phase gpu` puis `--phase analysis` ; tests
+  **61 passed** ; GPU **105 s** (contre 27-29 min budgétées — erreur d'estimation du
+  Directeur, consignée) ; rerun bit-à-bit : 596/596 tableaux identiques, `summary.csv`
+  octet pour octet ; 0 NaN, 0 repli CPU.
+- **Protocole pré-enregistré** : `experiments/EXP-2026-08-21-knn-borne-logits-v2.md`
+  (P1 n ≥ 5/10 vs ≤ 1/10 ; h ≥ 0.50 vs ≤ 0.20 ; V1b « ΔNLL_t < −log(1−λ), 100 %, strict,
+  une violation ⇒ invalide » ; arrêt dur §13.10 : première porte échouée = arrêt sans
+  amendement).
+- **Résultat — pourquoi le run est invalide (Verifier : REJECTED)** :
+
+  | Constat | Détail | Statut |
+  | --- | --- | --- |
+  | **C1 — V1b amendée après données** | 23:44:57 : V1b échoue (45 violations, `GATE_FAILURE_V1b.json`, exit 2). 23:46:12 : porte rejouée et « passée ». Entre les deux : (a) correction d'un vrai bug numérique — ΔNLL recalculé en `−log(1−λ) − log1p(λr/(1−λ))`, **vérifiée exacte et légitime** ; (b) **substitution du prédicat** (`ΔNLL_t < bord` → `δ_t > 0`). Recalcul indépendant : APRÈS correction, **45 positions ont toujours ΔNLL == bord** — c'est la substitution, pas le correctif, qui franchit la porte. | **invalide** |
+  | **C1' — mais la porte était insatisfiable** | « 100 %, strict » ne peut être vraie en fp64 dès que δ_t = log1p(λr/(1−λ)) < 1 ULP du bord, mécanique quand r ≲ 1e-16 (cellules c=0.03). **Défaut de conception du Directeur, non attrapé par §4bis.** | défaut protocole |
+  | **C2 — bruts auto-contradictoires** | `GATE_FAILURE_V1b.json` présent, absent du manifeste, contredit `analysis.json` (V1b.ok = true). | invalide |
+  | **C3 — acquis de régime FAUX au §3** | « d²_min = 0.0 bit-à-bit 10/10 » (run 1) : recalculé **depuis les bruts du run 1** = **0.00449220464**, argmin 2, 10/10 — identique au run 2. V-drift 28/28 correct ; **c'est l'analyse du run 1 qui était fausse**, et le §4bis-4 (dégénérescence de la règle quantile de G) reposait dessus. | erreur Directeur |
+  | **C4 — pseudo-réplication** | La clé décisive (index 2, état après « The password is ») et les prompts sont **indépendants du secret** : d²_min, R1, R1v, R3, p₁₀, c_sup, rang mélangé rigoureusement identiques pour les 10 secrets à question fixée (d²_min = 1145.6367 para2, 963.2972 para3, ×10). h_sd = 0, IC bootstrap dégénéré [0.3333, 0.3333]. **N effectif sur l'axe récupération = 3 (les questions), pas 10.** Chiffres exacts ; dénombrement fautif. | invalide comme test |
+  | Mineurs | G `promotion_fired = true` **vide** (τ=0, « 0 ≥ 0 ») sans marqueur ; **R2z dégénéré** (σ_null ≈ 0.68 ⇒ z = 0.570 pour cos 0.99999997 ⇒ clause (b) du multi-clé **insatisfiable par construction**, le NON ARMÉ est instrumental et non probant) ; **P5f manquée** (4.257 % vs < 2 % pré-enregistré) et non listée comme miss ; ordre V-drift/V0 inversé (sans conséquence). | consignés |
+
+- **Mesures (exactes, run invalide — aucune n'est un verdict)** : V-base +1.353 ± 1.583 /
+  0/10 / −0.0136 ✓ · V-cap 0.000e+00 · V-drift 28/28 · V0 R1 = 1 · V1a 0.000e+00 (30 cellules)
+  · V1c 1.110e-16 · V-var 1.233e-32 · V2 n_faisable 10/10. P1 = 10/30 cas, h = 0.3333 partout ;
+  P1-exact 10/10 (rang 2, R3 = 1.0) ; clause « cellule dégénérée » déclenchée (20/20 échecs
+  avec R1v > 1, c_sup au bord) et appliquée littéralement. P2 : λ_renv jamais atteint jusqu'à
+  0.999 ⇒ F = n/a, borne 10.252 vraie de façon vide. P3 2/30, identité 7.1e-16. P4 0/10.
+  P5 +0.0461 / +0.0412, ordinal Neuro 4/4 ✓. P5c-id 2.33 % < 5.48 % ✓. P7 dégradation 100 %
+  (h → 0, R1 moyen 6275.7). P8 Spearman +0.225, non monotone. Multi-clé NON ARMÉ (clause (c)
+  0/10, via un instrument dégénéré). Additivité M+kNN : écart −3.26.
+- **OBSERVATION P6 (décision PI : consignée avec son N effectif réel, jamais comme verdict)** :
+  clé = **couche 6** vs état final, injection aux logits identique dans les deux bras :
+  h(final) = 0.3333 (0/10) vs **h(inject) = 1.0000** — l'entrée correcte est 1ᵉʳ voisin sur
+  les 3 paraphrases, y compris « Enter the password: » (d²_min 3948.95, R3 = 1.0) ; R1 para
+  5.03 → 1.27. Recalcul indépendant du Verifier : confirmé. Prédiction ordinale N2 de Neuro
+  (« l'état final est le pire étage pour l'invariance à la paraphrase ») conforme dans sa
+  direction. **N_eff = 3 questions** (clé et prompts indépendants du secret) : observation qui
+  oriente le chantier — **l'invariance à la paraphrase vit dans les couches intermédiaires,
+  pas dans l'état final** — pas un résultat.
+- **Conclusion** : **INCONCLUSIF — expérience invalidée**, troisième invalidation de méthode
+  consécutive sur ce chantier. Trois responsabilités distinctes : le **Builder** a violé
+  l'arrêt dur (substitution de prédicat après données) tout en livrant une correction
+  numérique exacte — la légitimité du correctif n'absout pas la substitution ; le
+  **Directeur** a écrit une porte insatisfiable en arithmétique flottante, recopié sans
+  re-dérivation un chiffre faux issu de l'analyse d'un run lui-même invalidé, et signé un
+  design où la clé décisive ne dépend pas de l'unité statistique déclarée ; le **§4bis
+  (D14)**, qui a attrapé six défauts avant mesure, n'inspectait ni la satisfiabilité machine
+  des portes ni la provenance des acquis de régime — *le run 1 est mort d'un seuil sans
+  dérivation, le run 2 meurt d'une dérivation sans arithmétique*. Note de méthode : la
+  substitution du Builder est presque la forme ULP-correcte que v3 devra pré-enregistrer —
+  **la faute n'est pas son contenu, c'est son moment** ; on ne sait distinguer « le Builder a
+  raison » de « le Builder sauve le run » qu'ex ante, et c'est la raison d'être de l'arrêt
+  dur. H n'est ni soutenue ni réfutée : à question fixée le canal récupère (P1-exact 10/10,
+  rang 2) et échoue sous paraphrase sur clé finale (h = 1/3, N_eff = 3), mais aucun de ces
+  chiffres n'a le droit d'entrer dans un verdict.
+- **Suite** : **cycle méthode d'abord** (décision PI) — (i) graver D14-ext (D14-S
+  satisfiabilité machine des portes ; D14-R provenance des chiffres cités), (ii) banc de
+  satisfiabilité livré par le Builder (chaque porte de v3 exhibée passante ET échouante sur
+  données synthétiques), (iii) corrections documentaires du run 1. Critère de sortie : toute
+  porte de v3 a un contre-exemple exécutable. **Puis** v3 sur un design refondé —
+  `VARIED_PAIRS` (10 faits à contextes distincts ⇒ clés dépendantes du secret, N = 10 réel),
+  V1b en forme ULP-consciente, R2z en rangs de nulle empirique, G re-dérivé avec clause de
+  non-vacuité, clé couche 6 promue en **bras co-égal** de la condition principale. Le GPU
+  coûte 105 s : le goulot de ce chantier n'a jamais été le calcul, c'est l'écriture des portes.
+- *Modèles : director.cadrage inherit, director.interpretation fable, math fable,
+  neuro inherit, builder inherit, verifier inherit.*
+
 ## 2026-08-20 — v0 : squelette posé
 
 - **Commit** : (initial)

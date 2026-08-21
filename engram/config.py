@@ -55,17 +55,24 @@ class EngramConfig:
     gate_keysim_tau: float = 0.05
 
     # --- V2-D(a) : kNN-LM nu, borne de l'étage des logits ---
-    # Protocole pré-enregistré experiments/EXP-2026-08-21-knn-borne-logits.md, §10
-    # et décision PI §13.5 : « champs knn_* dans EngramConfig, défaut = comportement
-    # actuel (knn_lambda: float = 0.0) ». INSTRUMENT, pas un mécanisme retenu : la
-    # ligne va au tableau des ablations/instruments (§4).
+    # Protocole pré-enregistré experiments/EXP-2026-08-21-knn-borne-logits-v2.md, §10
+    # (antécédent v1 : EXP-2026-08-21-knn-borne-logits.md) et décision PI §13.5 :
+    # « champs knn_* dans EngramConfig, défaut = comportement actuel
+    # (knn_lambda: float = 0.0) ». INSTRUMENT, pas un mécanisme retenu : la ligne va
+    # au tableau des ablations/instruments (§4).
     # Le datastore lui-même vit dans le script d'éval (eval/knn_ceiling.py), JAMAIS
     # dans engram/ — et les clés kNN ne passent JAMAIS par G/DG (§5.8, D9).
     knn_lambda: float = 0.0     # λ du mélange p = (1−λ)·p_LM + λ·p_kNN ; 0.0 = inerte
     knn_k: int = 8              # nombre de voisins (k = 8, §7)
-    knn_temp_c: float = 1.0     # c de T = c·med_j(d²_j − d²_min), calibrée PAR BRAS
+    # SEUL AJOUT DU PROTOCOLE v2 (§10) : `knn_temp_c = 0.0` ≡ **un-hot** ≡ limite
+    # c→0⁺ ≡ **uniforme sur l'argmin-set**. T_q = c·med_{j≥2}(d²_j − d²_min) est
+    # recalculée PAR REQUÊTE (la médiane-de-médianes par bras du run 1 est abandonnée).
+    # Champ purement descriptif ici : aucun code de engram/ ne le lit (le datastore
+    # vit dans eval/), donc le défaut ne change aucun comportement courant.
+    knn_temp_c: float = 0.0
     knn_key_layer: str = "final"  # "final" (état pré-lm_head) | "inject" (layer_index)
     knn_gate_tau: float = 0.0   # bras G : α = 1[d²_min ≤ τ] ; 0.0 = gate désactivé
+                                # (bras G v2 : COURBE sur une grille de τ, aucun τ fixé)
 
     # --- V2-D(a) : second point de capture (état final, pré-lm_head) ---
     # Inerte par défaut (§10) : le hook n'est même pas posé quand le flag est faux.
