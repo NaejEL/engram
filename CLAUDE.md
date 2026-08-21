@@ -65,16 +65,24 @@ Ce n'est PAS un produit — c'est une expérience falsifiable sur un laptop RTX 
   C'est LE mur commun : top-10, E1c, E4/E4s.
 - X8.1 → X8.1b → P5 : anomalie entropie résolue — le dommage de lecture vit aux
   positions incertaines du cortex (corr +0.394) ; **loi 2 : gater côté mémoire,
-  jamais côté détresse du cortex** (la prédiction du modèle cholinergique de
-  Hasselmo) ; two_factor enterré.
+  jamais côté détresse du cortex** ; two_factor enterré. **Q-01 (2026-08-21,
+  /lab-run, RETENU)** : ce ciblage est GÉNÉRIQUE — un bruit de norme appariée le
+  reproduit à R ≈ 0.8 sur deux textes ; la direction quasi constante de la
+  lecture (invariant du modèle, orientée prior) fixe le signe aux positions
+  confiantes. Décision **D11** (ARCHITECTURE §3) : tout canal s'évalue en
+  perturbation aux positions incertaines. Référence bio : Salzman, Britten &
+  Newsome 1990 — la façade Hasselmo est tombée (Hasselmo ne vaut plus que pour
+  X3/Q-05, à requalifier avant lancement).
 - Famille conventions : E4/E4s = critère non atteint (pas de préférence
   token-niveau) ; E4-dur RETIRÉ (il mesure la fluidité) ; Qwen : E4s signes
   conformes n.s., E1 fumée +4.18 (N=2, régime X8 — non comparable aux points
   historiques, Q-08 de l'audit).
 - **Audit externe 2026-08-21 : voir `AUDIT-lab.md`** — 22 corrections traitées,
   6 questions priorisées prêtes pour /lab-run (+ 2 en réserve). **v2 : chantier
-  prioritaire = V2-D (canal de sortie directionnel)** ; sommeil/LoRA basse
-  priorité actée (verdict X9).
+  prioritaire = V2-D**, devenu une course à trois candidats (2026-08-21) :
+  kNN-LM nu (instrument de plafond, en premier) → M_out sur les logits
+  (principal) → Fast-KV (contexte fantôme KV) — fiches et écartements dans
+  EXTENSIONS.md ; sommeil/LoRA basse priorité actée (verdict X9).
 - Runs : SmolLM2 `--model HuggingFaceTB/SmolLM2-360M --layer 16` ; Qwen
   `--model Qwen/Qwen2.5-1.5B --layer 14`.
 

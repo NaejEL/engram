@@ -158,6 +158,7 @@ M (c'est l'op des évals), `reset_memory()` fait l'inverse.
 | D8 | Pas de backprop nulle part en v1 | C'est l'hypothèse testée : une règle locale + un cortex gelé suffisent-ils à un effet mesurable ? Introduire du gradient brouillerait la réponse. |
 | D9 | G (gyrus denté) aléatoire gelée, jamais apprise, seedée par cfg.seed | L'orthogonalisation ne demande aucun apprentissage (Johnson-Lindenstrauss fait le travail) ; une G apprise exigerait du gradient (contredit D8) ; la seed fixe garantit les mêmes clés d'un run à l'autre (comparabilité). Top-k par magnitude et non ReLU+top-k : conserve l'information de signe, deux fois plus de motifs distincts. |
 | D10 | Le cap `max_read_norm` reste en **plancher de sécurité sous le gate X8** (pas remplacé par lui) | En domaine, g ≈ 1 laisse passer λ=2 plein : le cap borne l'injection dans tous les cas, gate ouvert ou fermé. Tranche le « point de vigilance » noté dans EXTENSIONS §X8 ; référencée par `config.py` et `hippocampus.py`. Actée à l'implémentation X8 (2026-08-21) ; entrée ajoutée à l'audit (COR-06). |
+| D11 | La détresse du cortex (entropie, incertitude) est **proscrite comme signal d'ouverture** d'une lecture ou d'une injection ; tout canal, actuel ou futur (V2-D compris), s'évalue comme **perturbation aux positions incertaines** (dommage par position, pas seulement en moyenne) | Q-01 (journal + protocole pré-enregistré, 2026-08-21) : le ciblage du dommage aux positions incertaines est générique — un bruit de norme appariée le reproduit à R ≈ 0.8 sur deux textes — et la direction quasi constante de la lecture (invariant du modèle, orientée prior) en fixe le signe aux positions confiantes (+r̄ reproduit le profil à 0.993). Remplace l'ancrage Hasselmo de la loi 2 par Salzman, Britten & Newsome 1990, *Nature* 346 (6280), 174–177 (microstimulation de MT : biais des jugements vers la direction encodée par le site stimulé, décalage de courbe psychométrique — effet maximal sur le choix près du seuil ; traitement quantitatif : Salzman et al. 1992, *J. Neurosci.* 12(6), 2331–2355). |
 
 ## 4. Pièges connus (à surveiller dès les premiers runs)
 
@@ -237,10 +238,13 @@ référence), puis X1 (gyrus denté) + E3, chacun benchmarké séparément.
 
 ## 7. Hors scope v1 (notes pour v2)
 
-- **Rappel directionnel (V2-D) — LE chantier v2 prioritaire (acté 2026-08-21)** :
-  canal de sortie M_out (valeurs en espace d'unembedding, biais additif sur les
-  logits) — la réponse au mur X7 (zéro composante directionnelle : top-10, E1c,
-  E4s). Voir EXTENSIONS.md, entrée V2-D.
+- **Rappel directionnel (V2-D, LE chantier v2 prioritaire — acté 2026-08-21)** :
+  la réponse au mur X7 (zéro composante directionnelle : top-10, E1c, E4s),
+  devenu une **course à trois candidats** (2026-08-21) — kNN-LM nu en
+  instrument de plafond d'abord, M_out sur les logits (candidat principal),
+  Fast-KV (contexte fantôme KV) — chacun soumis au contrat zéro-gradient (D8)
+  et à D11 (évaluation en perturbation aux positions incertaines). Fiches
+  d'intention et options écartées : EXTENSIONS.md, entrée V2-D.
 - **Sommeil / consolidation — basse priorité actée (verdict X9 : pas de
   falaise)** : distiller périodiquement le contenu de M dans un LoRA
   du cortex, puis reset de M. Spec retenue : replay **génératif depuis M** (pas les

@@ -102,6 +102,11 @@ C'est l'état actuel du code. Aucun flag.
   de stockage mais le **mécanisme d'injection** (couche, λ), et on sait où chercher.
 - **Esquisse** : remplacer M par un store (K, V) explicite + recherche par similarité,
   même point d'injection. Interface commune avec FastWeightMemory pour swap propre.
+- **Renvoi (2026-08-21)** : le candidat V2-D « Fast-KV » (contexte fantôme KV)
+  est X5 arrivé par la porte de l'ingénierie — même théorie de l'indexation,
+  substrat = paires KV rejouées dans les couches basses au lieu d'un store
+  (K, V) lu en couche n/2. Si ce chantier s'ouvre un jour, arbitrer
+  explicitement la fusion X5/Fast-KV plutôt que d'entretenir deux entrées.
 
 ### I1 — Prédicteur d'échec par similarité de clés — *instrumentation, pas un mécanisme*
 
@@ -289,42 +294,114 @@ Détail : journal du 2026-08-21. Protocole d'origine ci-dessous.
   chargées dans M — la discrimination ne doit PAS augmenter (élimine l'effet
   « M pleine »).
 
-### V2-D — Canal de sortie directionnel (M_out) — *LE chantier v2 prioritaire*
+### V2-D — Rappel directionnel — *LE chantier v2 prioritaire ; course à trois candidats (2026-08-21)*
 
 - **Origine** : le mur mesuré en X7 (cos(r, W_U[cible]) ≈ −0.01, sous la base
   aléatoire 0.136 — le chemin direct est activement orthogonal à la cible) et ses
   quatre visages : E1c, verrou top-10, E4, E4s. M actuelle fait de l'**amorçage**
   (priming) : elle teinte le calcul (d'où E1/E2, l'adaptation, la paraphrase) mais
-  ne peut pas **nommer** un token.
-- **Précédent à étudier avant tout design : kNN-LM** (Khandelwal et al. 2020) —
-  mémoire non-paramétrique de paires (état caché → token suivant) interpolée
-  DIRECTEMENT dans la distribution de sortie ; son résultat historique est
-  précisément le rappel des tokens rares que le modèle seul ne hisse jamais.
-- **Esquisse (la version delta rule, compressée et en ligne, de kNN-LM)** : une
-  seconde matrice M_out qui stocke `φ(h) → u_token` (valeurs = lignes de
-  l'unembedding W_U du token OBSERVÉ, pas l'état caché), écrite par la même delta
-  rule au même signal de surprise, lue en **biais additif sur les logits** :
-  `logits += g·W_U·(M_out·φ(h))` — soit une correction linéaire en ligne de la
-  tête de sortie. Même taille que M (d×dg_dim), même gate keysim, aucun backprop.
+  ne peut pas **nommer** un token. **Q-01 (2026-08-21) est la 5ᵉ observation** :
+  la lecture d'état est une perturbation quasi générique, de direction invariante
+  du modèle — le rappel précis exige un canal qui désigne des tokens.
+- **Contrat d'admission (critère de la course)** : cortex gelé, règle locale, en
+  ligne, **zéro module entraîné par gradient** (D8) — c'est ce qui rend chaque
+  résultat attribuable. Tout candidat qui y déroge est hors course (voir les
+  options écartées en fin d'entrée).
+- **Règle transversale (D11, issue de Q-01)** : aucun canal ne s'ouvre sur la
+  détresse du cortex, et chaque candidat s'évalue comme **perturbation aux
+  positions incertaines** (dommage par position, pas seulement en moyenne) — les
+  logits et le cache KV ont leurs positions fragiles comme le flux résiduel.
+- **Ordre de la course** : (a) kNN-LM nu d'abord (instrument de plafond), puis
+  (b) M_out (candidat principal), (c) Fast-KV. Un candidat = une future entrée
+  pré-enregistrée avec critères chiffrés le moment venu — ici, fiches
+  d'intention seulement, aucun numéro d'expérience n'est promis.
+
+**Candidat (a) — kNN-LM nu (baseline-instrument, À FAIRE EN PREMIER)** :
+datastore brut de paires (état caché → token suivant) interpolé directement dans
+la distribution de sortie (Khandelwal et al. 2020 — son résultat historique est
+précisément le rappel des tokens rares que le modèle seul ne hisse jamais). Pas
+un candidat produit (un datastore se compte en dizaines de Go — l'esprit
+contraire du projet) mais **l'instrument qui mesure le PLAFOND** : si le
+datastore brut hisse les rangs sur E1/E1c là où M échoue, l'espace de sortie est
+confirmé comme bon point d'attaque avant d'écrire une ligne du mécanisme
+compressé ; s'il échoue aussi, V2-D est mal parti et on le saura pour trois fois
+rien. Ligne D11 : l'interpolation sera elle aussi regardée par position.
+
+**Candidat (b) — M_out sur les logits (candidat principal)** : une seconde
+matrice M_out qui stocke `φ(h) → u_token` (valeurs = lignes de l'unembedding W_U
+du token OBSERVÉ, pas l'état caché), écrite par la même delta rule au même
+signal de surprise, lue en **biais additif sur les logits** :
+`logits += g·W_U·(M_out·φ(h))` — soit une correction linéaire en ligne de la
+tête de sortie. Même taille que M (d×dg_dim), même gate keysim (organe déjà
+validé par X8), aucun backprop : la version compressée et en ligne de kNN-LM,
+la plus simple conforme au contrat. Ligne D11 : une distribution de sortie a
+aussi ses positions fragiles — le biais additif sera évalué en dommage par
+position, pas seulement en E3 moyen.
+
+**Candidat (c) — Fast-KV (contexte fantôme — nouveau, 2026-08-21)** : M pilote
+l'injection de paires KV **virtuelles** dans le cache des couches basses — le
+fait n'est plus dans la fenêtre, son ombre KV y est. Rationale : l'attention
+native sait DÉSIGNER des tokens (induction heads), contrairement au flux
+résiduel en n/2 (le mur X7) — on utilise la machinerie de rappel du cortex au
+lieu de la contourner. Bio : théorie de l'indexation hippocampique
+(l'hippocampe stocke de quoi RÉINSTALLER le pattern cortical, pas le contenu) —
+c'est **X5 arrivé par la porte de l'ingénierie** (renvoi croisé dans l'entrée
+X5). Question de design centrale, OUVERTE : construire les paires KV sans
+entraînement ; candidat naturel — **rejouer les KV réels capturés au moment de
+l'écriture** (l'hippocampe comme enregistreur d'états d'attention). À
+protocoler le jour venu, pas ici : (1) E3 dédié obligatoire, par position
+(D11 — un contexte fantôme peut distraire l'attention comme M distrait le flux,
+et Q-01 dit que TOUT canal coûte aux positions fragiles) ; (2) coût mémoire des
+KV stockés à chiffrer — n_couches_basses × 2 × d par token fantôme (GPT-2 :
+6 couches ≈ 37 Ko fp32 par token → ~1 000 tokens fantômes ≈ 35-40 Mo ; à
+vérifier contre l'esprit « dizaines de Mo ») ; (3) **point de vigilance D7
+(signalé, non tranché)** : `clear_context()` est LE contrôle du PoC — il devra
+vider AUSSI le contexte fantôme, la réinstallation devant être re-déclenchée
+par M au moment du rappel ; sinon l'éval ne distingue plus la mémoire du
+in-context et D7 perd son objet.
+
+**Options examinées et écartées (2026-08-21)** — même statut que les
+factorisations de M écartées par X9 :
+
+- **Pseudo-inverse de W_U** (Δh = W_U†·P_cible injecté dans le flux résiduel) :
+  fabrique une direction de logits puis la re-projette dans le résiduel pour que
+  l'unembedding la re-extraie — deux projections pour revenir au point de
+  départ, pseudo-inverse mal conditionnée (d × vocab), et le vecteur reconstruit
+  retraverse les couches qui le RECOMPUTENT (le mur X7, réimporté). Si le but
+  est de biaiser les logits : les biaiser directement. Écartée comme « M_out en
+  moins bien ».
+- **Cross-attention traductrice pré-entraînée** (~1M params entraînés une fois
+  sur dataset générique) : viole le contrat zéro-gradient (D8) — chaque succès
+  deviendrait inattribuable (M ou le traducteur ?) — et ne résout PAS X7 : le
+  problème du point d'injection n/2 n'est pas une transformation mal apprise
+  mais l'absence de chemin direct vers les tokens (cos ≈ −0.01, mesuré).
+  Écartée par défaut ; si un jour toutes les options sans entraînement sont
+  épuisées, la rouvrir sous son vrai nom (« passage au gradient »), pas comme
+  couche d'interfaçage.
+
 - **Architecture résultante — deux canaux de lecture** : un canal d'ÉTAT
   (l'existant : diffus, généralisant, ratio 0.38–0.68) et un canal de SORTIE
-  (directionnel, précis, pour le rappel exact). C'est la hiérarchie
-  registre/cache dessinée pour l'usage par-projet, mais À L'INTÉRIEUR du
-  mécanisme. Rapprochement familiarité/recollection corrigé (audit
-  2026-08-21) : la carte naïve est inversée — la **recollection**
+  (directionnel, précis, pour le rappel exact — b ou c selon la course). C'est
+  la hiérarchie registre/cache dessinée pour l'usage par-projet, mais À
+  L'INTÉRIEUR du mécanisme. Rapprochement familiarité/recollection corrigé
+  (audit 2026-08-21) : la carte naïve est inversée — la **recollection**
   (réinstallation d'un pattern via un index) est le processus hippocampique,
-  dont l'analogue ici est X5 ; un canal de sortie item-spécifique type kNN-LM
-  est plus proche de la **familiarité**. X5 et V2-D partagent donc la même
-  justification bio (indexing theory), par deux chemins différents.
-- **Évals de verdict** : E1 top-10 (le canal de sortie doit débloquer des rangs
-  que l'amorçage ne peut pas atteindre), E1c (renverser « Paris »), E4s (la
-  préférence token-niveau), chacune avec le canal d'état seul / sortie seul /
-  les deux — E3 toujours ≤ 0.05.
+  dont l'analogue ici est X5 (et donc Fast-KV) ; un canal de sortie
+  item-spécifique type kNN-LM est plus proche de la **familiarité**. X5 et V2-D
+  partagent donc la même justification bio (indexing theory), par deux chemins
+  différents.
+- **Évals de verdict (communes aux candidats)** : E1 top-10 (le canal de sortie
+  doit débloquer des rangs que l'amorçage ne peut pas atteindre), E1c (renverser
+  « Paris »), E4s (la préférence token-niveau), chacune avec le canal d'état
+  seul / sortie seul / les deux — E3 toujours ≤ 0.05, ET par position (D11).
 - **Principe consigné (dépasse engram)** : dans une mémoire test-time, **les
   gates ne sont pas des optimisations, ce sont les organes qui rendent le
   mécanisme viable** — écriture gatée = spécificité (E4 mode force), lecture
   gatée = innocuité (E3 +0.57 sans gate), et le rappel précis exige un troisième
   organe, directionnel.
+- **Priorité inchangée** : cette entrée prépare le terrain, elle n'ouvre pas le
+  chantier — les corrections d'audit et la file Q (Q-01b, requalification Q-05,
+  Q-03) passent avant toute ouverture V2-D.
 
 ### V2 — Replay / sharp-wave ripples (consolidation M → LoRA) — *hors v1, basse priorité actée*
 
@@ -388,5 +465,6 @@ retire un mécanisme de la référence, aucune n'est retenue comme nouveau défa
 | toujours-écrire (thr=0) | — | −0.0045 | — | **le gating porte ~92 % de l'effet E2** |
 | clés denses (dg off) | — | −0.0352 | — | DG apporte +57 % d'interaction |
 | delta η=0.4 | — | −0.0488 | — | contrôle C1 : l'avantage Hebb ≠ pas plus grand |
+| Q-01 perturbations appariées (diagnostic, gate none, 2 textes, 2026-08-21) | — | — | read-M +0.135 (réf.) ; iid_pair reproduit le ciblage à R = 0.83 (A) / 0.78 (B) | **H générique RETENUE (composite)** — le ciblage entropie n'est pas spécifique à M ; la direction prior (+r̄ ≈ read-M à 0.993) fixe le signe aux confiantes ; aucune interférence de contenu (P4 0.988 vs null 0.658) — protocole `experiments/EXP-2026-08-21-specificite-dommage-incertaines.md` |
 
 *(les lignes suivantes du tableau principal s'ajoutent quand leur déclencheur est observé)*

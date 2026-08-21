@@ -49,7 +49,9 @@ littéralement).
   est RETIRÉ (la NLL moyenne de phrase mesure la fluidité, pas la conformité) ;
   E4s y donne les premiers signes correctement signés, non significatifs
   (+0.018/−0.010, N=10). Le sauvetage plausible passe par le rappel
-  directionnel (V2-D).
+  directionnel (V2-D — course à trois candidats depuis le 2026-08-21 :
+  kNN-LM nu en instrument de plafond, M_out, Fast-KV ; fiches et écartements
+  dans EXTENSIONS.md).
 - **Tué par** : l'absence de rappel directionnel en v2 (la voie « meilleur
   juge » est consommée : E4-dur retiré, E4s Qwen n.s.) — la falaise X9 est,
   elle, déjà écartée (rien à 80 faits).
