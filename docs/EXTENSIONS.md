@@ -321,11 +321,15 @@ datastore brut de paires (état caché → token suivant) interpolé directement
 la distribution de sortie (Khandelwal et al. 2020 — son résultat historique est
 précisément le rappel des tokens rares que le modèle seul ne hisse jamais). Pas
 un candidat produit (un datastore se compte en dizaines de Go — l'esprit
-contraire du projet) mais **l'instrument qui mesure le PLAFOND** : si le
-datastore brut hisse les rangs sur E1/E1c là où M échoue, l'espace de sortie est
-confirmé comme bon point d'attaque avant d'écrire une ligne du mécanisme
-compressé ; s'il échoue aussi, V2-D est mal parti et on le saura pour trois fois
-rien. Ligne D11 : l'interpolation sera elle aussi regardée par position.
+contraire du projet) mais **l'instrument qui borne l'étage des logits** —
+au sens strict : ce qu'un mélange convexe peut faire avec des clés égales à des
+états du cortex gelé, aux étages de clé testés, dans le cadre de phrase testé.
+Ce n'est PAS un plafond de V2-D : la borne ne se retourne pas. Un succès ne
+démontre aucun mécanisme (le datastore contient la réponse) ; un échec ne dit pas
+« l'espace de sortie est le mauvais point d'attaque », il dit que **ces clés-là**
+n'adressent pas — l'attribution passe par la table clé/injection du protocole
+(Branche A = échec côté clé, V2-D non réfuté ; Branche B = échec côté injection,
+le seul résultat qui parle contre (b)). Ligne D11 : l'interpolation sera elle aussi regardée par position.
 
 **Candidat (b) — M_out sur les logits (candidat principal)** : une seconde
 matrice M_out qui stocke `φ(h) → u_token` (valeurs = lignes de l'unembedding W_U
@@ -387,7 +391,11 @@ factorisations de M écartées par X9 :
   (audit 2026-08-21) : la carte naïve est inversée — la **recollection**
   (réinstallation d'un pattern via un index) est le processus hippocampique,
   dont l'analogue ici est X5 (et donc Fast-KV) ; un canal de sortie
-  item-spécifique type kNN-LM est plus proche de la **familiarité**. X5 et V2-D
+  item-spécifique type kNN-LM **n'est pas pour autant de la familiarité** : dans (a),
+  la seule quantité qui porte une propriété de familiarité est `d²_min` (la
+  distance au plus proche voisin, un scalaire de force de correspondance) — la
+  **valeur** récupérée, elle, est un contenu item-spécifique. C'est pourquoi le
+  gate G du protocole se construit sur `d²_min` et sur rien d'autre. X5 et V2-D
   partagent donc la même justification bio (indexing theory), par deux chemins
   différents.
 - **Évals de verdict (communes aux candidats)** : E1 top-10 (le canal de sortie
@@ -467,7 +475,7 @@ retire un mécanisme de la référence, aucune n'est retenue comme nouveau défa
 | delta η=0.4 | — | −0.0488 | — | contrôle C1 : l'avantage Hebb ≠ pas plus grand |
 | Q-01 perturbations appariées (diagnostic, gate none, 2 textes, 2026-08-21) | — | — | read-M +0.135 (réf.) ; iid_pair reproduit le ciblage à R = 0.83 (A) / 0.78 (B) | **H générique RETENUE (composite)** — le ciblage entropie n'est pas spécifique à M ; la direction prior (+r̄ ≈ read-M à 0.993) fixe le signe aux confiantes ; aucune interférence de contenu (P4 0.988 vs null 0.658) — protocole `experiments/EXP-2026-08-21-specificite-dommage-incertaines.md` |
 | Q-01b congruence lexicale (diagnostic CPU sur bruts Q-01, gate none, 2026-08-21) | — | — | sans objet (aucune lecture modifiée) | **H1a REJETÉE** — ρ_S +0.18/+0.22 et β_s* +0.045/+0.028 (signe OPPOSÉ à la prédiction, p<10⁻³, deux opérationnalisations dont la direction réelle r̄) ; le signe positif s'effondre sous appariement NLL_base (+0.32 → +0.004/+0.05) et en zone non mordante ⇒ **propriété de la borne D_t ≥ −NLL_base, pas un canal inverse** ; D2 : |Δ_raw| 0.095 < sd intra-texte 0.27/0.13 — **l'anomalie A/B de Q-01 était de la pseudo-réplication** ; F non rapportée (P3 : Δ_z ≈ 0) ; ablation direction de fréquence **NON ARMÉE** (condition β_s* < 0 ; mesuré positif) — protocole `experiments/EXP-2026-08-21-congruence-lexicale.md` |
-| V2-D(a) kNN-LM nu, run 1 (instrument, 2026-08-21) | non mesuré (arrêt V1) | non mesuré | — | 0.0978-0.0989 à λ=0.10 ; identité −log(1−λ) vérifiée à **1.3e-15** hors tokens-valeurs | **INVALIDE** — portes V0/V1 incohérentes avec les amendements de régime (erreur de consolidation du Directeur) ; implémentation validée, récupération exacte parfaite (d²_min = 0, R1 = 1, 10/10) ; acquis analytiques λ\* = 0.0488, λ_renv ≳ 0.33 ; re-pré-enregistrement v2 avec re-collecte à neuf — protocole `experiments/EXP-2026-08-21-knn-borne-logits.md` |
+| V2-D(a) kNN-LM nu, run 1 (instrument, 2026-08-21) | non mesuré (arrêt V1) | non mesuré | — | 0.0978-0.0989 à λ=0.10 ; identité −log(1−λ) vérifiée à **1.3e-15** hors tokens-valeurs | **INVALIDE** — portes V0/V1 incohérentes avec les amendements de régime (erreur de consolidation du Directeur) ; implémentation validée, récupération exacte parfaite (rang 1, R1 = 1, 10/10 ; **erratum 2026-08-22** : le d²_min publié « = 0 » était faux, réel 0.00449220464) ; acquis analytiques λ\* = 0.0488, λ_renv ≳ 0.33 ; re-pré-enregistrement v2 avec re-collecte à neuf — protocole `experiments/EXP-2026-08-21-knn-borne-logits.md` |
 | V2-D(a) kNN-LM nu, run 2 (instrument, 2026-08-22) | — (récupération : N_eff = 3, non consignable) | non mesuré | — | +0.0461 à λ\* (fait-seul) ‡ chiffre exact d'un run invalide | **INVALIDE ×3** — porte V1b insatisfiable en fp64 puis amendée après données (arrêt dur violé) + **pseudo-réplication** (clé et prompts indépendants du secret ⇒ N_eff = 3, pas 10) + acquis de régime faux recopié du run 1 (d²_min = 0.0 → réel 0.00449220464) ⇒ **D14-ext candidate** (satisfiabilité machine des portes ; provenance des chiffres cités). **Observation P6 (N_eff = 3)** : clé couche 6 h = 1.00 vs état final h = 0.33 — l'invariance à la paraphrase vit dans les couches intermédiaires — protocole `experiments/EXP-2026-08-21-knn-borne-logits-v2.md` |
 
 *(les lignes suivantes du tableau principal s'ajoutent quand leur déclencheur est observé)*

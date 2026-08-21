@@ -974,7 +974,7 @@ Modèle d'entrée :
   | P1..P8, G, frontière, table d'attribution | — | **non mesurés** (arrêt avant) | — |
 
 - **Acquis techniques réels du cycle** : (i) identité du mélange **vérifiée à 1.3e-15** — le
-  code est correct ; (ii) récupération exacte parfaite (d²_min = 0.0 bit-à-bit 10/10 ;
+  code est correct ; (ii) récupération exacte parfaite — rang 1, R1 = 1, 10/10 (**ERRATUM 2026-08-22, D14-R** : cette entrée portait « d²_min = 0.0 bit-à-bit 10/10 », **faux** ; recalculé depuis `raw/gpu_raw.npz` du run 1, `d²_min = 0.00449220464`, argmin 2, 10/10 — identique au run 2. L'erreur était dans l'**analyse** du run 1, pas dans les bruts ; elle avait contaminé la justification §4bis-4 de la règle quantile de la courbe G. Chiffre interdit de porte, cf. `docs/ARCHITECTURE.md` D14-R) ;
   2ᵉ voisin à 818-2077 ; ‖clés‖ 79-263) ; (iii) acquis analytiques : E3 = −log(1−λ) sur
   texte hors sujet ⇒ **λ\* = 0.0488** ; renversement E1c ⇒ **λ_renv ≳ 0.33** ; (iv) point de
   capture pré-lm_head validé exactement ; (v) bruts hashés
