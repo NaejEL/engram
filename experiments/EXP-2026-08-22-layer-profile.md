@@ -169,13 +169,16 @@ Numérique : cosinus et Gram en **fp32**, valeurs propres en **fp64**.
 
 ## 11. Questions pour le PI
 
-1. **O-6 — bras de v3.** Si I2 désigne pour GPT-2 une couche-clé différente de 6, mon hypothèse posée est de **ne pas** toucher aux bras F et L6 de v3 (ajouter un bras ré-ouvrirait la multiplicité fermée par la décision 12) et de consigner la désignation comme prédiction en attente. Confirmes-tu, ou préfères-tu déplacer le bras avant pré-enregistrement de v3 ?
-2. **Ordonnancement.** I2 s'insère après la clôture du banc et avant le GPU de v3. Cela **retarde v3** du temps de I2 (XS, mais non nul). Confirmes-tu cet ordre, ou v3 passe-t-il d'abord ?
-3. **Avis d'experts.** Ce protocole n'a **pas** été soumis aux tours Math / Neuro — le cadrage ne le demandait pas. Vu que les deux tours ont trouvé des clauses fausses dans v3 à chaque passage, je recommande **un tour** avant pré-enregistrement. À toi.
+1. **O-6 — bras de v3. — TRANCHÉE PAR LE PI (2026-08-22) : NON.** Les bras **F et L6 de v3 restent inchangés**, quelle que soit la couche que I2 désignera. Motif du PI : *« on ne tire pas de plans sur la comète avant d'avoir eu des résultats de I2 »*. L'hypothèse O-6 est donc **confirmée** et cesse d'être une hypothèse. **Conséquence opératoire** : la désignation de I2 est consignée au journal comme **prédiction en attente**, et c'est un **cycle ultérieur** qui la teste — jamais v3, dont le design est clos sur ce point. La multiplicité fermée par la décision 12 du cycle méthode reste fermée.
+2. **Ordonnancement.** *Sans objet — déjà fixé par le cadrage* : I2 s'insère après la clôture du banc D14-ext et avant le GPU de v3. La question était une redite de ma part ; l'ordre du cadrage fait foi.
+3. **Avis d'experts.** Ce protocole n'a **pas** été soumis aux tours Math / Neuro — le cadrage ne le demandait pas. Vu que les deux tours ont trouvé des clauses fausses dans v3 **à chaque passage**, je recommande **un tour** avant pré-enregistrement. **Ouverte.** Rien ne presse : le banc est bloquant et aucune mesure ne peut partir avant qu'il soit vert.
 
 ## Historique
 
 - 2026-08-22 : cadrage PI (instrument I2, motivation à trois sources, prédictions P-A à P-D)
 - 2026-08-22 : références **vérifiées** — Skean et al. arXiv:2412.09563 confirmée ; **Lad et al. corrigée en arXiv:2406.19384** (le cadrage annonçait 2404.xxxx) ; `L` = 12 / 32 / 28 **re-mesuré** ; les trois couches D3 valent exactement `⌊L/2⌋`
 - 2026-08-22 : six écarts cadrage / état réel levés explicitement (§0) ; fenêtre de tolérance **dérivée** de la zone GPT-2 au lieu d'être posée trois fois ; ambiguïté du critère d'échec **désambiguïsée** en trois cellules avant mesure
+- 2026-08-22 : **PI — question 1 (O-6) tranchée : NON**, les bras F et L6 de v3 sont
+  clos ; la désignation de I2 sera une prédiction en attente, testée par un cycle
+  ultérieur. Question 2 sans objet (l'ordre du cadrage fait foi). Question 3 ouverte.
 - 2026-08-22 : **PROPOSE**. Étape suivante : décision du PI sur les trois questions §11, puis (si tour d'experts) avis Math / Neuro, puis banc, puis pré-enregistrement.
