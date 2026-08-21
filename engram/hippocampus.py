@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """L'hippocampe : mémoire associative à fast weights, sans aucun backprop.
 
 Une seule structure d'état : M (d×key_dim, fp32 ; key_dim = d en mode X0, dg_dim

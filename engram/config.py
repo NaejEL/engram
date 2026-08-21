@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Configuration unique du PoC. Tout hyperparamètre vit ici — rien en dur ailleurs.
 
 Les valeurs par défaut sont des points de départ raisonnés, pas des résultats :
@@ -15,13 +16,12 @@ class EngramConfig:
     layer_index: int = 6      # bloc où l'hippocampe lit/écrit (GPT-2 : 0..11, milieu = 6)
 
     # --- Hippocampe (lecture) ---
-    # λ=1.0, cap=0.25 : point de fonctionnement conforme E3, retenu au balayage λ×cap
-    # du 2026-08-20 (E1 +0.74 ± 0.80, E3 +0.023 < seuil 0.05). Le cap agit comme
-    # gating doux : les récupérations pertinentes saturent le cap, les parasites
-    # restent sous le cap — λ>1 n'ajoute donc rien à E1 mais amplifie le bruit E3
-    # (λ=2 même cap : E1 identique, E3 ×5.6). Historique : docs/JOURNAL.md.
-    lam: float = 1.0            # λ : force d'injection de M·φ(h) dans le flux résiduel
-    max_read_norm: float = 0.25  # plafond de ‖injection‖ en fraction de ‖h‖
+    # λ=2.0, cap=0.5 : régime agressif ROUVERT par le gate keysim (X8, 2026-08-21) —
+    # la sélectivité vient du gate (lecture coupée hors domaine), plus du cap serré.
+    # E1 +1.353 ± 1.58, E3 −0.014 (GPT-2). L'ancien point sans gate (λ=1, cap=0.25 :
+    # E1 +0.740, E3 +0.023) reste la référence d'ablation read_gate="none".
+    lam: float = 2.0            # λ : force d'injection de M·φ(h) dans le flux résiduel
+    max_read_norm: float = 0.5   # plafond de ‖injection‖ en fraction de ‖h‖
 
     # --- Hippocampe (écriture) ---
     eta: float = 0.2           # η : pas d'apprentissage de la delta rule
@@ -43,9 +43,10 @@ class EngramConfig:
 
     # --- X8 : gate de lecture à deux facteurs (voir EXTENSIONS.md §X8) ---
     # g = soft-OR(incertitude du cortex, pertinence du match mémoire). Le cap
-    # max_read_norm reste en PLANCHER de sécurité (décision D10). "none" = cap seul
-    # (comportement X1b) ; "entropy"/"keysim" = baselines d'ablation.
-    read_gate: str = "none"          # "none" | "entropy" | "keysim" | "two_factor"
+    # max_read_norm reste en PLANCHER de sécurité (décision D10). Défaut "keysim"
+    # depuis le banc X8 (2026-08-21) : E1 intact, E3 éliminé ; le facteur entropie
+    # est disqualifié (anomalie E3 + entropie décalée d'un pas — voir journal).
+    read_gate: str = "keysim"        # "none" | "entropy" | "keysim" | "two_factor"
     gate_entropy_mid: float = 2.0    # nats — centre du sigmoïde d'incertitude
     gate_entropy_tau: float = 0.5
     gate_keysim_mid: float = 0.6     # centre du sigmoïde de pertinence (calibré par X9)

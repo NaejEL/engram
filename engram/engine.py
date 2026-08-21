@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """La boucle en ligne : le cortex avance token par token, l'hippocampe lit à chaque
 pas et écrit quand la surprise l'exige.
 

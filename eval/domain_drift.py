@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """E2 — Dérive de domaine : M actif fait-il baisser la NLL au fil d'un long document ?
 
 Protocole (docs/ARCHITECTURE.md §5, E2) : streamer un long texte technique en chunks

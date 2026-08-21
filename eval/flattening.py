@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """X7 — Test de l'hypothèse d'aplatissement (protocole pré-enregistré, journal 2026-08-21).
 
 Trois mesures sur le même run :

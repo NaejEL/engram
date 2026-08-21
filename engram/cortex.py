@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Le néocortex : un LLM gelé, plus le hook d'injection de l'hippocampe.
 
 Rôles :

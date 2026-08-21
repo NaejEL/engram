@@ -134,3 +134,10 @@ sur E1/E2/E3, avec un « poids » chiffré par ajout — voir `docs/EXTENSIONS.m
         (c'est là que l'oubli catastrophique redevient un dragon — hors scope v1) ;
         piste rappel directionnel (valeurs en espace d'unembedding ou tête de
         lecture apprise — le verrou top-10 requalifié par X7)
+
+## Licence
+
+AGPL-3.0-or-later — Copyright (C) 2026 NaejEL. La valeur d'engram tient à ce que la
+mémoire est un artefact ouvert (inspectable, diffable, effaçable de façon
+vérifiable) ; la licence garantit que ça le reste, y compris en usage réseau.
+Texte intégral : [LICENSE](LICENSE).

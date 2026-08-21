@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """X9 — Courbe de capacité (protocole pré-enregistré, EXTENSIONS.md §X9).
 
 E1-multi varié à N ∈ {5, 10, 20, 40, 80} faits injectés dans la même M (contextes

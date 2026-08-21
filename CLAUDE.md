@@ -21,6 +21,9 @@ Ce n'est PAS un produit — c'est une expérience falsifiable sur un laptop RTX 
   mécanismes X0→X5, déclencheurs, tableau des poids. Rien n'entre dans le code sans ça.
 - `docs/JOURNAL.md` — journal d'expériences (à tenir à jour : chaque run notable y va).
 - `README.md` — vue d'ensemble + protocole d'évaluation.
+- `docs/VISION.md` — cas d'usage cibles, chacun avec prérequis (numéros
+  d'expérience) et conditions d'échec. Licence : AGPL-3.0-or-later (LICENSE,
+  SPDX dans chaque .py — à reporter sur tout nouveau fichier source).
 - `docs/POSSIBLE_APPROACH.md` — notes brutes de Jean (mécanismes bio) ; formalisées
   dans EXTENSIONS.md, ne pas modifier.
 - `docs/AFTER_v1_THOUGHTS.md` — relecture critique post-v1 (écrite AVANT v1.1, ne pas

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Tests unitaires de l'hippocampe — CPU pur, aucun modèle HF, quelques millisecondes.
 
 Ils vérifient les propriétés qui rendent le PoC interprétable : rappel associatif,
@@ -18,9 +19,11 @@ D = 64
 
 
 def make_memory(**overrides) -> FastWeightMemory:
-    # dg_dim=0 explicite : la base de test est le mode dense (X0) ; les tests X1
-    # activent la projection eux-mêmes. Le défaut de EngramConfig est dg actif.
-    cfg = EngramConfig(**{"eta": 0.2, "decay": 0.0, "prune_every": 0, "dg_dim": 0, **overrides})
+    # dg_dim=0 et read_gate="none" explicites : la base de test est le mécanisme nu
+    # (mode X0, sans gate) ; les tests X1/X8 activent leurs mécanismes eux-mêmes.
+    # Les défauts de EngramConfig sont dg actif + gate keysim.
+    cfg = EngramConfig(**{"eta": 0.2, "decay": 0.0, "prune_every": 0, "dg_dim": 0,
+                          "read_gate": "none", **overrides})
     return FastWeightMemory(D, cfg)
 
 

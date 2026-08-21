@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """E3 — Dommage collatéral : une M chargée rend-elle le modèle plus bête ailleurs ?
 
 Le scénario d'échec le plus probable du PoC n'est pas « pas de signal », c'est

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """X8 — Banc d'essai du gate de lecture (protocole pré-enregistré, EXTENSIONS.md §X8).
 
 Quatre modes comparés à config égale par ailleurs :

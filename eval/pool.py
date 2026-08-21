@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Pool de faits pour X9 (courbe de capacité) : 80 gabarits à contextes distincts
 + 80 secrets. Pré-requis posé par I1 : sans contextes distincts, les collisions de
 gabarit confondent la mesure de capacité.

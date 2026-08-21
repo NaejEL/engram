@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """engram — PoC hippocampe/néocortex : fast weights plastiques à test-time sur un LLM gelé.
 
 Point d'entrée typique :
