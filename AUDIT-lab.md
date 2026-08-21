@@ -45,7 +45,7 @@ Tri : sévérité décroissante puis taille croissante. Pas de specs (factory ab
 - **Ce qu'elle trancherait** : la forme finale de la loi 2 (propriété de la lecture de M vs propriété du cortex) — conclusion de l'arc X8.1, chapitre méthode du papier.
 - **Coût estimé** : XS — **Dépend de** : —
 - **Lancer** : `/lab-run "La corrélation dommage/entropie +0.394 (P5) est-elle spécifique à la lecture de M, ou toute perturbation de même norme aux positions incertaines la reproduit-elle ?"`
-- **Statut** : A_FAIRE
+- **Statut** : FAIT (2026-08-21) — verdict RETENU (H générique, composite), voir `experiments/EXP-2026-08-21-specificite-dommage-incertaines.md` et le journal
 
 ### Q-03 — E3 keysim « éliminé » avec incertitude
 - **Question** : le E3 keysim « −0.0076, éliminé (devient négatif) » et la non-monotonie cap 0.25→0.1 à λ=1 (+0.023 vs +0.031) tiennent-ils une fois l'écart-type rapporté ?

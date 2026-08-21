@@ -823,6 +823,58 @@ Modèle d'entrée :
 - **Suite** : questions de l'audit dans l'ordre Q-01 → Q-03 → Q-02 → Q-04 →
   Q-06 → Q-05, chacune via `/lab-run` (AUDIT-lab.md).
 
+## 2026-08-21 — Q-01 : le ciblage des positions incertaines est GÉNÉRIQUE — la direction de M en fixe le signe
+
+- **Commit** : non commité (nouveau : `eval/perturb_position.py`, `tests/test_perturb_position.py` ;
+  bruts dans `experiments/results/specificite-dommage-incertaines/` — répertoire NON suivi par git,
+  à committer ou hasher pour l'immutabilité, note Verifier)
+- **Config** : model=gpt2, layer=6, défauts EngramConfig SAUF read_gate=none (objet d'étude :
+  lecture non gatée, comme P5) ; textes neutres A (`NEUTRAL_TEXT`) et B (nouveau, embarqué) ;
+  5 conditions à norme appariée par position : read-M / iid ±ε (antithétique) / fixe / +r̄ / −r̄.
+- **Run** : `python eval/perturb_position.py` — 143 streams, 607 s, cuda ; tests 30/30 ;
+  Verifier APPROVED itération 1 (rerun bit-exact).
+- **Protocole pré-enregistré** : `experiments/EXP-2026-08-21-specificite-dommage-incertaines.md` —
+  V1 porte dure (+0.1354 ± 0.005) ; P2 décisionnelle unique (générique si
+  R = corr_pair(iid)/corr(read-M) ≥ 0.5, IC apparié excl. 0.25 ; spécifique si ≤ 0.25,
+  IC excl. 0.5) ; P6 en secours si zone grise ; P3/P4/P5'/P7/P-ord descriptives ;
+  signature anti-artefact signe constant ≥ 9/10 ; réserve « position unique » si ambiguïté.
+- **Résultat** :
+  - V1 ✓ (+0.13536) ; V3 indicatif : corr read-M A = +0.3849 ± 0.0121 (ancre P5 +0.394).
+  - **P2 : R = 0.826 [0.706, 0.946] (A) ; 0.779 [0.547, 1.011] (B) → H générique sur les
+    DEUX textes** (Fisher-z t apparié p=0.0089/0.072 ; Wilcoxon 0.0137/0.037). Signature
+    signe-constant 8/10 + 8/10 : NON atteinte (binomiale jointe p=0.0059, dépendance A/B).
+    Résidu directionnel R<1 : établi sur A, directionnel seulement sur B.
+  - P6 (descriptive) : read-M confiantes −0.0646 (A, 10/10) mais +0.0370 (B, 10/10 —
+    renversement réel, t=20.6). Décomposition pair/impair depuis ±r̄ : impair_confiantes
+    CONGRUENT sur les deux textes (−0.229/−0.134), pair_confiantes +0.137/+0.157 — le
+    renversement est un effet de bilan, pas d'inversion de mécanisme.
+  - P3 hors bande (0.164/0.106) et P-ord violé sur A (fixe +0.1617 > read-M +0.1354) :
+    même phénomène, fermé à ±0.02 nats — les perturbations cohérentes (fixe, ±r̄, read-M)
+    paient courbure locale + cohérence inter-positions (×4.6 vs iid).
+  - P4 : similarité inter-secrets 0.988/0.986 vs null empirique 0.658/0.626 — aucune
+    interférence de contenu. P5' : 3.85×/4.83× (dilution mécanique, descriptif).
+  - **P7 : corr(profil +r̄, profil read-M) = 0.9932/0.9927** — la direction suffit ;
+    −r̄ nuit aux confiantes (+0.366/+0.291) et corr(D,H) négative 20/20.
+  - Instrumentation : saturation cap 0.26 %/0.11 % — la prémisse « cap saturé partout »
+    était FAUSSE (diag-2 mesurait ‖r‖ sur le prompt d'injection : qualifier les normes
+    PAR RÉGIME) ; contrôle préservé (corr(‖r‖,H) ≈ 0) ; ρ₁ ≈ 0.06, N_eff ≈ N.
+- **Conclusion** : **H générique RETENUE, en formulation composite obligatoire.** Loi 2,
+  forme finale : « le cortex est fragile là où il hésite — toute perturbation y coûte ;
+  la lecture de M est un cas particulier, dont la direction, invariant du modèle orienté
+  prior, fixe en outre le signe de l'effet là où le cortex est confiant. » La façade ACh
+  tombe DOUBLEMENT (ciblage générique + P4 : aucune interférence de contenu — Hasselmo
+  n'a jamais habité la loi 2, il repart vers X3/Q-05) ; la référence bio devient Salzman,
+  Britten & Newsome 1990 (les deux composantes : levier maximal au stimulus ambigu,
+  biais signé vers la direction stimulée). « Bénéfice de congruence » requalifié en
+  « biais de critère vers le prior, à signe dépendant du texte ». Q-01 = 5ᵉ observation
+  ramenée à X7. Le résidu read-M − (+r̄) (+0.008..+0.027) est petit et NON testé — ne pas
+  le vendre comme « composante contenu ». La recommandation pratique tient : gater côté
+  mémoire, jamais côté détresse du cortex.
+- **Suite** : Q-01b (analyse GRATUITE des bruts ±r̄ existants : impair_t vs log-fréquence
+  de la cible, interaction D ~ H + logfreq + H×logfreq — teste l'hypothèse lexicale du
+  renversement A/B) ; requalifier Q-05 avant lancement (pré-approuvé) ; puis Q-03
+  (ordre de l'audit).
+
 ## 2026-08-20 — v0 : squelette posé
 
 - **Commit** : (initial)
