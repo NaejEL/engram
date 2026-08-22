@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """I2 — instrument de profil par couche (`layer_profile`).
 
-Protocole : `experiments/EXP-2026-08-22-layer-profile.md` (statut **PROPOSE** :
-la gate de pré-enregistrement n'est pas franchie ; ce fichier est écrit, pas
-exécuté sur GPU).
+Protocole : `experiments/EXP-2026-08-22-layer-profile.md` (statut **PROPOSE**,
+version CONSOLIDÉE : la gate de pré-enregistrement n'est pas franchie ; ce
+fichier est écrit, pas exécuté sur GPU).
 
 INSTRUMENT, PAS MÉCANISME : aucune injection, aucune écriture, `M` jamais
 instanciée, `engram/` non modifié (`engram.cortex._find_blocks` est lu, jamais
@@ -13,26 +13,23 @@ Ce que fait le module :
 
 - **capture** — hooks sur TOUTES les couches simultanément, posés et retirés dans
   un `try/finally` (`V-hooks`) ; **un seul forward par (modèle, variante)**
-  (`V-1pass`) : profiler L couches coûte UN passage, jamais L.
-- **indexation** — `ℓ = 0` = sortie des embeddings (+ positions), capturée par un
-  `forward_pre_hook` sur le bloc 0 ; `ℓ ∈ [1, L]` = sortie du bloc `ℓ`.
-  **L'argmax décisionnel ne se cherche que sur `[1, L]`** ; `ℓ = 0` est la nulle
-  « encodage » et en est **exclu** (§4.1).
-- **quantités** — AUC (primaire), Recall@1 (cosinus et L2), entropie matricielle
-  (convention Giraldo complète), λ₁/Σλ, ventilations `s_intra` / `s_inter` /
-  ratio / z.
-- **cinq nulles** (§5) — `AUC_lex` (0 forward), nulle suffixe, `ℓ = 0`, corpus
-  mélangé au niveau des tokens, et la nulle statistique (0.5 + bootstrap +
-  permutation des étiquettes d'unité à couche fixée).
-
-Les fonctions de calcul sont **pures et importables** — c'est ce que le banc
-(`eval/gate_bench.py`, suite `i2`) et les tests CPU (`tests/test_layer_profile.py`)
-exercent : `auc_par_couche`, `recall_at_1`, `entropie_matricielle`,
-`lambda1_ratio`, `stratifier`, `bootstrap_par_unite`.
+  (`V-1pass`).
+- **indexation** — `ℓ = 0` = sortie des embeddings ; `ℓ ∈ [1, L]` = sortie du
+  bloc `ℓ`. **L'argmax décisionnel ne se cherche que sur `[1, L]`** (§4.1).
+- **corpus** — (a) `pool.fact_pairs(80)` re-paraphrasé par les constantes gelées
+  (§4.2) ; **`B-v3`**, bras DESCRIPTIF, jamais fusionné, jamais décisionnel.
+- **partition par slot d'IDENTITÉ** — `P-0` / `P-own` / `P-ent` / `P-both`
+  (§4.2). **Le verbe n'est pas un slot** : il est une covariable de ventilation.
+- **quantités** — `AUC` (existence), `R1_36` et `ΔR1` (couloir, strate `P-own`),
+  entropie Giraldo, λ₁/Σλ, ventilations.
+- **cinq nulles** (§5) — `AUC_lex` / `R1_lex` (0 forward), **nulle de cadre**
+  (verbe conservé, slots de contenu remplacés), `ℓ = 0`, corpus mélangé, nulle
+  statistique (0.5 / 1/37 + bootstrap par **composante de slot** + permutation
+  des étiquettes d'unité à couche fixée **avec recalcul de `max_ℓ`**).
 
 Conventions numériques fixées (§7) : cosinus et Gram **fp32**, valeurs propres
-**fp64**, bootstrap **par unité** (jamais par paire) B = 10 000, égalités à
-**½ crédit**.
+**fp64**, bootstrap par **composante de slot** B = 10 000 avec **argmax
+re-sélectionné**, **BCa** dès qu'une borne dépasse 0.95, égalités **½ crédit**.
 
 Usage (APRÈS la gate de pré-enregistrement seulement) :
   .venv\\Scripts\\python eval\\layer_profile.py --model gpt2 --go
@@ -43,6 +40,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import sys
 import time
 from pathlib import Path
@@ -63,51 +61,94 @@ from pool import (  # noqa: E402  — tables et règles de paraphrase GELÉES
 #  Constantes du protocole — §3, §4, §7. Aucune n'est ajustable après mesure.
 # =========================================================================
 
-N_UNITES = 30                 # §4.2 : 30 unités
+N_UNITES = 80                 # §4.2 : N = 80 (M-10 / N-15)
+N_UNITES_PRECEDENT = 30       # consigné : la valeur ÉCARTÉE (§E)
 N_PARA = 3                    # trois types de paraphrase
-N_A = 90                      # §3 : n_a = 90 — dépendance à `n` de H
-N_INTRA_ATTENDU = 90          # §4.7 V-paires : 30 × C(3,2)
-N_INTER_ATTENDU = 3915        # §4.7 V-paires : C(30,2) × 9
-B_BOOT = 10_000               # §4.3 : bootstrap par unité
+N_A = 90                      # §3 : n_a = 90, sous-échantillonné parmi 240
+N_INTRA_ATTENDU = 240         # §4.7 V-paires : 80 × C(3,2)
+N_INTER_ATTENDU = 28_440      # §4.7 V-paires : C(80,2) × 9
+B_BOOT = 10_000               # §4.3 : bootstrap par composante de slot
 B_SOUS_ECH = 200              # §3 : sous-échantillonnage à n_a, B = 200
-ALPHA_IC = 0.05               # IC 95 % percentile
+ALPHA_IC = 0.05               # IC 95 %
+SEUIL_BCA = 0.95              # §4.3 : BCa dès qu'une borne dépasse 0.95
 SEED = 0                      # §7
-S_LEURRES = 36                # §4.5 : budget v4
-# §4.5 — couloir de faisabilité, RE-DÉRIVÉ ici (jamais recopié) :
-AUC_COULOIR_050 = 0.50 ** (1.0 / S_LEURRES)
-AUC_COULOIR_025 = 0.25 ** (1.0 / S_LEURRES)
-AUC_COULOIR_050_29 = 0.50 ** (1.0 / 29)
+
+# ------------------------------------------------------------- couloir v4
+S_LEURRES = 36                # §4.5 : 36 concurrents RÉELS
+TAILLE_JEU_R1 = S_LEURRES + 1  # 1 cible + 36 concurrents = 37
+HASARD_R1 = 1.0 / TAILLE_JEU_R1        # 1/37 = 0.02703
+T_COULOIR = 0.25              # §4.5, décision PI : T = 0.25
+T_COULOIR_PLUS = 0.50         # palier descriptif V⁺
+# Repères de PUBLICATION en AUC (§4.5, « note historique ») — JAMAIS un critère.
+AUC_REPERE_025 = 0.25 ** (1.0 / S_LEURRES)
+AUC_REPERE_050 = 0.50 ** (1.0 / S_LEURRES)
+
+# --------------------------------------------------------------- puissance
+SIGMA0 = 0.5                  # §3 : borne de Bernoulli, conservatrice
+MARGE_R1 = 0.25               # §3 : |θ − T| sous `R1_36`
+Z_975 = 1.96                  # §3 : quantile normal, recopié tel quel
+# §3/§4.7 : « sous décision AUC à T = 0.9622 : K ≥ 429 ». Le protocole PORTE le
+# résultat mais PAS la valeur de |θ−T| qui le produit ; le banc recopie donc le
+# K requis déclaré et publie EN PLUS sa propre dérivation candidate (marge =
+# largeur du couloir en AUC), en signalant l'écart. Les deux rendent FAIL à tout
+# N ≤ 80 : la conclusion de la porte ne dépend pas de la levée de cette
+# sous-spécification.
+K_REQUIS_AUC_PROTOCOLE = 429
+MARGE_AUC_BANC = AUC_REPERE_050 - AUC_REPERE_025
+
 # §7 — profondeurs attendues, re-lues du config par `V-L`.
 L_ATTENDU = {"gpt2": 12, "HuggingFaceTB/SmolLM2-360M": 32, "Qwen/Qwen2.5-1.5B": 28}
 MODELES = tuple(L_ATTENDU)
-VARIANTES = ("a", "a_prime", "nulle_suffixe", "nulle_melangee")
+VARIANTES = ("a", "b_v3", "nulle_cadre", "nulle_melangee")
 
-# Remplissage neutre GELÉ de la nulle suffixe (§5, maillon 2). Un seul mot,
-# choisi hors des cinq tables indexées par l'unité (`OWNERS`, `ENTITIES`,
-# `VERBS`, `SECRETS_80`, `OWNER_OBJ`) : il ne porte donc aucun matériel d'unité.
+# Remplissage neutre GELÉ de la nulle de cadre (§5, maillon 2). Un seul mot,
+# choisi hors des cinq tables indexées par l'unité : il ne porte aucun matériel.
 REMPLISSAGE_NEUTRE = " thing"
 
-STRATES = ("S0", "S1", "S2")   # (a) ; le jeu v3 est le bras séparé S3
+# ---------------------------------------------------- partition d'identité
+P_0, P_OWN, P_ENT, P_BOTH = "P-0", "P-own", "P-ent", "P-both"
+PARTITIONS = (P_0, P_OWN, P_ENT, P_BOTH)
+STRATE_DECISIONNELLE = P_OWN          # §D.2, nommée AVANT mesure
+N_OWNERS, N_ENTITES, N_VERBES = len(OWNERS), len(ENTITIES), len(VERBS)
+ESPACE_IDENTITE = N_OWNERS * N_ENTITES        # 320 — le verbe n'est pas un slot
+
+# `V-source` (§4.7, défaut 0-10) : registre des équations citées, avec le SUPPORT
+# de lecture. Lire du HTML pour citer une équation est un motif d'arrêt.
+CITATIONS = (
+    {"equation": "A_ij = K_ij / (n·√(K_ii·K_jj)), tr(A) = 1, H = −Σ λ log λ",
+     "source_primaire": "Giraldo, Rao & Principe 2014 — Measures of entropy from "
+                        "data using infinitely divisible kernels",
+     "support": "PDF",
+     "attribution_erronee_ecartee": "Skean et al. arXiv:2412.09563 Eq. 1 — telle "
+                                    "qu'imprimée, elle NE PORTE PAS la "
+                                    "normalisation des lignes"},
+    {"equation": "A = P(cos_intra > cos_inter) + ½·P(=) (Mann-Whitney)",
+     "source_primaire": "Mann & Whitney 1947 — On a test of whether one of two "
+                        "random variables is stochastically larger than the other",
+     "support": "PDF", "attribution_erronee_ecartee": None},
+    {"equation": "IC BCa : α₁ = Φ(ẑ₀ + (ẑ₀+z_α)/(1−â(ẑ₀+z_α)))",
+     "source_primaire": "Efron 1987 — Better bootstrap confidence intervals",
+     "support": "PDF", "attribution_erronee_ecartee": None},
+)
 
 
 # =========================================================================
-#  Corpus (§4.2) — (a) `fact_pairs(30)` RE-PARAPHRASÉ par les règles gelées
+#  Corpus (§4.2)
 # =========================================================================
 
 def triplets_fact_pairs(n: int = N_UNITES) -> list[tuple[int, int, int]]:
     """Les triplets (owner, entity, verb) de `pool.fact_pairs`, en INDICES.
 
     Recopié de la règle de `fact_pairs` (`i mod len(table)`), pas de la fonction :
-    `fact_pairs` rend des chaînes, I2 a besoin des slots pour la stratification.
-    16 owners, 20 entités, 5 verbes.
+    `fact_pairs` rend des chaînes, I2 a besoin des slots. 16 owners, 20 entités,
+    5 verbes ; `lcm(16, 20, 5) = 80` ⇒ 80 triplets distincts.
     """
-    return [(i % len(OWNERS), i % len(ENTITIES), i % len(VERBS)) for i in range(n)]
+    return [(i % N_OWNERS, i % N_ENTITES, i % N_VERBES) for i in range(n)]
 
 
 def paraphrases_de_triplets(triples) -> list[tuple[str, str, str]]:
-    """Les trois indices paraphrasés d'une liste de triplets, par les règles
-    GELÉES de `POOL_PARAPHRASES` (§7 / §15 A-1 de v3) — recopiées à l'identique,
-    seule l'indexation des slots change (§4.2 : re-paraphrasage de (a))."""
+    """Les trois indices paraphrasés, par les règles GELÉES (`PARA1_VERB`,
+    `PARA2_PREFIX`, `PARA3_*`, `OWNER_OBJ`). **Zéro contenu nouveau.**"""
     out = []
     for o, e, v in triples:
         owner, entity, verb = OWNERS[o], ENTITIES[e], VERBS[v]
@@ -119,22 +160,22 @@ def paraphrases_de_triplets(triples) -> list[tuple[str, str, str]]:
 
 
 def corpus_a(n: int = N_UNITES) -> dict:
-    """Corpus (a) PRIMAIRE : `fact_pairs(30)` re-paraphrasé (§D, §4.2)."""
+    """Corpus (a) PRIMAIRE : `pool.fact_pairs(80)` re-paraphrasé (§4.2)."""
     triples = triplets_fact_pairs(n)
     return {"nom": "a", "triplets": triples,
             "slots": [(OWNERS[o], ENTITIES[e], VERBS[v]) for o, e, v in triples],
             "paraphrases": paraphrases_de_triplets(triples)}
 
 
-def corpus_a_prime(tokenize=None) -> dict:
-    """Corpus (a′) = strate **S3** : le jeu d'unités de v3, TEL QUEL (§4.2).
+def corpus_b_v3(tokenize=None, n: int = 30) -> dict:
+    """**`B-v3`** — bras DESCRIPTIF (§4.2 b) : le jeu d'unités de v3, tel quel.
 
-    Bras séparé, JAMAIS fusionné avec (a). Import paresseux : la table v3 est
-    définie par le BPE de GPT-2 (C-3), que (a) n'a pas à payer.
+    **Jamais fusionné, jamais décisionnel, jamais appelé « strate »** (M-12,
+    défaut 0-11). Import paresseux : la table v3 est définie par le BPE de GPT-2.
     """
     from pool import v3_unit_triples
-    triples = v3_unit_triples(N_UNITES, tokenize)
-    return {"nom": "a_prime", "triplets": triples,
+    triples = v3_unit_triples(n, tokenize)
+    return {"nom": "B-v3", "triplets": triples,
             "slots": [(OWNERS[o], ENTITIES[e], VERBS[v]) for o, e, v in triples],
             "paraphrases": paraphrases_de_triplets(triples)}
 
@@ -149,52 +190,117 @@ def sha256_corpus(corpus: dict) -> str:
 
 
 # =========================================================================
-#  Stratification (§4.2) — recouvrement de surface entre unités
+#  Partition par slot d'IDENTITÉ (§4.2) — le VERBE n'est pas un slot (N-9)
 # =========================================================================
 
-def stratifier(slots) -> dict:
-    """Strate de chaque paire d'unités par **nombre de slots de contenu partagés**.
+def classe_identite(slot_i, slot_j) -> str:
+    """Classe d'une paire d'unités par les seuls slots d'IDENTITÉ (owner,
+    entité). **Le verbe est ignoré** : cinq quasi-synonymes ne font pas un slot
+    d'identité (N-9, défaut 0-12)."""
+    meme_owner = slot_i[0] == slot_j[0]
+    meme_entite = slot_i[1] == slot_j[1]
+    if meme_owner and meme_entite:
+        return P_BOTH
+    if meme_owner:
+        return P_OWN
+    if meme_entite:
+        return P_ENT
+    return P_0
 
-    `slots[i]` = (owner, entity, verb) de l'unité `i`. 0 partagé → **S0**,
-    1 → **S1**, 2 → **S2**, 3 → **S3-dégénéré** (deux unités identiques : hors
-    strates de (a), consigné à part).
 
-    Rend le recensement (à publier AVANT mesure, §4.7 `V-div`) et la carte des
-    paires. Fonction PURE, aucun GPU, décidable sur la seule combinatoire.
-    """
+def partition_identite(slots) -> dict:
+    """Recensement `P-0 / P-own / P-ent / P-both` + carte des paires + covariable
+    de ventilation par verbe (§4.2). Fonction PURE, aucun GPU."""
     n = len(slots)
-    paires, recens = {}, {"S0": 0, "S1": 0, "S2": 0, "S3-degenere": 0}
+    paires, recens = {}, {c: 0 for c in PARTITIONS}
+    verbe = {}
     for i in range(n):
         for j in range(i + 1, n):
-            k = sum(1 for a, b in zip(slots[i], slots[j]) if a == b)
-            nom = "S3-degenere" if k == 3 else f"S{k}"
-            paires[(i, j)] = nom
-            recens[nom] += 1
+            c = classe_identite(slots[i], slots[j])
+            paires[(i, j)] = c
+            recens[c] += 1
+            verbe[(i, j)] = "verbe=" if slots[i][2] == slots[j][2] else "verbe≠"
     return {"n_unites": n, "paires": paires, "recensement": recens,
             "n_paires": n * (n - 1) // 2,
-            "paires_par_strate": {s: sorted(p for p, v in paires.items() if v == s)
-                                  for s in ("S0", "S1", "S2", "S3-degenere")}}
+            "covariable_verbe": verbe,
+            "paires_par_classe": {c: sorted(p for p, v in paires.items() if v == c)
+                                  for c in PARTITIONS}}
 
 
-def strates_non_vides(slots, indices) -> dict:
-    """Strates non vides sur un sous-multiensemble d'unités (`indices` peut
-    contenir des répétitions : c'est le rééchantillonnage par unité).
+def composantes(slots) -> dict:
+    """Les composantes de slot : `owner` (16 blocs) et `entite` (20 blocs).
 
-    Une paire de positions dont les DEUX unités sont la même unité tirée deux
-    fois n'entre dans aucune strate de (a) : elle n'est pas une paire d'unités.
+    Le CLUSTER de rééchantillonnage (§D.1) est la composante de slot — owner pour
+    `P-own`, entité pour `P-ent` — seul cluster sous lequel les paires d'une
+    strate sont indépendantes, et qui **préserve exactement** les effectifs.
     """
-    car = stratifier(slots)["paires"]
-    vus = {s: 0 for s in STRATES}
-    m = len(indices)
-    for a in range(m):
-        for b in range(a + 1, m):
-            i, j = indices[a], indices[b]
-            if i == j:
-                continue
-            s = car[(min(i, j), max(i, j))]
-            if s in vus:
-                vus[s] += 1
-    return vus
+    par_owner, par_entite = {}, {}
+    for i, (o, e, _v) in enumerate(slots):
+        par_owner.setdefault(o, []).append(i)
+        par_entite.setdefault(e, []).append(i)
+    return {"owner": {k: tuple(v) for k, v in par_owner.items()},
+            "entite": {k: tuple(v) for k, v in par_entite.items()}}
+
+
+def clusters_de_strate(slots, strate: str = STRATE_DECISIONNELLE) -> dict:
+    """Étiquette de cluster par UNITÉ et `K` pour la strate décisionnelle.
+
+    **`K` = nombre de composantes PORTANT au moins une paire de la strate**
+    (donc de taille ≥ 2) : une composante singleton ne contribue à aucune paire
+    et n'entre pas dans la puissance. D'où `P-own` : K = 14 (N=30) → **16**
+    (N=80) ; `P-ent` : K = 10 → **20**. Les composantes de taille ≥ 2 sont les
+    clusters du rééchantillonnage (`membres`).
+    """
+    comp = composantes(slots)
+    cle = "owner" if strate == P_OWN else "entite"
+    ordre = sorted(comp[cle])
+    etiq = {}
+    for k, nom in enumerate(ordre):
+        for i in comp[cle][nom]:
+            etiq[i] = k
+    porteuses = [nom for nom in ordre if len(comp[cle][nom]) >= 2]
+    return {"strate": strate, "cle": cle, "K": len(porteuses),
+            "K_composantes_totales": len(ordre),
+            "n_singletons": len(ordre) - len(porteuses),
+            "etiquette_par_unite": etiq,
+            "membres": {k: comp[cle][nom] for k, nom in enumerate(porteuses)}}
+
+
+def p_both_impossible(n_owners: int = N_OWNERS, n_entites: int = N_ENTITES,
+                      n: int = N_UNITES) -> dict:
+    """N-11, gravé : `P-both` exige `lcm(16, 20) = 80 | d`. La paire minimale sur
+    l'ENTITÉ n'existe à aucun `N ≤ 80`."""
+    l = math.lcm(n_owners, n_entites)
+    return {"lcm": l, "N": n, "possible": l < n,
+            "clause": "P-both exige lcm(16,20) = 80 | d : la paire minimale sur "
+                      "l'ENTITÉ — le leurre canonique — n'existe à aucun N ≤ 80. "
+                      "Le protocole n'a pas CHOISI le contraste d'owner ; "
+                      "l'arithmétique du pool le lui a IMPOSÉ."}
+
+
+# =========================================================================
+#  Diversité (§4.7 `V-diversité`) et puissance (§4.7 `V-puissance`)
+# =========================================================================
+
+def diversite(slots) -> tuple[int, int, int]:
+    """`(#owners, #entités, #verbes)` effectivement présents."""
+    return (len({s[0] for s in slots}), len({s[1] for s in slots}),
+            len({s[2] for s in slots}))
+
+
+def diversite_attendue(n: int) -> tuple[int, int, int]:
+    """`(min(N,16), min(N,20), min(N,5))` — combinatoire, ZÉRO bootstrap.
+
+    Remplace `V-div`, qui mesurait un CARDINAL DE STRATE et **récompensait la
+    dégénérescence** (défaut 0-7).
+    """
+    return (min(n, N_OWNERS), min(n, N_ENTITES), min(n, N_VERBES))
+
+
+def k_requis(sigma0: float = SIGMA0, marge: float = MARGE_R1,
+             z: float = Z_975) -> int:
+    """`K_S ≥ (z·σ₀/|θ−T|)²`, arrondi à l'entier supérieur (§3)."""
+    return int(math.ceil((z * sigma0 / abs(marge)) ** 2))
 
 
 # =========================================================================
@@ -202,11 +308,8 @@ def strates_non_vides(slots, indices) -> dict:
 # =========================================================================
 
 def paires_intra_inter(n_unites: int = N_UNITES, n_para: int = N_PARA):
-    """Indices de lignes (0..n_unites*n_para-1) des paires intra et inter.
-
-    Convention de disposition : la ligne `i*n_para + t` porte la paraphrase `t`
-    de l'unité `i`. `n_intra = n·C(3,2)`, `n_inter = C(n,2)·9`.
-    """
+    """Indices de lignes des paires intra et inter. La ligne `i*n_para + t` porte
+    la paraphrase `t` de l'unité `i`. `n_intra = n·C(3,2)`, `n_inter = C(n,2)·9`."""
     intra, inter = [], []
     for i in range(n_unites):
         for s in range(n_para):
@@ -218,6 +321,89 @@ def paires_intra_inter(n_unites: int = N_UNITES, n_para: int = N_PARA):
                 for t in range(n_para):
                     inter.append((i * n_para + s, j * n_para + t))
     return intra, inter
+
+
+# =========================================================================
+#  Jeu de candidats `R1_36` (§4.5) — DÉTERMINISTE, indépendant des données
+# =========================================================================
+
+def _ordre_decalage(i: int, candidats, n: int) -> list[int]:
+    """Ordre par **décalage d'indice croissant** `d = (j − i) mod n`."""
+    return sorted(candidats, key=lambda j: ((j - i) % n, j))
+
+
+def jeu_candidats_R1(i: int, t: int, slots, strate: str = STRATE_DECISIONNELLE,
+                     s: int = S_LEURRES, n_para: int = N_PARA) -> dict:
+    """Jeu de candidats **pré-déclaré** du §4.5 : 1 cible + `s = 36` concurrents.
+
+    - **cible unique** : même unité, type `t′` par la règle cyclique fixe
+      para1 → para2 → para3 → para1 ;
+    - **concurrents, le plus dur d'abord** : (1) les 12 états des 4 autres unités
+      de la composante d'**owner** ; (2) les 9 états des 3 autres unités de la
+      composante d'**entité** ; (3) 15 états de `P-0` par **décalage croissant**.
+      Sur `P-ent`, les deux premiers blocs sont échangés (le plus dur d'abord
+      reste la composante du slot partagé).
+
+    **Aucune similarité mesurée n'entre ici** : toute sélection par proximité est
+    un motif d'invalidation (§4.5, §6). La fonction ne reçoit aucun état.
+    """
+    n = len(slots)
+    comp = composantes(slots)
+    o, e = slots[i][0], slots[i][1]
+    bloc_own = _ordre_decalage(i, [j for j in comp["owner"][o] if j != i], n)
+    bloc_ent = _ordre_decalage(i, [j for j in comp["entite"][e] if j != i], n)
+    exclus = set(bloc_own) | set(bloc_ent) | {i}
+    bloc_p0 = _ordre_decalage(i, [j for j in range(n) if j not in exclus], n)
+    ordre = ([bloc_own, bloc_ent, bloc_p0] if strate == P_OWN
+             else [bloc_ent, bloc_own, bloc_p0])
+    etats = [j * n_para + u for bloc in ordre for j in bloc for u in range(n_para)]
+    cible = i * n_para + ((t + 1) % n_para)
+    concurrents = etats[:s]
+    return {"requete": i * n_para + t, "cible": cible,
+            "concurrents": concurrents,
+            "taille": 1 + len(concurrents),
+            "blocs": {"owner": len(bloc_own) * n_para,
+                      "entite": len(bloc_ent) * n_para,
+                      "P-0": len(bloc_p0) * n_para},
+            "strate": strate}
+
+
+def r1_36(S, slots, strate: str = STRATE_DECISIONNELLE, s: int = S_LEURRES,
+          n_para: int = N_PARA) -> dict:
+    """`R1_36` : plus proche voisin en cosinus dans le jeu de candidats.
+
+    `S` : matrice de similarité (n·3, n·3). **Égalités à ½ crédit** (§7). Rend
+    aussi le vecteur de succès par requête (pour l'appariement de `ΔR1`) et
+    l'étiquette de cluster de chaque requête.
+    """
+    S = np.asarray(S, dtype=np.float64)
+    n = len(slots)
+    clus = clusters_de_strate(slots, strate)["etiquette_par_unite"]
+    succes, cluster, requetes = [], [], []
+    for i in range(n):
+        for t in range(n_para):
+            j = jeu_candidats_R1(i, t, slots, strate, s, n_para)
+            cand = [j["cible"]] + list(j["concurrents"])
+            vals = S[j["requete"], cand]
+            m = vals.max()
+            gagnants = int((vals == m).sum())
+            succes.append((1.0 / gagnants) if vals[0] == m else 0.0)
+            cluster.append(clus[i])
+            requetes.append(j["requete"])
+    succes = np.asarray(succes, dtype=np.float64)
+    return {"R1": float(succes.mean()), "succes": succes,
+            "cluster": np.asarray(cluster), "requetes": np.asarray(requetes),
+            "n_requetes": int(succes.size), "hasard": 1.0 / (1 + s),
+            "taille_jeu": 1 + s, "strate": strate}
+
+
+def delta_r1(succes_reel, succes_plancher) -> np.ndarray:
+    """`ΔR1` **appariée par requête** (§4.3, D16) — différence, pas taux."""
+    a = np.asarray(succes_reel, dtype=np.float64)
+    b = np.asarray(succes_plancher, dtype=np.float64)
+    if a.shape != b.shape:
+        raise ValueError("appariement impossible : formes différentes")
+    return a - b
 
 
 # =========================================================================
@@ -237,37 +423,31 @@ def auc_par_couche(cos_intra, cos_inter) -> float:
     """`A = P(cos_intra > cos_inter) + ½·P(=)` — Mann-Whitney (§3, §4.3).
 
     **Égalités à ½ crédit**, déclaré avant mesure. Invariante sous toute
-    transformation strictement monotone appliquée **par couche** : c'est la
-    propriété qui interdit à l'anisotropie de déplacer l'argmax (M-1b).
+    transformation strictement monotone appliquée **par couche** (M-1b, 0-1).
     """
     a = np.asarray(cos_intra, dtype=np.float64).ravel()
     b = np.sort(np.asarray(cos_inter, dtype=np.float64).ravel())
     if a.size == 0 or b.size == 0:
         return float("nan")
-    inf = np.searchsorted(b, a, side="left")          # # {b < a}
-    sup = np.searchsorted(b, a, side="right")         # # {b <= a}
-    eg = sup - inf                                     # # {b == a}
-    return float((inf.sum() + 0.5 * eg.sum()) / (a.size * b.size))
+    inf = np.searchsorted(b, a, side="left")
+    sup = np.searchsorted(b, a, side="right")
+    return float((inf.sum() + 0.5 * (sup - inf).sum()) / (a.size * b.size))
 
 
 def compte_egalites(cos_intra, cos_inter) -> int:
-    """Comptes d'égalités exactes (ventilation obligatoire, §4.3)."""
     a = np.asarray(cos_intra, dtype=np.float64).ravel()
     b = np.sort(np.asarray(cos_inter, dtype=np.float64).ravel())
     return int((np.searchsorted(b, a, "right") - np.searchsorted(b, a, "left")).sum())
 
 
 def recall_at_1(X, etiquettes, metrique: str = "cos") -> float:
-    """Fraction des états dont le plus proche voisin (hors soi) porte la MÊME
-    unité — `metrique` ∈ {"cos", "l2"} (§4.3).
+    """`R1_full` : plus proche voisin (hors soi) parmi TOUS les états.
 
-    **Indice ↔ indice UNIQUEMENT.** Mesurer une quantité indice↔fait est un
-    motif d'invalidation du run (§4.4, §6) : cette fonction ne reçoit qu'un seul
-    jeu d'états et une étiquette d'unité par état — elle ne peut pas en produire.
+    **Indice ↔ indice UNIQUEMENT.** Mesurer une quantité indice↔fait est un motif
+    d'invalidation du run (§4.4, §6).
     """
     A = np.asarray(X, dtype=np.float32)
     lab = np.asarray(etiquettes)
-    n = A.shape[0]
     if metrique == "cos":
         S = cosinus_matrice(A).astype(np.float64)
         np.fill_diagonal(S, -np.inf)
@@ -285,11 +465,9 @@ def recall_at_1(X, etiquettes, metrique: str = "cos") -> float:
 def _gram_normalisee(X, normalisation: str) -> np.ndarray:
     """Gram **fp32** puis normalisation.
 
-    - `"giraldo"` (LA convention du protocole, §3) : `A_ij = K_ij /
-      (n·√(K_ii·K_jj))`, donc `tr(A) = 1` par construction et `A` est invariante
-      sous mise à l'échelle des LIGNES de `X`.
-    - `"trace"` : `A = K / tr(K)`. Conservée UNIQUEMENT comme contre-exemple
-      échouant du banc (défaut 0-2) — elle confond `H` avec le profil de normes.
+    - `"giraldo"` (LA convention, §3, **Giraldo et al. 2014**) : `A_ij = K_ij /
+      (n·√(K_ii·K_jj))`, `tr(A) = 1`, invariante sous mise à l'échelle des LIGNES.
+    - `"trace"` : `A = K / tr(K)` — contre-exemple ÉCHOUANT (défaut 0-2).
     """
     A = np.asarray(X, dtype=np.float32)
     n = A.shape[0]
@@ -304,20 +482,15 @@ def _gram_normalisee(X, normalisation: str) -> np.ndarray:
 
 
 def valeurs_propres(X, normalisation: str = "giraldo") -> np.ndarray:
-    """Valeurs propres de la Gram normalisée, en **fp64** (§7)."""
     A = _gram_normalisee(X, normalisation)
-    lam = np.linalg.eigvalsh(A.astype(np.float64))
-    return np.clip(lam, 0.0, None)
+    return np.clip(np.linalg.eigvalsh(A.astype(np.float64)), 0.0, None)
 
 
 def entropie_matricielle(X, normalisation: str = "giraldo") -> float:
     """Entropie matricielle, convention **Giraldo et al. 2014**, α → 1 (§3, §4.6).
 
-    `H = −Σᵢ λᵢ log λᵢ` sur les valeurs propres de `A_ij = K_ij/(n√(K_ii K_jj))`
-    (`tr(A) = 1`). **La normalisation des lignes est REQUISE** : sans elle, `H`
-    est confondue avec le profil de normes par couche (défaut 0-2). Log naturel
-    (nats) ; `H ≤ log min(n, d)`, d'où `n_a = 90` fixé et l'interdiction de
-    comparer des NIVEAUX entre corpus (§3, M-3).
+    `H = −Σ λ log λ`. **La normalisation des lignes est REQUISE** (défaut 0-2).
+    `H ≤ log min(n, d)` ⇒ `n_a = 90` fixé, comparaisons de NIVEAUX interdites.
     """
     lam = valeurs_propres(X, normalisation)
     s = lam.sum()
@@ -328,8 +501,7 @@ def entropie_matricielle(X, normalisation: str = "giraldo") -> float:
 
 
 def lambda1_ratio(X, normalisation: str = "giraldo") -> float:
-    """`λ₁/Σλ` — **obligatoire par couche** (§2 (v), porte `V-λ₁`) : sans lui un
-    minimum de `H` n'est PAS interprétable."""
+    """`λ₁/Σλ` — obligatoire par couche (§2 (v), `V-λ₁`)."""
     lam = valeurs_propres(X, normalisation)
     s = lam.sum()
     return float(lam.max() / s) if s > 0 else float("nan")
@@ -337,9 +509,7 @@ def lambda1_ratio(X, normalisation: str = "giraldo") -> float:
 
 def sous_echantillonner_H(X, n_a: int = N_A, b: int = B_SOUS_ECH, seed: int = SEED,
                           normalisation: str = "giraldo") -> dict:
-    """`H` et `λ₁/Σλ` sur `b` sous-échantillons de taille `n_a` (§3, M-3) :
-    médiane ± IQR. Rend `n` explicite — les NIVEAUX ne se comparent qu'à `n` égal.
-    """
+    """`H` et `λ₁/Σλ` sur `b` sous-échantillons de taille `n_a` (§3)."""
     A = np.asarray(X, dtype=np.float32)
     rng = np.random.default_rng(seed)
     n = A.shape[0]
@@ -358,59 +528,139 @@ def sous_echantillonner_H(X, n_a: int = N_A, b: int = B_SOUS_ECH, seed: int = SE
 
 
 # =========================================================================
-#  Incertitude — bootstrap PAR UNITÉ (§4.3), jamais par paire
+#  Incertitude — cluster = composante de slot (§D.1), argmax re-sélectionné
 # =========================================================================
 
-def bootstrap_par_unite(stat_fn, n_unites: int = N_UNITES, b: int = B_BOOT,
-                        seed: int = SEED, alpha: float = ALPHA_IC) -> dict:
-    """Bootstrap **par unité** : on rééchantillonne les UNITÉS factuelles avec
-    remise, jamais les paires (§4.3, M-4).
+def bootstrap_par_cluster(stat_fn, k_clusters: int, b: int = B_BOOT,
+                          seed: int = SEED, alpha: float = ALPHA_IC) -> dict:
+    """Bootstrap par **composante de slot** (§4.3, §D.1) : on rééchantillonne les
+    CLUSTERS avec remise, jamais les paires ni les requêtes.
 
-    `stat_fn(indices)` reçoit un tableau d'indices d'unités (avec répétitions) et
-    rend un scalaire. IC 95 % percentile.
+    `stat_fn(indices_de_clusters)` rend un scalaire.
     """
     rng = np.random.default_rng(seed)
     ech = np.empty(b, dtype=np.float64)
     for k in range(b):
-        ech[k] = stat_fn(rng.integers(0, n_unites, size=n_unites))
+        ech[k] = stat_fn(rng.integers(0, k_clusters, size=k_clusters))
     fini = ech[np.isfinite(ech)]
     lo = float(np.percentile(fini, 100 * alpha / 2)) if fini.size else float("nan")
     hi = float(np.percentile(fini, 100 * (1 - alpha / 2))) if fini.size else float("nan")
-    return {"B": b, "ic_bas": lo, "ic_haut": hi,
+    return {"B": b, "K": k_clusters, "ic_bas": lo, "ic_haut": hi,
             "moyenne": float(fini.mean()) if fini.size else float("nan"),
             "n_non_fini": int(b - fini.size), "echantillons": ech}
 
 
-def auc_stat_fn(cos_intra_unite, cos_inter_paire):
-    """Fabrique un `stat_fn` d'AUC pour `bootstrap_par_unite`.
+def _phi(x):
+    return 0.5 * (1.0 + math.erf(x / math.sqrt(2.0)))
 
-    `cos_intra_unite` : (n, 3) — les 3 cosinus intra de chaque unité.
-    `cos_inter_paire` : (n, n, 9) — les 9 cosinus croisés de chaque paire d'unités.
-    Les paires (unité tirée deux fois) sont exclues du bras inter : ce ne sont
-    pas des paires d'unités.
+
+def _phi_inv(p):
+    """Quantile normal (Acklam, précision ~1e-9) — aucune dépendance scipy."""
+    if not 0.0 < p < 1.0:
+        return float("-inf") if p <= 0 else float("inf")
+    a = [-3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02,
+         1.383577518672690e+02, -3.066479806614716e+01, 2.506628277459239e+00]
+    b = [-5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02,
+         6.680131188771972e+01, -1.328068155288572e+01]
+    c = [-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00,
+         -2.549732539343734e+00, 4.374664141464968e+00, 2.938163982698783e+00]
+    d = [7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00,
+         3.754408661907416e+00]
+    pl, ph = 0.02425, 1 - 0.02425
+    if p < pl:
+        q = math.sqrt(-2 * math.log(p))
+        return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / \
+               ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1)
+    if p > ph:
+        q = math.sqrt(-2 * math.log(1 - p))
+        return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / \
+                ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1)
+    q = p - 0.5
+    r = q * q
+    return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q / \
+           (((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1)
+
+
+def ic_bca(echantillons, theta_obs: float, jackknife, alpha: float = ALPHA_IC) -> dict:
+    """IC **BCa** (Efron 1987) — requis dès qu'une borne dépasse 0.95 (M-16 : le
+    percentile SOUS-COUVRE près de la borne 1)."""
+    ech = np.asarray(echantillons, dtype=np.float64)
+    ech = ech[np.isfinite(ech)]
+    jk = np.asarray(jackknife, dtype=np.float64)
+    prop = float((ech < theta_obs).mean())
+    z0 = _phi_inv(min(max(prop, 1e-12), 1 - 1e-12))
+    jbar = jk.mean()
+    num = ((jbar - jk) ** 3).sum()
+    den = 6.0 * (((jbar - jk) ** 2).sum() ** 1.5)
+    a = float(num / den) if den != 0 else 0.0
+    out = []
+    for p in (alpha / 2, 1 - alpha / 2):
+        z = _phi_inv(p)
+        adj = z0 + (z0 + z) / (1 - a * (z0 + z))
+        out.append(float(np.percentile(ech, 100 * _phi(adj))))
+    return {"ic_bas": out[0], "ic_haut": out[1], "z0": z0, "a": a, "methode": "BCa"}
+
+
+def ic_du_max(echantillons, theta_obs: float, jackknife=None,
+              alpha: float = ALPHA_IC, seuil_bca: float = SEUIL_BCA) -> dict:
+    """IC du **max sur les couches**, argmax re-sélectionné dans chaque
+    rééchantillon (M-15), **BCa** dès qu'une borne dépasse `seuil_bca` (M-16).
+
+    Rend aussi l'**estimateur débiaisé** `θ̂ = 2·max_obs − mean_b(θ*_b)` : le biais
+    de sélection du max (`E[max − moyenne] ≈ 0.033` d'AUC) dépasse le couloir
+    entier, donc le max brut **fuit la bande N**.
     """
-    A = np.asarray(cos_intra_unite, dtype=np.float64)
-    B = np.asarray(cos_inter_paire, dtype=np.float64)
+    ech = np.asarray(echantillons, dtype=np.float64)
+    fini = ech[np.isfinite(ech)]
+    lo = float(np.percentile(fini, 100 * alpha / 2))
+    hi = float(np.percentile(fini, 100 * (1 - alpha / 2)))
+    methode = "percentile"
+    if max(lo, hi) > seuil_bca and jackknife is not None:
+        b = ic_bca(fini, theta_obs, jackknife, alpha)
+        lo, hi, methode = b["ic_bas"], b["ic_haut"], b["methode"]
+    return {"ic_bas": lo, "ic_haut": hi, "methode": methode,
+            "max_observe": float(theta_obs),
+            "moyenne_bootstrap": float(fini.mean()),
+            "theta_debiaise": estimateur_debiaise(theta_obs, fini),
+            "B": int(ech.size)}
 
-    def stat(indices):
-        idx = np.asarray(indices)
-        intra = A[idx].ravel()
-        i, j = np.triu_indices(idx.size, k=1)
-        garde = idx[i] != idx[j]
-        if not garde.any():
-            return float("nan")
-        inter = B[idx[i][garde], idx[j][garde]].ravel()
-        return auc_par_couche(intra, inter)
 
-    return stat
+def estimateur_debiaise(max_obs: float, echantillons) -> float:
+    """`θ̂ = 2·max_obs − mean_b(θ*_b)` (M-15). Peut sortir de [0, 1] : **non
+    tronqué** ici, la troncature casserait la couverture du BCa (§12.3)."""
+    ech = np.asarray(echantillons, dtype=np.float64)
+    ech = ech[np.isfinite(ech)]
+    return float(2.0 * max_obs - ech.mean())
+
+
+def ic_max_des_ic_par_couche(ic_par_couche):
+    """**MOTIF D'INVALIDATION** (§4.3, §6) : « max des IC par couche » ne construit
+    pas un IC du max — il ignore la re-sélection de l'argmax. Toujours rejeté."""
+    raise ValueError(
+        "« max des IC par couche » = motif d'invalidation (§4.3, §6) : l'IC du "
+        "max exige la RE-SÉLECTION de l'argmax dans chaque rééchantillon.")
+
+
+def permutation_max_couches(stat_par_couche, couches, b: int = B_BOOT,
+                            seed: int = SEED) -> dict:
+    """Bande **N** par permutation des **étiquettes d'unité à couche fixée avec
+    recalcul de `max_ℓ`** (M-15) — FWER exact.
+
+    `stat_par_couche(ell, rng)` rend la statistique de la couche `ell` sous une
+    permutation tirée avec `rng`. La permutation des étiquettes de COUCHE est
+    invalide (couches non échangeables).
+    """
+    rng = np.random.default_rng(seed)
+    ech = np.empty(b, dtype=np.float64)
+    for k in range(b):
+        ech[k] = max(stat_par_couche(e, rng) for e in couches)
+    return {"B": b, "q_0.95": float(np.percentile(ech, 95)),
+            "echantillons": ech}
 
 
 def permutation_etiquettes_unite(cos_intra, cos_inter, b: int = B_BOOT,
                                  seed: int = SEED) -> dict:
-    """Nulle statistique du §5 (maillon 5) : permutation des étiquettes d'unité
-    entre paires, **à couche fixée** — les paires sont échangeables sous H₀ à
-    l'INTÉRIEUR d'une couche (la permutation des étiquettes de COUCHE, elle, est
-    invalide : M-4)."""
+    """Nulle statistique du §5 (maillon 5) à couche fixée."""
     a = np.asarray(cos_intra, dtype=np.float64).ravel()
     c = np.asarray(cos_inter, dtype=np.float64).ravel()
     tout = np.concatenate([a, c])
@@ -425,25 +675,37 @@ def permutation_etiquettes_unite(cos_intra, cos_inter, b: int = B_BOOT,
             "p_unilateral": float((ech >= obs).mean()), "echantillons": ech}
 
 
-def v_plat(courbes_par_unite, b: int = B_BOOT, seed: int = SEED) -> dict:
-    """`V-plat` (§4.7, re-dérivée M-4) : courbe **centrée par unité**, PLATE ssi
-    `R_obs ≤ q_0.95(R*)`, B = 10 000. **Aucune constante posée.**
+def auc_stat_fn(cos_intra_unite, cos_inter_paire, membres_par_cluster):
+    """Fabrique un `stat_fn` d'AUC pour `bootstrap_par_cluster`.
 
-    `courbes_par_unite` : (n_unites, n_couches).
-
-    Opérationnalisation DÉCLARÉE par le banc (le protocole fixe la statistique
-    `R = max_ℓ − min_ℓ` et le bootstrap par unité, pas la fabrique de `R*`) :
-    `R*` est le range de la courbe moyenne de rééchantillons d'unités tirés de la
-    courbe **doublement centrée** (par unité PUIS par couche) — c.-à-d. le bruit
-    par unité sans le profil observé, la seule façon d'obtenir une distribution
-    de `R` sous une vérité plate. Permutation des étiquettes de couche : INVALIDE
-    (couches non échangeables, variances différentes).
+    `cos_intra_unite` : (n, 3) ; `cos_inter_paire` : (n, n, 9) ;
+    `membres_par_cluster[k]` : les unités du cluster `k`.
     """
+    A = np.asarray(cos_intra_unite, dtype=np.float64)
+    B = np.asarray(cos_inter_paire, dtype=np.float64)
+
+    def stat(indices_clusters):
+        unites = np.concatenate([np.asarray(membres_par_cluster[int(k)])
+                                 for k in indices_clusters])
+        intra = A[unites].ravel()
+        i, j = np.triu_indices(unites.size, k=1)
+        garde = unites[i] != unites[j]
+        if not garde.any():
+            return float("nan")
+        inter = B[unites[i][garde], unites[j][garde]].ravel()
+        return auc_par_couche(intra, inter)
+
+    return stat
+
+
+def v_plat(courbes_par_unite, b: int = B_BOOT, seed: int = SEED) -> dict:
+    """`V-plat` (§4.7) : courbe **centrée par unité**, PLATE ssi
+    `R_obs ≤ q_0.95(R*)`. **Aucune constante posée.**"""
     C = np.asarray(courbes_par_unite, dtype=np.float64)
-    C = C - C.mean(axis=1, keepdims=True)              # centrage PAR UNITÉ
+    C = C - C.mean(axis=1, keepdims=True)
     moy = C.mean(axis=0)
     r_obs = float(moy.max() - moy.min())
-    C0 = C - C.mean(axis=0, keepdims=True)             # vérité plate + bruit
+    C0 = C - C.mean(axis=0, keepdims=True)
     rng = np.random.default_rng(seed)
     n = C.shape[0]
     rs = np.empty(b, dtype=np.float64)
@@ -460,7 +722,7 @@ def v_plat(courbes_par_unite, b: int = B_BOOT, seed: int = SEED) -> dict:
 # =========================================================================
 
 def w_of_L(L: int) -> int:
-    """`w(L) = max(1, ⌊L/12⌋)` (M-8) ⇒ 1 / 2 / 2 pour L = 12 / 32 / 28."""
+    """`w(L) = max(1, ⌊L/12⌋)` ⇒ 1 / 2 / 2 pour L = 12 / 32 / 28."""
     return max(1, L // 12)
 
 
@@ -471,7 +733,7 @@ def fenetre_D3(L: int) -> tuple[int, int]:
 
 
 def borne_multiplicite(L: int) -> float:
-    """Borne conservatrice `(2w+1)/L` (M-5)."""
+    """Borne conservatrice `(2w+1)/L` (§4.8)."""
     return (2 * w_of_L(L) + 1) / L
 
 
@@ -481,7 +743,6 @@ def couches_decisionnelles(L: int) -> list[int]:
 
 
 def argmax_decisionnel(courbe) -> int:
-    """Argmax sur `[1, L]` : `courbe` est indexée `ℓ = 0..L`, l'indice 0 est exclu."""
     c = np.asarray(courbe, dtype=np.float64)
     return int(1 + np.argmax(c[1:]))
 
@@ -509,7 +770,7 @@ def vecteurs_indicateurs_bpe(chaines, tokenize) -> np.ndarray:
 
 def auc_lex(chaines, tokenize, n_unites: int = N_UNITES,
             n_para: int = N_PARA) -> float:
-    """`AUC_lex` (§5, maillon 1) : *combien d'AUC le seul recouvrement lexical
+    """`AUC_lex` (§5, maillon 1) : *combien le seul recouvrement lexical
     produit-il, sans cortex ?*"""
     X = vecteurs_indicateurs_bpe(chaines, tokenize)
     S = cosinus_matrice(X)
@@ -517,9 +778,15 @@ def auc_lex(chaines, tokenize, n_unites: int = N_UNITES,
     return auc_par_couche([S[a, b] for a, b in intra], [S[a, b] for a, b in inter])
 
 
+def r1_lex(chaines, slots, tokenize, strate: str = STRATE_DECISIONNELLE) -> float:
+    """`R1_lex` (§5, maillon 1) — le même plancher, sur la statistique
+    DÉCISIONNELLE."""
+    X = vecteurs_indicateurs_bpe(chaines, tokenize)
+    return r1_36(cosinus_matrice(X).astype(np.float64), slots, strate)["R1"]
+
+
 def suffixe_commun(sequences) -> list:
-    """Plus long suffixe de tokens commun à toutes les séquences (par exécution
-    du tokenizer, aucun jugement) — sert la nulle suffixe et `V-suffixe`."""
+    """Plus long suffixe de tokens commun (par exécution du tokenizer)."""
     if not sequences:
         return []
     k = 0
@@ -529,32 +796,138 @@ def suffixe_commun(sequences) -> list:
     return list(sequences[0][len(sequences[0]) - k:]) if k else []
 
 
-def nulle_suffixe(chaines_par_type, tokenize, filler_id) -> list[list[int]]:
-    """Maillon 2 : contenu d'unité remplacé par un **remplissage neutre gelé**,
-    **même suffixe, même longueur, même position**.
+CADRE, SLOT = "cadre", "slot"
 
-    `chaines_par_type[t]` = les 30 indices du type `t`. Le suffixe conservé est
-    le plus long suffixe de tokens COMMUN aux 30 indices du type (déterminé par
-    exécution) ; tout ce qui le précède est remplacé par `filler_id` répété, à
-    longueur inchangée. La longueur propre de chaque prompt est PRÉSERVÉE : c'est
-    ce qui fait de cette nulle un plancher de **position et de suffixe** et non
-    une constante.
+
+def segments_par_type(owner: str, entity: str, verb: str, t: int) -> list[tuple]:
+    """Décomposition d'un indice en segments `(texte, rôle)`.
+
+    Rôle `SLOT` = slot de CONTENU (owner, entité). Rôle `CADRE` = préfixe,
+    ponctuation **et le verbe** — qui n'est pas un slot d'identité (N-9) et est
+    donc **conservé** par la nulle du maillon 2 (§5, re-spécifiée, 0-8).
     """
-    out = []
-    for chaines in chaines_par_type:
-        seqs = [list(tokenize(s)) for s in chaines]
-        suf = suffixe_commun(seqs)
-        for s in seqs:
-            k = len(s) - len(suf)
-            out.append([filler_id] * k + list(suf))
-    return out
+    if t == 0:
+        return [(owner, SLOT), (" " + entity, SLOT), (" " + PARA1_VERB, CADRE)]
+    if t == 1:
+        return [(PARA2_PREFIX, CADRE), (_lower_first(owner), SLOT),
+                (" " + entity, SLOT), (" " + verb, CADRE)]
+    return [(PARA3_HEAD, CADRE), (entity, SLOT), (PARA3_MID, CADRE),
+            (OWNER_OBJ[owner], SLOT), (PARA3_TAIL, CADRE)]
+
+
+def spans_slots_par_type(owner: str, entity: str, verb: str, t: int,
+                         inclure_verbe: bool = False) -> tuple:
+    """Chaîne complète d'un indice + les **spans de caractères** de ses slots de
+    contenu (owner, entité). Le cadre — préfixe, ponctuation, **verbe** — n'y est
+    pas, sauf si `inclure_verbe` (construction FAUTIVE, contre-exemple du banc).
+    """
+    segs = segments_par_type(owner, entity, verb, t)
+    texte, spans, pos = "", [], 0
+    for k, (s, role) in enumerate(segs):
+        if role == SLOT or (inclure_verbe and k in _INDEX_VERBE.get(t, ())):
+            spans.append((pos, pos + len(s)))
+        texte += s
+        pos += len(s)
+    return texte, spans
+
+
+# Index du segment PORTANT LE VERBE dans `segments_par_type` : para1 → le verbe
+# global gelé, para2 → le verbe de l'unité, para3 → aucun (le type n'en a pas).
+_INDEX_VERBE = {0: (2,), 1: (3,)}
+
+
+def span_verbe_par_type(owner: str, entity: str, verb: str, t: int):
+    """Span de caractères du VERBE (cadre), ou `None` pour para3."""
+    segs = segments_par_type(owner, entity, verb, t)
+    idx = _INDEX_VERBE.get(t)
+    if not idx:
+        return None
+    pos = sum(len(s) for s, _ in segs[:idx[0]])
+    return (pos, pos + len(segs[idx[0]][0]))
+
+
+def verbe_conserve(slots, tokenize, sequences, offsets) -> dict:
+    """Vérifie PAR EXÉCUTION que la nulle du maillon 2 conserve le **verbe**
+    verbatim (§5, re-spécifiée) : les tokens chevauchant le span du verbe sont
+    identiques à ceux de l'indice réel."""
+    if offsets is None:
+        return {"conserve": None, "verifiable": False,
+                "motif": "spans de caractères indisponibles (repli mot-à-mot)"}
+    ok, n_verifies = True, 0
+    for u, (owner, entity, verb) in enumerate(slots):
+        for t in range(N_PARA):
+            sp = span_verbe_par_type(owner, entity, verb, t)
+            if sp is None:
+                continue
+            texte, _ = spans_slots_par_type(owner, entity, verb, t)
+            ids, offs = offsets(texte)
+            nul = sequences[u * N_PARA + t]
+            for k, (s, e) in enumerate(offs):
+                if s < sp[1] and sp[0] < e:
+                    n_verifies += 1
+                    ok = ok and (nul[k] == int(ids[k]))
+    return {"conserve": bool(ok), "verifiable": True,
+            "n_tokens_de_verbe_verifies": n_verifies}
+
+
+def nulle_cadre(slots, tokenize, filler_id, offsets=None,
+                effacer_le_verbe: bool = False) -> dict:
+    """**Maillon 2, re-spécifiée (0-8)** : *même cadre de type, **verbe
+    conservé**, slots de contenu remplacés par un remplissage neutre gelé,
+    apparié en longueur et position.*
+
+    L'ancienne clause « même suffixe » est ABANDONNÉE : le suffixe commun de
+    para2 est **vide**, elle y était **vacuée**.
+
+    Deux constructions, dans cet ordre de préférence :
+
+    - `offsets(s) -> (ids, spans)` fourni (tokenizer rapide) : les tokens dont le
+      span de caractères **chevauche** un slot de contenu sont remplacés par le
+      remplissage ; tous les autres — cadre et **verbe** — sont conservés
+      VERBATIM. Longueur et position sont préservées **par construction** ;
+    - à défaut, découpage par segments, dont la fidélité au BPE de la chaîne
+      entière est **vérifiée par exécution** et publiée.
+    """
+    seqs, longueurs_ok, fidele, n_remplaces = [], [], [], []
+    for owner, entity, verb in slots:
+        for t in range(N_PARA):
+            texte, spans = spans_slots_par_type(owner, entity, verb, t,
+                                                effacer_le_verbe)
+            complet = list(tokenize(texte))
+            if offsets is not None:
+                ids, offs = offsets(texte)
+                ids = list(ids)
+                nul = [filler_id if any(a < e and s < b for (a, b) in spans)
+                       else tid for tid, (s, e) in zip(ids, offs)]
+                fidele.append(ids == complet)
+            else:
+                segs = segments_par_type(owner, entity, verb, t)
+                iv = _INDEX_VERBE.get(t, ()) if effacer_le_verbe else ()
+                reel, nul = [], []
+                for k, (txt, role) in enumerate(segs):
+                    tk = list(tokenize(txt))
+                    reel.extend(tk)
+                    nul.extend([filler_id] * len(tk)
+                               if (role == SLOT or k in iv) else tk)
+                fidele.append(reel == complet)
+            n_remplaces.append(sum(1 for x in nul if x == filler_id))
+            longueurs_ok.append(len(nul) == len(complet))
+            seqs.append(nul)
+    return {"sequences": seqs,
+            "longueurs_appariees": bool(all(longueurs_ok)),
+            "segmentation_fidele": bool(all(fidele)),
+            "n_segmentations_infideles": int(len(fidele) - sum(fidele)),
+            "tokens_remplaces_min_max": [int(min(n_remplaces)),
+                                         int(max(n_remplaces))],
+            "construction": "offsets" if offsets is not None else "segments",
+            "verbe_conserve": True,
+            "position_de_capture": "dernier token de l'indice, inchangée",
+            "remplissage": REMPLISSAGE_NEUTRE}
 
 
 def nulle_melangee(chaines, tokenize, seed: int = SEED) -> list[list[int]]:
     """Maillon 4 : corpus (a) **mélangé au niveau des tokens**, apparié en
-    multiensemble, nombre d'items, longueur et position (la permutation d'une
-    séquence conserve exactement son multiensemble et sa longueur ; la position
-    de capture reste le dernier indice)."""
+    multiensemble, nombre d'items, longueur et position."""
     rng = np.random.default_rng(seed)
     out = []
     for s in chaines:
@@ -563,11 +936,23 @@ def nulle_melangee(chaines, tokenize, seed: int = SEED) -> list[list[int]]:
     return out
 
 
+NULLE_PERMISSIVE_MARGE = 0.02      # §5, maillon 4 : `AUC < 0.5 − 0.02`
+
+
+def nulle_melangee_permissive(auc_melangee: float) -> dict:
+    """Clause pré-enregistrée du maillon 4 : si `AUC_mélangée < 0.5 − 0.02`, la
+    nulle est **déclarée permissive** (collapse vers un attracteur), **exclue du
+    plancher le plus haut**, et le fait est publié."""
+    perm = bool(auc_melangee < 0.5 - NULLE_PERMISSIVE_MARGE)
+    return {"auc_melangee": float(auc_melangee), "permissive": perm,
+            "seuil": 0.5 - NULLE_PERMISSIVE_MARGE,
+            "consequence": ("exclue du plancher le plus haut, fait publié"
+                            if perm else "conservée dans les planchers")}
+
+
 def partage_dernier_token(chaines, tokenize) -> float:
-    """`V-suffixe` (§4.7, rétrogradée en intégrité) — opérationnalisation
-    DÉCLARÉE par le banc : fraction des paires (i<j) d'un même type dont le
-    DERNIER token BPE est identique. 1.0 = tous les indices du type finissent sur
-    le même token."""
+    """`V-suffixe` : fraction des paires (i<j) d'un même type dont le DERNIER
+    token BPE coïncide."""
     derniers = [list(tokenize(s))[-1] for s in chaines]
     n = len(derniers)
     if n < 2:
@@ -576,13 +961,29 @@ def partage_dernier_token(chaines, tokenize) -> float:
     return eg / (n * (n - 1) / 2)
 
 
+def partage_suffixe_derive(n: int = N_UNITES) -> dict:
+    """`V-suffixe` **entièrement dérivée** (§4.7, 0-8) :
+
+    - **para1 = 1.0000** : tous les indices finissent par `PARA1_VERB`, chaîne
+      globale gelée ⇒ 1 par construction ;
+    - **para3 = 1.0000** : tous finissent par `PARA3_TAIL` ⇒ 1 ;
+    - **para2 = `#{paires : 5 | d}/C(N,2)`** : para2 finit par le **verbe**, de
+      période 5 ⇒ 5·C(⌈·⌉,2) sur C(N,2). À N = 80 : 600/3160 = **0.18987**.
+    """
+    q, r = divmod(n, N_VERBES)
+    paires_5 = r * (q + 1) * q // 2 + (N_VERBES - r) * q * (q - 1) // 2
+    total = n * (n - 1) // 2
+    return {"para1": 1.0, "para2": paires_5 / total if total else float("nan"),
+            "para3": 1.0, "n_paires_5_divise_d": paires_5, "C_n_2": total,
+            "N": n}
+
+
 # =========================================================================
 #  Capture — hooks sur TOUTES les couches, UN forward (V-hooks, V-1pass)
 # =========================================================================
 
 def compte_hooks(module) -> int:
-    """Nombre total de hooks (forward, pre-forward) survivants dans l'arbre —
-    `V-hooks` : un hook survivant contaminerait tout run ultérieur."""
+    """Nombre total de hooks survivants dans l'arbre (`V-hooks`)."""
     n = 0
     for m in module.modules():
         n += len(getattr(m, "_forward_hooks", {}))
@@ -592,17 +993,13 @@ def compte_hooks(module) -> int:
 
 class CaptureToutesCouches:
     """Contexte : hooks sur les L blocs + un `forward_pre_hook` sur le bloc 0
-    (pour `ℓ = 0` = sortie des embeddings + positions), retirés en `finally`.
-
-    Un seul forward suffit à profiler les L+1 couches (`V-1pass`) ; le compteur
-    `n_forwards` est incrémenté par un pre-hook sur le module racine.
-    """
+    (`ℓ = 0`), retirés en `finally`. Un seul forward profile les L+1 couches."""
 
     def __init__(self, model, blocks):
         self.model, self.blocks = model, blocks
         self.handles = []
         self.etats: dict[int, np.ndarray] = {}
-        self.positions = None            # LongTensor [B] : dernier token réel
+        self.positions = None
         self.n_forwards = 0
 
     def _extraire(self, hidden):
@@ -613,7 +1010,7 @@ class CaptureToutesCouches:
                else torch.full((b,), h.shape[1] - 1, dtype=torch.long,
                                device=h.device))
         sel = h[torch.arange(b, device=h.device), idx.to(h.device)]
-        return sel.detach().float().cpu().numpy()      # capture en fp32 (§7)
+        return sel.detach().float().cpu().numpy()
 
     def __enter__(self):
         def pre_bloc0(_m, inputs):
@@ -637,18 +1034,14 @@ class CaptureToutesCouches:
         for h in self.handles:
             h.remove()
         self.handles.clear()
-        return False                      # aucune exception n'est avalée
+        return False
 
     def pile(self, L: int) -> np.ndarray:
-        """(L+1, n, d) — `ℓ = 0..L`."""
         return np.stack([self.etats[ell] for ell in range(L + 1)], axis=0)
 
 
 def capture_un_forward(model, blocks, input_ids, attention_mask, positions) -> dict:
-    """UN forward, tous les états de couche (`V-1pass`, `V-hooks`, D8).
-
-    `torch.no_grad()` : aucun gradient nulle part.
-    """
+    """UN forward, tous les états de couche (`V-1pass`, `V-hooks`, D8)."""
     import torch
     cap = CaptureToutesCouches(model, blocks)
     try:
@@ -660,7 +1053,7 @@ def capture_un_forward(model, blocks, input_ids, attention_mask, positions) -> d
             etats = {k: v.copy() for k, v in cap.etats.items()}
             n_fw = cap.n_forwards
     finally:
-        cap.__exit__(None, None, None)     # idempotent : les handles sont vidés
+        cap.__exit__(None, None, None)
     return {"etats": etats, "n_forwards": n_fw,
             "hooks_restants": compte_hooks(model)}
 
@@ -669,42 +1062,61 @@ def capture_un_forward(model, blocks, input_ids, attention_mask, positions) -> d
 #  Bandes (§4.5) et cellules (§4.8) — classifieurs PURS
 # =========================================================================
 
-BANDE_V, BANDE_M, BANDE_N, BANDE_D = "V", "M", "N", "D"
+BANDE_N, BANDE_M, BANDE_I, BANDE_V, BANDE_D = "N", "M", "I", "V", "D"
 BANDE_HORS = "HORS-PARTITION"
+BANDES = (BANDE_N, BANDE_M, BANDE_I, BANDE_V)
 
 
-def bande_modele(ic_max, planchers, ic_toutes_couches,
-                 seuil: float = AUC_COULOIR_025) -> str:
-    """Bande d'UN modèle sur `max_ℓ AUC(ℓ | S2 ∪ S3)` (§4.5).
+def bande_modele(ic_delta_r1, ic_r1, seuil: float = T_COULOIR) -> str:
+    """Bande d'UN modèle (§4.5), conditions **dans cet ordre** :
 
-    - **V** : IC 95 % inf ≥ `seuil` (0.9622 re-dérivé = `0.25^(1/36)`) ;
-    - **N** : IC ∩ [planchers] ≠ ∅ **à toutes les couches** ;
-    - **M** : IC inf > plancher le plus haut **et** IC sup < `seuil`.
+    1. **N** — IC 95 % de `ΔR1` (appariée, argmax re-sélectionné) contient 0 ;
+    2. **M** — `ΔR1` > 0 significatif **et** `IC_sup(R1_36) < T` ;
+    3. **I** — `ΔR1` > 0 significatif **et** `IC_inf < T ≤ IC_sup` ;
+    4. **V** — `IC_inf(R1_36) ≥ T`.
 
-    Rend `HORS-PARTITION` pour toute observation qu'aucune des trois clauses ne
-    couvre — le classifieur ne comble AUCUN trou : combler serait amender.
+    Conventions de bord gravées : `IC_sup = T → I` ; `IC_inf = T → V` ; `ΔR1`
+    dont l'IC touche 0 par la borne inférieure → **N**.
+
+    Opérationnalisation DÉCLARÉE (le protocole ne nomme pas le cas `ΔR1`
+    significativement NÉGATIF) : la bande **N** est l'absence de `ΔR1`
+    significativement positif (`IC_inf(ΔR1) ≤ 0`), seule lecture qui rende la
+    partition **exhaustive et mutuellement exclusive** sans amender une clause.
     """
-    lo, hi = float(ic_max[0]), float(ic_max[1])
-    p_max = max(planchers)
+    lo_d = float(ic_delta_r1[0])
+    if lo_d <= 0.0:
+        return BANDE_N
+    lo, hi = float(ic_r1[0]), float(ic_r1[1])
+    if hi < seuil:
+        return BANDE_M
     if lo >= seuil:
         return BANDE_V
-    chevauche = lambda ic: not (ic[1] < min(planchers) or ic[0] > p_max)  # noqa: E731
-    if ic_toutes_couches and all(chevauche(ic) for ic in ic_toutes_couches):
-        return BANDE_N
-    if lo > p_max and hi < seuil:
-        return BANDE_M
-    return BANDE_HORS
+    return BANDE_I
+
+
+def delta_r1_negatif(ic_delta_r1) -> bool:
+    """Sous-étiquette DESCRIPTIVE du cas replié dans N : `ΔR1` significativement
+    négatif (`IC_sup < 0`). Publiée, jamais décisionnelle."""
+    return float(ic_delta_r1[1]) < 0.0
+
+
+def mention_v_plus(ic_r1, seuil_plus: float = T_COULOIR_PLUS) -> bool:
+    """Mention **V⁺** si `IC_inf ≥ 0.50` (§4.5)."""
+    return float(ic_r1[0]) >= seuil_plus
 
 
 def bande_gate(bande_gpt2: str, bande_smollm2: str) -> str:
-    """**D — dissocié** : bande différente entre GPT-2 et SmolLM2 (§4.5)."""
+    """**Overlay `D`, précédence gravée** (§4.5) : (1) si l'un des deux modèles
+    rend `I`, le verdict global est **`I`** ; (2) sinon bandes différentes ⇒
+    **`D`** ; (3) sinon la bande commune."""
+    if BANDE_I in (bande_gpt2, bande_smollm2):
+        return BANDE_I
     return bande_gpt2 if bande_gpt2 == bande_smollm2 else BANDE_D
 
 
 def cellule(l_contrast: int, l_H: int, fenetre, L: int,
             plate_contrast: bool, plate_H: bool) -> str:
-    """Cellule C1-C4 d'UN modèle (§4.8). **C4 d'abord** : une courbe PLATE ou un
-    argmax au BORD retire la quantité du test joint."""
+    """Cellule C1-C4 d'UN modèle (§4.8). **C4 d'abord**."""
     bord = lambda x: x == 1 or x == L                       # noqa: E731
     if plate_contrast or plate_H or bord(l_contrast) or bord(l_H):
         return "C4"
@@ -721,24 +1133,27 @@ def cellule(l_contrast: int, l_H: int, fenetre, L: int,
 #  Profil complet d'une variante (partie GPU — NON EXÉCUTÉE en statut PROPOSE)
 # =========================================================================
 
-def profil_depuis_etats(etats, slots) -> dict:
-    """Toutes les quantités de §4.3 à partir des états capturés.
+def profil_depuis_etats(etats, slots, strate: str = STRATE_DECISIONNELLE) -> dict:
+    """Toutes les quantités du §4.3 à partir des états capturés.
 
-    `etats[ℓ]` : (90, d) — la ligne `i*3 + t` porte la paraphrase `t` de l'unité
-    `i`. **Aucune quantité indice↔fait** n'est calculable ici : la fonction ne
-    reçoit que des états d'indices.
+    `etats[ℓ]` : (n·3, d) — la ligne `i*3 + t` porte la paraphrase `t` de l'unité
+    `i`. **Aucune quantité indice↔fait** n'est calculable ici.
     """
     L = max(etats)
-    intra, inter = paires_intra_inter(len(slots), N_PARA)
-    car = stratifier(slots)["paires"]
-    etiquettes = np.repeat(np.arange(len(slots)), N_PARA)
+    n = len(slots)
+    intra, inter = paires_intra_inter(n, N_PARA)
+    part = partition_identite(slots)
+    etiquettes = np.repeat(np.arange(n), N_PARA)
     out = {"L": L, "n_intra": len(intra), "n_inter": len(inter),
-           "auc": {}, "auc_par_strate": {}, "recall_at_1": {}, "H": {},
-           "lambda1": {}, "s_intra": {}, "s_inter": {}, "ratio": {}, "z": {},
-           "egalites": {}}
+           "recensement_identite": part["recensement"],
+           "auc": {}, "auc_par_classe": {}, "auc_par_verbe": {},
+           "R1_36": {}, "R1_36_P-ent": {}, "succes_R1": {}, "R1_full": {},
+           "H": {}, "lambda1": {}, "s_intra": {}, "s_inter": {}, "ratio": {},
+           "z": {}, "egalites": {}}
     for ell in range(L + 1):
         X = etats[ell]
         S = cosinus_matrice(X)
+        Sd = S.astype(np.float64)
         ci = np.array([S[a, b] for a, b in intra], dtype=np.float64)
         ce = np.array([S[a, b] for a, b in inter], dtype=np.float64)
         out["auc"][ell] = auc_par_couche(ci, ce)
@@ -748,16 +1163,28 @@ def profil_depuis_etats(etats, slots) -> dict:
         out["ratio"][ell] = float(ci.mean() / ce.mean()) if ce.mean() else float("nan")
         sd = float(ce.std(ddof=1))
         out["z"][ell] = float((ci.mean() - ce.mean()) / sd) if sd else float("nan")
-        par_strate = {}
-        for s in STRATES:
-            sel = [(a, b) for (i, j), st in car.items() if st == s
+        par_classe = {}
+        for c in PARTITIONS:
+            sel = [(a, b) for (i, j), cc in part["paires"].items() if cc == c
                    for a in range(i * N_PARA, i * N_PARA + N_PARA)
                    for b in range(j * N_PARA, j * N_PARA + N_PARA)]
-            par_strate[s] = (auc_par_couche(ci, [S[a, b] for a, b in sel])
+            par_classe[c] = (auc_par_couche(ci, [S[a, b] for a, b in sel])
                              if sel else float("nan"))
-        out["auc_par_strate"][ell] = par_strate
-        out["recall_at_1"][ell] = {m: recall_at_1(X, etiquettes, m)
-                                   for m in ("cos", "l2")}
+        out["auc_par_classe"][ell] = par_classe
+        par_verbe = {}
+        for v in ("verbe=", "verbe≠"):
+            sel = [(a, b) for (i, j), vv in part["covariable_verbe"].items() if vv == v
+                   for a in range(i * N_PARA, i * N_PARA + N_PARA)
+                   for b in range(j * N_PARA, j * N_PARA + N_PARA)]
+            par_verbe[v] = (auc_par_couche(ci, [S[a, b] for a, b in sel])
+                            if sel else float("nan"))
+        out["auc_par_verbe"][ell] = par_verbe
+        r_own = r1_36(Sd, slots, P_OWN)
+        r_ent = r1_36(Sd, slots, P_ENT)
+        out["R1_36"][ell] = r_own["R1"]
+        out["R1_36_P-ent"][ell] = r_ent["R1"]
+        out["succes_R1"][ell] = r_own["succes"].tolist()
+        out["R1_full"][ell] = {m: recall_at_1(X, etiquettes, m) for m in ("cos", "l2")}
         out["H"][ell] = entropie_matricielle(X)
         out["lambda1"][ell] = lambda1_ratio(X)
     courbe = np.array([out["auc"][e] for e in range(L + 1)])
@@ -769,7 +1196,7 @@ def profil_depuis_etats(etats, slots) -> dict:
 
 
 def _prompts_du_corpus(corpus) -> list[str]:
-    """Les 90 indices, disposés `i*3 + t` (§ convention de `paires_intra_inter`)."""
+    """Les indices, disposés `i*3 + t`."""
     return [p for triple in corpus["paraphrases"] for p in triple]
 
 
@@ -819,15 +1246,16 @@ def main() -> int:
         return 3
 
     tokenize = lambda s: [int(t) for t in tok.encode(s)]        # noqa: E731
-    corpus = corpus_a() if args.variante in ("a", "nulle_suffixe",
-                                             "nulle_melangee") else corpus_a_prime()
+    corpus = corpus_b_v3(tokenize) if args.variante == "b_v3" else corpus_a()
     prompts = _prompts_du_corpus(corpus)
-    if args.variante == "nulle_suffixe":
+    def offsets(s):
+        enc = tok(s, return_offsets_mapping=True, add_special_tokens=False)
+        return [int(x) for x in enc["input_ids"]], list(enc["offset_mapping"])
+
+    if args.variante == "nulle_cadre":
         filler = tokenize(REMPLISSAGE_NEUTRE)[-1]
-        par_type = [[corpus["paraphrases"][i][t] for i in range(N_UNITES)]
-                    for t in range(N_PARA)]
-        brut = nulle_suffixe(par_type, tokenize, filler)
-        seqs = [brut[t * N_UNITES + i] for i in range(N_UNITES) for t in range(N_PARA)]
+        seqs = nulle_cadre(corpus["slots"], tokenize, filler,
+                           offsets if tok.is_fast else None)["sequences"]
     elif args.variante == "nulle_melangee":
         seqs = nulle_melangee(prompts, tokenize)
     else:
@@ -849,8 +1277,8 @@ def main() -> int:
     prof = profil_depuis_etats(cap["etats"], corpus["slots"])
     prof.update({
         "modele": args.model, "variante": args.variante,
-        "n_forwards": cap["n_forwards"], "V-1pass": "PASS" if cap["n_forwards"] == 1
-        else "FAIL",
+        "n_forwards": cap["n_forwards"],
+        "V-1pass": "PASS" if cap["n_forwards"] == 1 else "FAIL",
         "hooks_restants": cap["hooks_restants"],
         "V-hooks": "PASS" if cap["hooks_restants"] == 0 else "FAIL",
         "V-L": verdict_L, "sha256_avant": hash_avant,
@@ -864,8 +1292,9 @@ def main() -> int:
     (out / f"{nom}.json").write_text(
         json.dumps(prof, ensure_ascii=False, indent=1, default=str), encoding="utf-8")
     print(f"AUC ℓ*={prof['l_contrast']} : {prof['auc'][prof['l_contrast']]:.4f} ; "
-          f"H ℓ*={prof['l_H']} ; forwards={prof['n_forwards']} ; "
-          f"VRAM={prof['vram_gio']} Gio ; {prof['duree_s']} s")
+          f"R1_36 = {prof['R1_36'][prof['l_contrast']]:.4f} ; H ℓ*={prof['l_H']} ; "
+          f"forwards={prof['n_forwards']} ; VRAM={prof['vram_gio']} Gio ; "
+          f"{prof['duree_s']} s")
     print(f"écrit : {out / (nom + '.json')}")
     return 0
 

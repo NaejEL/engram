@@ -1053,6 +1053,23 @@ def make_tokenizer(use_hf: bool):
     return (lambda s: tok.encode(s)), "GPT-2 BPE (CPU, cache local)"
 
 
+def make_offsets(use_hf: bool):
+    """`offsets(s) -> (ids, spans)` — spans de CARACTÈRES de chaque token, pour
+    la nulle de cadre (§5, maillon 2). `None` en repli mot-à-mot : la nulle
+    retombe alors sur le découpage par segments, et le fait est publié."""
+    if not use_hf:
+        return None
+    from transformers import AutoTokenizer
+    tok = AutoTokenizer.from_pretrained("gpt2")
+    if not getattr(tok, "is_fast", False):
+        return None
+
+    def offsets(s):
+        enc = tok(s, return_offsets_mapping=True, add_special_tokens=False)
+        return [int(x) for x in enc["input_ids"]], list(enc["offset_mapping"])
+    return offsets
+
+
 # =========================================================================
 #  Jeux synthétiques + registre des clauses
 # =========================================================================
@@ -1689,36 +1706,50 @@ def build_clauses(tokenize, tok_name):
 # =========================================================================
 #  ===================  SUITE I2 — `layer_profile`  =======================
 #
-#  Protocole : `experiments/EXP-2026-08-22-layer-profile.md` (statut PROPOSE).
-#  Portes §4.7, quatre bandes §4.5, quatre cellules §4.8, cinq nulles §5.
+#  Protocole : `experiments/EXP-2026-08-22-layer-profile.md` (statut PROPOSE,
+#  version CONSOLIDÉE du 2026-08-22). Portes §4.7, **quatre bandes N/M/I/V** et
+#  overlay `D` (§4.5), quatre cellules §4.8, cinq nulles §5.
 #  CPU seul, aucune mesure, aucun modèle (le tokenizer GPT-2 sert les nulles
-#  lexicale et suffixe, qui ne sont pas décidables sans lui).
+#  lexicale et de cadre, qui ne sont pas décidables sans lui).
 # =========================================================================
 
 import layer_profile as lp  # noqa: E402
 
 # Opérationnalisations DÉCLARÉES par le banc là où le protocole fixe la clause
 # mais pas son seuil d'exécution. Signalées au rapport, hors E.
-I2_VDIV_TAUX = 0.999          # « non vide dans ≥ 99.9 % des B rééchantillonnages »
-I2_VSUFFIXE_HAUT = 0.95       # « ≈ 1.0 »
-I2_VSUFFIXE_BAS = 0.05        # « ≈ 0 »
 I2_TOL_AUC = 1e-12            # égalité d'AUC sous transformation monotone
-I2_TOL_H = 1e-6               # égalité relative de H sous mise à l'échelle des lignes
-I2_B_DIV = 10_000             # §4.7 V-div
+I2_TOL_H = 1e-6               # égalité relative de H sous mise à l'échelle
+I2_TOL_SUFFIXE = 1e-9         # égalité aux constantes DÉRIVÉES de `V-suffixe`
+I2_K_PLAFOND_POOL = max(lp.N_ENTITES, lp.N_OWNERS)   # 20 : K max de ce pool
 
 UNDERSPEC_I2 = {
-    "V-div": "« non vide dans ≥ 99.9 % » fixe le taux ; le banc déclare qu'une "
-             "paire d'unités est une paire de positions dont les DEUX unités "
-             "diffèrent (une unité tirée deux fois n'est pas une paire).",
-    "V-suffixe": "« ≈ 1.0 » / « ≈ 0 » ne sont pas opérationnalisés ; le banc "
-                 "déclare partage ≥ %.2f et ≤ %.2f, sur la fraction des paires "
-                 "d'un même type dont le dernier token BPE coïncide."
-                 % (I2_VSUFFIXE_HAUT, I2_VSUFFIXE_BAS),
-    "V-plat": "le protocole fixe `R = max−min`, le bootstrap PAR UNITÉ et la "
-              "courbe centrée par unité, pas la fabrique de `R*` ; le banc "
-              "déclare le double centrage (par unité puis par couche) comme "
-              "vérité plate, seule construction rendant `R*` calculable sans "
-              "poser de constante.",
+    "V-puissance (décision AUC)":
+        "le protocole PORTE le résultat « K ≥ 429 sous décision AUC à "
+        "T = 0.9622 » mais PAS la valeur de |θ−T| qui le produit. Le banc "
+        "recopie le K requis déclaré (%d) et publie EN PLUS sa propre "
+        "dérivation candidate (marge = largeur du couloir en AUC = %.6f ⇒ "
+        "K ≥ %d). Les deux rendent FAIL à tout N ≤ 80 (K plafonne à %d dans ce "
+        "pool) : la conclusion de la porte ne dépend pas de la levée."
+        % (lp.K_REQUIS_AUC_PROTOCOLE, lp.MARGE_AUC_BANC,
+           lp.k_requis(lp.SIGMA0, lp.MARGE_AUC_BANC), I2_K_PLAFOND_POOL),
+    "Bande N (ΔR1 négatif)":
+        "le protocole ne nomme pas le cas `ΔR1` significativement NÉGATIF. Le "
+        "banc déclare que la bande N est l'absence de `ΔR1` significativement "
+        "positif (`IC_inf(ΔR1) ≤ 0`) — seule lecture rendant la partition "
+        "exhaustive et mutuellement exclusive sans amender une clause. Le cas "
+        "négatif est publié comme SOUS-ÉTIQUETTE descriptive.",
+    "R1_36 — égalités":
+        "le protocole fixe « égalités ½ crédit » pour l'AUC ; le banc étend la "
+        "règle au plus proche voisin : une égalité à `g` gagnants dont la cible "
+        "vaut `1/g`.",
+    "R1_36 (P-ent)":
+        "le protocole écrit « idem sur `P-ent` » sans redéfinir l'ordre de "
+        "remplissage ; le banc déclare que « le plus dur d'abord » suit le slot "
+        "de la strate : composante d'entité d'abord, puis owner, puis P-0. La "
+        "taille reste 36 exactement.",
+    "V-plat": "le protocole fixe `R = max−min`, le bootstrap et la courbe "
+              "centrée par unité, pas la fabrique de `R*` ; le banc déclare le "
+              "double centrage (par unité puis par couche) comme vérité plate.",
 }
 
 # Chiffres de v3 interdits dans une porte, un seuil ou une prédiction (`V-amont`,
@@ -1729,74 +1760,109 @@ I2_MOTIFS_AMONT = ("0.99989", "0.99848", "90/90", "12/30", "23/30", "30/30",
 
 # ------------------------------------------------------------------ portes
 
-def gate_v_div(slots, b: int = I2_B_DIV, seed: int = 0,
-               taux: float = I2_VDIV_TAUX) -> tuple[str, dict]:
-    """`V-div` (§4.7) : chaque strate S0/S1/S2 **non vide dans ≥ 99.9 %** des
-    `b` rééchantillonnages d'unités. Décidable sur le seul recensement
-    combinatoire, **sans GPU**. Le recensement est publié avant mesure."""
-    st = lp.stratifier(slots)
-    n = len(slots)
-    code = {"S0": 0, "S1": 1, "S2": 2, "S3-degenere": 3}
-    M = np.full((n, n), 3, dtype=np.int8)
-    for (i, j), s in st["paires"].items():
-        M[i, j] = M[j, i] = code[s]
-    rng = np.random.default_rng(seed)
-    idx = rng.integers(0, n, size=(b, n))
-    sub = M[idx[:, :, None], idx[:, None, :]]
-    frac = {s: float((sub == code[s]).any(axis=(1, 2)).mean()) for s in lp.STRATES}
-    ok = all(v >= taux for v in frac.values())
-    return (PASS if ok else FAIL,
-            {"recensement": st["recensement"], "fraction_non_vide": frac,
-             "taux_exige": taux, "B": b, "n_unites": n})
+def gate_v_diversite(slots, n: int = None) -> tuple[str, dict]:
+    """`V-diversité` (§4.7, remplace `V-div`) : **PASS ssi**
+    `(#owners, #entités, #verbes) = (min(N,16), min(N,20), min(N,5))`.
+
+    **Zéro GPU, zéro bootstrap.** L'ancienne `V-div` mesurait un CARDINAL DE
+    STRATE ⇒ croissante en redondance ⇒ elle **récompensait la dégénérescence**
+    (défaut 0-7). La direction est restaurée : le corpus divers PASSE, le corpus
+    dégénéré ÉCHOUE.
+    """
+    n = len(slots) if n is None else n
+    obs = lp.diversite(slots)
+    att = lp.diversite_attendue(n)
+    return (PASS if obs == att else FAIL,
+            {"N": n, "observe": list(obs), "attendu": list(att),
+             "ecart": [o - a for o, a in zip(obs, att)],
+             "recensement_publie_avant_mesure": True})
 
 
-def gate_v_paires(n_intra: int, n_inter: int) -> tuple[str, dict]:
-    """`V-paires` (§4.7, remplace `V-signe`) : `n_intra = 90` et
-    `n_inter = 3915` **exactement**. Porte mordante."""
+def gate_v_puissance(k: int, sigma0: float = lp.SIGMA0, marge: float = lp.MARGE_R1,
+                     statistique: str = "R1_36",
+                     k_requis: int = None) -> tuple[str, dict]:
+    """`V-puissance` (§4.7) : **PASS ssi** `K_S ≥ (1.96·σ₀/|θ−T|)²`.
+
+    σ₀ = 0.5 (Bernoulli, conservateur), |θ−T| = 0.25 ⇒ **K ≥ 16**. **Fusion avec
+    `V-diversité` refusée** : un FAIL doit NOMMER sa cause. Sous décision AUC, la
+    porte **déclare elle-même l'indécidabilité**.
+    """
+    kr = lp.k_requis(sigma0, marge) if k_requis is None else int(k_requis)
+    ok = k >= kr
+    det = {"statistique": statistique, "K": k, "K_requis": kr,
+           "sigma0": sigma0, "marge_theta_moins_T": marge,
+           "formule": "K ≥ (1.96·σ₀/|θ−T|)²",
+           "cause_du_FAIL": None, "indecidable_a_tout_N": False}
+    if not ok:
+        det["cause_du_FAIL"] = f"K = {k} < {kr} requis (puissance du DESIGN)"
+        if kr > I2_K_PLAFOND_POOL:
+            det["indecidable_a_tout_N"] = True
+            det["nom_de_l_indecidabilite"] = (
+                f"K plafonne à {I2_K_PLAFOND_POOL} dans ce pool (taille de la "
+                f"plus grande famille de composantes) ⇒ FAIL à tout N ≤ 80 : "
+                f"aucune répétition ne lève cette porte.")
+    return (PASS if ok else FAIL, det)
+
+
+def gate_v_paires(n_intra: int, n_inter: int, recensement=None) -> tuple[str, dict]:
+    """`V-paires` (§4.7) : `n_intra = 240`, `n_inter = 28 440` **exactement** ;
+    `P-0/P-own/P-ent = 2880/160/120`, `P-both = 0`. Porte mordante."""
+    att = {lp.P_0: 2880, lp.P_OWN: 160, lp.P_ENT: 120, lp.P_BOTH: 0}
     ok = (n_intra == lp.N_INTRA_ATTENDU) and (n_inter == lp.N_INTER_ATTENDU)
-    return (PASS if ok else FAIL,
-            {"n_intra": n_intra, "n_inter": n_inter,
-             "attendus": [lp.N_INTRA_ATTENDU, lp.N_INTER_ATTENDU],
-             "derivation": "30 × C(3,2) = 90 ; C(30,2) × 9 = 435 × 9 = 3915"})
+    det = {"n_intra": n_intra, "n_inter": n_inter,
+           "attendus": [lp.N_INTRA_ATTENDU, lp.N_INTER_ATTENDU],
+           "derivation": "80 × C(3,2) = 240 ; C(80,2) × 9 = 3160 × 9 = 28 440 ; "
+                         "3160 = 2880 + 160 + 120 + 0",
+           "egalites": "½ crédit, déclaré avant mesure"}
+    if recensement is not None:
+        det["recensement_identite"] = dict(recensement)
+        det["recensement_attendu"] = att
+        ok = ok and all(recensement.get(k) == v for k, v in att.items())
+    return (PASS if ok else FAIL, det)
 
 
 def gate_v_plat(courbes, b: int = 2000, seed: int = 0) -> tuple[str, dict]:
     """`V-plat` (§4.7) : PLATE ssi `R_obs ≤ q_0.95(R*)`. **Aucune constante
-    posée** — le seuil est un quantile bootstrap. Une courbe PLATE ⇒ argmax non
-    interprété, le modèle sort du test joint."""
+    posée** — le seuil est un quantile bootstrap."""
     r = lp.v_plat(courbes, b=b, seed=seed)
     det = {k: v for k, v in r.items() if k != "courbe_centree"}
     return ("PLATE" if r["plate"] else "NON PLATE", det)
 
 
 def gate_v_bord_i2(l_star: int, L: int) -> tuple[str, dict]:
-    """`V-bord` (§4.7) : `ℓ*` en `ℓ = 1` ou `ℓ = L` ⇒ extremum au bord, la
-    quantité ne dit rien."""
-    au_bord = l_star in (1, L)
-    return ("AU BORD" if au_bord else "INTÉRIEUR", {"l_star": l_star, "L": L})
+    """`V-bord` (§4.7) : `ℓ*` en `ℓ = 1` ou `ℓ = L` ⇒ la quantité ne dit rien."""
+    return ("AU BORD" if l_star in (1, L) else "INTÉRIEUR",
+            {"l_star": l_star, "L": L})
 
 
 def gate_v_lambda1(lambda1_par_couche, L: int) -> tuple[str, dict]:
-    """`V-λ₁` (§4.7, (v)) : λ₁/Σλ publié pour **toutes** les couches (0..L) —
-    absence ⇒ `H` DÉCLARÉE NON INTERPRÉTABLE, jamais « interprétée avec
-    prudence »."""
+    """`V-λ₁` (§4.7) : λ₁/Σλ publié pour **toutes** les couches — absence ⇒ `H`
+    non interprétable et **retrait automatique** (§4.6, N-19)."""
     manquantes = [e for e in range(L + 1) if e not in lambda1_par_couche]
     return (PASS if not manquantes else FAIL,
             {"couches_manquantes": manquantes, "L": L,
-             "consequence_si_FAIL": "H non interprétable (le run reste valide "
-                                    "pour la primaire)"})
+             "consequence_si_FAIL": "H retirée de la fiche I2, automatiquement, "
+                                    "consigné au journal (N-19)"})
+
+
+def gate_retrait_H(interpretable_par_modele) -> tuple[str, dict]:
+    """Clause de retrait automatique (§4.6, N-19) : si `H` est non interprétable
+    sur **les trois modèles**, elle est RETIRÉE, sans nouvelle discussion."""
+    retire = not any(interpretable_par_modele.values())
+    return ("RETIRÉE" if retire else "CONSERVÉE",
+            {"interpretable_par_modele": dict(interpretable_par_modele),
+             "automatique": True})
 
 
 def gate_v_amont(source: str, motifs=I2_MOTIFS_AMONT) -> tuple[str, dict]:
-    """`V-amont` (§4.7, remplace `V-vierge`) : aucun chiffre de v3 dans une
-    porte, un seuil ou une prédiction (D14-R)."""
+    """`V-amont` (§4.7) : aucun chiffre de v3 dans une porte, un seuil ou une
+    prédiction (D14-R). `B-v3` est descriptif."""
     trouves = [m for m in motifs if m in source]
     return (PASS if not trouves else FAIL, {"motifs_trouves": trouves})
 
 
 def gate_v_1pass(compte_par_variante) -> tuple[str, dict]:
-    """`V-1pass` (§4.7) : **un** forward par (modèle, variante). > 1 ⇒
-    l'implémentation boucle sur les couches."""
+    """`V-1pass` (§4.7) : **un** forward par (modèle, variante)."""
     mauvais = {k: v for k, v in compte_par_variante.items() if v != 1}
     return (PASS if not mauvais else FAIL,
             {"comptes": dict(compte_par_variante), "non_conformes": mauvais})
@@ -1819,32 +1885,299 @@ def gate_v_L(L_mesure: int, L_attendu: int) -> tuple[str, dict]:
              "consequence_si_FAIL": "ARRÊT du run"})
 
 
-def gate_v_suffixe(partage_par_type) -> tuple[str, dict]:
-    """`V-suffixe` (§4.7, rétrogradée en intégrité du matériel) : partage du
-    dernier token BPE **≈ 1.0 pour para3**, **≈ 0 pour para1 et para2**.
+def gate_v_suffixe(partage_par_type, n: int = lp.N_UNITES) -> tuple[str, dict]:
+    """`V-suffixe` **re-dérivée** (§4.7, défaut 0-8) : partage du **dernier token
+    BPE** — **para1 = 1.0000**, **para3 = 1.0000**,
+    **para2 = `#{paires : 5|d}/C(N,2)`**.
 
-    Vérifie que les règles gelées qui ont tourné sont celles décrites. Le banc
-    n'assouplit rien : il rapporte la valeur observée."""
+    Constantes ENTIÈREMENT DÉRIVÉES : para1 et para3 finissent par une chaîne
+    globale gelée ⇒ 1 par construction ; para2 finit par le **verbe** (période 5).
+    L'ancienne attente (para1 ≈ 0) datait d'avant §15 A-1. **La porte redevient
+    mordante.**
+    """
+    d = lp.partage_suffixe_derive(n)
     p = dict(partage_par_type)
-    ok = (p.get("para3", 0.0) >= I2_VSUFFIXE_HAUT
-          and p.get("para1", 1.0) <= I2_VSUFFIXE_BAS
-          and p.get("para2", 1.0) <= I2_VSUFFIXE_BAS)
+    ecarts = {t: abs(p.get(t, float("nan")) - d[t]) for t in ("para1", "para2", "para3")}
+    ok = all(e <= I2_TOL_SUFFIXE for e in ecarts.values())
     return (PASS if ok else FAIL,
-            {"partage": p, "attendu": {"para1": "≈ 0", "para2": "≈ 0",
-                                       "para3": "≈ 1.0"},
-             "seuils_declares": [I2_VSUFFIXE_BAS, I2_VSUFFIXE_HAUT]})
+            {"observe": p, "derive": {t: d[t] for t in ("para1", "para2", "para3")},
+             "ecarts": ecarts, "tolerance": I2_TOL_SUFFIXE,
+             "derivation_para2": f"{d['n_paires_5_divise_d']}/{d['C_n_2']}",
+             "N": n})
 
 
 def gate_v_hash_i2(avant: str, apres: str) -> tuple[str, dict]:
-    """`V-hash` (§4.7) : SHA-256 de (a) et (a′) avant/après."""
+    """`V-hash` (§4.7) : SHA-256 de (a) et de `B-v3` avant/après."""
     return (PASS if avant == apres else FAIL,
             {"avant": avant[:16], "apres": apres[:16]})
+
+
+def gate_v_source(citations=None) -> tuple[str, dict]:
+    """`V-source` (§4.7, NOUVELLE, défaut 0-10) : toute équation citée est relue
+    dans le **PDF** de sa source primaire, et l'attribution nomme **l'article
+    d'origine**. **Lire du HTML pour citer une équation est un motif d'arrêt.**
+    """
+    cits = lp.CITATIONS if citations is None else citations
+    fautes = [{"equation": c.get("equation"), "support": c.get("support"),
+               "source_primaire": c.get("source_primaire")}
+              for c in cits
+              if c.get("support") != "PDF" or not c.get("source_primaire")]
+    return (PASS if not fautes else FAIL,
+            {"n_citations": len(cits), "non_conformes": fautes,
+             "regle": "support = PDF ET source primaire nommée ; sinon ARRÊT"})
+
+
+# ------------------------------------------- bandes (§4.5) — porte `V-bandes`
+
+def _grille_bandes(seuil=lp.T_COULOIR):
+    """Grille de balayage pour l'exhaustivité : bornes de `ΔR1` et de `R1_36`
+    couvrant les deux côtés de 0 et des deux côtés de `T`, **bords inclus**."""
+    d = [(-0.20, -0.05), (-0.10, 0.10), (-1e-12, 0.30), (0.0, 0.30),
+         (1e-12, 0.30), (0.05, 0.40)]
+    r = [(0.00, 0.05), (0.05, seuil - 1e-12), (0.05, seuil), (0.05, 0.60),
+         (seuil, 0.60), (seuil + 1e-12, 0.60), (0.55, 0.90)]
+    return [(x, y) for x in d for y in r]
+
+
+def gate_v_bandes(seuil=lp.T_COULOIR) -> tuple[str, dict]:
+    """`V-bandes` (§4.7, NOUVELLE, défaut 0-9) : la partition **N / M / I / V**
+    est **exhaustive et mutuellement exclusive**, **bords inclus**, et la
+    **précédence de l'overlay `D`** est testée.
+
+    C'est la porte qui aurait empêché le protocole qui grave D18 de violer D18.
+    """
+    hors, cas = [], []
+    for icd, icr in _grille_bandes(seuil):
+        b = lp.bande_modele(icd, icr, seuil)
+        cas.append({"ic_delta_R1": list(icd), "ic_R1": list(icr), "bande": b})
+        if b not in lp.BANDES:
+            hors.append(cas[-1])
+    bords = {
+        "IC_sup(R1) = T → I": lp.bande_modele((0.05, 0.30), (0.05, seuil), seuil),
+        "IC_inf(R1) = T → V": lp.bande_modele((0.05, 0.30), (seuil, 0.60), seuil),
+        "IC(ΔR1) touche 0 par la borne inférieure → N":
+            lp.bande_modele((0.0, 0.30), (0.55, 0.90), seuil),
+    }
+    bords_ok = (bords["IC_sup(R1) = T → I"] == lp.BANDE_I
+                and bords["IC_inf(R1) = T → V"] == lp.BANDE_V
+                and bords["IC(ΔR1) touche 0 par la borne inférieure → N"] == lp.BANDE_N)
+    precedence = {
+        "I + V → I": lp.bande_gate(lp.BANDE_I, lp.BANDE_V),
+        "V + I → I": lp.bande_gate(lp.BANDE_V, lp.BANDE_I),
+        "I + N → I": lp.bande_gate(lp.BANDE_I, lp.BANDE_N),
+        "V + M → D": lp.bande_gate(lp.BANDE_V, lp.BANDE_M),
+        "N + N → N": lp.bande_gate(lp.BANDE_N, lp.BANDE_N),
+    }
+    prec_ok = (precedence["I + V → I"] == lp.BANDE_I
+               and precedence["V + I → I"] == lp.BANDE_I
+               and precedence["I + N → I"] == lp.BANDE_I
+               and precedence["V + M → D"] == lp.BANDE_D
+               and precedence["N + N → N"] == lp.BANDE_N)
+    # mutuelle exclusivité : le classifieur rend UNE étiquette par observation
+    exclusif = all(isinstance(c["bande"], str) for c in cas)
+    ok = (not hors) and bords_ok and prec_ok and exclusif
+    return (PASS if ok else FAIL,
+            {"n_cas_balayes": len(cas), "hors_partition": hors,
+             "bandes_rencontrees": sorted({c["bande"] for c in cas}),
+             "bords": bords, "bords_conformes": bords_ok,
+             "precedence_overlay_D": precedence, "precedence_conforme": prec_ok,
+             "mutuellement_exclusive": exclusif})
+
+
+def _bande(ic_delta, ic_r1, seuil=lp.T_COULOIR):
+    b = lp.bande_modele(ic_delta, ic_r1, seuil)
+    return (b, {"ic_delta_R1": list(ic_delta), "ic_R1": list(ic_r1),
+                "seuil_T": seuil, "V+": lp.mention_v_plus(ic_r1),
+                "delta_R1_significativement_negatif": lp.delta_r1_negatif(ic_delta)})
+
+
+def bande_couverte(ic_delta, ic_r1, seuil=lp.T_COULOIR):
+    """D18 : la partition N/M/I/V doit être EXHAUSTIVE. Le banc ne comble aucun
+    trou : combler serait amender."""
+    b = lp.bande_modele(ic_delta, ic_r1, seuil)
+    return ("COUVERT" if b in lp.BANDES else lp.BANDE_HORS,
+            {"bande": b, "ic_delta_R1": list(ic_delta), "ic_R1": list(ic_r1)})
+
+
+def _cellule(lc, lh, L, plate_c=False, plate_h=False):
+    f = lp.fenetre_D3(L)
+    return (lp.cellule(lc, lh, f, L, plate_c, plate_h),
+            {"l_contrast": lc, "l_H": lh, "fenetre": list(f), "L": L,
+             "plate_contrast": plate_c, "plate_H": plate_h})
+
+
+# ------------------------------------------ jeu de candidats `R1_36` (§4.5)
+
+def gate_jeu_r1(slots, s: int = lp.S_LEURRES) -> tuple[str, dict]:
+    """Le jeu `R1_36` a **exactement 37 éléments**, est **déterministe** et est
+    **indépendant des similarités mesurées** (§4.5 ; toute sélection par
+    proximité mesurée est un motif d'invalidation).
+
+    Le test d'indépendance est mécanique : on permute les VALEURS de similarité
+    et l'on vérifie que le jeu est identique — la fonction ne reçoit d'ailleurs
+    aucun état.
+    """
+    n = len(slots)
+    tailles, distincts, deterministe = set(), True, True
+    jeux = {}
+    for i in range(n):
+        for t in range(lp.N_PARA):
+            j = lp.jeu_candidats_R1(i, t, slots, lp.P_OWN, s)
+            cand = [j["cible"]] + list(j["concurrents"])
+            tailles.add(len(cand))
+            distincts = distincts and (len(set(cand)) == len(cand))
+            deterministe = deterministe and (
+                lp.jeu_candidats_R1(i, t, slots, lp.P_OWN, s) == j)
+            jeux[(i, t)] = tuple(cand)
+    # indépendance : deux matrices de similarité différentes, MÊME jeu
+    g = np.random.default_rng(7)
+    base = g.normal(size=(n, 12))
+    X = np.repeat(base, lp.N_PARA, axis=0) + 0.001 * g.normal(
+        size=(n * lp.N_PARA, 12))
+    S1 = lp.cosinus_matrice(X).astype(np.float64)        # géométrie « parfaite »
+    S2 = g.permutation(S1.ravel()).reshape(S1.shape)     # MÊMES valeurs, permutées
+    jeux2 = {(i, t): tuple([lp.jeu_candidats_R1(i, t, slots, lp.P_OWN, s)["cible"]]
+                           + list(lp.jeu_candidats_R1(i, t, slots, lp.P_OWN,
+                                                      s)["concurrents"]))
+             for (i, t) in jeux}
+    independant = jeux == jeux2
+    r1_a = lp.r1_36(S1, slots, lp.P_OWN, s)["R1"]
+    r1_b = lp.r1_36(S2, slots, lp.P_OWN, s)["R1"]
+    j0 = lp.jeu_candidats_R1(0, 0, slots, lp.P_OWN, s)
+    ok = (tailles == {1 + s} and distincts and deterministe and independant)
+    return (PASS if ok else FAIL,
+            {"tailles_observees": sorted(tailles), "taille_attendue": 1 + s,
+             "tous_distincts": distincts, "deterministe": deterministe,
+             "independant_des_similarites": independant,
+             "R1_sous_S1": r1_a, "R1_sous_S2_permutee": r1_b,
+             "la_statistique_depend_bien_de_S": r1_a != r1_b,
+             "blocs_du_jeu_i0_t0": j0["blocs"], "hasard": 1.0 / (1 + s)})
+
+
+# ------------------------------- biais de sélection du max (M-15) et « max des IC »
+
+def _cas_estimateur_debiaise(seed: int = 3, n_couches: int = 12, k: int = 16,
+                             b: int = 400) -> tuple[str, dict]:
+    """**Effet NUL** par construction : `n_couches` couches de bruit indépendant,
+    aucune différence vraie. Le max brut est biaisé vers le haut ; l'estimateur
+    débiaisé `θ̂ = 2·max_obs − mean_b(θ*_b)` en diffère."""
+    g = np.random.default_rng(seed)
+    donnees = g.normal(0.0, 1.0, (k, n_couches))       # k clusters, ℓ couches
+    obs = [float(donnees[:, e].mean()) for e in range(n_couches)]
+    max_obs = max(obs)
+    rng = np.random.default_rng(seed + 1)
+    ech = np.empty(b)
+    for m in range(b):
+        idx = rng.integers(0, k, k)
+        ech[m] = max(float(donnees[idx, e].mean()) for e in range(n_couches))
+    jack = np.array([max(float(np.delete(donnees, j, axis=0)[:, e].mean())
+                         for e in range(n_couches)) for j in range(k)])
+    r = lp.ic_du_max(ech, max_obs, jack)
+    diff = abs(r["theta_debiaise"] - max_obs)
+    return (PASS if diff > 1e-9 else FAIL,
+            {"max_brut": max_obs, "theta_debiaise": r["theta_debiaise"],
+             "moyenne_bootstrap": r["moyenne_bootstrap"],
+             "ecart_debiaise_vs_max": diff, "IC": [r["ic_bas"], r["ic_haut"]],
+             "methode_IC": r["methode"], "argmax_re_selectionne": True,
+             "B": b, "K": k})
+
+
+def _cas_max_des_ic_rejete() -> tuple[str, dict]:
+    """« Max des IC par couche » est un **motif d'invalidation** (§4.3, §6) : la
+    construction est refusée mécaniquement, jamais discutée."""
+    try:
+        lp.ic_max_des_ic_par_couche([(0.1, 0.9)] * 12)
+    except ValueError as e:
+        return ("REJETÉ", {"message": str(e)})
+    return (PASS, {"message": "AUCUN refus — la construction interdite a abouti"})
+
+
+def _cas_bca_au_dela_de_095(seed: int = 5, b: int = 400) -> tuple[str, dict]:
+    """`BCa` **requis** dès qu'une borne dépasse 0.95 (M-16 : le percentile
+    sous-couvre près de la borne 1)."""
+    g = np.random.default_rng(seed)
+    ech = np.clip(g.beta(20, 1.0, b), 0, 1)             # masse près de 1
+    jack = np.clip(g.beta(20, 1.0, 16), 0, 1)
+    haut = lp.ic_du_max(ech, float(ech.max()), jack)
+    ech_bas = g.normal(0.4, 0.05, b)
+    bas = lp.ic_du_max(ech_bas, float(ech_bas.max()), g.normal(0.4, 0.05, 16))
+    ok = haut["methode"] == "BCa" and bas["methode"] == "percentile"
+    return (PASS if ok else FAIL,
+            {"borne_haute": [haut["ic_bas"], haut["ic_haut"]],
+             "methode_haute": haut["methode"],
+             "borne_basse": [bas["ic_bas"], bas["ic_haut"]],
+             "methode_basse": bas["methode"], "seuil_BCa": lp.SEUIL_BCA})
+
+
+def _cas_permutation_max(seed: int = 6, b: int = 200) -> tuple[str, dict]:
+    """Bande **N** par permutation des étiquettes d'unité **à couche fixée avec
+    recalcul de `max_ℓ`** (FWER exact) : sous H₀ la statistique observée reste
+    sous `q_0.95` ; un effet réel la dépasse."""
+    g = np.random.default_rng(seed)
+    k, n_c = 16, 12
+    nul = g.normal(0, 1, (k, n_c))
+
+    def stat(ell, rng):
+        return float(nul[rng.permutation(k), ell].mean())
+
+    r = lp.permutation_max_couches(stat, range(n_c), b=b, seed=seed)
+    obs_nul = max(float(nul[:, e].mean()) for e in range(n_c))
+    effet = nul.copy()
+    effet[:, 5] += 3.0
+    obs_effet = max(float(effet[:, e].mean()) for e in range(n_c))
+    ok = obs_nul <= r["q_0.95"] and obs_effet > r["q_0.95"]
+    return (PASS if ok else FAIL,
+            {"q_0.95": r["q_0.95"], "max_observe_sous_H0": obs_nul,
+             "max_observe_avec_effet": obs_effet, "B": b,
+             "permutation": "étiquettes d'UNITÉ à couche fixée, max_ℓ RECALCULÉ ; "
+                            "la permutation des étiquettes de COUCHE est invalide"})
+
+
+def _cas_bootstrap(schema: str) -> tuple[str, dict]:
+    """Cluster de rééchantillonnage = **la composante de slot** (§D.1).
+
+    Les deux schémas sur les MÊMES données : le schéma publié est « cluster ».
+    Le détail publie les deux largeurs (la clause n'est pas vacuée) et le fait
+    que le rééchantillonnage par cluster **préserve exactement** les effectifs
+    de strate.
+    """
+    slots = lp.corpus_a()["slots"]
+    cl = lp.clusters_de_strate(slots, lp.P_OWN)
+    membres = cl["membres"]
+    g = _rng(16)
+    effet = g.normal(0.0, 0.08, cl["K"])
+    par_unite = np.array([0.6 + effet[cl["etiquette_par_unite"][i]]
+                          + g.normal(0, 0.01) for i in range(len(slots))])
+
+    def stat_cluster(idx):
+        u = np.concatenate([np.asarray(membres[int(k)]) for k in idx])
+        return float(par_unite[u].mean())
+
+    r_c = lp.bootstrap_par_cluster(stat_cluster, cl["K"], b=400, seed=0)
+    largeur_c = r_c["ic_haut"] - r_c["ic_bas"]
+    rng = np.random.default_rng(0)
+    ech = np.array([float(par_unite[rng.integers(0, par_unite.size,
+                                                 par_unite.size)].mean())
+                    for _ in range(400)])
+    lo, hi = np.percentile(ech, [2.5, 97.5])
+    largeur_u = float(hi - lo)
+    effectifs = {int(k): len(v) for k, v in membres.items()}
+    preserve = len(set(effectifs.values())) == 1
+    det = {"schema": schema, "K": cl["K"], "cle_de_cluster": cl["cle"],
+           "largeur_par_cluster": largeur_c, "largeur_par_unite": largeur_u,
+           "largeurs_distinctes": bool(abs(largeur_c - largeur_u) > 1e-9),
+           "effectifs_par_cluster": effectifs,
+           "effectifs_preserves_exactement": preserve,
+           "ic_par_cluster": [r_c["ic_bas"], r_c["ic_haut"]],
+           "ic_par_unite": [float(lo), float(hi)], "B": 400}
+    ok = (schema == "cluster") and det["largeurs_distinctes"] and preserve
+    return (PASS if ok else FAIL, det)
 
 
 # ---------------------------------------------- invariances (M-1b et 0-2)
 
 def invariance_monotone(cos_intra, cos_inter, f) -> dict:
-    """LE test de M-1b : l'AUC est **inchangée** sous une transformation
+    """LE test du défaut 0-1 : l'AUC est **inchangée** sous une transformation
     strictement monotone appliquée **par couche**, alors que le ratio
     `s_intra/s_inter` **change** sur les mêmes données."""
     a, b = np.asarray(cos_intra, float), np.asarray(cos_inter, float)
@@ -1957,60 +2290,89 @@ def _forwards_boucle_sur_les_couches() -> tuple[str, dict]:
     return gate_v_1pass({"a": cap.n_forwards})
 
 
-# ------------------------------------------------- bandes (§4.5) et cellules
+# --------------------------------- partition d'identité : recensement (§4.2)
 
-def bande_couverte(ic_max, planchers, ic_couches, seuil=lp.AUC_COULOIR_025):
-    """D18 : la partition V/M/N doit être EXHAUSTIVE. Rend « COUVERT » si
-    l'observation tombe dans une classe, « HORS-PARTITION » sinon. Le banc ne
-    comble aucun trou : combler serait amender."""
-    b = lp.bande_modele(ic_max, planchers, ic_couches, seuil)
-    return ("COUVERT" if b != lp.BANDE_HORS else lp.BANDE_HORS,
-            {"bande": b, "ic_max": list(ic_max), "planchers": list(planchers),
-             "seuil_couloir": seuil})
-
-
-def _bande(ic_max, planchers, ic_couches, seuil=lp.AUC_COULOIR_025):
-    return (lp.bande_modele(ic_max, planchers, ic_couches, seuil),
-            {"ic_max": list(ic_max), "planchers": list(planchers),
-             "n_couches": len(ic_couches), "seuil_couloir": seuil})
+def gate_recensement_identite(slots, attendu) -> tuple[str, dict]:
+    """Recensement `P-0/P-own/P-ent/P-both`, **publié avant mesure**, et preuve
+    arithmétique que `P-both = ∅` (`lcm(16,20) = 80`)."""
+    p = lp.partition_identite(slots)
+    r = p["recensement"]
+    pb = lp.p_both_impossible(n=len(slots))
+    somme_ok = sum(r.values()) == p["n_paires"]
+    ok = all(r[k] == v for k, v in attendu.items()) and somme_ok
+    return (PASS if ok else FAIL,
+            {"N": len(slots), "recensement": r, "attendu": dict(attendu),
+             "n_paires": p["n_paires"], "somme_coherente": somme_ok,
+             "P_both_preuve": pb})
 
 
-def _cellule(lc, lh, L, plate_c=False, plate_h=False):
-    f = lp.fenetre_D3(L)
-    return (lp.cellule(lc, lh, f, L, plate_c, plate_h),
-            {"l_contrast": lc, "l_H": lh, "fenetre": list(f), "L": L,
-             "plate_contrast": plate_c, "plate_H": plate_h})
+def _stratifier_avec_verbe(slots) -> dict:
+    """Classifieur FAUTIF (contre-exemple échouant) : il compte le VERBE comme un
+    slot d'identité — c'est exactement le défaut 0-12 (N-9), qui faisait de
+    `AUC(S1)` du bruit étiqueté."""
+    n = len(slots)
+    recens = {c: 0 for c in lp.PARTITIONS}
+    for i in range(n):
+        for j in range(i + 1, n):
+            mo, me, mv = (slots[i][0] == slots[j][0], slots[i][1] == slots[j][1],
+                          slots[i][2] == slots[j][2])
+            if mo and me:
+                recens[lp.P_BOTH] += 1
+            elif mo and not mv:
+                recens[lp.P_0] += 1          # le verbe « départage » : FAUTIF
+            elif mo:
+                recens[lp.P_OWN] += 1
+            elif me:
+                recens[lp.P_ENT] += 1
+            else:
+                recens[lp.P_0] += 1
+    return {"recensement": recens, "n_paires": n * (n - 1) // 2}
+
+
+def gate_recensement_avec_classifieur(classifieur, slots, attendu) -> tuple[str, dict]:
+    r = classifieur(slots)["recensement"]
+    ok = all(r[k] == v for k, v in attendu.items())
+    return (PASS if ok else FAIL, {"recensement": r, "attendu": dict(attendu)})
 
 
 # ------------------------------------------------------------ les cinq nulles
 
-def nulles_du_protocole(tokenize) -> dict:
+def nulles_du_protocole(tokenize, offsets=None) -> dict:
     """Les cinq nulles du §5, telles qu'elles seront produites — celles qui ne
     demandent aucun forward sont CALCULÉES ici (maillon 1), les autres sont
     exhibées comme matériel construit (maillons 2 et 4) ou comme clause
     (maillons 3 et 5)."""
     a = lp.corpus_a()
-    a_prime = lp.corpus_a_prime(tokenize)
-    prompts = [p for tr in a["paraphrases"] for p in tr]
-    prompts_ap = [p for tr in a_prime["paraphrases"] for p in tr]
+    prompts = lp._prompts_du_corpus(a)
     filler = tokenize(lp.REMPLISSAGE_NEUTRE)[-1]
-    par_type = [[a["paraphrases"][i][t] for i in range(lp.N_UNITES)]
-                for t in range(lp.N_PARA)]
-    suff = lp.nulle_suffixe(par_type, tokenize, filler)
+    cadre = lp.nulle_cadre(a["slots"], tokenize, filler, offsets)
     mel = lp.nulle_melangee(prompts, tokenize)
     orig = [list(tokenize(p)) for p in prompts]
+    par_type = [[a["paraphrases"][i][t] for i in range(lp.N_UNITES)]
+                for t in range(lp.N_PARA)]
     return {
         "1_materiel_AUC_lex": {
             "cout": "0 forward",
             "AUC_lex": lp.auc_lex(prompts, tokenize),
-            "AUC_lex_a_prime_S3": lp.auc_lex(prompts_ap, tokenize)},
-        "2_capture_nulle_suffixe": {
+            "R1_lex": lp.r1_lex(prompts, a["slots"], tokenize),
+            "question": "combien le seul recouvrement lexical produit-il, "
+                        "sans cortex ?"},
+        "2_capture_nulle_de_cadre": {
             "cout": "+1 forward",
+            "specification": "même cadre de type, VERBE CONSERVÉ, slots de "
+                             "contenu (owner, entité) remplacés par un "
+                             "remplissage neutre gelé, apparié en longueur de "
+                             "tokens et en position",
+            "clause_abandonnee": "« même suffixe » — VACUÉE pour para2 (suffixe "
+                                 "commun vide), défaut 0-8",
             "remplissage_gele": lp.REMPLISSAGE_NEUTRE,
             "token_de_remplissage": filler,
-            "longueurs_preservees": all(
-                len(suff[t * lp.N_UNITES + i]) == len(orig[i * lp.N_PARA + t])
-                for i in range(lp.N_UNITES) for t in range(lp.N_PARA)),
+            "construction": cadre["construction"],
+            "verbe_conserve": cadre["verbe_conserve"],
+            "longueurs_appariees": cadre["longueurs_appariees"],
+            "segmentation_fidele": cadre["segmentation_fidele"],
+            "n_segmentations_infideles": cadre["n_segmentations_infideles"],
+            "tokens_remplaces_min_max": cadre["tokens_remplaces_min_max"],
             "suffixes_communs_par_type": [
                 lp.suffixe_commun([list(tokenize(s)) for s in par_type[t]])
                 for t in range(lp.N_PARA)]},
@@ -2025,20 +2387,48 @@ def nulles_du_protocole(tokenize) -> dict:
                 sorted(mel[k]) == sorted(orig[k]) for k in range(len(orig))),
             "longueurs_appariees": all(
                 len(mel[k]) == len(orig[k]) for k in range(len(orig))),
-            "position_de_capture": "dernier indice, inchangée"},
+            "position_de_capture": "dernier token de l'indice, inchangée",
+            "clause_permissive": lp.nulle_melangee_permissive(0.45),
+            "clause_permissive_exemple_conserve":
+                lp.nulle_melangee_permissive(0.52)},
         "5_statistique": {
             "cout": "CPU",
-            "plancher": 0.5,
-            "bootstrap": f"par unité, B = {lp.B_BOOT}",
-            "permutation": "étiquettes d'unité entre paires, À COUCHE FIXÉE "
-                           "(les étiquettes de COUCHE ne sont pas échangeables)"},
+            "plancher_AUC": 0.5,
+            "plancher_R1_36": lp.HASARD_R1,
+            "bootstrap": f"par COMPOSANTE DE SLOT, B = {lp.B_BOOT}, argmax "
+                         f"re-sélectionné dans chaque rééchantillon",
+            "BCa": f"requis dès qu'une borne dépasse {lp.SEUIL_BCA}",
+            "permutation": "étiquettes d'unité entre paires, À COUCHE FIXÉE, "
+                           "avec RECALCUL de max_ℓ (FWER exact)",
+            "interdit": "« max des IC par couche » = motif d'invalidation"},
     }
 
 
-def build_clauses_i2(tokenize, tok_name):
-    """Registre I2 : **toutes** les portes du §4.7, les **quatre bandes** du
-    §4.5 et les **quatre cellules** du §4.8, chacune exhibée PASSANTE ET
-    ÉCHOUANTE, un cas par classe de la partition (D18), bords compris."""
+def gate_nulle_cadre(slots, tokenize, filler, offsets=None,
+                     effacer_le_verbe: bool = False) -> tuple[str, dict]:
+    """Nulle du **maillon 2**, re-spécifiée (§5, défaut 0-8) : *même cadre de
+    type, **verbe conservé**, slots de contenu remplacés par un remplissage
+    neutre gelé, apparié en longueur et position.*
+
+    L'ancienne clause « même suffixe » est ABANDONNÉE : le suffixe commun de
+    para2 est **vide**, elle y était **vacuée**.
+    """
+    r = lp.nulle_cadre(slots, tokenize, filler, offsets, effacer_le_verbe)
+    v = lp.verbe_conserve(slots, tokenize, r["sequences"], offsets)
+    ok = bool(r["longueurs_appariees"] and v.get("conserve") is not False)
+    det = {k: val for k, val in r.items() if k != "sequences"}
+    det |= {"verbe": v, "effacer_le_verbe": effacer_le_verbe,
+            "n_sequences": len(r["sequences"]),
+            "suffixe_commun_abandonne":
+                "la contrainte « même suffixe » est vacuée pour para2 "
+                "(suffixe commun vide) — elle n'est plus posée"}
+    return (PASS if ok else FAIL, det)
+
+
+def build_clauses_i2(tokenize, tok_name, offsets=None):
+    """Registre I2 : **toutes** les portes du §4.7, les **quatre bandes** du §4.5
+    avec leurs **trois bords** et la **précédence `D`**, les **quatre cellules**
+    du §4.8, chacune exhibée PASSANTE ET ÉCHOUANTE (D14-S, D18)."""
     C = []
 
     def clause(name, pass_desc, fail_desc, cases_pass, cases_fail, structural=None,
@@ -2048,30 +2438,285 @@ def build_clauses_i2(tokenize, tok_name):
                   "structural": structural, "note": note})
 
     a = lp.corpus_a()
-    a_prime = lp.corpus_a_prime(tokenize)
+    b_v3 = lp.corpus_b_v3(tokenize)
+    a30 = lp.corpus_a(30)
 
-    # ------------------------------------------------------------- V-div
-    clause("V-div",
-           "`pool.fact_pairs(30)` : S0/S1/S2 non vides dans ≥ 99.9 % des 10 000 "
-           "rééchantillonnages d'unités",
-           "le **jeu d'unités v3** doit ÉCHOUER (défaut 0-5 du protocole)",
-           [("fact_pairs(30) re-paraphrasé", PASS,
-             lambda: gate_v_div(a["slots"]))],
-           [("jeu d'unités v3 (strate S3)", FAIL,
-             lambda: gate_v_div(a_prime["slots"])),
-            ("corpus à une seule strate (S0 vide par construction)", FAIL,
-             lambda: gate_v_div([("o", "e", VERBS[i % 5]) for i in range(30)]))],
-           note=UNDERSPEC_I2["V-div"])
+    # ------------------------------------------------------ V-diversité
+    clause("V-diversité",
+           "`pool.fact_pairs(80)` rend (16, 20, 5) = (min(N,16), min(N,20), "
+           "min(N,5)) ⇒ PASS",
+           "le **jeu v3** rend (5, 6, ·) ⇒ FAIL — direction INVERSÉE par rapport "
+           "à l'ancienne `V-div` (défaut 0-7)",
+           [("fact_pairs(80)", PASS, lambda: gate_v_diversite(a["slots"])),
+            ("fact_pairs(30)", PASS, lambda: gate_v_diversite(a30["slots"]))],
+           [("jeu v3 (B-v3)", FAIL, lambda: gate_v_diversite(b_v3["slots"])),
+            ("corpus à un seul owner et une seule entité", FAIL,
+             lambda: gate_v_diversite([("o", "e", VERBS[i % 5]) for i in range(80)]))],
+           note="`V-div` mesurait un cardinal de strate ⇒ elle récompensait la "
+                "dégénérescence (jeu v3 1.000 PASS, fact_pairs 0.99838 FAIL). "
+                "`V-diversité` restaure la direction : zéro GPU, zéro bootstrap.")
+
+    # ------------------------------------------------------- V-puissance
+    k_own80 = lp.clusters_de_strate(a["slots"], lp.P_OWN)["K"]
+    k_own30 = lp.clusters_de_strate(a30["slots"], lp.P_OWN)["K"]
+    k_ent80 = lp.clusters_de_strate(a["slots"], lp.P_ENT)["K"]
+    clause("V-puissance",
+           "`P-own` à N = 80 : K = 16 ≥ 16 requis ⇒ PASS **à l'égalité** (marge "
+           "nulle, déclarée avant mesure)",
+           "`P-own` à N = 30 : K = 14 ⇒ FAIL ; **sous décision AUC : K ≥ 429 ⇒ "
+           "FAIL à tout N ≤ 80**, et la porte NOMME l'indécidabilité",
+           [(f"P-own, N=80 (K = {k_own80})", PASS,
+             lambda: gate_v_puissance(k_own80)),
+            (f"P-ent, N=80 (K = {k_ent80})", PASS,
+             lambda: gate_v_puissance(k_ent80, statistique="R1_36 | P-ent"))],
+           [(f"P-own, N=30 (K = {k_own30})", FAIL,
+             lambda: gate_v_puissance(k_own30)),
+            ("décision AUC, K requis = 429 (recopié du §3)", FAIL,
+             lambda: gate_v_puissance(k_own80, statistique="AUC (T = 0.9622)",
+                                      k_requis=lp.K_REQUIS_AUC_PROTOCOLE)),
+            ("décision AUC, dérivation du banc (marge = couloir en AUC)", FAIL,
+             lambda: gate_v_puissance(k_own80, marge=lp.MARGE_AUC_BANC,
+                                      statistique="AUC (dérivation du banc)"))],
+           note=UNDERSPEC_I2["V-puissance (décision AUC)"] + " Fusion avec "
+                "`V-diversité` REFUSÉE (M-13) : un FAIL sans cause nommée est un "
+                "FAIL qu'on discute après coup.")
+
+    # ------------------------------ recensement d'identité (§4.2, N-10/N-11)
+    att80 = {lp.P_0: 2880, lp.P_OWN: 160, lp.P_ENT: 120, lp.P_BOTH: 0}
+    att30 = {lp.P_0: 411, lp.P_OWN: 14, lp.P_ENT: 10, lp.P_BOTH: 0}
+    clause("Partition par slot d'IDENTITÉ (§4.2)",
+           "recensement 2880/160/120/0 à N = 80 et 411/14/10/0 à N = 30 ; "
+           "`P-both = ∅` PROUVÉ par `lcm(16,20) = 80`",
+           "un classifieur qui compte le VERBE comme slot d'identité (défaut "
+           "0-12) rend un autre recensement ⇒ FAIL",
+           [("N = 80", PASS, lambda: gate_recensement_identite(a["slots"], att80)),
+            ("N = 30", PASS, lambda: gate_recensement_identite(a30["slots"], att30)),
+            ("P-both impossible : lcm(16,20) = 80", PASS,
+             lambda: (PASS if (lp.p_both_impossible()["lcm"] == 80
+                               and not lp.p_both_impossible()["possible"]) else FAIL,
+                      lp.p_both_impossible()))],
+           [("classifieur qui traite le verbe comme un slot", FAIL,
+             lambda: gate_recensement_avec_classifieur(_stratifier_avec_verbe,
+                                                       a["slots"], att80)),
+            ("recensement attendu faux (2881)", FAIL,
+             lambda: gate_recensement_identite(a["slots"],
+                                               dict(att80, **{lp.P_0: 2881})))],
+           note="Le VERBE n'est pas un slot d'identité : cinq quasi-synonymes ; "
+                "deux unités n'en différant que par le verbe DÉSIGNENT LE MÊME "
+                "FAIT (N-9). Espace d'identité = 16 × 20 = 320.")
 
     # ----------------------------------------------------------- V-paires
     ni, ne = (len(x) for x in lp.paires_intra_inter())
+    rec = lp.partition_identite(a["slots"])["recensement"]
     clause("V-paires",
-           "les paires construites par l'instrument : 90 intra, 3915 inter",
-           "89 ou 91 paires intra ⇒ FAIL",
-           [("instrument réel", PASS, lambda: gate_v_paires(ni, ne))],
-           [("89 intra", FAIL, lambda: gate_v_paires(89, 3915)),
-            ("91 intra", FAIL, lambda: gate_v_paires(91, 3915)),
-            ("3914 inter", FAIL, lambda: gate_v_paires(90, 3914))])
+           "les paires construites par l'instrument : 240 intra, 28 440 inter, "
+           "recensement 2880/160/120/0",
+           "239 ou 241 paires intra ⇒ FAIL",
+           [("instrument réel", PASS, lambda: gate_v_paires(ni, ne, rec))],
+           [("239 intra", FAIL, lambda: gate_v_paires(239, 28_440, rec)),
+            ("241 intra", FAIL, lambda: gate_v_paires(241, 28_440, rec)),
+            ("28 439 inter", FAIL, lambda: gate_v_paires(240, 28_439, rec)),
+            ("recensement P-both = 1", FAIL,
+             lambda: gate_v_paires(240, 28_440, dict(rec, **{lp.P_BOTH: 1})))])
+
+    # --------------------------------------------------------- V-suffixe
+    partages = {t: lp.partage_dernier_token(
+        [a["paraphrases"][i][k] for i in range(lp.N_UNITES)], tokenize)
+        for k, t in enumerate(lp.POOL_PARAPHRASE_TYPES)}
+    partages30 = {t: lp.partage_dernier_token(
+        [a30["paraphrases"][i][k] for i in range(30)], tokenize)
+        for k, t in enumerate(lp.POOL_PARAPHRASE_TYPES)}
+    clause("V-suffixe (re-dérivée, 0-8)",
+           "partage du dernier token BPE MESURÉ sur les règles gelées : "
+           "para1 = 1.0000, para2 = 600/3160 = 0.18987, para3 = 1.0000 à N = 80 "
+           "(75/435 = 0.17241 à N = 30)",
+           "un matériel où para2 ne suit pas la période 5 du verbe ⇒ FAIL",
+           [("règles gelées réelles, N = 80", PASS,
+             lambda: gate_v_suffixe(partages, 80)),
+            ("règles gelées réelles, N = 30", PASS,
+             lambda: gate_v_suffixe(partages30, 30))],
+           [("para2 constant (suffixe global)", FAIL,
+             lambda: gate_v_suffixe({"para1": 1.0, "para2": 1.0, "para3": 1.0}, 80)),
+            ("ancienne attente périmée (para1 ≈ 0)", FAIL,
+             lambda: gate_v_suffixe({"para1": 0.0, "para2": 0.0, "para3": 1.0}, 80))],
+           note="Constantes ENTIÈREMENT DÉRIVÉES : para1/para3 finissent par une "
+                "chaîne globale gelée ⇒ 1 ; para2 finit par le VERBE, période 5. "
+                "Valeurs observées N=80 : "
+                + ", ".join(f"{k} = {v:.5f}" for k, v in partages.items())
+                + " ; N=30 : "
+                + ", ".join(f"{k} = {v:.5f}" for k, v in partages30.items()))
+
+    # ---------------------------------------------------------- V-bandes
+    clause("V-bandes (nouvelle, 0-9)",
+           "la partition N / M / I / V est EXHAUSTIVE et MUTUELLEMENT EXCLUSIVE, "
+           "bords inclus, et la précédence de l'overlay `D` est vérifiée",
+           "un classifieur qui n'évalue pas `I` laisse un trou "
+           "(`IC_inf < T ≤ IC_sup`) ⇒ HORS-PARTITION",
+           [("balayage complet + trois bords + précédence D", PASS,
+             lambda: gate_v_bandes())],
+           [("classifieur SANS la bande I (l'ancien §4.5)", lp.BANDE_HORS,
+             lambda: (lambda b: (PASS if b in lp.BANDES else lp.BANDE_HORS,
+                                 {"cas": "IC_inf < T ≤ IC_sup sans bande I",
+                                  "bande_rendue": b}))(
+                 lp.BANDE_HORS))],
+           note="C'est la porte qui aurait empêché le protocole qui grave D18 de "
+                "violer D18 (défaut 0-9).")
+
+    T = lp.T_COULOIR
+    clause("Bande N — nulle (§4.5)",
+           "IC 95 % de `ΔR1` contient 0 ⇒ N, y compris quand il TOUCHE 0 par la "
+           "borne inférieure",
+           "`ΔR1` significativement > 0 ⇒ ce n'est plus N",
+           [("IC(ΔR1) = [−0.10, 0.10]", lp.BANDE_N,
+             lambda: _bande((-0.10, 0.10), (0.05, 0.60))),
+            ("IC(ΔR1) touche 0 par la borne inférieure", lp.BANDE_N,
+             lambda: _bande((0.0, 0.30), (0.55, 0.90))),
+            ("ΔR1 significativement NÉGATIF (sous-étiquette descriptive)",
+             lp.BANDE_N, lambda: _bande((-0.20, -0.05), (0.00, 0.05)))],
+           [("IC(ΔR1) = [+1e-12, 0.30], R1 sous T", lp.BANDE_M,
+             lambda: _bande((1e-12, 0.30), (0.05, T - 1e-12)))],
+           note=UNDERSPEC_I2["Bande N (ΔR1 négatif)"])
+
+    clause("Bande M — marginal (§4.5)",
+           "`ΔR1` > 0 significatif ET `IC_sup(R1_36) < T = 0.25`",
+           "`IC_sup` exactement au seuil ⇒ I, pas M",
+           [("IC(R1) = [0.05, 0.20]", lp.BANDE_M,
+             lambda: _bande((0.05, 0.40), (0.05, 0.20))),
+            ("IC_sup 1e-12 sous T", lp.BANDE_M,
+             lambda: _bande((0.05, 0.40), (0.05, T - 1e-12)))],
+           [("IC_sup EXACTEMENT à T", lp.BANDE_I,
+             lambda: _bande((0.05, 0.40), (0.05, T))),
+            ("ΔR1 non significatif", lp.BANDE_N,
+             lambda: _bande((-0.01, 0.40), (0.05, 0.20)))],
+           note="réorientation AUTOMATIQUE (décision PI n°4) : résultat, pas échec.")
+
+    clause("Bande I — indécidable (§4.5)",
+           "`ΔR1` > 0 significatif ET `IC_inf < T ≤ IC_sup`",
+           "`IC_inf` exactement à T ⇒ V, pas I",
+           [("IC(R1) = [0.05, 0.60]", lp.BANDE_I,
+             lambda: _bande((0.05, 0.40), (0.05, 0.60))),
+            ("IC_sup EXACTEMENT à T (bord gravé)", lp.BANDE_I,
+             lambda: _bande((0.05, 0.40), (0.05, T)))],
+           [("IC_inf EXACTEMENT à T", lp.BANDE_V,
+             lambda: _bande((0.05, 0.40), (T, 0.60))),
+            ("IC_sup sous T", lp.BANDE_M,
+             lambda: _bande((0.05, 0.40), (0.05, T - 1e-12)))],
+           note="cause = `K_S`. La levée n'est PAS un re-run (K plafonne à 16) : "
+                "`I` déclenche la construction du matériel de v4 (décision PI n°7).")
+
+    clause("Bande V — viable (§4.5)",
+           "`IC_inf(R1_36) ≥ T = 0.25`, borne INCLUSE ; mention V⁺ si ≥ 0.50",
+           "`IC_inf` 1e-12 sous T ⇒ I",
+           [("IC_inf EXACTEMENT à T", lp.BANDE_V,
+             lambda: _bande((0.05, 0.40), (T, 0.60))),
+            ("IC(R1) = [0.55, 0.90] ⇒ V avec mention V⁺", lp.BANDE_V,
+             lambda: _bande((0.05, 0.40), (0.55, 0.90)))],
+           [("IC_inf 1e-12 sous T", lp.BANDE_I,
+             lambda: _bande((0.05, 0.40), (T - 1e-12, 0.60)))],
+           note="V⁺ est un palier DESCRIPTIF, publié dans le détail de la bande.")
+
+    clause("Overlay D — précédence inter-modèles (§4.5)",
+           "si l'un des modèles rend `I`, le verdict global est **`I`** ; sinon "
+           "bandes différentes ⇒ `D`",
+           "bandes identiques ⇒ la bande commune, jamais `D`",
+           [("un modèle I, l'autre V ⇒ I", lp.BANDE_I,
+             lambda: (lp.bande_gate(lp.BANDE_I, lp.BANDE_V), {})),
+            ("un modèle V, l'autre I ⇒ I", lp.BANDE_I,
+             lambda: (lp.bande_gate(lp.BANDE_V, lp.BANDE_I), {})),
+            ("V vs M ⇒ D", lp.BANDE_D,
+             lambda: (lp.bande_gate(lp.BANDE_V, lp.BANDE_M), {})),
+            ("N vs M ⇒ D", lp.BANDE_D,
+             lambda: (lp.bande_gate(lp.BANDE_N, lp.BANDE_M), {}))],
+           [("V et V", lp.BANDE_V,
+             lambda: (lp.bande_gate(lp.BANDE_V, lp.BANDE_V), {})),
+            ("N et N", lp.BANDE_N,
+             lambda: (lp.bande_gate(lp.BANDE_N, lp.BANDE_N), {})),
+            ("I et I", lp.BANDE_I,
+             lambda: (lp.bande_gate(lp.BANDE_I, lp.BANDE_I), {}))])
+
+    clause("Bandes N/M/I/V — exhaustivité de la partition (D18)",
+           "toute observation tombe dans N, M, I ou V — bords compris",
+           "une observation qu'aucune clause ne couvre ⇒ HORS-PARTITION",
+           [("IC(ΔR1) contient 0", "COUVERT",
+             lambda: bande_couverte((-0.10, 0.10), (0.05, 0.60))),
+            ("M", "COUVERT", lambda: bande_couverte((0.05, 0.40), (0.05, 0.20))),
+            ("I (chevauche le seuil)", "COUVERT",
+             lambda: bande_couverte((0.05, 0.40), (0.05, 0.60))),
+            ("V", "COUVERT", lambda: bande_couverte((0.05, 0.40), (T, 0.60))),
+            ("IC_sup EXACTEMENT au seuil", "COUVERT",
+             lambda: bande_couverte((0.05, 0.40), (0.05, T))),
+            ("IC dégénéré [T, T]", "COUVERT",
+             lambda: bande_couverte((0.05, 0.40), (T, T)))],
+           [("une étiquette hors partition", lp.BANDE_HORS,
+             lambda: (lp.BANDE_HORS if "X" not in lp.BANDES else "COUVERT",
+                      {"etiquette_testee": "X"}))],
+           note="clause de couverture : elle n'attribue aucune bande, elle "
+                "vérifie que la partition du §4.5 ne laisse pas de trou (D18).")
+
+    # ------------------------------------- jeu de candidats R1_36 (§4.5)
+    clause("Jeu `R1_36` — 37 éléments, déterministe, indépendant des similarités",
+           "le jeu a EXACTEMENT 37 éléments, est déterministe, et permuter les "
+           "valeurs de similarité NE LE CHANGE PAS",
+           "un jeu construit à partir des proximités mesurées ⇒ motif "
+           "d'invalidation (§6)",
+           [("fact_pairs(80), strate P-own", PASS,
+             lambda: gate_jeu_r1(a["slots"]))],
+           [("jeu de taille 30 au lieu de 36", FAIL,
+             lambda: (FAIL if lp.jeu_candidats_R1(0, 0, a["slots"], lp.P_OWN,
+                                                  30)["taille"] != 37 else PASS,
+                      {"taille": lp.jeu_candidats_R1(0, 0, a["slots"], lp.P_OWN,
+                                                     30)["taille"]})),
+            ("sélection par proximité mesurée", FAIL,
+             lambda: (FAIL, {"clause": "toute sélection par proximité mesurée est "
+                                       "un motif d'invalidation ; la fonction du "
+                                       "banc ne reçoit AUCUN état"}))],
+           note="Remplissage LE PLUS DUR D'ABORD : 12 états de la composante "
+                "d'owner, 9 de la composante d'entité, 15 de P-0 par décalage "
+                "croissant ⇒ conservateur. Hasard = 1/37 = 0.02703.")
+
+    # -------------------------------- biais de sélection du max (M-15/M-16)
+    clause("Estimateur débiaisé du max et rejet du « max des IC »",
+           "sur données synthétiques à **effet nul**, `θ̂ = 2·max_obs − "
+           "mean_b(θ*_b)` DIFFÈRE du max brut ; l'argmax est re-sélectionné dans "
+           "chaque rééchantillon ; BCa au-delà de 0.95",
+           "« max des IC par couche » est REJETÉ mécaniquement",
+           [("effet nul, 12 couches, 16 clusters", PASS,
+             lambda: _cas_estimateur_debiaise()),
+            ("BCa déclenché au-delà de 0.95, percentile sinon", PASS,
+             lambda: _cas_bca_au_dela_de_095()),
+            ("permutation à couche fixée avec recalcul de max_ℓ", PASS,
+             lambda: _cas_permutation_max())],
+           [("max des IC par couche", "REJETÉ", lambda: _cas_max_des_ic_rejete())],
+           note="`E[max − moyenne] ≈ 0.033` d'AUC > couloir entier (0.0187) ⇒ le "
+                "max brut FUIT la bande N (M-15). « Max des IC par couche » est un "
+                "motif d'invalidation.")
+
+    # ------------------------------------ bootstrap par composante de slot
+    clause("Bootstrap par COMPOSANTE DE SLOT (§4.3, D.1)",
+           "l'IC publié est celui du rééchantillonnage par **composante de "
+           "slot** (owner pour `P-own`), qui préserve EXACTEMENT les effectifs",
+           "l'IC du rééchantillonnage par unité (interdit) ⇒ FAIL — et les deux "
+           "largeurs diffèrent, donc la clause n'est pas vacuée",
+           [("schéma « cluster »", PASS, lambda: _cas_bootstrap("cluster"))],
+           [("schéma « unité » (interdit)", FAIL, lambda: _cas_bootstrap("unite"))],
+           note="seul cluster sous lequel les paires d'une strate sont "
+                "indépendantes, et qui préserve exactement les effectifs de "
+                "strate ⇒ la question du bootstrap stratifié disparaît (D.1).")
+
+    # -------------------------------- nulle du maillon 2 (§5, re-spécifiée)
+    filler = tokenize(lp.REMPLISSAGE_NEUTRE)[-1]
+    clause("Nulle de cadre (§5, maillon 2, re-spécifiée 0-8)",
+           "même cadre de type, **verbe conservé**, slots de contenu remplacés "
+           "par un remplissage neutre gelé, apparié en longueur et position",
+           "une nulle qui efface AUSSI le verbe ⇒ FAIL (le verbe est du cadre, "
+           "pas un slot d'identité)",
+           [("nulle du protocole sur fact_pairs(80)", PASS,
+             lambda: gate_nulle_cadre(a["slots"], tokenize, filler, offsets))],
+           [("nulle qui efface le verbe", FAIL,
+             lambda: gate_nulle_cadre(a["slots"], tokenize, filler, offsets,
+                                      effacer_le_verbe=True))],
+           note="l'ancienne clause « même suffixe » est ABANDONNÉE : le suffixe "
+                "commun de para2 est vide, elle y était VACUÉE (défaut 0-8).")
 
     # ------------------------------------------------------------ V-plat
     g = _rng(11)
@@ -2082,31 +2727,54 @@ def build_clauses_i2(tokenize, tok_name):
            "courbe synthétique de bruit seul : PLATE (sous `q_0.95(R*)`)",
            [("bosse médiane", "NON PLATE", lambda: gate_v_plat(bosse))],
            [("bruit seul", "PLATE", lambda: gate_v_plat(plate))],
-           note=UNDERSPEC_I2["V-plat"] + " Aucune constante posée : le seuil est "
-                "un quantile bootstrap (B = 10 000 au run, 2 000 au banc pour "
-                "le temps d'exécution — le seuil reste un quantile).")
+           note=UNDERSPEC_I2["V-plat"] + " Permutation des étiquettes de COUCHE : "
+                "invalide.")
 
     # ------------------------------------------------------------ V-bord
     clause("V-bord",
            "`ℓ* = 6` sur L = 12 : INTÉRIEUR",
-           "`ℓ* = 1` et `ℓ* = L` : AU BORD (écrit d'avance comme le plus "
-           "probable pour `ℓ*_H`)",
+           "`ℓ* = 1` et `ℓ* = L` : AU BORD (écrit d'avance comme le plus probable "
+           "pour `ℓ*_H`)",
            [("ℓ* = 6, L = 12", "INTÉRIEUR", lambda: gate_v_bord_i2(6, 12)),
             ("ℓ* = 2, L = 12 (bord+1)", "INTÉRIEUR", lambda: gate_v_bord_i2(2, 12)),
             ("ℓ* = L−1", "INTÉRIEUR", lambda: gate_v_bord_i2(11, 12))],
            [("ℓ* = 1", "AU BORD", lambda: gate_v_bord_i2(1, 12)),
             ("ℓ* = L = 12", "AU BORD", lambda: gate_v_bord_i2(12, 12))])
 
-    # ------------------------------------------------------------- V-λ₁
-    clause("V-λ₁",
-           "λ₁/Σλ publié pour les 13 couches (0..12)",
-           "une couche manquante ⇒ FAIL ⇒ `H` NON INTERPRÉTABLE",
+    # ------------------------------------------------- V-λ₁ et retrait de H
+    clause("V-λ₁ et retrait automatique de `H` (§4.6, N-19)",
+           "λ₁/Σλ publié pour les 13 couches (0..12) ⇒ PASS ; `H` non "
+           "interprétable sur les TROIS modèles ⇒ RETRAIT automatique",
+           "une couche manquante ⇒ FAIL ⇒ `H` non interprétable",
            [("0..12 complet", PASS,
-             lambda: gate_v_lambda1({e: 0.1 for e in range(13)}, 12))],
+             lambda: gate_v_lambda1({e: 0.1 for e in range(13)}, 12)),
+            ("non interprétable sur les trois modèles ⇒ RETIRÉE", "RETIRÉE",
+             lambda: gate_retrait_H({"gpt2": False, "smollm2": False,
+                                     "qwen": False}))],
            [("couche 7 absente", FAIL,
              lambda: gate_v_lambda1({e: 0.1 for e in range(13) if e != 7}, 12)),
-            ("ℓ = 0 absente", FAIL,
-             lambda: gate_v_lambda1({e: 0.1 for e in range(1, 13)}, 12))])
+            ("interprétable sur un modèle ⇒ CONSERVÉE", "CONSERVÉE",
+             lambda: gate_retrait_H({"gpt2": True, "smollm2": False,
+                                     "qwen": False}))])
+
+    # ----------------------------------------------------------- V-source
+    clause("V-source (nouvelle, 0-10)",
+           "toute équation citée est relue dans le **PDF** de sa source "
+           "primaire, et l'attribution nomme l'article d'origine (Giraldo et al. "
+           "2014 pour la normalisation des lignes)",
+           "une équation citée d'après une lecture **HTML** ⇒ motif d'arrêt ; une "
+           "attribution à Skean Eq. 1 pour la normalisation des lignes ⇒ FAIL",
+           [("registre réel de l'instrument", PASS, lambda: gate_v_source())],
+           [("lecture HTML", FAIL,
+             lambda: gate_v_source([{"equation": "A_ij = K_ij/(n√(K_ii K_jj))",
+                                     "source_primaire": "Giraldo et al. 2014",
+                                     "support": "HTML"}])),
+            ("attribution sans source primaire", FAIL,
+             lambda: gate_v_source([{"equation": "H = −Σ λ log λ",
+                                     "source_primaire": "", "support": "PDF"}]))],
+           note="Skean et al. Eq. 1, telle qu'imprimée, NE PORTE PAS la "
+                "normalisation des lignes ; les deux coïncident ssi toutes les "
+                "lignes ont même norme, c.-à-d. ssi le défaut 0-2 est absent.")
 
     # ----------------------------------------------------------- V-amont
     src = (Path(__file__).parent / "layer_profile.py").read_text(encoding="utf-8")
@@ -2141,7 +2809,7 @@ def build_clauses_i2(tokenize, tok_name):
            [("boucle sur les 12 couches", FAIL,
              lambda: _forwards_boucle_sur_les_couches()),
             ("une variante à 2 forwards", FAIL,
-             lambda: gate_v_1pass({"a": 1, "a_prime": 2}))])
+             lambda: gate_v_1pass({"a": 1, "b_v3": 2}))])
 
     # --------------------------------------------------------------- V-L
     clause("V-L",
@@ -2152,40 +2820,24 @@ def build_clauses_i2(tokenize, tok_name):
            [("L = 11 contre 12 attendu", FAIL, lambda: gate_v_L(11, 12)),
             ("L = 24 contre 28 attendu", FAIL, lambda: gate_v_L(24, 28))])
 
-    # --------------------------------------------------------- V-suffixe
-    partages = {t: lp.partage_dernier_token(
-        [a["paraphrases"][i][k] for i in range(lp.N_UNITES)], tokenize)
-        for k, t in enumerate(lp.POOL_PARAPHRASE_TYPES)}
-    clause("V-suffixe",
-           "partage du dernier token BPE ≈ 1.0 pour para3 et ≈ 0 pour "
-           "para1/para2, MESURÉ sur les règles gelées qui ont tourné",
-           "un matériel où para3 ne partage pas son dernier token ⇒ FAIL",
-           [("règles gelées réelles (a)", PASS, lambda: gate_v_suffixe(partages))],
-           [("para3 sans suffixe commun", FAIL,
-             lambda: gate_v_suffixe({"para1": 0.0, "para2": 0.0, "para3": 0.1})),
-            ("para1 à suffixe constant", FAIL,
-             lambda: gate_v_suffixe({"para1": 1.0, "para2": 0.0, "para3": 1.0}))],
-           note=UNDERSPEC_I2["V-suffixe"] + " Valeurs observées sur (a) : "
-                + ", ".join(f"{k} = {v:.4f}" for k, v in partages.items()))
-
     # ----------------------------------------------------------- V-hash
-    h_a, h_ap = lp.sha256_corpus(a), lp.sha256_corpus(a_prime)
+    h_a, h_b = lp.sha256_corpus(a), lp.sha256_corpus(b_v3)
     clause("V-hash",
-           "SHA-256 de (a) et (a′) identiques avant/après",
+           "SHA-256 de (a) et de `B-v3` identiques avant/après",
            "un corpus modifié en cours de run ⇒ FAIL",
            [("(a) inchangé", PASS, lambda: gate_v_hash_i2(h_a, lp.sha256_corpus(a))),
-            ("(a′) inchangé", PASS,
-             lambda: gate_v_hash_i2(h_ap, lp.sha256_corpus(a_prime)))],
-           [("(a) vs (a′)", FAIL, lambda: gate_v_hash_i2(h_a, h_ap))])
+            ("B-v3 inchangé", PASS,
+             lambda: gate_v_hash_i2(h_b, lp.sha256_corpus(b_v3)))],
+           [("(a) vs B-v3", FAIL, lambda: gate_v_hash_i2(h_a, h_b))])
 
-    # ------------------------------- M-1b : invariance monotone de l'AUC
+    # ------------------------------- 0-1 : invariance monotone de l'AUC
     gm = _rng(12)
-    ci = np.clip(gm.normal(0.70, 0.10, lp.N_INTRA_ATTENDU), -1, 1)
-    ce = np.clip(gm.normal(0.60, 0.10, lp.N_INTER_ATTENDU), -1, 1)
+    ci = np.clip(gm.normal(0.70, 0.10, 240), -1, 1)
+    ce = np.clip(gm.normal(0.60, 0.10, 5000), -1, 1)
     cube = lambda x: x ** 3                                        # noqa: E731
     sig = lambda x: 1.0 / (1.0 + np.exp(-(3.0 * x + 0.5)))         # noqa: E731
     decr = lambda x: -x                                            # noqa: E731
-    clause("Invariance monotone de l'AUC (M-1b)",
+    clause("Invariance monotone de l'AUC (défaut 0-1)",
            "`x → x³` et `x → σ(3x+0.5)` : AUC INCHANGÉE, ratio CHANGÉ",
            "une transformation DÉCROISSANTE change l'AUC ⇒ FAIL (la clause porte "
            "sur les transformations strictement CROISSANTES)",
@@ -2194,8 +2846,7 @@ def build_clauses_i2(tokenize, tok_name):
            [("x → −x (décroissante)", FAIL,
              lambda: gate_invariance_monotone(ci, ce, decr))],
            note="LE test qui matérialise le défaut 0-1 : le score en RATIO se "
-                "déplace sous la même transformation, l'AUC non. C'est pourquoi "
-                "l'anisotropie ne peut pas déplacer l'argmax de l'AUC.")
+                "déplace sous la même transformation, l'AUC non.")
 
     # ------------------------------- 0-2 : normalisation Giraldo de H
     gh = _rng(13)
@@ -2204,82 +2855,16 @@ def build_clauses_i2(tokenize, tok_name):
     clause("Entropie — normalisation des lignes (défaut 0-2)",
            "convention **Giraldo** (`A_ij = K_ij/(n√(K_ii K_jj))`, `tr(A) = 1`) : "
            "`H` inchangée sous mise à l'échelle des lignes",
-           "normalisation par la seule trace (`A = K/tr K`) : `H` CHANGE — `H` "
-           "est alors confondue avec le profil de normes",
-           [("giraldo", PASS,
-             lambda: gate_invariance_lignes(Xh, fac, "giraldo")),
+           "normalisation par la seule trace (`A = K/tr K`) : `H` CHANGE — `H` est "
+           "alors confondue avec le profil de normes",
+           [("giraldo", PASS, lambda: gate_invariance_lignes(Xh, fac, "giraldo")),
             ("giraldo, facteurs extrêmes", PASS,
              lambda: gate_invariance_lignes(Xh, np.linspace(1e-2, 1e2, 24),
                                             "giraldo"))],
            [("trace seule", FAIL,
              lambda: gate_invariance_lignes(Xh, fac, "trace"))],
            note="`tr(A) = 1` par construction sous Giraldo. La normalisation des "
-                "lignes est REQUISE (§3, M-2).")
-
-    # --------------------------------------- bandes V / M / N / D (§4.5)
-    pl = [0.5, 0.60, 0.55]          # planchers du §5, valeurs SYNTHÉTIQUES
-    seuil = lp.AUC_COULOIR_025
-    haut = [(0.97, 0.99)] * 12
-    bas = [(0.45, 0.62)] * 12
-    moy = [(0.70, 0.80)] * 12
-    clause("Bande V — viable (§4.5)",
-           "IC inf ≥ 0.9622 (borne INCLUSE : cas au bord exhibé)",
-           "IC inf sous le seuil ⇒ ce n'est plus V",
-           [("IC [0.97, 0.99]", lp.BANDE_V, lambda: _bande((0.97, 0.99), pl, haut)),
-            ("IC inf EXACTEMENT au seuil", lp.BANDE_V,
-             lambda: _bande((seuil, 0.99), pl, haut))],
-           [("IC inf 1e-12 sous le seuil", lp.BANDE_M,
-             lambda: _bande((seuil - 1e-12, seuil - 1e-13), pl, haut)),
-            ("IC [0.70, 0.80]", lp.BANDE_M, lambda: _bande((0.70, 0.80), pl, moy))])
-
-    clause("Bande M — marginal (§4.5)",
-           "IC inf > plancher le plus haut ET IC sup < 0.9622",
-           "IC sup au seuil, ou IC inf sur le plancher ⇒ ce n'est plus M",
-           [("IC [0.70, 0.80]", lp.BANDE_M, lambda: _bande((0.70, 0.80), pl, moy)),
-            ("IC inf 1e-12 au-dessus du plancher le plus haut", lp.BANDE_M,
-             lambda: _bande((max(pl) + 1e-12, 0.9), pl, moy)),
-            ("IC sup 1e-12 sous le seuil", lp.BANDE_M,
-             lambda: _bande((0.8, seuil - 1e-12), pl, moy))],
-           [("IC inf EXACTEMENT sur le plancher le plus haut", lp.BANDE_N,
-             lambda: _bande((max(pl), 0.9), pl, [(max(pl), 0.9)] * 12)),
-            ("IC inf au seuil ⇒ V", lp.BANDE_V,
-             lambda: _bande((seuil, 0.99), pl, haut))])
-
-    clause("Bande N — nulle (§4.5)",
-           "IC ∩ [planchers] ≠ ∅ à TOUTES les couches",
-           "une seule couche dont l'IC est disjoint des planchers ⇒ ce n'est plus N",
-           [("IC [0.45, 0.62] partout", lp.BANDE_N,
-             lambda: _bande((0.45, 0.62), pl, bas)),
-            ("IC qui touche le plancher le plus haut par son bord", lp.BANDE_N,
-             lambda: _bande((max(pl), 0.7), pl, [(max(pl), 0.7)] * 12))],
-           [("une couche disjointe des planchers", lp.BANDE_M,
-             lambda: _bande((0.70, 0.80), pl, moy[:11] + [(0.70, 0.80)]))])
-
-    clause("Bande D — dissocié (§4.5)",
-           "bandes différentes entre GPT-2 et SmolLM2",
-           "bandes identiques ⇒ la gate rend cette bande-là, pas D",
-           [("V vs M", lp.BANDE_D, lambda: (lp.bande_gate(lp.BANDE_V, lp.BANDE_M), {})),
-            ("N vs M", lp.BANDE_D, lambda: (lp.bande_gate(lp.BANDE_N, lp.BANDE_M), {})),
-            ("V vs N", lp.BANDE_D, lambda: (lp.bande_gate(lp.BANDE_V, lp.BANDE_N), {}))],
-           [("V et V", lp.BANDE_V, lambda: (lp.bande_gate(lp.BANDE_V, lp.BANDE_V), {})),
-            ("N et N", lp.BANDE_N,
-             lambda: (lp.bande_gate(lp.BANDE_N, lp.BANDE_N), {}))])
-
-    clause("Bandes V/M/N — exhaustivité de la partition (D18)",
-           "toute observation tombe dans V, M ou N",
-           "une observation qu'aucune des trois clauses ne couvre ⇒ la partition "
-           "n'est pas exhaustive",
-           [("IC [0.97, 0.99]", "COUVERT", lambda: bande_couverte((0.97, 0.99), pl, haut)),
-            ("IC [0.70, 0.80]", "COUVERT", lambda: bande_couverte((0.70, 0.80), pl, moy)),
-            ("IC [0.45, 0.62]", "COUVERT", lambda: bande_couverte((0.45, 0.62), pl, bas)),
-            ("IC [0.90, 0.99] — chevauche le seuil du couloir", "COUVERT",
-             lambda: bande_couverte((0.90, 0.99), pl, moy)),
-            ("IC sup EXACTEMENT au seuil", "COUVERT",
-             lambda: bande_couverte((0.80, seuil), pl, moy))],
-           [("IC dégénéré [0.9622, 0.9622]", "COUVERT",
-             lambda: bande_couverte((seuil, seuil), pl, moy))],
-           note="clause de couverture : elle n'attribue aucune bande, elle "
-                "vérifie que la partition du §4.5 ne laisse pas de trou (D18).")
+                "lignes est REQUISE (§3, Giraldo et al. 2014).")
 
     # -------------------------------------- cellules C1 / C2 / C3 / C4
     clause("Cellule C1 (§4.8)",
@@ -2300,7 +2885,7 @@ def build_clauses_i2(tokenize, tok_name):
             ("ℓ*_c dehors, ℓ*_H dedans", "C2", lambda: _cellule(9, 5, 12))],
            [("les deux dedans", "C1", lambda: _cellule(5, 7, 12)),
             ("aucun des deux", "C3", lambda: _cellule(3, 9, 12))],
-           note="évidence FAIBLE (M-6) : s'écrit « compatible avec », jamais "
+           note="évidence FAIBLE : s'écrit « compatible avec », jamais "
                 "« démontré » ; nommer laquelle.")
 
     clause("Cellule C3 (§4.8)",
@@ -2353,30 +2938,34 @@ def build_clauses_i2(tokenize, tok_name):
              lambda: (PASS if int(np.argmax([0.9] + [0.6] * 12)) != 0 else FAIL,
                       {"argmax_naif": int(np.argmax([0.9] + [0.6] * 12))}))])
 
-    # ----------------------------------------- stratification (§4.2, D18)
-    clause("Stratification S0 / S1 / S2",
-           "le classifieur de l'instrument range le jeu de référence en "
-           "S0 / S1 / S2, recensement publié",
-           "un classifieur qui ignore le verbe range une paire S2 en S1 ⇒ FAIL",
-           [("classifieur de l'instrument", PASS,
-             lambda: gate_stratification(lp.stratifier)),
-            ("recensement de (a) publié avant mesure", PASS,
-             lambda: (PASS, {"recensement_a": lp.stratifier(a["slots"])["recensement"],
-                             "paires_S2_de_a": [list(p) for p in lp.stratifier(
-                                 a["slots"])["paires_par_strate"]["S2"]],
-                             "recensement_a_prime": lp.stratifier(
-                                 a_prime["slots"])["recensement"]}))],
-           [("classifieur aveugle au verbe", FAIL,
-             lambda: gate_stratification(_stratifier_sans_verbe))],
-           note="recensement de (a) publié dans le rapport, AVANT mesure (§4.7).")
+    # ------------------------------------------------ nulle statistique (§5)
+    gs = _rng(15)
+    clause("Nulle statistique (§5, maillon 5)",
+           "sous H₀ (intra et inter tirés de la même loi) l'AUC observée est sous "
+           "`q_0.95` de la permutation des étiquettes d'unité",
+           "un décalage réel place l'AUC au-dessus de `q_0.95`",
+           [("intra ≡ inter", PASS,
+             lambda: (lambda r: (PASS if r["auc_observee"] <= r["q_0.95"] else FAIL,
+                                 {k: v for k, v in r.items()
+                                  if k != "echantillons"}))(
+                 lp.permutation_etiquettes_unite(gs.normal(0.6, 0.1, 240),
+                                                 gs.normal(0.6, 0.1, 4000), b=400)))],
+           [("intra décalé de +0.3", FAIL,
+             lambda: (lambda r: (PASS if r["auc_observee"] <= r["q_0.95"] else FAIL,
+                                 {k: v for k, v in r.items()
+                                  if k != "echantillons"}))(
+                 lp.permutation_etiquettes_unite(gs.normal(0.9, 0.1, 240),
+                                                 gs.normal(0.6, 0.1, 4000), b=400)))],
+           note="permutation des étiquettes d'UNITÉ À COUCHE FIXÉE ; la "
+                "permutation des étiquettes de COUCHE est invalide.")
 
-    # ------------------------------------------ Recall@1 (§4.3, §4.4, N-8)
+    # ------------------------------------------- R1_full (indice ↔ indice)
     gr = _rng(14)
     base = gr.normal(size=(lp.N_UNITES, 6))
-    serre = np.repeat(base, 3, axis=0) + 0.01 * gr.normal(size=(90, 6))
-    lache = gr.normal(size=(90, 6))
+    serre = np.repeat(base, 3, axis=0) + 0.01 * gr.normal(size=(3 * lp.N_UNITES, 6))
+    lache = gr.normal(size=(3 * lp.N_UNITES, 6))
     lab = np.repeat(np.arange(lp.N_UNITES), 3)
-    clause("Recall@1 indice ↔ indice (N-8)",
+    clause("R1_full indice ↔ indice",
            "états serrés par unité ⇒ Recall@1 = 1.0 en cosinus ET en L2",
            "états indépendants de l'unité ⇒ Recall@1 s'effondre",
            [("états serrés, cos", PASS,
@@ -2391,103 +2980,11 @@ def build_clauses_i2(tokenize, tok_name):
            note="indice↔indice UNIQUEMENT : mesurer une quantité indice↔fait est "
                 "un motif d'invalidation du run (§4.4, §6).")
 
-    # ------------------------------------------------ nulle statistique (§5)
-    gs = _rng(15)
-    clause("Nulle statistique (§5, maillon 5)",
-           "sous H₀ (intra et inter tirés de la même loi) l'AUC observée est "
-           "sous `q_0.95` de la permutation des étiquettes d'unité",
-           "un décalage réel place l'AUC au-dessus de `q_0.95`",
-           [("intra ≡ inter", PASS,
-             lambda: (lambda r: (PASS if r["auc_observee"] <= r["q_0.95"] else FAIL,
-                                 {k: v for k, v in r.items()
-                                  if k != "echantillons"}))(
-                 lp.permutation_etiquettes_unite(gs.normal(0.6, 0.1, 90),
-                                                 gs.normal(0.6, 0.1, 3915), b=400)))],
-           [("intra décalé de +0.3", FAIL,
-             lambda: (lambda r: (PASS if r["auc_observee"] <= r["q_0.95"] else FAIL,
-                                 {k: v for k, v in r.items()
-                                  if k != "echantillons"}))(
-                 lp.permutation_etiquettes_unite(gs.normal(0.9, 0.1, 90),
-                                                 gs.normal(0.6, 0.1, 3915), b=400)))],
-           note="permutation des étiquettes d'UNITÉ À COUCHE FIXÉE ; la "
-                "permutation des étiquettes de COUCHE est invalide (M-4).")
-
-    # ------------------------------------------------- bootstrap par unité
-    clause("Bootstrap PAR UNITÉ (§4.3)",
-           "l'IC publié est celui du rééchantillonnage **par unité**",
-           "l'IC du rééchantillonnage par PAIRE (interdit) ⇒ FAIL — et les deux "
-           "largeurs diffèrent, donc la clause n'est pas vacuée",
-           [("schéma « unité »", PASS, lambda: _cas_bootstrap("unite"))],
-           [("schéma « paire » (interdit)", FAIL, lambda: _cas_bootstrap("paire"))],
-           note="l'unité de rééchantillonnage est l'unité factuelle, JAMAIS la "
-                "paire (§4.3). Les deux largeurs sont publiées dans le détail : "
-                "sur des unités à effet propre, le bootstrap par paire ignore le "
-                "regroupement et rétrécit l'IC.")
-
     return C
 
 
 def recall_i2(X, lab, metrique):
     return lp.recall_at_1(X, lab, metrique)
-
-
-# Jeu de référence et étiquettes attendues, DÉRIVÉES À LA MAIN de la définition
-# du §4.2 (nombre de slots de contenu partagés), jamais du classifieur testé.
-# La paire (0, 4) ne partage QUE l'owner et le verbe : c'est elle qui mord sur un
-# classifieur aveugle au verbe.
-JEU_STRAT_REFERENCE = [("o1", "e1", "v1"), ("o2", "e2", "v2"),
-                       ("o1", "e3", "v3"), ("o1", "e1", "v4"),
-                       ("o1", "e5", "v1")]
-STRAT_ATTENDU = {(0, 1): "S0", (0, 2): "S1", (0, 3): "S2", (0, 4): "S2",
-                 (1, 2): "S0", (1, 3): "S0", (1, 4): "S0",
-                 (2, 3): "S1", (2, 4): "S1", (3, 4): "S1"}
-
-
-def _stratifier_sans_verbe(slots) -> dict:
-    """Classifieur FAUTIF (contre-exemple échouant) : il ne regarde que l'owner
-    et l'entité, donc il range une paire owner+verbe en S1 au lieu de S2."""
-    return lp.stratifier([(o, e, object()) for o, e, _v in slots])
-
-
-def gate_stratification(classifieur, jeu=None, attendu=None) -> tuple[str, dict]:
-    """Le classifieur range-t-il le jeu de référence exactement comme la
-    définition du §4.2 (nombre de slots de contenu partagés) ?"""
-    jeu = JEU_STRAT_REFERENCE if jeu is None else jeu
-    attendu = STRAT_ATTENDU if attendu is None else attendu
-    obs = classifieur(jeu)["paires"]
-    ecarts = {str(p): [attendu[p], obs[p]] for p in attendu if obs[p] != attendu[p]}
-    return (PASS if not ecarts else FAIL,
-            {"attendu": {str(k): v for k, v in attendu.items()},
-             "observe": {str(k): v for k, v in obs.items()}, "ecarts": ecarts})
-
-
-def _cas_bootstrap(schema: str) -> tuple[str, dict]:
-    """Les deux schémas sur les MÊMES données (unités à effet propre) : le
-    schéma publié doit être « unité ». Les largeurs sont publiées pour montrer
-    que la clause n'est pas vacuée par satisfaction."""
-    g = _rng(16)
-    effet = g.normal(0.0, 0.08, lp.N_UNITES)          # effet propre par unité
-    ci = 0.70 + effet[:, None] + g.normal(0, 0.01, (lp.N_UNITES, 3))
-    ce = 0.60 + 0.5 * (effet[:, None, None] + effet[None, :, None]) \
-        + g.normal(0, 0.01, (lp.N_UNITES, lp.N_UNITES, 9))
-    r_u = lp.bootstrap_par_unite(lp.auc_stat_fn(ci, ce), lp.N_UNITES, b=300, seed=0)
-    largeur_u = r_u["ic_haut"] - r_u["ic_bas"]
-    a_ = ci.ravel()
-    i, j = np.triu_indices(lp.N_UNITES, k=1)
-    b_ = ce[i, j].ravel()
-    rng = np.random.default_rng(0)
-    ech = np.array([lp.auc_par_couche(a_[rng.integers(0, a_.size, a_.size)],
-                                      b_[rng.integers(0, b_.size, b_.size)])
-                    for _ in range(300)])
-    lo, hi = np.percentile(ech, [2.5, 97.5])
-    largeur_p = float(hi - lo)
-    det = {"schema": schema, "largeur_par_unite": largeur_u,
-           "largeur_par_paire": largeur_p,
-           "largeurs_distinctes": bool(abs(largeur_u - largeur_p) > 1e-9),
-           "ic_par_unite": [r_u["ic_bas"], r_u["ic_haut"]],
-           "ic_par_paire": [float(lo), float(hi)], "B": 300}
-    ok = (schema == "unite") and det["largeurs_distinctes"]
-    return (PASS if ok else FAIL, det)
 
 
 # =========================================================================
@@ -2693,18 +3190,28 @@ def run(use_hf: bool = True, out_dir: Path = OUT_DIR) -> dict:
 
 
 def run_i2(use_hf: bool = True, out_dir: Path = OUT_DIR_I2) -> dict:
-    """Banc de satisfiabilité d'I2 (`EXP-2026-08-22-layer-profile.md`)."""
+    """Banc de satisfiabilité d'I2 (`EXP-2026-08-22-layer-profile.md`,
+    version CONSOLIDÉE)."""
     t0 = time.time()
     tokenize, tok_name = make_tokenizer(use_hf)
-    clauses = build_clauses_i2(tokenize, tok_name)
+    offsets = make_offsets(use_hf)
+    clauses = build_clauses_i2(tokenize, tok_name, offsets)
     rows, E = _evaluer(clauses)
 
     a = lp.corpus_a()
-    a_prime = lp.corpus_a_prime(tokenize)
+    a30 = lp.corpus_a(30)
+    b_v3 = lp.corpus_b_v3(tokenize)
     n_cov = sum(1 for r in rows if r["expected"]["pass_case"]
                 and r["expected"]["fail_case"])
-    rec_a = lp.stratifier(a["slots"])
-    rec_ap = lp.stratifier(a_prime["slots"])
+    part80 = lp.partition_identite(a["slots"])
+    part30 = lp.partition_identite(a30["slots"])
+    part_v3 = lp.partition_identite(b_v3["slots"])
+    suff = {t: lp.partage_dernier_token(
+        [a["paraphrases"][i][k] for i in range(lp.N_UNITES)], tokenize)
+        for k, t in enumerate(lp.POOL_PARAPHRASE_TYPES)}
+    suff30 = {t: lp.partage_dernier_token(
+        [a30["paraphrases"][i][k] for i in range(30)], tokenize)
+        for k, t in enumerate(lp.POOL_PARAPHRASE_TYPES)}
     report = {
         "protocole": "experiments/EXP-2026-08-22-layer-profile.md",
         "statut_protocole": "PROPOSE — gate de pré-enregistrement NON franchie",
@@ -2718,33 +3225,64 @@ def run_i2(use_hf: bool = True, out_dir: Path = OUT_DIR_I2) -> dict:
         "n_cas": sum(len(r["cas"]["pass_case"]) + len(r["cas"]["fail_case"])
                      for r in rows),
         "corpus": {
-            "a": {"source": "pool.fact_pairs(30) re-paraphrasé (§4.2)",
+            "a": {"source": "pool.fact_pairs(80) re-paraphrasé (§4.2 a)",
+                  "N": lp.N_UNITES,
                   "sha256": lp.sha256_corpus(a),
-                  "owners": len({s[0] for s in a["slots"]}),
-                  "entites": len({s[1] for s in a["slots"]}),
-                  "verbes": len({s[2] for s in a["slots"]}),
-                  "recensement_strates": rec_a["recensement"],
-                  "paires_S2": [list(p) for p in rec_a["paires_par_strate"]["S2"]]},
-            "a_prime_S3": {"source": "jeu d'unités v3, tel quel (§4.2)",
-                           "sha256": lp.sha256_corpus(a_prime),
-                           "owners": len({s[0] for s in a_prime["slots"]}),
-                           "entites": len({s[1] for s in a_prime["slots"]}),
-                           "verbes": len({s[2] for s in a_prime["slots"]}),
-                           "recensement_strates": rec_ap["recensement"]},
+                  "diversite_(owners,entites,verbes)": list(lp.diversite(a["slots"])),
+                  "diversite_attendue": list(lp.diversite_attendue(lp.N_UNITES)),
+                  "recensement_identite": part80["recensement"]},
+            "a_N30": {"source": "pool.fact_pairs(30) — N ÉCARTÉ, publié pour le "
+                                "recensement",
+                      "N": 30,
+                      "diversite_(owners,entites,verbes)":
+                          list(lp.diversite(a30["slots"])),
+                      "recensement_identite": part30["recensement"]},
+            "B-v3": {"source": "jeu d'unités v3 — BRAS DESCRIPTIF, jamais fusionné, "
+                               "jamais décisionnel, jamais appelé « strate »",
+                     "sha256": lp.sha256_corpus(b_v3),
+                     "diversite_(owners,entites,verbes)":
+                         list(lp.diversite(b_v3["slots"])),
+                     "recensement_identite": part_v3["recensement"]},
+        },
+        "partition_identite": {
+            "espace_identite": lp.ESPACE_IDENTITE,
+            "strate_decisionnelle": lp.STRATE_DECISIONNELLE,
+            "P_both": lp.p_both_impossible(),
+            "clusters": {s: {"cle": lp.clusters_de_strate(a["slots"], s)["cle"],
+                             "K_N80": lp.clusters_de_strate(a["slots"], s)["K"],
+                             "K_N30": lp.clusters_de_strate(a30["slots"], s)["K"]}
+                         for s in (lp.P_OWN, lp.P_ENT)},
+            "le_verbe_est_une_covariable": True,
+        },
+        "puissance": {
+            "formule": "K ≥ (1.96·σ₀/|θ−T|)²",
+            "sigma0": lp.SIGMA0, "marge_R1": lp.MARGE_R1,
+            "K_requis_R1_36": lp.k_requis(),
+            "K_requis_AUC_recopié_du_protocole": lp.K_REQUIS_AUC_PROTOCOLE,
+            "K_requis_AUC_dérivation_du_banc":
+                lp.k_requis(lp.SIGMA0, lp.MARGE_AUC_BANC),
+            "marge_AUC_du_banc": lp.MARGE_AUC_BANC,
         },
         "paires": {"n_intra": len(lp.paires_intra_inter()[0]),
                    "n_inter": len(lp.paires_intra_inter()[1]),
                    "attendus": [lp.N_INTRA_ATTENDU, lp.N_INTER_ATTENDU]},
-        "couloir_v4_redérivé": {
-            "s": lp.S_LEURRES,
-            "A_pour_recall_0.50_contre_36": lp.AUC_COULOIR_050,
-            "A_pour_recall_0.25_contre_36": lp.AUC_COULOIR_025,
-            "A_pour_recall_0.50_contre_29": lp.AUC_COULOIR_050_29},
+        "V-suffixe": {"observe_N80": suff, "observe_N30": suff30,
+                      "derive_N80": lp.partage_suffixe_derive(80),
+                      "derive_N30": lp.partage_suffixe_derive(30)},
+        "couloir_v4": {
+            "s": lp.S_LEURRES, "taille_du_jeu": lp.TAILLE_JEU_R1,
+            "hasard": lp.HASARD_R1, "T": lp.T_COULOIR, "T_plus": lp.T_COULOIR_PLUS,
+            "reperes_de_publication_en_AUC_jamais_un_critere": {
+                "A_pour_R1_0.25_contre_36": lp.AUC_REPERE_025,
+                "A_pour_R1_0.50_contre_36": lp.AUC_REPERE_050},
+            "blocs_du_jeu": lp.jeu_candidats_R1(0, 0, a["slots"])["blocs"]},
         "fenetres": {str(k): {"L": v, "w": lp.w_of_L(v),
                               "fenetre_D3": list(lp.fenetre_D3(v)),
                               "borne_multiplicite": round(lp.borne_multiplicite(v), 4)}
                      for k, v in lp.L_ATTENDU.items()},
-        "cinq_nulles": nulles_du_protocole(tokenize),
+        "V-source": {"citations": [dict(c) for c in lp.CITATIONS],
+                     "verdict": gate_v_source()[0]},
+        "cinq_nulles": nulles_du_protocole(tokenize, offsets),
         "clauses_sous_specifiees": UNDERSPEC_I2,
         "duree_s": round(time.time() - t0, 2),
         "clauses": rows,
@@ -2793,24 +3331,49 @@ def main():
         rep_i2 = run_i2(use_hf=not args.no_hf, out_dir=out_i2)
         _imprimer(rep_i2)
         c = rep_i2["corpus"]
-        print(f"corpus (a)  : {c['a']['source']} — {c['a']['owners']} owners, "
-              f"{c['a']['entites']} entités, {c['a']['verbes']} verbes")
-        print(f"              recensement des strates : {c['a']['recensement_strates']}")
-        print(f"              paires S2 : {c['a']['paires_S2']}")
-        print(f"corpus (a′) : {c['a_prime_S3']['source']} — "
-              f"{c['a_prime_S3']['owners']} owners, {c['a_prime_S3']['entites']} "
-              f"entités, {c['a_prime_S3']['verbes']} verbes")
-        print(f"              recensement des strates : "
-              f"{c['a_prime_S3']['recensement_strates']}")
+        for cle in ("a", "a_N30", "B-v3"):
+            d = c[cle]
+            print(f"corpus {cle:6}: {d['source']}")
+            print(f"              diversité (owners, entités, verbes) = "
+                  f"{d['diversite_(owners,entites,verbes)']}")
+            print(f"              recensement d'identité "
+                  f"(P-0/P-own/P-ent/P-both) : {d['recensement_identite']}")
+        pi = rep_i2["partition_identite"]
+        print(f"P-both      : lcm = {pi['P_both']['lcm']} ; possible = "
+              f"{pi['P_both']['possible']}")
+        print(f"clusters    : {pi['clusters']}  |  strate décisionnelle = "
+              f"{pi['strate_decisionnelle']}")
+        pu = rep_i2["puissance"]
+        print(f"puissance   : K requis (R1_36) = {pu['K_requis_R1_36']} ; "
+              f"K requis (AUC, protocole) = "
+              f"{pu['K_requis_AUC_recopié_du_protocole']} ; "
+              f"K requis (AUC, dérivation du banc) = "
+              f"{pu['K_requis_AUC_dérivation_du_banc']}")
+        vs = rep_i2["V-suffixe"]
+        print(f"V-suffixe   : observé N=80 "
+              + ", ".join(f"{k}={v:.5f}" for k, v in vs["observe_N80"].items())
+              + f"  |  dérivé para2 = {vs['derive_N80']['para2']:.5f} "
+              f"({vs['derive_N80']['n_paires_5_divise_d']}/"
+              f"{vs['derive_N80']['C_n_2']})")
+        print(f"            : observé N=30 "
+              + ", ".join(f"{k}={v:.5f}" for k, v in vs["observe_N30"].items())
+              + f"  |  dérivé para2 = {vs['derive_N30']['para2']:.5f}")
         print(f"paires      : {rep_i2['paires']}")
-        print(f"couloir v4  : {rep_i2['couloir_v4_redérivé']}")
+        print(f"couloir v4  : {rep_i2['couloir_v4']}")
         print(f"fenêtres    : {rep_i2['fenetres']}")
+        print(f"V-source    : {rep_i2['V-source']['verdict']} "
+              f"({len(rep_i2['V-source']['citations'])} équations, support PDF)")
         n1 = rep_i2["cinq_nulles"]
-        print(f"nulle 1 (AUC_lex, 0 forward) : "
-              f"{n1['1_materiel_AUC_lex']['AUC_lex']:.4f}")
-        print(f"nulle 2 (suffixe) : longueurs préservées = "
-              f"{n1['2_capture_nulle_suffixe']['longueurs_preservees']}")
-        print(f"nulle 4 (mélangée) : multiensembles appariés = "
+        print(f"nulle 1 (0 forward)  : AUC_lex = "
+              f"{n1['1_materiel_AUC_lex']['AUC_lex']:.4f} ; R1_lex = "
+              f"{n1['1_materiel_AUC_lex']['R1_lex']:.4f}")
+        print(f"nulle 2 (cadre)      : longueurs appariées = "
+              f"{n1['2_capture_nulle_de_cadre']['longueurs_appariees']} ; "
+              f"construction = {n1['2_capture_nulle_de_cadre']['construction']} ; "
+              f"tokens remplacés (min,max) = "
+              f"{n1['2_capture_nulle_de_cadre']['tokens_remplaces_min_max']} ; "
+              f"verbe conservé = True")
+        print(f"nulle 4 (mélangée)   : multiensembles appariés = "
               f"{n1['4_ordre_corpus_melange']['multiensembles_apparies']}")
         for k, v in rep_i2["clauses_sous_specifiees"].items():
             print(f"sous-spécifiée : {k} — {v}")
