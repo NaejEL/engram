@@ -148,8 +148,15 @@ l'argument — aucune ne suffit seule :
   design**, jamais une prédiction (D14-R). I2 la généralise avec un N réel et sans
   injection.
 - **D3** (interne) : la règle du milieu (6/12 → 16/32 → 14/28, tardif nocif) est une
-  **régularité empirique sans prédicteur mécanique**. Le passage à Qwen (instruct,
-  RLHF qui sculpte les dernières couches) rend le report aveugle de `n/2` risqué.
+  **régularité empirique sans prédicteur mécanique** — les trois couches D3 valent
+  exactement `⌊L/2⌋` (6/12, 16/32, 14/28), ce qui est soit une loi, soit une
+  coïncidence à trois points, et le projet n'a aucun moyen de trancher. *(Correctif
+  2026-08-22, D14-R : le cadrage justifiait ce point par « le passage à Qwen, instruct,
+  RLHF qui sculpte les dernières couches ». **Faux** — `Qwen/Qwen2.5-1.5B` est le modèle
+  **base** : carte de modèle « Training Stage: Pretraining », « We do not recommend using
+  base language models for conversations ». La justification tombe, le besoin d'un
+  prédicteur mécanique subsiste. Le test local par présence d'un `chat_template` est
+  trompeur : Qwen le livre avec ses tokenizers base.)*
 - **Externe** : Skean, Arefin, LeCun & Shwartz-Ziv, *Does Representation Matter?
   Exploring Intermediate Layers in Large Language Models*, **arXiv:2412.09563**
   (NeurIPS 2024 Workshop on ML and Compression) — les couches intermédiaires
