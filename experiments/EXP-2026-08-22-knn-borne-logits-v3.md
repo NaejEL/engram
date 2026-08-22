@@ -488,6 +488,102 @@ Les huit questions ont reçu réponse ; l'intégration est au §B de l'arbitrage
 | **16** | **Corrections bloquantes du tour 2 intégrées sans négociation** : `P5f-borne` sur `V_k` avec inégalité large (E-D6) ; `τ_promu` = préfixe admissible **connexe** (E-D7) ; **B = 21** ; **porte V-tok** ; **V-para croisée** | deux clauses étaient **fausses telles qu'écrites**, dont une était **ma propre correction d'un amendement d'expert**. Aucune des deux n'ajoute de paramètre libre : la règle de simplicité n'a pas eu à arbitrer. |
 | **17** | **Les deux affirmations de fichier de Neuro ont été VÉRIFIÉES par exécution avant intégration** — la première vraie (`lighthouse`), la seconde fausse (`catapult`/`cathedral` ne collisionnent pas) | D14-R s'applique aussi aux **avis d'experts** : un chiffre ou un fait cité dans un avis n'entre pas dans le protocole sans être re-mesuré. La porte V-tok est conservée malgré la suspicion infirmée, parce que `POOL_PARAPHRASES` introduira des mots neufs. |
 
+## 15. Amendement post-banc (2026-08-22) — obligatoire, banc à rejouer en entier
+
+Le banc D14-S a rendu **E = 2**. `H_méthode` est **REJETÉE** : les trois passes du §4bis ne
+suffisent pas, le banc devient obligatoire à vie. `E < 3` ⇒ **pas** de réduction de portée.
+D14 impose d'amender **après le banc et avant le premier token de donnée réelle**, puis de
+**rejouer le banc en entier**. Aucun GPU n'a tourné : la frontière n'est pas franchie.
+
+### A. Le défaut de fond — deux fuites que le banc a confondues
+
+Distinction apportée par Neuro, et c'est le vrai résultat du cycle :
+
+- **Fuite structurelle** — une règle de génération **lit la ligne d'une autre unité**.
+  C'est para1 : `verb_index + 1 mod 5` va chercher le verbe de l'unité *i+1*, alors que
+  `VERBS` recycle tous les 5 indices. Ce n'est pas un défaut lexical, c'est un défaut de
+  **définition de l'unité** : para1(i) contient verbatim du matériel qui **identifie** six
+  autres unités, donc **la vérité-terrain est détruite** — on ne peut plus dire de quoi un
+  succès sous para1 est un succès. **Interdit sans condition, détectable sans mesure.**
+- **Fuite de cadre** — un type partage du matériel avec les 29 autres paraphrases du même
+  type, matériel qui **n'identifie aucune unité**. C'est para3, et c'est le **prix
+  inévitable d'un vrai recadrage**.
+
+Le banc les a mesurées avec le même Jaccard brut (70 + 80 violations). **C'est l'instrument
+qui doit se scinder, pas la donnée qui doit s'affaiblir.**
+
+**Erreur du §7 acquittée** : la phrase « la réutilisation d'un verbe présent verbatim dans 5
+autres faits est la condition la plus dure pour la clause (c), et c'est voulu — le régime de
+clés corrélées est celui que la séparation de patterns est censée traiter » est **fausse**.
+Un régime de clés corrélées se teste avec des **clés distinctes qui se ressemblent**, pas en
+logeant dans l'indice de *i* le matériel identifiant de *i+1*. Le second cas ne mesure pas
+l'interférence, il **détruit la vérité-terrain**. Le régime corrélé appartient à un **bras
+déclaré et séparé** (store distracteur, X9, X6), où il est une variable manipulée — jamais à
+la définition d'une paraphrase, dont la seule fonction est de **préserver l'identité de
+l'unité**.
+
+**Règles gravées** : *l'arbitraire doit être global — **et jamais indexé par l'unité**.* Et :
+*on n'affaiblit jamais le stimulus pour satisfaire une porte ; on corrige la porte, ou on
+abandonne la mesure.*
+
+### B. Amendements
+
+| # | Clause | Amendement |
+| --- | --- | --- |
+| **A-1** | **§7, para1** | La rotation `+1 mod 5` est **supprimée**. Remplacée par un **verbe attributif unique, global aux 30 unités, hors `VERBS`** : **`"bears the codename"`**. Owner, entity et absence de cadre ajouté inchangés — le facteur manipulé reste la seule substitution du verbe. *« The captain's ship bears the codename walrus. »* **Propriété prouvée, pas espérée** : un token qui n'appartient à aucun fait entre au dénominateur de **toutes** les comparaisons `J(para1(i), fait_j)` et à **aucun** numérateur — il dilue uniformément et **ne peut jamais** faire monter *j* au-dessus de *i*. **Preuve d'existence dans le jeu** : para2 satisfait déjà cette contrainte (préfixe gelé absent des faits) et rend **0 violation** — elle n'est pas passée par chance. Repli déterministe si collision : `"translates as"`, puis `"carries the tag"`, puis `"denotes"` — premier candidat conforme, aucun choix à la main. |
+| **A-2** | **§7, para3** | **INCHANGÉE.** L'exemption (« `V-para (c)` ne s'applique pas aux types à cadre lourd ») est **refusée** : c'est exactement le mode d'échec que **D14(c)** interdit — la porte mélangerait l'**identité** (l'indice désigne-t-il son unité ?) et le **recadrage** (le phénomène mesuré), et l'exemption soustrairait la partie gênante du mélange au lieu de le défaire. Un cadre plus léger est **refusé** : ce serait affaiblir le stimulus pour satisfaire l'instrument, et para3 est le seul type qui change simultanément cadre, type de phrase et registre — le chiffre-titre du PoC est un **ratio de généralisation**, le mesurer sur trois quasi-variantes le viderait de sens. Passer à 2 paraphrases est **refusé** : cela casse le chaînage 2/3 de P1 **et** ne laisserait que deux transformations du même type (substitution locale sous cadre déclaratif), supprimant le gradient de difficulté qui rend la primaire interprétable. |
+| **A-3** | **`V-para (c)` → `V-para (c′)`** | Le Jaccard porte désormais sur le **contenu**, pas sur les tokens bruts. **Définition indépendante de la position** : `F_t := ⋂_{i=1..30} tokens_BPE(para_t(i))`, `C_t(i) := tokens_BPE(para_t(i)) \ F_t` ; symétriquement `F_fait := ⋂_i tokens_BPE(fait_i)`, `C(fait_i) := tokens_BPE(fait_i) \ F_fait`. **Clause** : pour tout *i*, tout *t*, `J(C_t(i), C(fait_i)) > J(C_t(i), C(fait_j))` pour tout `j ≠ i`, **strictement — une égalité compte comme violation** (si l'indice n'est pas strictement plus proche de son fait, il ne désigne pas son unité). **Pourquoi PAS « plus long préfixe/suffixe commun »** : le cadre de para3 est **entrelacé** (`So what's the name of the` + entity + `that belongs to` + owner_obj + `? It's`) — un préfixe/suffixe laisserait `" that belongs to "` dans le contenu, **recréant la fuite**. `F_t` attrape le cadre **où qu'il soit**, se calcule **sans regarder aucun résultat** (données gelées seules) et capture gratuitement le nouveau verbe global de A-1. **Gain D14-S** : le Jaccard est un rapport de petits entiers ⇒ comparaison en **arithmétique entière exacte** par produit croisé (`a·d > c·b` sur `int`), **jamais en flottant** — l'analyse ULP disparaît au lieu d'être à faire. |
+| **A-4** | **`V-slot` (NOUVELLE, structurelle)** | Pour tout type *t* et toute unité *i* : l'ensemble des **valeurs de ligne** des tables indexées par l'unité (`OWNERS`, `ENTITIES`, `VERBS`, `SECRETS_80`, `OWNER_OBJ`) apparaissant **verbatim** dans `para_t(i)` est **inclus dans les slots de l'unité i**. Toute occurrence d'un slot d'une unité `j ≠ i` ⇒ **arrêt**. **Raison d'être** : `V-para (c′)` **neutralise** la fuite structurelle (elle la met hors contenu) mais **ne la détecte pas** — une règle future qui lirait la ligne d'une autre unité pourrait passer alors que la vérité-terrain serait détruite. Une fuite de **règle** se prend par une porte de **règle**. `V-slot` échoue sur l'ancienne para1 **de façon déterministe et sans aucune mesure** : c'est la porte qui aurait tué le défaut avant que 150 triples ne soient comptés. Elle est aussi la seule qui reste correcte si le tokenizer ou le modèle change. |
+| **A-5** | **`OWNER_OBJ`** | Porte ajoutée : `OWNER_OBJ` **injective**, et ses 16 images **deux à deux distinctes en BPE**. Motif : la table écrase de l'information (« Her » → « her », « His » → « him », « Our » → « us ») ; deux owners tombant sur la même forme objet rendraient deux unités **indiscernables dans para3**. **Vérifié par exécution le 2026-08-22 : 16/16 distinctes en chaînes ET en BPE.** La porte est conservée parce qu'elle doit tenir si la table bouge. |
+| **A-6** | **`V-bord`** | Deux corrections. (i) **Évaluée sur toute la grille λ**, pas au seul λ* : à λ* calculé les deux expressions sont **bit-identiques** (0 ULP) ⇒ la porte y est **vacuée par satisfaction** ; elle est discriminante ailleurs (λ = 0.02 → 5 ULP ; 0.05 → 6 ULP ; 0.10 → 2 ULP). (ii) **λ\* est défini comme l'EXPRESSION `1 − exp(−0.05)`, jamais comme un décimal recopié.** Défaut trouvé hors banc : le littéral `0.048770575499286` du protocole est à **2 ULP** de `1 − exp(−0.05)` = `0.048770575499285984` — c'est la classe de bug que `V-bord` garde, **un étage au-dessus**. Le décimal reste dans le document comme **documentation seule**, étiqueté comme tel (D14-R). |
+| **A-7** | **Descriptifs ajoutés** | Le **Jaccard brut** (avec cadre) reste **publié**, par type, avec son compte de violations — on ne cache rien : 80 violations sur para3 se lisent *« mesure du poids du cadre »*, 0 sur para1/para2 *« absence de fuite d'identité »*. **Deux quantités, deux noms, une seule bloquante.** Plus **`V-partage`** en descriptif (plus long préfixe **et** plus long suffixe communs en BPE, par type, sur les 30) : elle mesure une **troisième** propriété — position et volume du matériel commun — que ni `V-para (c′)` ni le Jaccard brut ne rapportent. C'est elle qui voit le préfixe de ~8 tokens de para2, que le Jaccard croisé laisse passer à 0 violation. |
+| **A-8** | **N10 re-signée** | L'ancienne N10 (`h(para1) ≥ h(para2) ≥ h(para3)`) était calibrée sur une para1 qui gardait un verbe partagé avec son propre fait. La nouvelle para1 **perd tout recouvrement de verbe** avec son fait. **Neuro re-signe : `h(para2) ≥ h(para1) ≥ h(para3)`.** Motif mécanique : para2 est le seul type conservant le verbe d'origine, donc le recouvrement lexical maximal avec le fait. **Motif empirique convergent, vérifié dans `docs/JOURNAL.md`** : para2 +1.006 ± 0.918, para1 +0.345 ± 0.347, para3 +0.168 ± 0.505 — *mais sur le jeu `QUESTIONS` de v1, qui n'est **PAS** `POOL_PARAPHRASES`* : c'est une **analogie orientante**, pas une dérivation ; c'est le motif mécanique qui porte la prédiction. **Re-signature datée AVANT le GPU**, comme l'exige le pré-enregistrement. |
+
+### C. Cascade D14(b) — obligatoire, la re-dérivation fait partie de l'amendement
+
+L'amendement change les **données gelées** ⇒ **nouveau SHA-256**, et **chaque** porte antérieure
+se re-dérive sous les nouvelles données :
+
+- **`V-tok`** : re-jouée — les tokens du nouveau verbe global contre les 30 premiers tokens BPE des secrets.
+- **`V-hash`** : nouveau hash de `POOL_PARAPHRASES`, `OWNER_OBJ` et de la table d'unités.
+- **`V-para (a)/(b)`** : re-jouées sur les nouveaux indices.
+- **`V-indep`** : re-jouée — les clés de requête changent avec les indices.
+- **Budget de la passe A** : la longueur des indices change ⇒ le compte de tokens du store change.
+- **`N10`** : re-signée (A-8).
+- **I2 hérite de l'amendement** : son corpus (a) **est** le jeu d'unités v3 ⇒ le hash scellé pour I2
+  doit être le hash **amendé**. Deux des douze points de l'avis Neuro sur I2 (score-titre sans para3 ;
+  ventilation même-verbe / verbe-différent de `s_inter`) deviennent **partiellement sans objet**, la
+  fuite par bloc disparaissant. À traiter au traitement d'I2, **pas ici**.
+
+### D. Prédiction signée avant re-run du banc
+
+**Neuro signe : 0 violation sur les trois types sous `V-para (c′)`.** Vérification de plausibilité,
+à **re-mesurer et non à croire** : après retrait de `F_t`, `C_para3(i) = {entity_i, owner_obj_i}`
+contre `C(fait_i) ⊇ {owner_i, entity_i, verb_i}` — l'intersection avec son propre fait contient
+owner **et** entity, celle avec tout autre fait au plus l'un des deux, et l'union est plus grande.
+*(Preuve du partage : deux unités partagent OWNER ssi `i ≡ j (mod 16)`, ENTITY ssi `i ≡ j (mod 20)`,
+les deux ssi `i ≡ j (mod 80)` — impossible pour n ≤ 30. Elle ne vaut que si A-5 tient.)*
+**Si des violations subsistent, ce n'est plus un défaut de règle mais un recyclage de table, et il
+faut le nommer.**
+
+### E. Vérifications d'exécution faites AVANT d'écrire cet amendement (D14-R)
+
+| Affirmation | Source | Verdict |
+| --- | --- | --- |
+| 150 violations, 23/30 unités, para1 = 70 / para2 = 0 / para3 = 80 | banc | **reproduit indépendamment**, chiffres identiques |
+| `OWNER_OBJ` injective et distincte en BPE | Neuro (résidu 1) | **vérifié : 16/16 en chaînes et en BPE** |
+| Journal v1 : para2 +1.006 / para1 +0.345 / para3 +0.168 | Neuro (A-8) | **les trois trouvés dans `docs/JOURNAL.md`**, valeurs exactes |
+| `"bears the codename"` ne contient aucune **valeur de ligne** des 5 tables | Neuro (A-1) | **conforme.** *Note de méthode : un premier test à recouvrement de **mots** l'avait signalé pour l'article « the », partagé avec des `OWNERS` — ce test était **plus strict que la règle**, qui porte sur les **valeurs de ligne verbatim**. Et le point est doublement sans objet : le verbe étant identique sur les 30, **tous** ses tokens sont dans `F_para1`, donc hors contenu par construction.* |
+| `Qwen/Qwen2.5-1.5B` est **base**, pas instruct | Neuro (avis I2) | **vérifié sur la carte de modèle** : « Training Stage: Pretraining », « We do not recommend using base language models for conversations ». *Le test local par présence d'un `chat_template` disait « instruct » — il est **trompeur**, Qwen livre le template avec les tokenizers base.* |
+
+### F. Ce que l'amendement ne fait pas
+
+Il ne touche **ni** aux prédictions décisionnelles (P1, ΔP6, P3, P4), **ni** aux seuils
+(12/30, 5/30, `k(n)`, λ*), **ni** aux bras. Les §4.4 et §6 sont **inchangés**. Seules changent
+les **données** et les **portes d'intégrité** — c'est-à-dire exactement ce que D14 autorise à
+amender entre le banc et le run, et rien d'autre.
+
+
 ## Historique
 
 - 2026-08-22 : brouillon du Directeur (v3, option B)
@@ -496,4 +592,12 @@ Les huit questions ont reçu réponse ; l'intégration est au §B de l'arbitrage
 - 2026-08-22 : D12 / D13 / D14 / D14-S / D14-R / D15 gravées dans `docs/ARCHITECTURE.md` §3 ; correctifs documentaires du run 1 appliqués
 - 2026-08-22 : **tour 2** sur le consolidé — Math **FAVORABLE** sous 2 corrections bloquantes (E-D6 `P5f-borne`, E-D7 `τ_promu`) + 2 scellements ; Neuro **RÉSERVÉ → FAVORABLE** sous 2 corrections de fichier (collision `lighthouse`, porte V-tok) + façade (iv) aliasing et façade (v) complétion de patterns
 - 2026-08-22 : **vérification par exécution** des deux affirmations de fichier — collision `lighthouse` **confirmée** et corrigée par règle déterministe ; suspicion `catapult`/`cathedral` **infirmée** (30 premiers tokens BPE distincts) ; aliasing verbe/entité **confirmé**
+- 2026-08-22 : **banc D14-S exécuté — E = 2, `H_méthode` REJETÉE** (34 clauses, 101 cas,
+  couverture 100 %) : `V-para (c)` insatisfiable sur les données gelées (150 violations,
+  23/30 unités) et `V-bord` vacuée par satisfaction à λ*. Défaut annexe trouvé hors banc :
+  le littéral λ* du document est à 2 ULP de `1 − exp(−0.05)`.
+- 2026-08-22 : **amendement post-banc (§15)** — para1 refondue (verbe global hors tables),
+  para3 inchangée, `V-para (c′)` sur contenu défini par intersection des 30, porte
+  structurelle `V-slot` ajoutée, `V-bord` sur toute la grille λ, N10 re-signée. Cascade
+  D14(b) faite. **Banc à rejouer EN ENTIER.** Aucun GPU n'a tourné.
 - 2026-08-22 : **protocole consolidé, corrections des deux tours intégrées — PROPOSE**. Étape suivante : livraison du banc `eval/gate_bench.py` par le Builder, puis gate de pré-enregistrement (**E = 0 exigé**), puis GPU.
