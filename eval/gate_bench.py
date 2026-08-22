@@ -69,6 +69,7 @@ from pool import (  # noqa: E402
 )
 
 OUT_DIR = ROOT / "experiments" / "results" / "gate-bench"
+OUT_DIR_I2 = ROOT / "experiments" / "results" / "gate-bench-i2"
 ARCHIVES = [ROOT / "experiments" / "results" / "knn-borne-logits" / "raw",
             ROOT / "experiments" / "results" / "knn-borne-logits-v2" / "raw"]
 
@@ -1686,6 +1687,810 @@ def build_clauses(tokenize, tok_name):
 
 
 # =========================================================================
+#  ===================  SUITE I2 — `layer_profile`  =======================
+#
+#  Protocole : `experiments/EXP-2026-08-22-layer-profile.md` (statut PROPOSE).
+#  Portes §4.7, quatre bandes §4.5, quatre cellules §4.8, cinq nulles §5.
+#  CPU seul, aucune mesure, aucun modèle (le tokenizer GPT-2 sert les nulles
+#  lexicale et suffixe, qui ne sont pas décidables sans lui).
+# =========================================================================
+
+import layer_profile as lp  # noqa: E402
+
+# Opérationnalisations DÉCLARÉES par le banc là où le protocole fixe la clause
+# mais pas son seuil d'exécution. Signalées au rapport, hors E.
+I2_VDIV_TAUX = 0.999          # « non vide dans ≥ 99.9 % des B rééchantillonnages »
+I2_VSUFFIXE_HAUT = 0.95       # « ≈ 1.0 »
+I2_VSUFFIXE_BAS = 0.05        # « ≈ 0 »
+I2_TOL_AUC = 1e-12            # égalité d'AUC sous transformation monotone
+I2_TOL_H = 1e-6               # égalité relative de H sous mise à l'échelle des lignes
+I2_B_DIV = 10_000             # §4.7 V-div
+
+UNDERSPEC_I2 = {
+    "V-div": "« non vide dans ≥ 99.9 % » fixe le taux ; le banc déclare qu'une "
+             "paire d'unités est une paire de positions dont les DEUX unités "
+             "diffèrent (une unité tirée deux fois n'est pas une paire).",
+    "V-suffixe": "« ≈ 1.0 » / « ≈ 0 » ne sont pas opérationnalisés ; le banc "
+                 "déclare partage ≥ %.2f et ≤ %.2f, sur la fraction des paires "
+                 "d'un même type dont le dernier token BPE coïncide."
+                 % (I2_VSUFFIXE_HAUT, I2_VSUFFIXE_BAS),
+    "V-plat": "le protocole fixe `R = max−min`, le bootstrap PAR UNITÉ et la "
+              "courbe centrée par unité, pas la fabrique de `R*` ; le banc "
+              "déclare le double centrage (par unité puis par couche) comme "
+              "vérité plate, seule construction rendant `R*` calculable sans "
+              "poser de constante.",
+}
+
+# Chiffres de v3 interdits dans une porte, un seuil ou une prédiction (`V-amont`,
+# D14-R). Écrits ici SOUS FORME DE MOTIFS À DÉTECTER, jamais comme seuils.
+I2_MOTIFS_AMONT = ("0.99989", "0.99848", "90/90", "12/30", "23/30", "30/30",
+                   "3-4/30", "0,99989")
+
+
+# ------------------------------------------------------------------ portes
+
+def gate_v_div(slots, b: int = I2_B_DIV, seed: int = 0,
+               taux: float = I2_VDIV_TAUX) -> tuple[str, dict]:
+    """`V-div` (§4.7) : chaque strate S0/S1/S2 **non vide dans ≥ 99.9 %** des
+    `b` rééchantillonnages d'unités. Décidable sur le seul recensement
+    combinatoire, **sans GPU**. Le recensement est publié avant mesure."""
+    st = lp.stratifier(slots)
+    n = len(slots)
+    code = {"S0": 0, "S1": 1, "S2": 2, "S3-degenere": 3}
+    M = np.full((n, n), 3, dtype=np.int8)
+    for (i, j), s in st["paires"].items():
+        M[i, j] = M[j, i] = code[s]
+    rng = np.random.default_rng(seed)
+    idx = rng.integers(0, n, size=(b, n))
+    sub = M[idx[:, :, None], idx[:, None, :]]
+    frac = {s: float((sub == code[s]).any(axis=(1, 2)).mean()) for s in lp.STRATES}
+    ok = all(v >= taux for v in frac.values())
+    return (PASS if ok else FAIL,
+            {"recensement": st["recensement"], "fraction_non_vide": frac,
+             "taux_exige": taux, "B": b, "n_unites": n})
+
+
+def gate_v_paires(n_intra: int, n_inter: int) -> tuple[str, dict]:
+    """`V-paires` (§4.7, remplace `V-signe`) : `n_intra = 90` et
+    `n_inter = 3915` **exactement**. Porte mordante."""
+    ok = (n_intra == lp.N_INTRA_ATTENDU) and (n_inter == lp.N_INTER_ATTENDU)
+    return (PASS if ok else FAIL,
+            {"n_intra": n_intra, "n_inter": n_inter,
+             "attendus": [lp.N_INTRA_ATTENDU, lp.N_INTER_ATTENDU],
+             "derivation": "30 × C(3,2) = 90 ; C(30,2) × 9 = 435 × 9 = 3915"})
+
+
+def gate_v_plat(courbes, b: int = 2000, seed: int = 0) -> tuple[str, dict]:
+    """`V-plat` (§4.7) : PLATE ssi `R_obs ≤ q_0.95(R*)`. **Aucune constante
+    posée** — le seuil est un quantile bootstrap. Une courbe PLATE ⇒ argmax non
+    interprété, le modèle sort du test joint."""
+    r = lp.v_plat(courbes, b=b, seed=seed)
+    det = {k: v for k, v in r.items() if k != "courbe_centree"}
+    return ("PLATE" if r["plate"] else "NON PLATE", det)
+
+
+def gate_v_bord_i2(l_star: int, L: int) -> tuple[str, dict]:
+    """`V-bord` (§4.7) : `ℓ*` en `ℓ = 1` ou `ℓ = L` ⇒ extremum au bord, la
+    quantité ne dit rien."""
+    au_bord = l_star in (1, L)
+    return ("AU BORD" if au_bord else "INTÉRIEUR", {"l_star": l_star, "L": L})
+
+
+def gate_v_lambda1(lambda1_par_couche, L: int) -> tuple[str, dict]:
+    """`V-λ₁` (§4.7, (v)) : λ₁/Σλ publié pour **toutes** les couches (0..L) —
+    absence ⇒ `H` DÉCLARÉE NON INTERPRÉTABLE, jamais « interprétée avec
+    prudence »."""
+    manquantes = [e for e in range(L + 1) if e not in lambda1_par_couche]
+    return (PASS if not manquantes else FAIL,
+            {"couches_manquantes": manquantes, "L": L,
+             "consequence_si_FAIL": "H non interprétable (le run reste valide "
+                                    "pour la primaire)"})
+
+
+def gate_v_amont(source: str, motifs=I2_MOTIFS_AMONT) -> tuple[str, dict]:
+    """`V-amont` (§4.7, remplace `V-vierge`) : aucun chiffre de v3 dans une
+    porte, un seuil ou une prédiction (D14-R)."""
+    trouves = [m for m in motifs if m in source]
+    return (PASS if not trouves else FAIL, {"motifs_trouves": trouves})
+
+
+def gate_v_1pass(compte_par_variante) -> tuple[str, dict]:
+    """`V-1pass` (§4.7) : **un** forward par (modèle, variante). > 1 ⇒
+    l'implémentation boucle sur les couches."""
+    mauvais = {k: v for k, v in compte_par_variante.items() if v != 1}
+    return (PASS if not mauvais else FAIL,
+            {"comptes": dict(compte_par_variante), "non_conformes": mauvais})
+
+
+def gate_v_hooks(hooks_restants: int, diff_engram: str = "",
+                 m_instanciee: bool = False) -> tuple[str, dict]:
+    """`V-hooks` (§4.7) : hooks retirés en `finally`, `git diff --stat engram/`
+    vide, `M` jamais instanciée."""
+    ok = (hooks_restants == 0) and (diff_engram.strip() == "") and not m_instanciee
+    return (PASS if ok else FAIL,
+            {"hooks_restants": hooks_restants,
+             "git_diff_engram": diff_engram.strip(), "M_instanciee": m_instanciee})
+
+
+def gate_v_L(L_mesure: int, L_attendu: int) -> tuple[str, dict]:
+    """`V-L` (§4.7) : `L` re-lu du config ; écart ⇒ **arrêt**."""
+    return (PASS if L_mesure == L_attendu else FAIL,
+            {"L_config": L_mesure, "L_attendu": L_attendu,
+             "consequence_si_FAIL": "ARRÊT du run"})
+
+
+def gate_v_suffixe(partage_par_type) -> tuple[str, dict]:
+    """`V-suffixe` (§4.7, rétrogradée en intégrité du matériel) : partage du
+    dernier token BPE **≈ 1.0 pour para3**, **≈ 0 pour para1 et para2**.
+
+    Vérifie que les règles gelées qui ont tourné sont celles décrites. Le banc
+    n'assouplit rien : il rapporte la valeur observée."""
+    p = dict(partage_par_type)
+    ok = (p.get("para3", 0.0) >= I2_VSUFFIXE_HAUT
+          and p.get("para1", 1.0) <= I2_VSUFFIXE_BAS
+          and p.get("para2", 1.0) <= I2_VSUFFIXE_BAS)
+    return (PASS if ok else FAIL,
+            {"partage": p, "attendu": {"para1": "≈ 0", "para2": "≈ 0",
+                                       "para3": "≈ 1.0"},
+             "seuils_declares": [I2_VSUFFIXE_BAS, I2_VSUFFIXE_HAUT]})
+
+
+def gate_v_hash_i2(avant: str, apres: str) -> tuple[str, dict]:
+    """`V-hash` (§4.7) : SHA-256 de (a) et (a′) avant/après."""
+    return (PASS if avant == apres else FAIL,
+            {"avant": avant[:16], "apres": apres[:16]})
+
+
+# ---------------------------------------------- invariances (M-1b et 0-2)
+
+def invariance_monotone(cos_intra, cos_inter, f) -> dict:
+    """LE test de M-1b : l'AUC est **inchangée** sous une transformation
+    strictement monotone appliquée **par couche**, alors que le ratio
+    `s_intra/s_inter` **change** sur les mêmes données."""
+    a, b = np.asarray(cos_intra, float), np.asarray(cos_inter, float)
+    fa, fb = f(a), f(b)
+    return {"auc": lp.auc_par_couche(a, b), "auc_transformee": lp.auc_par_couche(fa, fb),
+            "ratio": float(a.mean() / b.mean()),
+            "ratio_transforme": float(fa.mean() / fb.mean())}
+
+
+def gate_invariance_monotone(cos_intra, cos_inter, f) -> tuple[str, dict]:
+    d = invariance_monotone(cos_intra, cos_inter, f)
+    auc_egale = abs(d["auc"] - d["auc_transformee"]) <= I2_TOL_AUC
+    ratio_change = abs(d["ratio"] - d["ratio_transforme"]) > I2_TOL_AUC
+    d |= {"auc_egale": auc_egale, "ratio_change": ratio_change}
+    return (PASS if (auc_egale and ratio_change) else FAIL, d)
+
+
+def gate_invariance_lignes(X, facteurs, normalisation: str) -> tuple[str, dict]:
+    """Défaut 0-2 : `H` est inchangée sous mise à l'échelle des LIGNES **si et
+    seulement si** la normalisation Giraldo est appliquée."""
+    X = np.asarray(X, dtype=np.float64)
+    c = np.asarray(facteurs, dtype=np.float64)[:, None]
+    h0 = lp.entropie_matricielle(X, normalisation)
+    h1 = lp.entropie_matricielle(c * X, normalisation)
+    egal = abs(h1 - h0) <= I2_TOL_H * max(1.0, abs(h0))
+    return (PASS if egal else FAIL,
+            {"H": h0, "H_lignes_mises_a_l_echelle": h1, "ecart": abs(h1 - h0),
+             "normalisation": normalisation, "tol": I2_TOL_H})
+
+
+# ------------------------------------------------- hooks réels (torch, CPU)
+
+def _module_jouet():
+    """Petit module torch (CPU, 12 « blocs ») — aucun modèle HF, aucun poids
+    téléchargé : `V-hooks` et `V-1pass` s'exercent sur du vrai `nn.Module`."""
+    import torch
+    from torch import nn
+
+    class Bloc(nn.Module):
+        def __init__(self, d):
+            super().__init__()
+            self.lin = nn.Linear(d, d)
+
+        def forward(self, x):
+            return (self.lin(x),)
+
+    class Jouet(nn.Module):
+        def __init__(self, d=8, L=12):
+            super().__init__()
+            self.blocs = nn.ModuleList([Bloc(d) for _ in range(L)])
+
+        def forward(self, x):
+            for b in self.blocs:
+                x = b(x)[0]
+            return x
+
+    torch.manual_seed(0)
+    return Jouet()
+
+
+def _hooks_apres_capture(leve_exception: bool) -> tuple[str, dict]:
+    """Cas PASSANT de `V-hooks` : la capture retire ses hooks en `finally`,
+    **même quand le forward lève**."""
+    import torch
+    m = _module_jouet()
+    cap = lp.CaptureToutesCouches(m, m.blocs)
+    x = torch.zeros(4, 8)
+    try:
+        with cap:
+            cap.positions = None
+            if leve_exception:
+                raise RuntimeError("panne simulée pendant le forward")
+            with torch.no_grad():
+                m(x[:, None, :])
+    except RuntimeError:
+        pass
+    return gate_v_hooks(lp.compte_hooks(m))
+
+
+def _hooks_fuite() -> tuple[str, dict]:
+    """Cas ÉCHOUANT de `V-hooks` : un hook posé hors du `try/finally` survit."""
+    m = _module_jouet()
+    m.blocs[3].register_forward_hook(lambda *a: None)     # jamais retiré
+    return gate_v_hooks(lp.compte_hooks(m))
+
+
+def _forwards_un_passage() -> tuple[str, dict]:
+    """Cas PASSANT de `V-1pass` : L+1 couches profilées en UN forward."""
+    import torch
+    m = _module_jouet()
+    cap = lp.CaptureToutesCouches(m, m.blocs)
+    with cap:
+        cap.positions = None
+        with torch.no_grad():
+            m(torch.zeros(4, 1, 8))
+    return gate_v_1pass({"a": cap.n_forwards}) if cap.n_forwards else (FAIL, {})
+
+
+def _forwards_boucle_sur_les_couches() -> tuple[str, dict]:
+    """Cas ÉCHOUANT de `V-1pass` : une implémentation qui relance le forward
+    couche par couche."""
+    import torch
+    m = _module_jouet()
+    cap = lp.CaptureToutesCouches(m, m.blocs)
+    with cap:
+        cap.positions = None
+        with torch.no_grad():
+            for _ell in range(len(m.blocs)):
+                m(torch.zeros(4, 1, 8))
+    return gate_v_1pass({"a": cap.n_forwards})
+
+
+# ------------------------------------------------- bandes (§4.5) et cellules
+
+def bande_couverte(ic_max, planchers, ic_couches, seuil=lp.AUC_COULOIR_025):
+    """D18 : la partition V/M/N doit être EXHAUSTIVE. Rend « COUVERT » si
+    l'observation tombe dans une classe, « HORS-PARTITION » sinon. Le banc ne
+    comble aucun trou : combler serait amender."""
+    b = lp.bande_modele(ic_max, planchers, ic_couches, seuil)
+    return ("COUVERT" if b != lp.BANDE_HORS else lp.BANDE_HORS,
+            {"bande": b, "ic_max": list(ic_max), "planchers": list(planchers),
+             "seuil_couloir": seuil})
+
+
+def _bande(ic_max, planchers, ic_couches, seuil=lp.AUC_COULOIR_025):
+    return (lp.bande_modele(ic_max, planchers, ic_couches, seuil),
+            {"ic_max": list(ic_max), "planchers": list(planchers),
+             "n_couches": len(ic_couches), "seuil_couloir": seuil})
+
+
+def _cellule(lc, lh, L, plate_c=False, plate_h=False):
+    f = lp.fenetre_D3(L)
+    return (lp.cellule(lc, lh, f, L, plate_c, plate_h),
+            {"l_contrast": lc, "l_H": lh, "fenetre": list(f), "L": L,
+             "plate_contrast": plate_c, "plate_H": plate_h})
+
+
+# ------------------------------------------------------------ les cinq nulles
+
+def nulles_du_protocole(tokenize) -> dict:
+    """Les cinq nulles du §5, telles qu'elles seront produites — celles qui ne
+    demandent aucun forward sont CALCULÉES ici (maillon 1), les autres sont
+    exhibées comme matériel construit (maillons 2 et 4) ou comme clause
+    (maillons 3 et 5)."""
+    a = lp.corpus_a()
+    a_prime = lp.corpus_a_prime(tokenize)
+    prompts = [p for tr in a["paraphrases"] for p in tr]
+    prompts_ap = [p for tr in a_prime["paraphrases"] for p in tr]
+    filler = tokenize(lp.REMPLISSAGE_NEUTRE)[-1]
+    par_type = [[a["paraphrases"][i][t] for i in range(lp.N_UNITES)]
+                for t in range(lp.N_PARA)]
+    suff = lp.nulle_suffixe(par_type, tokenize, filler)
+    mel = lp.nulle_melangee(prompts, tokenize)
+    orig = [list(tokenize(p)) for p in prompts]
+    return {
+        "1_materiel_AUC_lex": {
+            "cout": "0 forward",
+            "AUC_lex": lp.auc_lex(prompts, tokenize),
+            "AUC_lex_a_prime_S3": lp.auc_lex(prompts_ap, tokenize)},
+        "2_capture_nulle_suffixe": {
+            "cout": "+1 forward",
+            "remplissage_gele": lp.REMPLISSAGE_NEUTRE,
+            "token_de_remplissage": filler,
+            "longueurs_preservees": all(
+                len(suff[t * lp.N_UNITES + i]) == len(orig[i * lp.N_PARA + t])
+                for i in range(lp.N_UNITES) for t in range(lp.N_PARA)),
+            "suffixes_communs_par_type": [
+                lp.suffixe_commun([list(tokenize(s)) for s in par_type[t]])
+                for t in range(lp.N_PARA)]},
+        "3_encodage_l0": {
+            "cout": "0",
+            "clause": "ℓ = 0 publié comme nulle « aucun calcul » et EXCLU de "
+                      "l'argmax décisionnel (§4.1)",
+            "couches_decisionnelles_L12": lp.couches_decisionnelles(12)},
+        "4_ordre_corpus_melange": {
+            "cout": "+1 forward",
+            "multiensembles_apparies": all(
+                sorted(mel[k]) == sorted(orig[k]) for k in range(len(orig))),
+            "longueurs_appariees": all(
+                len(mel[k]) == len(orig[k]) for k in range(len(orig))),
+            "position_de_capture": "dernier indice, inchangée"},
+        "5_statistique": {
+            "cout": "CPU",
+            "plancher": 0.5,
+            "bootstrap": f"par unité, B = {lp.B_BOOT}",
+            "permutation": "étiquettes d'unité entre paires, À COUCHE FIXÉE "
+                           "(les étiquettes de COUCHE ne sont pas échangeables)"},
+    }
+
+
+def build_clauses_i2(tokenize, tok_name):
+    """Registre I2 : **toutes** les portes du §4.7, les **quatre bandes** du
+    §4.5 et les **quatre cellules** du §4.8, chacune exhibée PASSANTE ET
+    ÉCHOUANTE, un cas par classe de la partition (D18), bords compris."""
+    C = []
+
+    def clause(name, pass_desc, fail_desc, cases_pass, cases_fail, structural=None,
+               note=None):
+        C.append({"clause": name, "pass_case": pass_desc, "fail_case": fail_desc,
+                  "cases_pass": cases_pass, "cases_fail": cases_fail,
+                  "structural": structural, "note": note})
+
+    a = lp.corpus_a()
+    a_prime = lp.corpus_a_prime(tokenize)
+
+    # ------------------------------------------------------------- V-div
+    clause("V-div",
+           "`pool.fact_pairs(30)` : S0/S1/S2 non vides dans ≥ 99.9 % des 10 000 "
+           "rééchantillonnages d'unités",
+           "le **jeu d'unités v3** doit ÉCHOUER (défaut 0-5 du protocole)",
+           [("fact_pairs(30) re-paraphrasé", PASS,
+             lambda: gate_v_div(a["slots"]))],
+           [("jeu d'unités v3 (strate S3)", FAIL,
+             lambda: gate_v_div(a_prime["slots"])),
+            ("corpus à une seule strate (S0 vide par construction)", FAIL,
+             lambda: gate_v_div([("o", "e", VERBS[i % 5]) for i in range(30)]))],
+           note=UNDERSPEC_I2["V-div"])
+
+    # ----------------------------------------------------------- V-paires
+    ni, ne = (len(x) for x in lp.paires_intra_inter())
+    clause("V-paires",
+           "les paires construites par l'instrument : 90 intra, 3915 inter",
+           "89 ou 91 paires intra ⇒ FAIL",
+           [("instrument réel", PASS, lambda: gate_v_paires(ni, ne))],
+           [("89 intra", FAIL, lambda: gate_v_paires(89, 3915)),
+            ("91 intra", FAIL, lambda: gate_v_paires(91, 3915)),
+            ("3914 inter", FAIL, lambda: gate_v_paires(90, 3914))])
+
+    # ------------------------------------------------------------ V-plat
+    g = _rng(11)
+    plate = g.normal(0, 0.02, (30, 13))
+    bosse = plate + np.array([0, .1, .2, .35, .5, .6, .55, .4, .3, .2, .1, 0, 0])
+    clause("V-plat",
+           "courbe synthétique à bosse : NON PLATE (au-dessus de `q_0.95(R*)`)",
+           "courbe synthétique de bruit seul : PLATE (sous `q_0.95(R*)`)",
+           [("bosse médiane", "NON PLATE", lambda: gate_v_plat(bosse))],
+           [("bruit seul", "PLATE", lambda: gate_v_plat(plate))],
+           note=UNDERSPEC_I2["V-plat"] + " Aucune constante posée : le seuil est "
+                "un quantile bootstrap (B = 10 000 au run, 2 000 au banc pour "
+                "le temps d'exécution — le seuil reste un quantile).")
+
+    # ------------------------------------------------------------ V-bord
+    clause("V-bord",
+           "`ℓ* = 6` sur L = 12 : INTÉRIEUR",
+           "`ℓ* = 1` et `ℓ* = L` : AU BORD (écrit d'avance comme le plus "
+           "probable pour `ℓ*_H`)",
+           [("ℓ* = 6, L = 12", "INTÉRIEUR", lambda: gate_v_bord_i2(6, 12)),
+            ("ℓ* = 2, L = 12 (bord+1)", "INTÉRIEUR", lambda: gate_v_bord_i2(2, 12)),
+            ("ℓ* = L−1", "INTÉRIEUR", lambda: gate_v_bord_i2(11, 12))],
+           [("ℓ* = 1", "AU BORD", lambda: gate_v_bord_i2(1, 12)),
+            ("ℓ* = L = 12", "AU BORD", lambda: gate_v_bord_i2(12, 12))])
+
+    # ------------------------------------------------------------- V-λ₁
+    clause("V-λ₁",
+           "λ₁/Σλ publié pour les 13 couches (0..12)",
+           "une couche manquante ⇒ FAIL ⇒ `H` NON INTERPRÉTABLE",
+           [("0..12 complet", PASS,
+             lambda: gate_v_lambda1({e: 0.1 for e in range(13)}, 12))],
+           [("couche 7 absente", FAIL,
+             lambda: gate_v_lambda1({e: 0.1 for e in range(13) if e != 7}, 12)),
+            ("ℓ = 0 absente", FAIL,
+             lambda: gate_v_lambda1({e: 0.1 for e in range(1, 13)}, 12))])
+
+    # ----------------------------------------------------------- V-amont
+    src = (Path(__file__).parent / "layer_profile.py").read_text(encoding="utf-8")
+    clause("V-amont",
+           "`eval/layer_profile.py` ne contient aucun chiffre de v3",
+           "une source qui pose un chiffre de v3 en seuil ⇒ FAIL",
+           [("source réelle de l'instrument", PASS, lambda: gate_v_amont(src))],
+           [("seuil posé sur une similarité de v3", FAIL,
+             lambda: gate_v_amont("SEUIL = 0.99989  # cos inter-unités")),
+            ("plancher de bruit de v3 recopié", FAIL,
+             lambda: gate_v_amont("plancher = 12/30"))])
+
+    # ----------------------------------------------------------- V-hooks
+    clause("V-hooks",
+           "les hooks des L blocs sont retirés en `finally`, y compris quand le "
+           "forward lève",
+           "un hook posé hors du `try/finally` survit ⇒ FAIL",
+           [("capture normale", PASS, lambda: _hooks_apres_capture(False)),
+            ("forward qui lève", PASS, lambda: _hooks_apres_capture(True))],
+           [("hook jamais retiré", FAIL, lambda: _hooks_fuite()),
+            ("engram/ modifié", FAIL,
+             lambda: gate_v_hooks(0, " engram/hippocampus.py | 3 +-")),
+            ("M instanciée", FAIL, lambda: gate_v_hooks(0, "", True))])
+
+    # ----------------------------------------------------------- V-1pass
+    clause("V-1pass",
+           "L+1 couches profilées en UN forward",
+           "une implémentation qui boucle sur les couches ⇒ FAIL",
+           [("un passage", PASS, lambda: _forwards_un_passage()),
+            ("quatre variantes à 1 forward", PASS,
+             lambda: gate_v_1pass({v: 1 for v in lp.VARIANTES}))],
+           [("boucle sur les 12 couches", FAIL,
+             lambda: _forwards_boucle_sur_les_couches()),
+            ("une variante à 2 forwards", FAIL,
+             lambda: gate_v_1pass({"a": 1, "a_prime": 2}))])
+
+    # --------------------------------------------------------------- V-L
+    clause("V-L",
+           "`L` re-lu du config == {12, 32, 28}",
+           "`L` différent du config ⇒ ARRÊT",
+           [(f"L = {v} pour {k}", PASS, (lambda v=v: gate_v_L(v, v)))
+            for k, v in lp.L_ATTENDU.items()],
+           [("L = 11 contre 12 attendu", FAIL, lambda: gate_v_L(11, 12)),
+            ("L = 24 contre 28 attendu", FAIL, lambda: gate_v_L(24, 28))])
+
+    # --------------------------------------------------------- V-suffixe
+    partages = {t: lp.partage_dernier_token(
+        [a["paraphrases"][i][k] for i in range(lp.N_UNITES)], tokenize)
+        for k, t in enumerate(lp.POOL_PARAPHRASE_TYPES)}
+    clause("V-suffixe",
+           "partage du dernier token BPE ≈ 1.0 pour para3 et ≈ 0 pour "
+           "para1/para2, MESURÉ sur les règles gelées qui ont tourné",
+           "un matériel où para3 ne partage pas son dernier token ⇒ FAIL",
+           [("règles gelées réelles (a)", PASS, lambda: gate_v_suffixe(partages))],
+           [("para3 sans suffixe commun", FAIL,
+             lambda: gate_v_suffixe({"para1": 0.0, "para2": 0.0, "para3": 0.1})),
+            ("para1 à suffixe constant", FAIL,
+             lambda: gate_v_suffixe({"para1": 1.0, "para2": 0.0, "para3": 1.0}))],
+           note=UNDERSPEC_I2["V-suffixe"] + " Valeurs observées sur (a) : "
+                + ", ".join(f"{k} = {v:.4f}" for k, v in partages.items()))
+
+    # ----------------------------------------------------------- V-hash
+    h_a, h_ap = lp.sha256_corpus(a), lp.sha256_corpus(a_prime)
+    clause("V-hash",
+           "SHA-256 de (a) et (a′) identiques avant/après",
+           "un corpus modifié en cours de run ⇒ FAIL",
+           [("(a) inchangé", PASS, lambda: gate_v_hash_i2(h_a, lp.sha256_corpus(a))),
+            ("(a′) inchangé", PASS,
+             lambda: gate_v_hash_i2(h_ap, lp.sha256_corpus(a_prime)))],
+           [("(a) vs (a′)", FAIL, lambda: gate_v_hash_i2(h_a, h_ap))])
+
+    # ------------------------------- M-1b : invariance monotone de l'AUC
+    gm = _rng(12)
+    ci = np.clip(gm.normal(0.70, 0.10, lp.N_INTRA_ATTENDU), -1, 1)
+    ce = np.clip(gm.normal(0.60, 0.10, lp.N_INTER_ATTENDU), -1, 1)
+    cube = lambda x: x ** 3                                        # noqa: E731
+    sig = lambda x: 1.0 / (1.0 + np.exp(-(3.0 * x + 0.5)))         # noqa: E731
+    decr = lambda x: -x                                            # noqa: E731
+    clause("Invariance monotone de l'AUC (M-1b)",
+           "`x → x³` et `x → σ(3x+0.5)` : AUC INCHANGÉE, ratio CHANGÉ",
+           "une transformation DÉCROISSANTE change l'AUC ⇒ FAIL (la clause porte "
+           "sur les transformations strictement CROISSANTES)",
+           [("x → x³", PASS, lambda: gate_invariance_monotone(ci, ce, cube)),
+            ("x → σ(3x+0.5)", PASS, lambda: gate_invariance_monotone(ci, ce, sig))],
+           [("x → −x (décroissante)", FAIL,
+             lambda: gate_invariance_monotone(ci, ce, decr))],
+           note="LE test qui matérialise le défaut 0-1 : le score en RATIO se "
+                "déplace sous la même transformation, l'AUC non. C'est pourquoi "
+                "l'anisotropie ne peut pas déplacer l'argmax de l'AUC.")
+
+    # ------------------------------- 0-2 : normalisation Giraldo de H
+    gh = _rng(13)
+    Xh = gh.normal(size=(24, 9))
+    fac = gh.uniform(0.1, 10.0, 24)
+    clause("Entropie — normalisation des lignes (défaut 0-2)",
+           "convention **Giraldo** (`A_ij = K_ij/(n√(K_ii K_jj))`, `tr(A) = 1`) : "
+           "`H` inchangée sous mise à l'échelle des lignes",
+           "normalisation par la seule trace (`A = K/tr K`) : `H` CHANGE — `H` "
+           "est alors confondue avec le profil de normes",
+           [("giraldo", PASS,
+             lambda: gate_invariance_lignes(Xh, fac, "giraldo")),
+            ("giraldo, facteurs extrêmes", PASS,
+             lambda: gate_invariance_lignes(Xh, np.linspace(1e-2, 1e2, 24),
+                                            "giraldo"))],
+           [("trace seule", FAIL,
+             lambda: gate_invariance_lignes(Xh, fac, "trace"))],
+           note="`tr(A) = 1` par construction sous Giraldo. La normalisation des "
+                "lignes est REQUISE (§3, M-2).")
+
+    # --------------------------------------- bandes V / M / N / D (§4.5)
+    pl = [0.5, 0.60, 0.55]          # planchers du §5, valeurs SYNTHÉTIQUES
+    seuil = lp.AUC_COULOIR_025
+    haut = [(0.97, 0.99)] * 12
+    bas = [(0.45, 0.62)] * 12
+    moy = [(0.70, 0.80)] * 12
+    clause("Bande V — viable (§4.5)",
+           "IC inf ≥ 0.9622 (borne INCLUSE : cas au bord exhibé)",
+           "IC inf sous le seuil ⇒ ce n'est plus V",
+           [("IC [0.97, 0.99]", lp.BANDE_V, lambda: _bande((0.97, 0.99), pl, haut)),
+            ("IC inf EXACTEMENT au seuil", lp.BANDE_V,
+             lambda: _bande((seuil, 0.99), pl, haut))],
+           [("IC inf 1e-12 sous le seuil", lp.BANDE_M,
+             lambda: _bande((seuil - 1e-12, seuil - 1e-13), pl, haut)),
+            ("IC [0.70, 0.80]", lp.BANDE_M, lambda: _bande((0.70, 0.80), pl, moy))])
+
+    clause("Bande M — marginal (§4.5)",
+           "IC inf > plancher le plus haut ET IC sup < 0.9622",
+           "IC sup au seuil, ou IC inf sur le plancher ⇒ ce n'est plus M",
+           [("IC [0.70, 0.80]", lp.BANDE_M, lambda: _bande((0.70, 0.80), pl, moy)),
+            ("IC inf 1e-12 au-dessus du plancher le plus haut", lp.BANDE_M,
+             lambda: _bande((max(pl) + 1e-12, 0.9), pl, moy)),
+            ("IC sup 1e-12 sous le seuil", lp.BANDE_M,
+             lambda: _bande((0.8, seuil - 1e-12), pl, moy))],
+           [("IC inf EXACTEMENT sur le plancher le plus haut", lp.BANDE_N,
+             lambda: _bande((max(pl), 0.9), pl, [(max(pl), 0.9)] * 12)),
+            ("IC inf au seuil ⇒ V", lp.BANDE_V,
+             lambda: _bande((seuil, 0.99), pl, haut))])
+
+    clause("Bande N — nulle (§4.5)",
+           "IC ∩ [planchers] ≠ ∅ à TOUTES les couches",
+           "une seule couche dont l'IC est disjoint des planchers ⇒ ce n'est plus N",
+           [("IC [0.45, 0.62] partout", lp.BANDE_N,
+             lambda: _bande((0.45, 0.62), pl, bas)),
+            ("IC qui touche le plancher le plus haut par son bord", lp.BANDE_N,
+             lambda: _bande((max(pl), 0.7), pl, [(max(pl), 0.7)] * 12))],
+           [("une couche disjointe des planchers", lp.BANDE_M,
+             lambda: _bande((0.70, 0.80), pl, moy[:11] + [(0.70, 0.80)]))])
+
+    clause("Bande D — dissocié (§4.5)",
+           "bandes différentes entre GPT-2 et SmolLM2",
+           "bandes identiques ⇒ la gate rend cette bande-là, pas D",
+           [("V vs M", lp.BANDE_D, lambda: (lp.bande_gate(lp.BANDE_V, lp.BANDE_M), {})),
+            ("N vs M", lp.BANDE_D, lambda: (lp.bande_gate(lp.BANDE_N, lp.BANDE_M), {})),
+            ("V vs N", lp.BANDE_D, lambda: (lp.bande_gate(lp.BANDE_V, lp.BANDE_N), {}))],
+           [("V et V", lp.BANDE_V, lambda: (lp.bande_gate(lp.BANDE_V, lp.BANDE_V), {})),
+            ("N et N", lp.BANDE_N,
+             lambda: (lp.bande_gate(lp.BANDE_N, lp.BANDE_N), {}))])
+
+    clause("Bandes V/M/N — exhaustivité de la partition (D18)",
+           "toute observation tombe dans V, M ou N",
+           "une observation qu'aucune des trois clauses ne couvre ⇒ la partition "
+           "n'est pas exhaustive",
+           [("IC [0.97, 0.99]", "COUVERT", lambda: bande_couverte((0.97, 0.99), pl, haut)),
+            ("IC [0.70, 0.80]", "COUVERT", lambda: bande_couverte((0.70, 0.80), pl, moy)),
+            ("IC [0.45, 0.62]", "COUVERT", lambda: bande_couverte((0.45, 0.62), pl, bas)),
+            ("IC [0.90, 0.99] — chevauche le seuil du couloir", "COUVERT",
+             lambda: bande_couverte((0.90, 0.99), pl, moy)),
+            ("IC sup EXACTEMENT au seuil", "COUVERT",
+             lambda: bande_couverte((0.80, seuil), pl, moy))],
+           [("IC dégénéré [0.9622, 0.9622]", "COUVERT",
+             lambda: bande_couverte((seuil, seuil), pl, moy))],
+           note="clause de couverture : elle n'attribue aucune bande, elle "
+                "vérifie que la partition du §4.5 ne laisse pas de trou (D18).")
+
+    # -------------------------------------- cellules C1 / C2 / C3 / C4
+    clause("Cellule C1 (§4.8)",
+           "les deux argmax dans la fenêtre D3, courbes non plates",
+           "un seul dans la fenêtre ⇒ C2",
+           [("ℓ*_c = 6, ℓ*_H = 6 (L = 12, fenêtre [5,7])", "C1",
+             lambda: _cellule(6, 6, 12)),
+            ("bords de fenêtre : 5 et 7", "C1", lambda: _cellule(5, 7, 12)),
+            ("SmolLM2 : 14 et 18 (fenêtre [14,18])", "C1",
+             lambda: _cellule(14, 18, 32))],
+           [("ℓ*_c = 6, ℓ*_H = 4", "C2", lambda: _cellule(6, 4, 12)),
+            ("juste hors fenêtre : 4 et 8", "C3", lambda: _cellule(4, 8, 12))])
+
+    clause("Cellule C2 (§4.8)",
+           "exactement un des deux dans la fenêtre",
+           "les deux dedans ⇒ C1 ; aucun ⇒ C3",
+           [("ℓ*_c dedans, ℓ*_H dehors", "C2", lambda: _cellule(6, 4, 12)),
+            ("ℓ*_c dehors, ℓ*_H dedans", "C2", lambda: _cellule(9, 5, 12))],
+           [("les deux dedans", "C1", lambda: _cellule(5, 7, 12)),
+            ("aucun des deux", "C3", lambda: _cellule(3, 9, 12))],
+           note="évidence FAIBLE (M-6) : s'écrit « compatible avec », jamais "
+                "« démontré » ; nommer laquelle.")
+
+    clause("Cellule C3 (§4.8)",
+           "ni l'une ni l'autre dans la fenêtre",
+           "au moins un dedans ⇒ C1 ou C2",
+           [("3 et 9", "C3", lambda: _cellule(3, 9, 12)),
+            ("Qwen : 5 et 20 (fenêtre [12,16])", "C3", lambda: _cellule(5, 20, 28))],
+           [("un dedans", "C2", lambda: _cellule(6, 9, 12)),
+            ("les deux dedans", "C1", lambda: _cellule(6, 6, 12))])
+
+    clause("Cellule C4 (§4.8)",
+           "au moins une courbe PLATE ou un argmax AU BORD ⇒ le modèle sort du "
+           "test joint",
+           "aucune platitude, aucun bord ⇒ C1/C2/C3",
+           [("ℓ*_H = 1 (bord)", "C4", lambda: _cellule(6, 1, 12)),
+            ("ℓ*_c = L (bord)", "C4", lambda: _cellule(12, 6, 12)),
+            ("courbe de contraste PLATE", "C4",
+             lambda: _cellule(6, 6, 12, plate_c=True)),
+            ("courbe H PLATE", "C4", lambda: _cellule(6, 6, 12, plate_h=True))],
+           [("intérieur, non plates", "C1", lambda: _cellule(6, 6, 12)),
+            ("intérieur hors fenêtre, non plates", "C3",
+             lambda: _cellule(3, 9, 12))],
+           note="pré-écrite comme la plus probable pour `ℓ*_H` (N-P4).")
+
+    # ------------------------------------------ w(L) et indexation (§4.1)
+    clause("w(L) et fenêtre D3",
+           "`w(L) = max(1, ⌊L/12⌋)` rend 1 / 2 / 2 pour L = 12 / 32 / 28",
+           "une fenêtre calculée sur `L/2 ± 1` partout ⇒ FAIL sur L = 32",
+           [("w(12), w(32), w(28)", PASS,
+             lambda: (PASS if [lp.w_of_L(L) for L in (12, 32, 28)] == [1, 2, 2]
+                      else FAIL,
+                      {"w": [lp.w_of_L(L) for L in (12, 32, 28)],
+                       "fenetres": [list(lp.fenetre_D3(L)) for L in (12, 32, 28)],
+                       "bornes_multiplicite": [round(lp.borne_multiplicite(L), 3)
+                                               for L in (12, 32, 28)]}))],
+           [("w constant = 1", FAIL,
+             lambda: (PASS if [1, 1, 1] == [lp.w_of_L(L) for L in (12, 32, 28)]
+                      else FAIL, {"w_pose": [1, 1, 1]}))])
+
+    clause("Indexation ℓ = 0 exclue de l'argmax (§4.1)",
+           "un maximum en `ℓ = 0` n'est PAS choisi : l'argmax se cherche sur [1, L]",
+           "un argmax cherché sur [0, L] rendrait 0",
+           [("courbe maximale en ℓ = 0", PASS,
+             lambda: (PASS if lp.argmax_decisionnel([0.9] + [0.6] * 12) != 0
+                      else FAIL,
+                      {"argmax_decisionnel": lp.argmax_decisionnel(
+                          [0.9] + [0.6] * 12),
+                       "couches": lp.couches_decisionnelles(12)}))],
+           [("argmax naïf sur [0, L]", FAIL,
+             lambda: (PASS if int(np.argmax([0.9] + [0.6] * 12)) != 0 else FAIL,
+                      {"argmax_naif": int(np.argmax([0.9] + [0.6] * 12))}))])
+
+    # ----------------------------------------- stratification (§4.2, D18)
+    clause("Stratification S0 / S1 / S2",
+           "le classifieur de l'instrument range le jeu de référence en "
+           "S0 / S1 / S2, recensement publié",
+           "un classifieur qui ignore le verbe range une paire S2 en S1 ⇒ FAIL",
+           [("classifieur de l'instrument", PASS,
+             lambda: gate_stratification(lp.stratifier)),
+            ("recensement de (a) publié avant mesure", PASS,
+             lambda: (PASS, {"recensement_a": lp.stratifier(a["slots"])["recensement"],
+                             "paires_S2_de_a": [list(p) for p in lp.stratifier(
+                                 a["slots"])["paires_par_strate"]["S2"]],
+                             "recensement_a_prime": lp.stratifier(
+                                 a_prime["slots"])["recensement"]}))],
+           [("classifieur aveugle au verbe", FAIL,
+             lambda: gate_stratification(_stratifier_sans_verbe))],
+           note="recensement de (a) publié dans le rapport, AVANT mesure (§4.7).")
+
+    # ------------------------------------------ Recall@1 (§4.3, §4.4, N-8)
+    gr = _rng(14)
+    base = gr.normal(size=(lp.N_UNITES, 6))
+    serre = np.repeat(base, 3, axis=0) + 0.01 * gr.normal(size=(90, 6))
+    lache = gr.normal(size=(90, 6))
+    lab = np.repeat(np.arange(lp.N_UNITES), 3)
+    clause("Recall@1 indice ↔ indice (N-8)",
+           "états serrés par unité ⇒ Recall@1 = 1.0 en cosinus ET en L2",
+           "états indépendants de l'unité ⇒ Recall@1 s'effondre",
+           [("états serrés, cos", PASS,
+             lambda: (PASS if recall_i2(serre, lab, "cos") == 1.0 else FAIL,
+                      {"recall": recall_i2(serre, lab, "cos")})),
+            ("états serrés, L2", PASS,
+             lambda: (PASS if recall_i2(serre, lab, "l2") == 1.0 else FAIL,
+                      {"recall": recall_i2(serre, lab, "l2")}))],
+           [("états indépendants, cos", FAIL,
+             lambda: (PASS if recall_i2(lache, lab, "cos") > 0.5 else FAIL,
+                      {"recall": recall_i2(lache, lab, "cos")}))],
+           note="indice↔indice UNIQUEMENT : mesurer une quantité indice↔fait est "
+                "un motif d'invalidation du run (§4.4, §6).")
+
+    # ------------------------------------------------ nulle statistique (§5)
+    gs = _rng(15)
+    clause("Nulle statistique (§5, maillon 5)",
+           "sous H₀ (intra et inter tirés de la même loi) l'AUC observée est "
+           "sous `q_0.95` de la permutation des étiquettes d'unité",
+           "un décalage réel place l'AUC au-dessus de `q_0.95`",
+           [("intra ≡ inter", PASS,
+             lambda: (lambda r: (PASS if r["auc_observee"] <= r["q_0.95"] else FAIL,
+                                 {k: v for k, v in r.items()
+                                  if k != "echantillons"}))(
+                 lp.permutation_etiquettes_unite(gs.normal(0.6, 0.1, 90),
+                                                 gs.normal(0.6, 0.1, 3915), b=400)))],
+           [("intra décalé de +0.3", FAIL,
+             lambda: (lambda r: (PASS if r["auc_observee"] <= r["q_0.95"] else FAIL,
+                                 {k: v for k, v in r.items()
+                                  if k != "echantillons"}))(
+                 lp.permutation_etiquettes_unite(gs.normal(0.9, 0.1, 90),
+                                                 gs.normal(0.6, 0.1, 3915), b=400)))],
+           note="permutation des étiquettes d'UNITÉ À COUCHE FIXÉE ; la "
+                "permutation des étiquettes de COUCHE est invalide (M-4).")
+
+    # ------------------------------------------------- bootstrap par unité
+    clause("Bootstrap PAR UNITÉ (§4.3)",
+           "l'IC publié est celui du rééchantillonnage **par unité**",
+           "l'IC du rééchantillonnage par PAIRE (interdit) ⇒ FAIL — et les deux "
+           "largeurs diffèrent, donc la clause n'est pas vacuée",
+           [("schéma « unité »", PASS, lambda: _cas_bootstrap("unite"))],
+           [("schéma « paire » (interdit)", FAIL, lambda: _cas_bootstrap("paire"))],
+           note="l'unité de rééchantillonnage est l'unité factuelle, JAMAIS la "
+                "paire (§4.3). Les deux largeurs sont publiées dans le détail : "
+                "sur des unités à effet propre, le bootstrap par paire ignore le "
+                "regroupement et rétrécit l'IC.")
+
+    return C
+
+
+def recall_i2(X, lab, metrique):
+    return lp.recall_at_1(X, lab, metrique)
+
+
+# Jeu de référence et étiquettes attendues, DÉRIVÉES À LA MAIN de la définition
+# du §4.2 (nombre de slots de contenu partagés), jamais du classifieur testé.
+# La paire (0, 4) ne partage QUE l'owner et le verbe : c'est elle qui mord sur un
+# classifieur aveugle au verbe.
+JEU_STRAT_REFERENCE = [("o1", "e1", "v1"), ("o2", "e2", "v2"),
+                       ("o1", "e3", "v3"), ("o1", "e1", "v4"),
+                       ("o1", "e5", "v1")]
+STRAT_ATTENDU = {(0, 1): "S0", (0, 2): "S1", (0, 3): "S2", (0, 4): "S2",
+                 (1, 2): "S0", (1, 3): "S0", (1, 4): "S0",
+                 (2, 3): "S1", (2, 4): "S1", (3, 4): "S1"}
+
+
+def _stratifier_sans_verbe(slots) -> dict:
+    """Classifieur FAUTIF (contre-exemple échouant) : il ne regarde que l'owner
+    et l'entité, donc il range une paire owner+verbe en S1 au lieu de S2."""
+    return lp.stratifier([(o, e, object()) for o, e, _v in slots])
+
+
+def gate_stratification(classifieur, jeu=None, attendu=None) -> tuple[str, dict]:
+    """Le classifieur range-t-il le jeu de référence exactement comme la
+    définition du §4.2 (nombre de slots de contenu partagés) ?"""
+    jeu = JEU_STRAT_REFERENCE if jeu is None else jeu
+    attendu = STRAT_ATTENDU if attendu is None else attendu
+    obs = classifieur(jeu)["paires"]
+    ecarts = {str(p): [attendu[p], obs[p]] for p in attendu if obs[p] != attendu[p]}
+    return (PASS if not ecarts else FAIL,
+            {"attendu": {str(k): v for k, v in attendu.items()},
+             "observe": {str(k): v for k, v in obs.items()}, "ecarts": ecarts})
+
+
+def _cas_bootstrap(schema: str) -> tuple[str, dict]:
+    """Les deux schémas sur les MÊMES données (unités à effet propre) : le
+    schéma publié doit être « unité ». Les largeurs sont publiées pour montrer
+    que la clause n'est pas vacuée par satisfaction."""
+    g = _rng(16)
+    effet = g.normal(0.0, 0.08, lp.N_UNITES)          # effet propre par unité
+    ci = 0.70 + effet[:, None] + g.normal(0, 0.01, (lp.N_UNITES, 3))
+    ce = 0.60 + 0.5 * (effet[:, None, None] + effet[None, :, None]) \
+        + g.normal(0, 0.01, (lp.N_UNITES, lp.N_UNITES, 9))
+    r_u = lp.bootstrap_par_unite(lp.auc_stat_fn(ci, ce), lp.N_UNITES, b=300, seed=0)
+    largeur_u = r_u["ic_haut"] - r_u["ic_bas"]
+    a_ = ci.ravel()
+    i, j = np.triu_indices(lp.N_UNITES, k=1)
+    b_ = ce[i, j].ravel()
+    rng = np.random.default_rng(0)
+    ech = np.array([lp.auc_par_couche(a_[rng.integers(0, a_.size, a_.size)],
+                                      b_[rng.integers(0, b_.size, b_.size)])
+                    for _ in range(300)])
+    lo, hi = np.percentile(ech, [2.5, 97.5])
+    largeur_p = float(hi - lo)
+    det = {"schema": schema, "largeur_par_unite": largeur_u,
+           "largeur_par_paire": largeur_p,
+           "largeurs_distinctes": bool(abs(largeur_u - largeur_p) > 1e-9),
+           "ic_par_unite": [r_u["ic_bas"], r_u["ic_haut"]],
+           "ic_par_paire": [float(lo), float(hi)], "B": 300}
+    ok = (schema == "unite") and det["largeurs_distinctes"]
+    return (PASS if ok else FAIL, det)
+
+
+# =========================================================================
 #  Usage méta borné : portes d'INTÉGRITÉ SEULES sur les bruts archivés
 # =========================================================================
 
@@ -1785,11 +2590,9 @@ def _unit_set_facts(tokenize) -> dict:
     }
 
 
-def run(use_hf: bool = True, out_dir: Path = OUT_DIR) -> dict:
-    t0 = time.time()
-    tokenize, tok_name = make_tokenizer(use_hf)
-    clauses = build_clauses(tokenize, tok_name)
-
+def _evaluer(clauses) -> tuple[list, int]:
+    """Boucle d'évaluation commune aux deux suites : pour chaque clause, tous les
+    contre-exemples passants et échouants, puis le compte `E`."""
     rows, E = [], 0
     for c in clauses:
         exp_p, obs_p, det_p, ok_p = [], [], [], []
@@ -1838,6 +2641,14 @@ def run(use_hf: bool = True, out_dir: Path = OUT_DIR) -> dict:
             "note": c["note"],
             "cas": {"pass_case": det_p, "fail_case": det_f},
         })
+    return rows, E
+
+
+def run(use_hf: bool = True, out_dir: Path = OUT_DIR) -> dict:
+    t0 = time.time()
+    tokenize, tok_name = make_tokenizer(use_hf)
+    clauses = build_clauses(tokenize, tok_name)
+    rows, E = _evaluer(clauses)
 
     n_cov = sum(1 for r in rows if r["expected"]["pass_case"]
                 and r["expected"]["fail_case"])
@@ -1881,17 +2692,147 @@ def run(use_hf: bool = True, out_dir: Path = OUT_DIR) -> dict:
     return report
 
 
+def run_i2(use_hf: bool = True, out_dir: Path = OUT_DIR_I2) -> dict:
+    """Banc de satisfiabilité d'I2 (`EXP-2026-08-22-layer-profile.md`)."""
+    t0 = time.time()
+    tokenize, tok_name = make_tokenizer(use_hf)
+    clauses = build_clauses_i2(tokenize, tok_name)
+    rows, E = _evaluer(clauses)
+
+    a = lp.corpus_a()
+    a_prime = lp.corpus_a_prime(tokenize)
+    n_cov = sum(1 for r in rows if r["expected"]["pass_case"]
+                and r["expected"]["fail_case"])
+    rec_a = lp.stratifier(a["slots"])
+    rec_ap = lp.stratifier(a_prime["slots"])
+    report = {
+        "protocole": "experiments/EXP-2026-08-22-layer-profile.md",
+        "statut_protocole": "PROPOSE — gate de pré-enregistrement NON franchie",
+        "banc": "D14-S — satisfiabilité I2, CPU seul, aucune mesure, aucun modèle",
+        "tokenizer": tok_name,
+        "E": int(E),
+        "n_clauses": len(rows),
+        "couverture": {"clauses_avec_les_deux_contre_exemples": n_cov,
+                       "total": len(rows),
+                       "pct": round(100.0 * n_cov / len(rows), 2)},
+        "n_cas": sum(len(r["cas"]["pass_case"]) + len(r["cas"]["fail_case"])
+                     for r in rows),
+        "corpus": {
+            "a": {"source": "pool.fact_pairs(30) re-paraphrasé (§4.2)",
+                  "sha256": lp.sha256_corpus(a),
+                  "owners": len({s[0] for s in a["slots"]}),
+                  "entites": len({s[1] for s in a["slots"]}),
+                  "verbes": len({s[2] for s in a["slots"]}),
+                  "recensement_strates": rec_a["recensement"],
+                  "paires_S2": [list(p) for p in rec_a["paires_par_strate"]["S2"]]},
+            "a_prime_S3": {"source": "jeu d'unités v3, tel quel (§4.2)",
+                           "sha256": lp.sha256_corpus(a_prime),
+                           "owners": len({s[0] for s in a_prime["slots"]}),
+                           "entites": len({s[1] for s in a_prime["slots"]}),
+                           "verbes": len({s[2] for s in a_prime["slots"]}),
+                           "recensement_strates": rec_ap["recensement"]},
+        },
+        "paires": {"n_intra": len(lp.paires_intra_inter()[0]),
+                   "n_inter": len(lp.paires_intra_inter()[1]),
+                   "attendus": [lp.N_INTRA_ATTENDU, lp.N_INTER_ATTENDU]},
+        "couloir_v4_redérivé": {
+            "s": lp.S_LEURRES,
+            "A_pour_recall_0.50_contre_36": lp.AUC_COULOIR_050,
+            "A_pour_recall_0.25_contre_36": lp.AUC_COULOIR_025,
+            "A_pour_recall_0.50_contre_29": lp.AUC_COULOIR_050_29},
+        "fenetres": {str(k): {"L": v, "w": lp.w_of_L(v),
+                              "fenetre_D3": list(lp.fenetre_D3(v)),
+                              "borne_multiplicite": round(lp.borne_multiplicite(v), 4)}
+                     for k, v in lp.L_ATTENDU.items()},
+        "cinq_nulles": nulles_du_protocole(tokenize),
+        "clauses_sous_specifiees": UNDERSPEC_I2,
+        "duree_s": round(time.time() - t0, 2),
+        "clauses": rows,
+    }
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / "report.json").write_text(
+        json.dumps(report, ensure_ascii=False, indent=1, default=str),
+        encoding="utf-8")
+    return report
+
+
+def _imprimer(rep: dict) -> None:
+    print(f"tokenizer : {rep['tokenizer']}")
+    print(f"clauses   : {rep['n_clauses']}  |  cas exécutés : {rep['n_cas']}  "
+          f"|  couverture : {rep['couverture']['pct']} %")
+    print(f"durée     : {rep['duree_s']} s")
+    print("-" * 78)
+    for r in rep["clauses"]:
+        mark = "ok " if not r["compte_dans_E"] else "E !"
+        print(f"[{mark}] {r['clause']}")
+        for side in ("pass_case", "fail_case"):
+            for d in r["cas"][side]:
+                flag = "  " if d["ok"] else "!!"
+                print(f"      {flag} {side:9} {d['cas'][:62]:<62} "
+                      f"→ {d['observé']!r}")
+        for reason in r["raisons_E"]:
+            print(f"      >>> {reason}")
+    print("-" * 78)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--no-hf", action="store_true",
                     help="repli mot-à-mot au lieu du tokenizer GPT-2")
-    ap.add_argument("--out", default=str(OUT_DIR))
+    ap.add_argument("--suite", default="v3", choices=("v3", "i2", "all"),
+                    help="v3 = V2-D(a) v3 (défaut, inchangé) ; i2 = layer_profile")
+    ap.add_argument("--out", default=None)
     args = ap.parse_args()
+
+    if args.suite in ("i2", "all"):
+        out_i2 = Path(args.out) if (args.out and args.suite == "i2") else OUT_DIR_I2
+        print("=" * 78)
+        print("BANC DE SATISFIABILITÉ (D14-S) — EXP-2026-08-22-layer-profile (I2)")
+        print("AUCUNE MESURE, AUCUN GPU, AUCUN MODÈLE. CPU seul.")
+        print("=" * 78)
+        rep_i2 = run_i2(use_hf=not args.no_hf, out_dir=out_i2)
+        _imprimer(rep_i2)
+        c = rep_i2["corpus"]
+        print(f"corpus (a)  : {c['a']['source']} — {c['a']['owners']} owners, "
+              f"{c['a']['entites']} entités, {c['a']['verbes']} verbes")
+        print(f"              recensement des strates : {c['a']['recensement_strates']}")
+        print(f"              paires S2 : {c['a']['paires_S2']}")
+        print(f"corpus (a′) : {c['a_prime_S3']['source']} — "
+              f"{c['a_prime_S3']['owners']} owners, {c['a_prime_S3']['entites']} "
+              f"entités, {c['a_prime_S3']['verbes']} verbes")
+        print(f"              recensement des strates : "
+              f"{c['a_prime_S3']['recensement_strates']}")
+        print(f"paires      : {rep_i2['paires']}")
+        print(f"couloir v4  : {rep_i2['couloir_v4_redérivé']}")
+        print(f"fenêtres    : {rep_i2['fenetres']}")
+        n1 = rep_i2["cinq_nulles"]
+        print(f"nulle 1 (AUC_lex, 0 forward) : "
+              f"{n1['1_materiel_AUC_lex']['AUC_lex']:.4f}")
+        print(f"nulle 2 (suffixe) : longueurs préservées = "
+              f"{n1['2_capture_nulle_suffixe']['longueurs_preservees']}")
+        print(f"nulle 4 (mélangée) : multiensembles appariés = "
+              f"{n1['4_ordre_corpus_melange']['multiensembles_apparies']}")
+        for k, v in rep_i2["clauses_sous_specifiees"].items():
+            print(f"sous-spécifiée : {k} — {v}")
+        print("-" * 78)
+        print(f"E(I2) = {rep_i2['E']}")
+        if rep_i2["E"] == 0:
+            print("E = 0 — gate de satisfiabilité I2 VERTE.")
+        else:
+            bad = [r["clause"] for r in rep_i2["clauses"] if r["compte_dans_E"]]
+            print(f"E ≥ 1 — gate NON franchie. Clauses en cause : {bad}")
+            print("Le banc ne corrige AUCUNE clause : amender est une décision de "
+                  "pré-enregistrement, pas d'implémentation.")
+        print(f"rapport : {out_i2 / 'report.json'}")
+        if args.suite == "i2":
+            return 0
+        print("=" * 78)
 
     print("=" * 78)
     print("BANC DE SATISFIABILITÉ (D14-S) — EXP-2026-08-22-knn-borne-logits-v3")
     print("AUCUNE MESURE, AUCUN GPU, AUCUN MODÈLE. CPU seul.")
     print("=" * 78)
+    args.out = args.out or str(OUT_DIR)
     rep = run(use_hf=not args.no_hf, out_dir=Path(args.out))
     print(f"tokenizer : {rep['tokenizer']}")
     print(f"clauses   : {rep['n_clauses']}  |  cas exécutés : {rep['n_cas']}  "
