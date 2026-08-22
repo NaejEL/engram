@@ -1206,6 +1206,108 @@ Modèle d'entrée :
 - *Modèles : director.cadrage inherit, director.interpretation fable, math fable,
   neuro inherit, builder inherit, verifier non sollicité (aucune mesure à vérifier).*
 
+## 2026-08-22 — V2-D(a) v3 : arrêt P3, instrument sans étape d'adressage — INCONCLUSIF
+
+- **Commit** : non commité au moment de la rédaction (bruts dans
+  `experiments/results/knn-borne-logits-v3/`, hashés ; nouveau `tests/test_knn_ceiling_v3.py` ;
+  `eval/knn_ceiling.py` amendé de façon purement additive, `--protocol v3`)
+- **Config** : `model=gpt2`, `layer=6`, défauts `EngramConfig()` sinon ; `knn_lambda = λ* = 1−e^(−0.05)`,
+  `knn_k=8`, `knn_key_layer ∈ {final, inject}`, `M=0`, table d'unités v3 (§16, C-1/C-2/C-3),
+  SHA données `7380b285f89c06ca…`
+- **Run** : `.venv\Scripts\python eval\gate_bench.py` (E = 0, 39 clauses, 115 cas) puis
+  `.venv\Scripts\python eval\knn_ceiling.py --protocol v3` (bras F et L6 dans la même passe) —
+  **74.5 s GPU**, VRAM max **1.017 Go**, 101 tests exit 0 ; ré-exécution Verifier :
+  **989/989 tableaux bit-à-bit identiques**
+- **Protocole pré-enregistré** : `experiments/EXP-2026-08-22-knn-borne-logits-v3.md`, gelé après
+  gate (E = 0). P1 (seule décisionnelle, par bras) : H vraie ssi n ≥ 12/30, fausse ssi n ≤ 5/30 ;
+  P1-exact 30/30 ; P3 bloquant médiane ≤ 3/30 (invalidant ≥ 12/30) ; ΔP6 signes conditionnel
+  (n_disc < 5 ⇒ non évaluable) ; P5 théorème E3(λ*) ≤ 0.05 ; Neuro §4.6 : N2′, N10, N11 (F n ≤ 6/30
+  et h_F ≤ 0.35 ; L6 n ∈ [8, 22]/30 ; audit si n_L6 ≥ 25/30), N12, N13, N14 ; H_méthode : E = 0 au banc.
+- **Résultat** :
+
+  | Mesure | Valeur |
+  | --- | --- |
+  | Portes intégrité/données | **toutes PASS** (V-base +1.353 ± 1.583 / 0/10 / −0.0143 reproduite ; V-bord 0 ULP grille entière ; V-λ0 30/30 bit-exact ; V-para (a)(b)(c′) 0 violation ×3 ; V-slot 0 ; V-ident 0) |
+  | V2 faisabilité | **30/30 les deux bras**, médiane p₁₀ = 0.005806 |
+  | P1-exact | **30/30 F et L6** |
+  | P1[F] | 28/30, IC CP [0.7793, 0.9918] — **non interprétable** |
+  | P1[L6] | 30/30, IC [0.8843, 1.0000] — **non interprétable** |
+  | P3 (B = 21) | F médiane **3/30** PASS ; L6 médiane **4/30** → région [4, 11] non spécifiée → branche stricte → **INCONCLUSIF, ARRÊT DUR** |
+  | ΔP6 | NON ÉVALUABLE (n_disc = 2) ; ΔP6-sec 0.000 bit |
+  | h (descriptif) | F 0.644 ± 0.085 ; L6 0.756 ± 0.150 — quantifié par plafond |
+  | V-indep (d) | cos max inter-unités **+0.99989** (F) / **+0.99848** (L6) |
+  | **Contrôles hors protocole (Verifier)** | clé d'une autre unité : 19-21/30 (F), **30/30 (L6, vecteur de succès identique)** ; **clé de bruit de norme appariée : 12/30 (F), 23/30 (L6)** ; cible dans les 8 voisins sur **90/90** requêtes ; argmin inchangé sous clé étrangère 130/180 (F), 167/180 (L6) |
+
+- **Acquis** (les deux seuls, valides car **indépendants de la clé**) :
+  1. **Le budget E3 n'est pas le verrou du top-10** : V2 = 30/30 et P1-exact = 30/30 — à λ*
+     conforme à E3 ≤ +0.05, l'étage des logits a la marge arithmétique dès que la mémoire
+     accorde ~1/8 de masse. **Une hypothèse explicative du verrou 0/10 tenu depuis X0 est éliminée.**
+  2. **Divergence des deux nulles** (résultat interne le plus informatif) : détruire la liaison
+     clé→valeur (P3) rend 3-4/30 ; détruire l'adresse en gardant le contenu (clé bruit) rend
+     12-23/30. **L'effet est porté par l'appartenance de la cible au store, pas par la récupération.**
+- **Non-acquis** (explicites) : rien sur H ; rien sur l'étage de clé ; rien sur la couche 6
+  (l'écart F/L6 **survit au retrait de la clé** : différence de discrimination, pas de récupération
+  — la phrase « la couche 6 bat l'état final » est désormais **interdite**, §2 (ii) durcie, cf. D16) ;
+  rien sur V2-D ni sur (b) — la branche B de la table d'attribution (§6) est conditionnée à un
+  **échec** de P1, donc **logiquement inaccessible** ; le critère d'ouverture de (b) (P1 ≥ 12/30,
+  décision 6) **n'est PAS franchi au sens de son intention** ; N2′/N10/N11/N12/N14 **non testées
+  — PAS falsifiées** (la bande L6 de N11 était entière **sous** le plancher clé-nulle de
+  l'instrument) ; V1a/V1b/V1c, V-var, P4, P5, P5f, P5c-id, F₁₀, P7, P8, G, multi-clé, additivité,
+  E1c, table d'attribution R1/R1v/R3, C1/C2/C3 **non mesurés** (arrêt).
+- **Erreurs du cycle** (la règle du journal : elles se consignent) :
+  - **Directeur** : la nulle de P1 n'a **jamais été re-dérivée du mécanisme** — le seul chiffre
+    décisionnel où D14-R n'a pas été appliquée. Sous clé aveugle, `p_kNN(cible) ≈ m/min(k,s)` donne
+    un gain `0.0512711/8 = 0.00641` **>** médiane p₁₀ = **0.005806** : le seuil 12/30 supposait
+    `Bin(30, 0.1)`, **faux dès que `knn_k ≥ |store|`**. Calculable avant le run depuis V-base/V2.
+  - **Directeur** : seuil P3 **mal transposé** (image fidèle de « ≤ 1/10 » = **≤ 4/30**,
+    breakeven 0.15, et non 3/30 = 0.125 — sous 4/30 L6 aurait passé) **et** dérivation **falsifiée
+    par les comptes du run** (sd empirique ≈ 3.4 contre 1.75 sous `Bin(30, 0.03)` : surdispersion
+    ×2) — le seuil était posé au milieu du bruit de son propre instrument. *L'arrêt reste conforme
+    au texte gelé et ne s'amende pas.*
+  - **Directeur / copilote** : région **[4, 11] de P3 spécifiée nulle part** ; le code a appliqué
+    la branche stricte (conservateur, conforme) mais le banc n'exerce jamais cette région —
+    couverture « 100 % » **surévaluée**. `P1-cellule-dégénérée` : PASS **et** INCONCLUSIF simultanés
+    en F, **vacuée par ensemble vide** en L6 — la définition exacte de **E**, que le banc avait
+    certifié à 0 : **E vaut sur le banc seul, pas sur le run**.
+  - **Copilote (§16 I)** : coût « diversité effondrée » **déclaré avec le mauvais signe** —
+    conservateur pour multi-clé (c), **anti-conservateur pour P1** (une fausse clé gagne plus
+    facilement). *Un coût déclaré n'est pas maîtrisé tant que son signe n'a pas été évalué clause
+    par clause, en commençant par la décisionnelle.*
+  - **Neuro (auto-consigné)** : N11 **nommait un suspect** (recouvrement lexical — ce dont le cycle
+    venait de souffrir) au lieu d'exiger **un plancher à produire**. *On audite ce dont on vient de
+    souffrir ; une clause d'audit qui peut innocenter est plus dangereuse qu'une absence de clause.*
+  - **Budget** : VRAM **1.017 Go** contre « < 0.8 Go » annoncé au §9 — **estimation fausse**, consignée.
+  - **Maillons sans nulle** : le protocole avait une nulle pour les **données**
+    (V-para/V-slot/V-ident) et une pour la **liaison clé→valeur** (P3) ; **aucune pour les maillons
+    « clé » et « sélection des k voisins »** — c'est exactement là que le run est mort.
+- **Conclusion** : **INCONCLUSIF — confondant d'instrument (`knn_k ≥ |store|` : pas d'étape
+  d'adressage)** ; arrêt formel conforme par P3[L6].
+
+  > « Ce run n'a pas mesuré la récupération sous indice dégradé. Avec `knn_k = 8` pour un store de
+  > 8 à 11 entrées et des clés inter-unités à cos ≥ 0.998, l'ensemble des voisins est le store
+  > entier et la cible y figure sur 90/90 requêtes : le circuit mesuré ne comporte pas d'étape
+  > d'adressage. P1 est un **taux de détection publié sans taux de fausse alarme**, et son plancher
+  > sous clé nulle — 12/30 en F, 23/30 en L6 — atteint ou dépasse le seuil de succès pré-enregistré
+  > de 12/30 ; en L6, la clé d'une autre unité rend 30/30 avec un **vecteur de succès identique**,
+  > c'est-à-dire une contribution **exactement nulle** de l'information de clé. L'effet survit à la
+  > destruction de l'adresse et non à celle du contenu (P3, 3-4/30) : il est porté par
+  > l'appartenance de la cible au store. Aucune conclusion, positive ou négative, ne se tire sur
+  > l'étage de clé, sur la couche 6, ni sur V2-D — la branche B de la table d'attribution est
+  > logiquement inaccessible depuis ce run. Le seul acquis scientifique est arithmétique et
+  > indépendant de la clé : à λ* conforme au budget E3 ≤ +0.05 nats/token, l'étage des logits a la
+  > marge nécessaire pour hisser un token en top-10 ; **le budget n'est pas le verrou**. »
+
+- **Suite** : **v4 — « l'adressage apporte-t-il quelque chose ? »** Primaire = **différence
+  clé correcte − clé nulle appariée** (jamais un taux) ; plancher de hasard **dérivé analytiquement
+  AVANT le run** depuis la géométrie mesurée du store, strictement inférieur au seuil avec marge
+  (**porte bloquante** : plancher ≥ seuil ⇒ le run ne part pas) ; `C-null` ⇒ **s ≈ 36 leurres
+  appariés** (même modèle, même couche, même famille syntaxique, même longueur — le distracteur
+  RFC 30 k **ne convient pas**) ; tension frontale **identifiabilité (C-1/C-2/C-3) vs similarité
+  des leurres**, à résoudre par **construction de matériel**, pas par réglage. Analogue : Mnemonic
+  Similarity Task (Bakker et al. 2008 ; Yassa & Stark 2011).
+- *Modèles : director.interpretation fable, math fable, neuro inherit, builder inherit,
+  verifier inherit.*
+
 ## 2026-08-20 — v0 : squelette posé
 
 - **Commit** : (initial)

@@ -2404,6 +2404,1416 @@ def _analysis_phase(args, out_dir):
     return res
 
 
+# =========================================================================
+#  AMENDEMENT v3 — V2-D(a) v3 : deux bras (F / L6), N = 30 unités
+#
+#  Protocole : experiments/EXP-2026-08-22-knn-borne-logits-v3.md
+#  (PRE-ENREGISTRE par le PI le 2026-08-22, après banc de satisfiabilité E = 0).
+#
+#  Ce bloc est PUREMENT ADDITIF : rien au-dessus n'est modifié et les chemins v2
+#  restent exécutables à l'identique (`--protocol v2`, défaut). AUCUNE clause
+#  n'est ré-écrite ici : toutes les portes et tous les verdicts sont appliqués
+#  par les fonctions de `eval/gate_bench.py` — celles-là MÊMES que le banc a
+#  certifiées à E = 0 (39 clauses, 115 cas, couverture 100 %). Le script ne
+#  produit que les QUANTITÉS MESURÉES ; les seuils vivent dans le banc.
+#
+#  `gate_bench` importe `knn_ceiling` : l'import est donc LOCAL aux fonctions
+#  (jamais au niveau module), sans quoi le cycle casserait les chemins v2.
+# =========================================================================
+
+V3_UNITS_N = 30                       # §4.2 : N = 30 unités par bras
+V3_ARMS = (("F", "final"), ("L6", "inject"))   # §4.2 : deux bras co-égaux
+V3_INDEX_NAMES = ("exact", "para1", "para2", "para3")
+V3_G_LAMBDA = 0.25                    # §4.5, bras G : déclencheur évalué à λ = 0.25
+V3_BUCKET_MIN = 1000                  # nulle stratifiée : bucket < 1000 clés fusionné
+V3_BUCKET_MIN_COUNT = 3               # < 3 buckets ⇒ NON ÉVALUABLE
+V3_CONFIDENT_DECILE = 9               # P5f-cond : « positions confiantes » = dernier
+                                      # décile de confiance = 1er décile de NLL_base
+
+
+def clopper_pearson(k, n, alpha=0.05):
+    """IC exact de Clopper-Pearson sur `k/n` (§4.2, exigé par Math).
+
+    Sans scipy : les bornes sont les racines des queues binomiales EXACTES
+    (`math.comb`, entiers), trouvées par bissection. À n = 30 la somme exacte est
+    gratuite ⇒ aucune approximation normale n'intervient.
+    """
+    k, n = int(k), int(n)
+    if n <= 0:
+        return (math.nan, math.nan)
+
+    def tail_ge(p, j):
+        return sum(math.comb(n, x) * p ** x * (1.0 - p) ** (n - x)
+                   for x in range(j, n + 1))
+
+    def tail_le(p, j):
+        return sum(math.comb(n, x) * p ** x * (1.0 - p) ** (n - x)
+                   for x in range(0, j + 1))
+
+    lo = 0.0
+    if k > 0:
+        a, b = 0.0, 1.0
+        for _ in range(200):
+            m = 0.5 * (a + b)
+            if tail_ge(m, k) < alpha / 2.0:
+                a = m
+            else:
+                b = m
+        lo = 0.5 * (a + b)
+    hi = 1.0
+    if k < n:
+        a, b = 0.0, 1.0
+        for _ in range(200):
+            m = 0.5 * (a + b)
+            if tail_le(m, k) > alpha / 2.0:
+                a = m
+            else:
+                b = m
+        hi = 0.5 * (a + b)
+    return (lo, hi)
+
+
+def wilcoxon_signed_rank(diffs):
+    """Wilcoxon apparié **exact** (ΔP6-sec, §4.4).
+
+    Différences nulles écartées (règle de Wilcoxon), ex-æquo par rangs moyens ;
+    distribution nulle de `W⁺` obtenue par convolution ENTIÈRE sur les rangs
+    1..n (aucune approximation normale). SECONDAIRE : ne renverse jamais ΔP6.
+    """
+    d = [float(x) for x in diffs if float(x) != 0.0]
+    n = len(d)
+    if n == 0:
+        return {"n": 0, "W_plus": math.nan, "p_bilateral": math.nan,
+                "note": "toutes les différences nulles"}
+    order = sorted(range(n), key=lambda i: abs(d[i]))
+    ranks = [0.0] * n
+    i = 0
+    while i < n:
+        j = i
+        while j + 1 < n and abs(d[order[j + 1]]) == abs(d[order[i]]):
+            j += 1
+        avg = (i + j + 2) / 2.0
+        for t in range(i, j + 1):
+            ranks[order[t]] = avg
+        i = j + 1
+    wp = float(sum(r for r, x in zip(ranks, d) if x > 0.0))
+    tot = n * (n + 1) // 2
+    dist = [0] * (tot + 1)
+    dist[0] = 1
+    for r in range(1, n + 1):
+        for s in range(tot, r - 1, -1):
+            dist[s] += dist[s - r]
+    denom = float(2 ** n)
+    cum_le = sum(dist[:int(math.floor(wp)) + 1]) / denom
+    cum_ge = sum(dist[min(int(math.ceil(wp)), tot):]) / denom
+    return {"n": n, "W_plus": wp, "W_max": tot,
+            "p_bilateral": float(min(1.0, 2.0 * min(cum_le, cum_ge)))}
+
+
+def _cos_matrix(Q, K):
+    """cos(q, k) pour un lot de requêtes contre un lot de clés, en fp64."""
+    Q = np.asarray(Q, dtype=np.float64)
+    K = np.asarray(K, dtype=np.float64)
+    nq = np.linalg.norm(Q, axis=1, keepdims=True)
+    nk = np.linalg.norm(K, axis=1, keepdims=True)
+    nq[nq == 0] = 1.0
+    nk[nk == 0] = 1.0
+    return (Q / nq) @ (K / nk).T
+
+
+# =========================================================================
+#  v3 — passe GPU
+# =========================================================================
+
+def _gpu_phase_v3(args, out_dir):
+    """Ordre imposé par le §9 : V-base (+ scellement de `borne_marge`) →
+    portes d'environnement → passe A → passe D → passe E → descriptifs → V-λ0.
+
+    `borne_marge` est calculée sur la passe V-base **sans kNN** (la retrieval ne
+    dépend pas du mélange, §4bis passe (ii)), **hashée et scellée AVANT la passe
+    A**. Les états des DEUX bras sont capturés dans la MÊME passe forward
+    (§5.10) ⇒ aucun effet d'ordre entre bras, par construction.
+    """
+    import torch
+    import gate_bench as GB
+    from collateral import NEUTRAL_TEXT, mean_nll_on_neutral
+    from fact_injection import (FACT_TEMPLATE as FI_TEMPLATE,
+                                QUESTIONS as FI_QUESTIONS, SECRETS as FI_SECRETS,
+                                run_one as fi_run_one)
+    from read_gate import E1C_FACT, E1C_QUESTION
+    from pool import unit_table
+    from engram import EngramConfig, EngramEngine
+
+    raw = out_dir / "raw"
+    raw.mkdir(parents=True, exist_ok=True)
+    t_start = time.time()
+
+    # §7 : variables fixées — défauts EngramConfig() + le second point de capture
+    # (inerte par défaut, armé ici : c'est le seul écart, et il ne change aucun
+    # calcul du cortex — porte V-cap).
+    cfg = EngramConfig(capture_final_state=True)
+    print(f"[knn_ceiling v3 / V2-D(a) — passe GPU] {cfg.summary()}")
+    print(f"  capture_final_state={cfg.capture_final_state} knn_lambda(défaut)="
+          f"{cfg.knn_lambda} knn_k={cfg.knn_k} knn_temp_c={cfg.knn_temp_c}")
+    print(f"  λ* = 1 - math.exp(-0.05) = {LAMBDA_STAR!r}  (EXPRESSION, jamais un "
+          f"décimal recopié — §15 A-6)")
+
+    engine = EngramEngine(cfg)
+    device = str(engine.cortex.device)
+    print(f"  device : {device}")
+    if device == "cpu":
+        print("  !! ANOMALIE : repli CPU silencieux (CUDA indisponible) — à rapporter")
+    model = engine.cortex.model
+    L = cfg.layer_index
+    tok = engine.tokenizer
+
+    arrays: dict[str, np.ndarray] = {}
+    meta: dict = {"protocol": "experiments/EXP-2026-08-22-knn-borne-logits-v3.md",
+                  "config": cfg.summary(), "device": device,
+                  "d_model": engine.cortex.d_model, "layer_index": L,
+                  "lambda_star_repr": repr(LAMBDA_STAR),
+                  "anomalies": []}
+
+    def anomaly(msg):
+        print(f"  !! ANOMALIE : {msg}")
+        meta["anomalies"].append(msg)
+
+    if device == "cpu":
+        meta["anomalies"].append("repli CPU silencieux (CUDA indisponible)")
+
+    @torch.no_grad()
+    def states_of(ids):
+        x = torch.tensor([ids], device=engine.cortex.device)
+        o = model(input_ids=x, use_cache=False, output_hidden_states=True)
+        hs = o.hidden_states
+        return (hs[-1][0].float().cpu().numpy().astype(np.float32),
+                hs[L + 1][0].float().cpu().numpy().astype(np.float32))
+
+    def build_store(text):
+        """Traces égalisées (§5.7) : UNE entrée par token, clé = état à t−1,
+        valeur = token t — même compte que `force_write=True`."""
+        ids = tok.encode(text)
+        fin, l6 = states_of(ids)
+        return {"ids": np.asarray(ids, dtype=np.int64), "keys_final": fin[:-1],
+                "keys_inject": l6[:-1], "values": np.asarray(ids[1:], dtype=np.int64)}
+
+    @torch.no_grad()
+    def score_first(prompt, continuation, *, read=False):
+        """Mesure D7-conforme, position de requête SEULE : `clear_context` avant,
+        écriture coupée, cible = **premier token BPE** de `" <secret>"` dérivée
+        par différence. Les DEUX bras sont lus dans la même passe forward."""
+        tgt, _ = first_bpe_target(tok, prompt, continuation)
+        engine.clear_context()
+        assert engine._context_len == 0 and engine._past is None, "clear_context inopérant"
+        w0 = engine.memory.write_count
+        engine.stream(prompt, read=read, write=False)
+        lp = torch.log_softmax(engine._last_logits.float(), dim=-1)
+        out = {"logp": lp.cpu().numpy().astype(np.float32),
+               "final": engine.cortex.last_h_final.cpu().numpy().astype(np.float32),
+               "inject": engine.cortex.last_h_pre.cpu().numpy().astype(np.float32),
+               "target": int(tgt), "nll_base": -float(lp[tgt]),
+               "H": float(-(lp.exp() * lp).sum())}
+        assert engine.memory.write_count == w0, "D7/D8 : write pendant une mesure"
+        return out
+
+    # ================================================ PORTE V-cap
+    print("\n================ PORTE V-cap ================")
+    with torch.no_grad():
+        probe = tok.encode("The password is swordfish.")
+        x = torch.tensor([probe], device=engine.cortex.device)
+        o = model(input_ids=x, use_cache=False, output_hidden_states=True)
+        cap_dev = float((model.lm_head(o.hidden_states[-1]) - o.logits).abs().max())
+    v_cap = GB.gate_v_cap(cap_dev)
+    print(f"  |lm_head(hidden_states[-1]) − logits|_max = {cap_dev:.3e} "
+          f"(seuil ≤ {VCAP_TOL:.0e}) → V-cap = {v_cap}")
+    meta["V_cap"] = {"ecart_max": cap_dev, "seuil": VCAP_TOL, "verdict": v_cap}
+    if v_cap != GB.PASS:
+        _fail(out_dir, "V-cap", meta["V_cap"])
+
+    # ================================================ PORTE V-base
+    # E1 / top-10 / E3 aux défauts EngramConfig(), par DEUX chemins de code
+    # indépendants (les scripts de référence vs une recomposition en ligne) ;
+    # l'écart doit être nul au centième. AUCUN chiffre du journal n'entre ici
+    # (D14-R) : la référence est la valeur RE-MESURÉE dans ce run.
+    print("\n================ PORTE V-base (E1 / top-10 / E3 aux défauts) ================")
+    t0 = time.time()
+    base_engine = EngramEngine(EngramConfig())
+    rows = [fi_run_one(base_engine, s) for s in FI_SECRETS]
+    e1_ref, e1_sd = mean_sd([r["deltas"]["exact"] for r in rows])
+    top10_ref = sum(1 for r in rows if r["rank_mem"] <= 10)
+    writes_base = [r["writes"] for r in rows]
+    if sum(writes_base) == 0:
+        anomaly("0 write partout à la passe V-base : run INVALIDE")
+        _fail(out_dir, "V-base", {"cause": "0 write"})
+    # E3 par le chemin de référence (`collateral.mean_nll_on_neutral`)
+    base_engine.reset_memory()
+    base_engine.clear_context()
+    nll_m0 = mean_nll_on_neutral(base_engine)
+    base_engine.reset_memory()
+    base_engine.clear_context()
+    base_engine.stream(FI_TEMPLATE.format(secret=FI_SECRETS[0]), force_write=True)
+    nll_mload = mean_nll_on_neutral(base_engine)
+    e3_ref = nll_mload - nll_m0
+    # second chemin : recomposition en ligne, mêmes défauts, code distinct
+    e1_bis = []
+    for s in FI_SECRETS:
+        base_engine.reset_memory()
+        base_engine.clear_context()
+        base_engine.stream(FI_TEMPLATE.format(secret=s), force_write=True)
+        base_engine.clear_context()
+        lp_m, rk_m = base_engine.logprob_continuation(FI_QUESTIONS[0][1], f" {s}")
+        base_engine.reset_memory()
+        base_engine.clear_context()
+        lp_0, _ = base_engine.logprob_continuation(FI_QUESTIONS[0][1], f" {s}")
+        e1_bis.append((lp_m - lp_0, rk_m))
+    e1_mes, e1_mes_sd = mean_sd([d for d, _ in e1_bis])
+    top10_mes = sum(1 for _, r in e1_bis if r <= 10)
+    base_engine.reset_memory()
+    base_engine.clear_context()
+    recs0 = base_engine.stream(NEUTRAL_TEXT, read=True, write=False)
+    n0 = statistics.mean(r.nll for r in recs0 if r.nll is not None)
+    base_engine.reset_memory()
+    base_engine.clear_context()
+    base_engine.stream(FI_TEMPLATE.format(secret=FI_SECRETS[0]), force_write=True)
+    base_engine.clear_context()
+    recs1 = base_engine.stream(NEUTRAL_TEXT, read=True, write=False)
+    n1 = statistics.mean(r.nll for r in recs1 if r.nll is not None)
+    e3_mes = n1 - n0
+    v_base = GB.gate_v_base({"E1": e1_mes, "top10": top10_mes, "E3": e3_mes},
+                            {"E1": e1_ref, "top10": top10_ref, "E3": e3_ref})
+    print(f"  E1 (question exacte)  : {e1_ref:+.3f} ± {e1_sd:.3f} (N={len(rows)}) "
+          f"| re-mesuré {e1_mes:+.3f} ± {e1_mes_sd:.3f}")
+    print(f"  top-10 avec M         : {top10_ref}/{len(rows)} | re-mesuré {top10_mes}/{len(rows)}")
+    print(f"  E3 sur NEUTRAL_TEXT   : {e3_ref:+.4f} nats | re-mesuré {e3_mes:+.4f}")
+    print(f"  writes par secret     : {writes_base}")
+    print(f"  V-base → {v_base}  (tolérance {GB.VBASE_TOL:g} « au centième », "
+          f"{time.time() - t0:.1f}s)")
+    meta["V_base"] = {"E1_mean": e1_ref, "E1_sd": e1_sd, "top10": top10_ref,
+                      "N": len(rows), "E3": e3_ref,
+                      "E1_recompose": e1_mes, "top10_recompose": top10_mes,
+                      "E3_recompose": e3_mes, "writes": writes_base,
+                      "nll_neutral_M0": nll_m0, "nll_neutral_Mload": nll_mload,
+                      "verdict": v_base, "duree_s": time.time() - t0}
+    if v_base != GB.PASS:
+        _fail(out_dir, "V-base", meta["V_base"])
+    del base_engine
+
+    # ================================================ PORTE V-drift
+    # Contrôle croisé BIT-À-BIT contre les bruts archivés du run 2 : le store du
+    # fait `FACT_TEMPLATE.format(secret=SECRETS[0])` est une donnée INCHANGÉE
+    # entre v2 et v3, donc reproductible à l'identique si l'environnement n'a pas
+    # dérivé. VÉRIFICATION D'ENVIRONNEMENT SEULEMENT (§4.3) : un écart est une
+    # ANOMALIE à signaler, JAMAIS une autorisation de réutiliser les bruts.
+    print("\n================ PORTE V-drift (contrôle croisé bit-à-bit) ================")
+    v2_raw = (Path(__file__).resolve().parents[1] / "experiments" / "results"
+              / "knn-borne-logits-v2" / "raw" / "gpu_raw.npz")
+    drift = {"reference": str(v2_raw).replace("\\", "/"),
+             "note": "vérification d'environnement seulement ; ne bloque pas"}
+    if not v2_raw.exists():
+        drift["status"] = "référence absente"
+        anomaly(f"{v2_raw} absent — contrôle croisé V-drift impossible")
+    else:
+        drift["sha256"] = sha256_file(v2_raw)
+        ref = np.load(v2_raw)
+        probe_store = build_store(FI_TEMPLATE.format(secret=FI_SECRETS[0]))
+        cmp = {}
+        for nme, cur in (("A_ids_0", probe_store["ids"]),
+                         ("A_values_0", probe_store["values"]),
+                         ("A_keys_final_0", probe_store["keys_final"]),
+                         ("A_keys_inject_0", probe_store["keys_inject"])):
+            if nme not in ref.files:
+                cmp[nme] = {"status": "absent de la référence"}
+                continue
+            b = np.asarray(ref[nme])
+            cmp[nme] = {"verdict": GB.gate_v_drift(cur, b),
+                        "max_abs_dev": (float(np.max(np.abs(cur.astype(np.float64)
+                                                            - b.astype(np.float64))))
+                                        if cur.shape == b.shape else math.nan),
+                        "n": int(cur.size)}
+        drift["arrays"] = cmp
+        n_id = sum(1 for v in cmp.values() if v.get("verdict") == GB.PASS)
+        drift["status"] = ("aucun écart" if n_id == len(cmp) else "ÉCART — ANOMALIE")
+        print(f"  tableaux reproduits bit-à-bit : {n_id}/{len(cmp)} → {drift['status']}")
+        for nme, v in cmp.items():
+            print(f"    {nme:<18} {v.get('verdict', v.get('status'))} "
+                  f"(écart abs max {v.get('max_abs_dev')})")
+        if n_id != len(cmp):
+            anomaly("V-drift : écart bit-à-bit contre les bruts archivés du run 2")
+    meta["V_drift"] = drift
+
+    # ================================================ portes de DONNÉES (sans mesure)
+    print("\n================ PORTES DE DONNÉES (décidables sans mesure) ================")
+    units = unit_table(V3_UNITS_N)
+    frozen_before = GB.frozen_dataset()
+    tokenize, tok_name = GB.make_tokenizer(True)
+    meta["tokenizer_portes"] = tok_name
+
+    def _tok_check(name, verdict, det=None):
+        print(f"  {name:<10} → {verdict}"
+              + (f"   {json.dumps(det, ensure_ascii=False)[:180]}" if det else ""))
+        meta.setdefault("portes_donnees", {})[name] = {"verdict": verdict,
+                                                       "detail": det}
+        return verdict
+
+    from pool import all_row_values, OWNER_OBJ as PO_OWNER_OBJ
+    v_tok, d_tok = GB.gate_v_tok([u["secret"] for u in units], tokenize)
+    _tok_check("V-tok", v_tok, d_tok)
+    # §15 A-3 : la clause (c) est REMPLACÉE par (c′) — le Jaccard porte sur le
+    # CONTENU. (a) et (b) restent bloquantes sous leur forme d'origine ; le
+    # Jaccard BRUT croisé reste publié en DESCRIPTIF (A-7), jamais en porte.
+    v_para, d_para = GB.gate_v_para(units, tokenize, check_cross=False)
+    _tok_check("V-para(a,b)", v_para, {"a_sous_chaine": d_para["a_sous_chaine"],
+                                       "b_jaccard": d_para["b_jaccard"]})
+    v_pc, d_pc = GB.gate_v_para_c_prime(units, tokenize)
+    _tok_check("V-para(c')", v_pc, {k: d_pc[k] for k in list(d_pc)[:4]})
+    v_slot, d_slot = GB.gate_v_slot(units, all_row_values())
+    _tok_check("V-slot", v_slot, {k: d_slot[k] for k in list(d_slot)[:4]})
+    from pool import v3_unit_triples
+    v_ident, d_ident = GB.gate_v_ident(v3_unit_triples(V3_UNITS_N), tokenize)
+    _tok_check("V-ident", v_ident, {k: d_ident[k] for k in list(d_ident)[:4]})
+    v_oo, d_oo = GB.gate_owner_obj(PO_OWNER_OBJ, tokenize)
+    _tok_check("OWNER_OBJ", v_oo, d_oo)
+    v_lam, d_lam = GB.gate_lambda_star_expression(LAMBDA_STAR)
+    _tok_check("λ*-expr", v_lam, d_lam)
+    v_bord, d_bord = GB.gate_v_bord(GB.LAMBDA_GRID, naive_side=False)
+    _tok_check("V-bord", v_bord, {"grille_lambda": list(GB.LAMBDA_GRID),
+                                  "ulp_max": max(v["ulp"] for v in d_bord.values())})
+    meta["V_bord_detail"] = d_bord
+    meta["V_para_matrice_30x4"] = d_para["matrice_30x4"]
+    meta["V_para_c_prime_detail"] = d_pc
+    meta["descriptif_jaccard_brut"] = GB.descriptif_jaccard_brut(units, tokenize)
+    meta["descriptif_v_partage"] = GB.descriptif_v_partage(units, tokenize)
+    meta["sha256_donnees_gelees"] = GB.sha256_obj(frozen_before)
+    print(f"  SHA-256 des données gelées : {meta['sha256_donnees_gelees']}")
+    for nme, verd in (("V-tok", v_tok), ("V-para(a,b)", v_para),
+                      ("V-para(c')", v_pc), ("V-slot", v_slot),
+                      ("V-ident", v_ident), ("OWNER_OBJ", v_oo),
+                      ("λ*-expr", v_lam), ("V-bord", v_bord)):
+        if verd != GB.PASS:
+            _fail(out_dir, nme, meta["portes_donnees"].get(nme, {"verdict": verd}))
+
+    # ============================ stores de faits + passe D + scellement borne_marge
+    print("\n--- stores fait-seul (30 unités) + passe D (NEUTRAL_TEXT) ---")
+    t0 = time.time()
+    store_sizes = {}
+    for u in units:
+        fact = u["fact_template"].format(secret=u["secret"])
+        st = build_store(fact)
+        arrays[f"U{u['i']}_ids"] = st["ids"]
+        arrays[f"U{u['i']}_keys_final"] = st["keys_final"]
+        arrays[f"U{u['i']}_keys_inject"] = st["keys_inject"]
+        arrays[f"U{u['i']}_values"] = st["values"]
+        store_sizes[u["i"]] = int(len(st["values"]))
+    meta["store_sizes"] = store_sizes
+    meta["store_tokens_total"] = int(sum(store_sizes.values()))
+    print(f"  30 stores fait-seul : {meta['store_tokens_total']} entrées "
+          f"(min {min(store_sizes.values())}, max {max(store_sizes.values())})")
+
+    engine.reset_memory()
+    engine.clear_context()
+    ids_n = tok.encode(NEUTRAL_TEXT)
+    w0 = engine.memory.write_count
+    n_lp, n_fin, n_inj, n_nll, n_H, n_tgt = [], [], [], [], [], []
+    with torch.no_grad():
+        for tid in ids_n:
+            if engine._last_logits is not None:
+                lp = torch.log_softmax(engine._last_logits.float(), dim=-1)
+                n_lp.append(lp.cpu().numpy().astype(np.float32))
+                n_fin.append(engine.cortex.last_h_final.cpu().numpy().astype(np.float32))
+                n_inj.append(engine.cortex.last_h_pre.cpu().numpy().astype(np.float32))
+                n_nll.append(-float(lp[tid]))
+                n_H.append(float(-(lp.exp() * lp).sum()))
+                n_tgt.append(int(tid))
+            engine._consume(tid, read=False, write=False, force_write=False)
+    assert engine.memory.write_count == w0, "D7 : write pendant la passe D"
+    arrays["D_logp"] = np.stack(n_lp)
+    arrays["D_final"] = np.stack(n_fin)
+    arrays["D_inject"] = np.stack(n_inj)
+    arrays["D_nll_base"] = np.asarray(n_nll, dtype=np.float32)
+    arrays["D_H"] = np.asarray(n_H, dtype=np.float32)
+    arrays["D_target"] = np.asarray(n_tgt, dtype=np.int64)
+    meta["neutral_tokens"] = len(ids_n)
+    meta["neutral_positions"] = len(n_tgt)
+    print(f"  passe D : {len(ids_n)} tokens, {len(n_tgt)} positions valides "
+          f"({time.time() - t0:.1f}s)")
+
+    # -------- `borne_marge` : min sur V_k des 8 voisins, SANS kNN (§4.4, E-D6)
+    print("\n--- scellement de `borne_marge` (min sur V_k, §4.4 corrigé E-D6) ---")
+    p_rows = np.exp(arrays["D_logp"].astype(np.float64))
+    borne = {}
+    for arm, key_name in V3_ARMS:
+        Q = arrays[f"D_{key_name}"]
+        margins_all, margins_vnn_all = [], []
+        for u in units:
+            K = arrays[f"U{u['i']}_keys_{key_name}"]
+            V = arrays[f"U{u['i']}_values"]
+            d2m = d2_matrix(Q, K)
+            _, _, valsk = neighbors_from_matrix(d2m, V, K_NEIGHBORS)
+            margins_all.append(GB.margins_over_vk(p_rows, valsk))
+            margins_vnn_all.append(GB.margins_over_vnn(p_rows, valsk[:, 0]))
+        m_all = np.concatenate(margins_all)
+        borne[arm] = {"borne_marge": GB.borne_marge(m_all),
+                      "T": int(m_all.size),
+                      "borne_marge_vnn_FAUSSE": GB.borne_marge(
+                          np.concatenate(margins_vnn_all)),
+                      "marge_min": float(m_all.min()),
+                      "marge_mediane": float(np.median(m_all))}
+        print(f"  bras {arm:<3} : borne_marge = {borne[arm]['borne_marge']:.6f} "
+              f"sur T = {borne[arm]['T']} positions "
+              f"(forme v_nn sous-comptante, écartée : "
+              f"{borne[arm]['borne_marge_vnn_FAUSSE']:.6f})")
+    sealed = {"borne_marge": borne, "P10_FEASIBLE": P10_FEASIBLE,
+              "definition": "#{p : min_{v ∈ V_k(p)} (p_max(p) − p_LM(v)) ≤ "
+                            "0.0512711} / T, inégalité LARGE (§4.4, E-D6)",
+              "scelle_avant": "passe A"}
+    sealed_json = json.dumps(sealed, ensure_ascii=False, sort_keys=True, default=str)
+    sealed_sha = hashlib.sha256(sealed_json.encode("utf-8")).hexdigest()
+    (raw / "borne_marge_scellee.json").write_text(
+        json.dumps({"payload": sealed, "sha256": sealed_sha}, ensure_ascii=False,
+                   indent=1, default=str), encoding="utf-8")
+    meta["borne_marge_scellee"] = sealed
+    meta["borne_marge_sha256"] = sealed_sha
+    print(f"  SCELLÉ avant la passe A — SHA-256 = {sealed_sha[:32]}…")
+
+    # ================================================ passe A : 30 unités × 4 indices
+    print("\n--- passe A : store fait-seul, M = 0, 30 unités × 4 indices "
+          "(les DEUX bras dans la même passe forward, §5.10) ---")
+    t0 = time.time()
+    engine.reset_memory()
+    for u in units:
+        i = u["i"]
+        prompts = [u["exact"]] + list(u["paraphrases"])
+        for qi, prompt in enumerate(prompts):
+            r = score_first(prompt, f" {u['secret']}", read=False)
+            arrays[f"U{i}_q{qi}_logp"] = r["logp"]
+            arrays[f"U{i}_q{qi}_final"] = r["final"]
+            arrays[f"U{i}_q{qi}_inject"] = r["inject"]
+            arrays[f"U{i}_q{qi}_target"] = np.asarray([r["target"]], dtype=np.int64)
+            arrays[f"U{i}_q{qi}_nll_base"] = np.asarray([r["nll_base"]],
+                                                        dtype=np.float32)
+    meta["duration_A"] = time.time() - t0
+    meta["unites"] = [{"i": u["i"], "owner": u["owner"], "entity": u["entity"],
+                       "verb": u["verb"], "secret": u["secret"],
+                       "exact": u["exact"], "paraphrases": list(u["paraphrases"]),
+                       "fait": u["fact_no_secret"],
+                       "store_entrees": store_sizes[u["i"]]} for u in units]
+    print(f"  passe A : 30 × 4 = 120 requêtes en {meta['duration_A']:.1f}s")
+
+    # ================================================ PORTE V0 (indice exact, 1 unité/bras)
+    print("\n================ PORTE V0 (indice EXACT, 1 unité par bras) ================")
+    meta["V0"] = {}
+    for arm, key_name in V3_ARMS:
+        q = arrays["U0_q0_" + key_name]
+        v0, d0 = GB.gate_v0(arrays[f"U0_keys_{key_name}"], arrays["U0_values"],
+                            q, int(arrays["U0_q0_target"][0]))
+        print(f"  bras {arm:<3} : R1 = {d0['R1']} (attendu 1) | "
+              f"d²_min = {d0['d2_min']:.8f} → V0 = {v0}")
+        meta["V0"][arm] = {"verdict": v0, **d0}
+        if v0 != GB.PASS:
+            _fail(out_dir, f"V0[{arm}]", meta["V0"][arm])
+
+    # ================================================ passe E : distracteur 30 k
+    print(f"\n--- passe E : store distracteur {args.distractor_tokens} tokens ---")
+    t0 = time.time()
+    root = Path(__file__).resolve().parents[1]
+    rfc = root / "data" / "rfc9293.txt"
+    if not rfc.exists():
+        anomaly(f"{rfc} absent — passe E NON exécutée")
+        meta["distractor"] = None
+    else:
+        meta["rfc_sha256"] = sha256_file(rfc)
+        txt = rfc.read_text(encoding="utf-8", errors="replace")
+        ids_r: list[int] = []
+        for line in txt.splitlines(keepends=True):
+            ids_r.extend(tok.encode(line))
+            if len(ids_r) >= args.distractor_tokens + CHUNK:
+                break
+        ids_r = ids_r[:args.distractor_tokens]
+        dkf, dki, dv, dpos = [], [], [], []
+        for start in range(0, len(ids_r), CHUNK):
+            chunk = ids_r[start:start + CHUNK]
+            if len(chunk) < 2:
+                continue
+            fin, inj = states_of(chunk)
+            dkf.append(fin[:-1])
+            dki.append(inj[:-1])
+            dv.append(np.asarray(chunk[1:], dtype=np.int64))
+            dpos.append(np.arange(start, start + len(chunk) - 1, dtype=np.int64))
+        arrays["E_keys_final"] = np.concatenate(dkf, axis=0)
+        arrays["E_keys_inject"] = np.concatenate(dki, axis=0)
+        arrays["E_values"] = np.concatenate(dv, axis=0)
+        arrays["E_positions"] = np.concatenate(dpos, axis=0)
+        meta["distractor"] = {"tokens": len(ids_r), "chunk": CHUNK,
+                              "entries": int(len(arrays["E_values"])),
+                              "sha256": meta["rfc_sha256"]}
+        meta["duration_E"] = time.time() - t0
+        print(f"  {len(ids_r)} tokens → {len(arrays['E_values'])} entrées "
+              f"({meta['duration_E']:.1f}s) | SHA-16 rfc9293 = "
+              f"{meta['rfc_sha256'][:16]}")
+
+    # ================================================ descriptifs : additivité + E1c
+    print("\n--- descriptifs : additivité (M chargée) + E1c ---")
+    t0 = time.time()
+    for u in units[:V3_UNITS_N]:
+        i = u["i"]
+        engine.reset_memory()
+        engine.clear_context()
+        recs = engine.stream(u["fact_template"].format(secret=u["secret"]),
+                             force_write=True)
+        w = sum(r.wrote for r in recs)
+        meta.setdefault("writes_additivite", {})[i] = int(w)
+        prompts = [u["exact"]] + list(u["paraphrases"])
+        for qi, prompt in enumerate(prompts):
+            r = score_first(prompt, f" {u['secret']}", read=True)
+            arrays[f"M{i}_q{qi}_logp"] = r["logp"]
+            arrays[f"M{i}_q{qi}_target"] = np.asarray([r["target"]], dtype=np.int64)
+    tot_w = sum(meta["writes_additivite"].values())
+    if tot_w == 0:
+        anomaly("0 write partout sur le bras additivité : run INVALIDE")
+    print(f"  additivité : {tot_w} writes au total sur 30 unités")
+
+    store_c = build_store(E1C_FACT)
+    arrays["C_keys_final"] = store_c["keys_final"]
+    arrays["C_keys_inject"] = store_c["keys_inject"]
+    arrays["C_values"] = store_c["values"]
+    for tag, load_M in (("m0", False), ("mload", True)):
+        engine.reset_memory()
+        engine.clear_context()
+        w = 0
+        if load_M:
+            w = sum(r.wrote for r in engine.stream(E1C_FACT, force_write=True))
+        meta[f"writes_C_{tag}"] = int(w)
+        for wi, word in enumerate((" Marseille", " Paris")):
+            r = score_first(E1C_QUESTION, word, read=load_M)
+            arrays[f"C_{tag}_w{wi}_logp"] = r["logp"]
+            arrays[f"C_{tag}_w{wi}_final"] = r["final"]
+            arrays[f"C_{tag}_w{wi}_inject"] = r["inject"]
+            arrays[f"C_{tag}_w{wi}_target"] = np.asarray([r["target"]], dtype=np.int64)
+    meta["duration_descriptifs"] = time.time() - t0
+    print(f"  E1c : writes M chargée = {meta['writes_C_mload']} "
+          f"({meta['duration_descriptifs']:.1f}s)")
+
+    # ================================================ PORTE V-λ0 (fin de run)
+    print("\n================ PORTE V-λ0 (knn_lambda = 0 ⇒ logits bit-exacts) ================")
+    lam0 = []
+    for u in units:
+        engine.reset_memory()
+        engine.clear_context()
+        a = score_first(u["exact"], f" {u['secret']}", read=False)
+        engine.reset_memory()
+        engine.clear_context()
+        b = score_first(u["exact"], f" {u['secret']}", read=False)
+        lam0.append(GB.gate_v_lambda0(a["logp"], b["logp"]))
+    v_lam0 = GB.PASS if all(v == GB.PASS for v in lam0) else GB.FAIL
+    n_ok = sum(1 for v in lam0 if v == GB.PASS)
+    print(f"  {n_ok}/{len(lam0)} unités bit-exactes à knn_lambda = 0 → V-λ0 = {v_lam0}")
+    meta["V_lambda0"] = {"verdict": v_lam0, "n_bit_exact": n_ok, "N": len(lam0),
+                         "note": "knn_lambda = 0.0 : le mélange est l'IDENTITÉ "
+                                 "bit-exacte (mix_logprob court-circuite à λ=0)"}
+    if v_lam0 != GB.PASS:
+        _fail(out_dir, "V-λ0", meta["V_lambda0"])
+
+    # ================================================ V-hash (après le run)
+    v_hash, d_hash = GB.gate_v_hash(frozen_before, GB.frozen_dataset())
+    rfc_ok = (meta.get("rfc_sha256") == sha256_file(rfc)) if rfc.exists() else None
+    print(f"\n  V-hash → {v_hash}  {d_hash} | rfc9293 re-vérifié : {rfc_ok}")
+    meta["V_hash"] = {"verdict": v_hash, **d_hash, "rfc9293_stable": rfc_ok}
+    if v_hash != GB.PASS:
+        _fail(out_dir, "V-hash", meta["V_hash"])
+
+    # ---------------------------------------------------------------- VRAM / durée
+    if device != "cpu":
+        try:
+            meta["vram_max_bytes"] = int(torch.cuda.max_memory_allocated())
+            meta["vram_max_reserved_bytes"] = int(torch.cuda.max_memory_reserved())
+        except Exception as exc:                                   # pragma: no cover
+            anomaly(f"lecture VRAM impossible : {exc}")
+    meta["duration_gpu_s"] = time.time() - t_start
+    if meta["duration_gpu_s"] > 30 * 60:
+        anomaly(f"durée GPU {meta['duration_gpu_s']:.0f}s > 30 min "
+                f"(règle pré-enregistrée §9 : anomalie à SIGNALER)")
+    np.savez(raw / "gpu_raw_v3.npz", **arrays)
+    (raw / "gpu_meta_v3.json").write_text(
+        json.dumps(meta, ensure_ascii=False, indent=1, default=str), encoding="utf-8")
+    print(f"\n  passe GPU v3 : {meta['duration_gpu_s']:.1f}s | VRAM max = "
+          f"{meta.get('vram_max_bytes', 0) / 1e9:.3f} Go | "
+          f"{(raw / 'gpu_raw_v3.npz').stat().st_size / 1e6:.1f} Mo")
+
+
+# =========================================================================
+#  v3 — analyse hors-ligne (ZÉRO GPU)
+# =========================================================================
+
+def _v3_eval(keys, values, q, logp_row, target, lam=LAMBDA_STAR,
+             c_fixed=None, c_grid=None):
+    """Une cellule (store, requête) : `sup_c` sur la grille déclarée, ou un `c`
+    FIXÉ (P3 : « même `sup_c`, même bras »). Rend R1/R1v/R3/R4/p₁₀/d²_min."""
+    d2_all = squared_distances(q, keys)
+    idx = topk_neighbors(d2_all, K_NEIGHBORS)
+    d2k = d2_all[idx].astype(np.float64)
+    vals = np.asarray(values)
+    valsk = vals[idx]
+    if c_fixed is None:
+        s = sup_over_c(logp_row, d2k, valsk, target, lam, c_grid)
+    else:
+        pk = knn_distribution_c(d2k, valsk, c_fixed)
+        s = {"c_sup": c_fixed, "rank": mix_rank(logp_row, pk, lam, target),
+             "p_knn_target": float(pk.get(int(target), 0.0)),
+             "H_knn": knn_entropy(pk), "T_q": per_query_temperature(d2k, c_fixed),
+             "pk": pk, "per_c": {}}
+    lm = lm_prob_stats(logp_row, target)
+    hit = np.nonzero(vals == int(target))[0]
+    return {"rank": int(s["rank"]), "top10": bool(s["rank"] <= RANK_TOP),
+            "c_sup": s["c_sup"], "R3": float(s["p_knn_target"]),
+            "R4": float(s["H_knn"]), "T_q": float(s["T_q"]),
+            "R1": int(rank_of_index(d2_all, int(hit[0]))) if hit.size else -1,
+            "R1v": int(rank_of_value(d2_all, vals, target)),
+            "d2_min": float(d2_all.min()),
+            "ties": int(count_argmin_ties(d2_all)),
+            "p10": float(lm["p10"]), "p_max": float(lm["p_max"]),
+            "p_target": float(lm["p_target"]),
+            "logp_target": float(lm["logp_target"]),
+            "rank_base": int(lm["rank_base"]), "pk": s["pk"],
+            "d2_all": d2_all, "idx": idx, "valsk": valsk}
+
+
+def _analysis_phase_v3(args, out_dir):
+    import gate_bench as GB
+    from pool import unit_table
+
+    raw = out_dir / "raw"
+    arrays = dict(np.load(raw / "gpu_raw_v3.npz"))
+    meta = json.loads((raw / "gpu_meta_v3.json").read_text(encoding="utf-8"))
+    sealed = json.loads((raw / "borne_marge_scellee.json").read_text(encoding="utf-8"))
+    units = unit_table(V3_UNITS_N)
+    n_u = len(units)
+    res = {"protocol": meta["protocol"], "config": meta["config"],
+           "device": meta["device"], "gpu_meta": {k: v for k, v in meta.items()
+                                                  if k not in ("V_para_matrice_30x4",
+                                                               "V_bord_detail")},
+           "borne_marge_scellee": sealed}
+    csv_rows: list[list] = []
+    print(f"\n[knn_ceiling v3 — analyse hors-ligne] {meta['config']}")
+    print(f"  λ* = {LAMBDA_STAR!r} | k = {K_NEIGHBORS} | grille c = {C_GRID}")
+
+    # ---------------------------------------------------- cellules par bras
+    cells: dict[str, list[list[dict]]] = {}
+    for arm, kn in V3_ARMS:
+        per_unit = []
+        for u in units:
+            i = u["i"]
+            keys = arrays[f"U{i}_keys_{kn}"]
+            vals = arrays[f"U{i}_values"]
+            row = []
+            for qi in range(4):
+                row.append(_v3_eval(keys, vals, arrays[f"U{i}_q{qi}_{kn}"],
+                                    arrays[f"U{i}_q{qi}_logp"],
+                                    int(arrays[f"U{i}_q{qi}_target"][0])))
+            per_unit.append(row)
+        cells[arm] = per_unit
+
+    # ================================================ V-tie
+    ties = {arm: [c["ties"] for r in cells[arm] for c in r] for arm, _ in V3_ARMS}
+    v_tie = {}
+    for arm, kn in V3_ARMS:
+        d2 = cells[arm][0][0]["d2_all"]
+        verdict, det = GB.gate_v_tie(d2)
+        v_tie[arm] = {"verdict_unite0_exact": verdict, **det,
+                      "ex_aequo_total_120_requetes": int(sum(ties[arm])),
+                      "requetes_avec_ex_aequo": int(sum(1 for t in ties[arm] if t > 1))}
+        print(f"  V-tie [{arm}] : ex-æquo à d²_min — total {sum(ties[arm])} sur 120 "
+              f"requêtes, {v_tie[arm]['requetes_avec_ex_aequo']} requêtes concernées")
+    res["V_tie"] = v_tie
+
+    # ================================================ V-indep
+    res["V_indep"] = {}
+    for arm, kn in V3_ARMS:
+        qk = np.stack([[arrays[f"U{u['i']}_q{qi}_{kn}"] for qi in range(4)]
+                       for u in units])
+        verdict, det = GB.gate_v_indep(qk,
+                                       [cells[arm][i][0]["d2_min"] for i in range(n_u)],
+                                       [cells[arm][i][0]["p10"] for i in range(n_u)])
+        res["V_indep"][arm] = {"verdict": verdict, **det}
+        print(f"  V-indep [{arm}] : {verdict} | clés distinctes "
+              f"{det['n_distinctes']}/{det['n_cles']} | sd(d²_min) {det['b_sd_d2min']:.4g} "
+              f"| sd(p₁₀) {det['c_sd_p10']:.4g} | cos_max inter-unités "
+              f"{det['d_cos_max_inter_unites']:+.4f}")
+        if verdict != GB.PASS:
+            _fail(out_dir, f"V-indep[{arm}]", res["V_indep"][arm], res)
+
+    # ================================================ V2 — AVANT P1 (§4.3)
+    print("\n================ V2 — faisabilité arithmétique (RAPPORTÉE AVANT P1) ================")
+    res["V2"] = {}
+    for arm, kn in V3_ARMS:
+        p10m = np.asarray([[cells[arm][i][qi]["p10"] for qi in (1, 2, 3)]
+                           for i in range(n_u)])
+        verdict, det = GB.gate_v2(p10m)
+        res["V2"][arm] = {"verdict": verdict, **det,
+                          "p10_median": float(np.median(p10m)),
+                          "p10_par_unite": p10m.tolist()}
+        print(f"  bras {arm:<3} : n_faisable = {det['n_faisable']}/30 "
+              f"(p₁₀ < {P10_FEASIBLE:.7f} sur ≥ 2/3 paraphrases) → {verdict} "
+              f"| médiane p₁₀ = {float(np.median(p10m)):.6f}")
+        csv_rows.append(["V2", arm, "n_faisable", det["n_faisable"], "", 30])
+
+    # ================================================ P1 / P1-exact (par bras)
+    print("\n================ P1 (SEULE DÉCISIONNELLE, ITT, PAR BRAS) ================")
+    res["P1"] = {}
+    h_values = {}
+    for arm, kn in V3_ARMS:
+        succ = [sum(1 for qi in (1, 2, 3) if cells[arm][i][qi]["top10"])
+                for i in range(n_u)]
+        h_values[arm] = [s / 3.0 for s in succ]
+        n = sum(1 for s in succ if s >= P1_PARAPHRASE_MIN)
+        lo, hi = clopper_pearson(n, n_u)
+        verdict = GB.verdict_p1(n)
+        r1v_succ = [cells[arm][i][qi]["R1v"] for i in range(n_u)
+                    if succ[i] >= P1_PARAPHRASE_MIN for qi in (1, 2, 3)
+                    if cells[arm][i][qi]["top10"]]
+        r1v_fail = [cells[arm][i][qi]["R1v"] for i in range(n_u)
+                    if succ[i] < P1_PARAPHRASE_MIN for qi in (1, 2, 3)]
+        c_fail = [cells[arm][i][qi]["c_sup"] for i in range(n_u)
+                  if succ[i] < P1_PARAPHRASE_MIN for qi in (1, 2, 3)]
+        anti = GB.verdict_p1_antipode(r1v_succ)
+        degen = GB.verdict_p1_degenerate(r1v_fail, c_fail)
+        n_ex = sum(1 for i in range(n_u) if cells[arm][i][0]["top10"])
+        res["P1"][arm] = {"n": n, "N": n_u, "verdict": verdict,
+                          "IC95_Clopper_Pearson": [lo, hi],
+                          "succes_par_unite": succ, "h": h_values[arm],
+                          "antipode_R1v": anti, "cellule_degeneree": degen,
+                          "P1_exact": {"n": n_ex, "verdict":
+                                       "PASS" if n_ex == n_u else "SUSPECT"},
+                          "c_sup_distribution": {str(c): sum(
+                              1 for i in range(n_u) for qi in range(4)
+                              if cells[arm][i][qi]["c_sup"] == c) for c in C_GRID}}
+        print(f"  bras {arm:<3} : P1 = {n}/30  → {verdict}   "
+              f"IC 95 % Clopper-Pearson [{lo:.4f}, {hi:.4f}]")
+        print(f"            antipode R1v = {anti} | cellule dégénérée = {degen}")
+        print(f"            P1-exact = {n_ex}/30 "
+              f"({'PASS' if n_ex == n_u else 'SUSPECT — l entrée correcte est à d² minimal'})")
+        print(f"            c-du-sup : {res['P1'][arm]['c_sup_distribution']}")
+        csv_rows.append(["P1", arm, "n_top10_unites", n, "", 30])
+        csv_rows.append(["P1-exact", arm, "n_top10_unites", n_ex, "", 30])
+
+    # ================================================ ΔP6 (arbitrage des bras)
+    print("\n================ ΔP6 — arbitrage L6 vs F (signes, conditionnel) ================")
+    sF = [1 if s >= P1_PARAPHRASE_MIN else 0
+          for s in res["P1"]["F"]["succes_par_unite"]]
+    sL = [1 if s >= P1_PARAPHRASE_MIN else 0
+          for s in res["P1"]["L6"]["succes_par_unite"]]
+    disc = [(a, b) for a, b in zip(sF, sL) if a != b]
+    n_disc = len(disc)
+    n_succ_L6 = sum(1 for a, b in disc if b > a)
+    v_dp6, d_dp6 = GB.verdict_dp6(n_disc, n_succ_L6)
+    logr = {}
+    for arm, _ in V3_ARMS:
+        logr[arm] = [statistics.median([math.log2(max(cells[arm][i][qi]["R1"], 1))
+                                        for qi in (1, 2, 3)]) for i in range(n_u)]
+    wil = wilcoxon_signed_rank([a - b for a, b in zip(logr["L6"], logr["F"])])
+    gap = statistics.median(logr["F"]) - statistics.median(logr["L6"])
+    v_sec = GB.verdict_dp6_sec(v_dp6, gap)
+    res["DP6"] = {"n_disc": n_disc, "n_succes_L6": n_succ_L6, **d_dp6,
+                  "verdict": v_dp6, "succes_F": sF, "succes_L6": sL,
+                  "DP6_sec": {"ecart_bits_median_F_moins_L6": gap,
+                              "wilcoxon": wil, "verdict": v_sec}}
+    print(f"  paires discordantes n_disc = {n_disc} | succès L6 = {n_succ_L6} "
+          f"| k(n_disc) = {d_dp6.get('k(n_disc)', '—')} → {v_dp6}")
+    print(f"  ΔP6-sec : médiane par unité de log₂R1, écart F − L6 = {gap:+.3f} bit "
+          f"| Wilcoxon exact p = {wil['p_bilateral']:.4g} (n={wil['n']}) → {v_sec}")
+    csv_rows.append(["DP6", "L6-vs-F", "n_disc", n_disc, "", 30])
+
+    # ================================================ P3 (BLOQUANT) — 21 permutations
+    print("\n================ P3 — valeurs permutées, B = 21, même sup_c ================")
+    res["P3"] = {}
+    for arm, kn in V3_ARMS:
+        counts, ident_bad = [], 0
+        for b in range(GB.P3_B):
+            n_perm = 0
+            for i, u in enumerate(units):
+                keys = arrays[f"U{i}_keys_{kn}"]
+                vals = arrays[f"U{i}_values"]
+                pv = permute_values(vals, seed=PERM_SEED + b)
+                ok = 0
+                for qi in (1, 2, 3):
+                    c0 = cells[arm][i][qi]
+                    e = _v3_eval(keys, pv, arrays[f"U{i}_q{qi}_{kn}"],
+                                 arrays[f"U{i}_q{qi}_logp"],
+                                 int(arrays[f"U{i}_q{qi}_target"][0]),
+                                 c_fixed=c0["c_sup"])
+                    # identité exacte : les CLÉS sont intactes ⇒ d² bit-à-bit égal
+                    if not np.array_equal(e["d2_all"], c0["d2_all"]):
+                        ident_bad += 1
+                    if e["top10"]:
+                        ok += 1
+                if ok >= P1_PARAPHRASE_MIN:
+                    n_perm += 1
+            counts.append(n_perm)
+        verdict, det = GB.verdict_p3(counts, GB.P3_B)
+        res["P3"][arm] = {"verdict": verdict, **det, "comptes": counts,
+                          "identite_d2_violations": ident_bad}
+        print(f"  bras {arm:<3} : médiane {det.get('mediane')}/30 sur B = {GB.P3_B} "
+              f"permutations → {verdict} | comptes = {counts}")
+        print(f"            identité « clés intactes ⇒ d² bit-à-bit égal » : "
+              f"{ident_bad} violation(s)")
+        csv_rows.append(["P3", arm, "mediane_n_permute", det.get("mediane"), "",
+                         GB.P3_B])
+        if verdict != GB.PASS or ident_bad:
+            _fail(out_dir, f"P3[{arm}]", res["P3"][arm], res)
+
+    # ================================================ P4 (spécificité)
+    print("\n================ P4 — store unité A, indice unité B ================")
+    res["P4"] = {}
+    for arm, kn in V3_ARMS:
+        n_cross = 0
+        rows = []
+        for i in range(n_u):
+            j = (i + 1) % n_u
+            keys = arrays[f"U{i}_keys_{kn}"]
+            vals = arrays[f"U{i}_values"]
+            ok = 0
+            for qi in (1, 2, 3):
+                e = _v3_eval(keys, vals, arrays[f"U{j}_q{qi}_{kn}"],
+                             arrays[f"U{j}_q{qi}_logp"],
+                             int(arrays[f"U{j}_q{qi}_target"][0]))
+                if e["top10"]:
+                    ok += 1
+            rows.append({"store": i, "indice": j, "n_top10": ok})
+            if ok >= P1_PARAPHRASE_MIN:
+                n_cross += 1
+        verdict = GB.verdict_p4(n_cross)
+        res["P4"][arm] = {"n": n_cross, "verdict": verdict, "paires": rows}
+        print(f"  bras {arm:<3} : {n_cross}/30 → {verdict}")
+        csv_rows.append(["P4", arm, "n_croise", n_cross, "", 30])
+
+    # ============================== passe D : V1a / V1b / V1c / V-var / P5 / P5f
+    print("\n================ passe D — V1a / V1b-1 / V1b-2 / V1c / V-var / P5 ================")
+    D_logp = arrays["D_logp"]
+    D_tgt = arrays["D_target"]
+    D_nll = arrays["D_nll_base"]
+    p_rows = np.exp(D_logp.astype(np.float64))
+    T = len(D_tgt)
+    res["passe_D"] = {}
+    for arm, kn in V3_ARMS:
+        Q = arrays[f"D_{kn}"]
+        per_c_e3 = {c: [] for c in C_GRID}
+        dnll_all, dec_all, pk_all, flips, flip_rows = [], [], [], 0, []
+        d2min_all = []
+        relief = {c: 0 for c in C_GRID}
+        n_pos_total = 0
+        for u in units:
+            i = u["i"]
+            K = arrays[f"U{i}_keys_{kn}"]
+            V = arrays[f"U{i}_values"]
+            d2m = d2_matrix(Q, K)
+            idx, d2k, valsk = neighbors_from_matrix(d2m, V, K_NEIGHBORS)
+            d2min_all.append(d2k[:, 0])
+            for c in C_GRID:
+                mass, _ = target_mass_batch(d2k, valsk, D_tgt, c)
+                dn = mix_delta_nll_vec(D_logp.astype(np.float64)[
+                    np.arange(T), D_tgt], mass, LAMBDA_STAR)
+                per_c_e3[c].append(float(dn.mean()))
+                relief[c] += int((mass > 0.0).sum())
+            # cellule un-hot (défaut §7 `knn_temp_c = 0.0`) pour V1a/V1b/P5f
+            mass0, _ = target_mass_batch(d2k, valsk, D_tgt, UNHOT)
+            lpt = D_logp.astype(np.float64)[np.arange(T), D_tgt]
+            dnll_all.append(mix_delta_nll_vec(lpt, mass0, LAMBDA_STAR))
+            dec_all.append(mix_decrement_vec(lpt, mass0, LAMBDA_STAR))
+            pk_all.append(mass0)
+            n_pos_total += T
+            for p in range(T):
+                pk = knn_distribution(d2k[p], valsk[p], 0.0)
+                a_mix = mix_argmax(D_logp[p], pk, LAMBDA_STAR)
+                a_base = int(p_rows[p].argmax())
+                if a_mix != a_base:
+                    flips += 1
+                    flip_rows.append({"unite": i, "position": p, "gagnant": int(a_mix),
+                                      "argmax_base": a_base,
+                                      "nll_base": float(D_nll[p]),
+                                      "dans_le_store": bool(int(a_mix) in
+                                                            {int(x) for x in V})})
+        dnll = np.concatenate(dnll_all)
+        dec = np.concatenate(dec_all)
+        pk = np.concatenate(pk_all)
+        zero = pk <= 0.0
+        pos = ~zero
+        v1a, d1a = GB.gate_v1a(dnll[zero], LAMBDA_STAR)
+        v1b1, d1b1 = GB.gate_v1b1(dnll[pos], LAMBDA_STAR) if pos.any() else \
+            ("PASS (aucun p_kNN > 0)", {})
+        v1b2, d1b2 = GB.gate_v1b2(dnll[pos], dec[pos], LAMBDA_STAR) if pos.any() else \
+            ("PASS (aucun p_kNN > 0)", {})
+        vvar, dvar = GB.gate_v_var(dnll[zero])
+        # V1c : E3 mesuré (forme sans annulation) vs recomposé (log p_mix − log p_LM)
+        lpt_full = np.concatenate([D_logp.astype(np.float64)[np.arange(T), D_tgt]] * n_u)
+        recomposed = np.asarray([
+            -(mix_logprob(float(l), float(m), LAMBDA_STAR) - float(l))
+            for l, m in zip(lpt_full, pk)])
+        v1c, d1c = GB.gate_v1c(float(dnll.mean()), float(recomposed.mean()))
+        e3_per_c = {str(c): float(np.mean(per_c_e3[c])) for c in C_GRID}
+        e3_max = max(e3_per_c.values())
+        v_p5 = GB.verdict_p5(e3_max)
+        flip_rate = flips / float(n_pos_total)
+        borne = float(sealed["payload"]["borne_marge"][arm]["borne_marge"])
+        v_p5f = GB.verdict_p5f_borne(flip_rate, borne)
+        # P5c-id : f_relief(un-hot) vs f_relief(c fini)
+        f_unhot = relief[UNHOT] / float(n_pos_total)
+        f_fini = relief[1.0] / float(n_pos_total)
+        v_p5c = GB.verdict_p5c_id(f_unhot, f_fini)
+        # P5f-cond : par décile de NLL_base, identité du gagnant sur les confiantes
+        dec_edges = np.quantile(D_nll.astype(np.float64), np.linspace(0, 1, 11))
+        cond = []
+        for k in range(10):
+            lo_, hi_ = dec_edges[k], dec_edges[k + 1]
+            sel = [r for r in flip_rows if lo_ <= r["nll_base"] <= hi_]
+            npos = int(((D_nll >= lo_) & (D_nll <= hi_)).sum()) * n_u
+            cond.append({"decile": k + 1, "nll_range": [float(lo_), float(hi_)],
+                         "n_bascules": len(sel),
+                         "taux": (len(sel) / npos) if npos else math.nan})
+        confident = [r for r in flip_rows if r["nll_base"] <= dec_edges[1]]
+        conf_verdicts = [GB.verdict_p5f_cond(r["gagnant"],
+                                             arrays[f"U{r['unite']}_values"], True)
+                         for r in confident]
+        res["passe_D"][arm] = {
+            "V1a": {"verdict": v1a, **d1a, "n": int(zero.sum())},
+            "V1b-1": {"verdict": v1b1, **d1b1, "n": int(pos.sum())},
+            "V1b-2": {"verdict": v1b2, **d1b2},
+            "V1c": {"verdict": v1c, **d1c, "E3_mesure": float(dnll.mean()),
+                    "E3_recompose": float(recomposed.mean())},
+            "V-var": {"verdict": vvar, **dvar},
+            "P5": {"E3_par_c": e3_per_c, "E3_max_sur_grille": e3_max,
+                   "verdict": v_p5, "budget": GB.E3_BUDGET,
+                   "T_positions": T, "n_unites": n_u},
+            "P5f-borne": {"taux_bascule": flip_rate, "borne_marge": borne,
+                          "verdict": v_p5f, "n_bascules": flips,
+                          "n_positions": n_pos_total},
+            "P5f-cond": {"par_decile_NLL_base": cond,
+                         "n_bascules_confiantes": len(confident),
+                         "taux_confiantes": len(confident) / float(n_pos_total),
+                         "verdicts": sorted(set(conf_verdicts)),
+                         "gagnants_confiants": confident[:30]},
+            "P5c-id": {"f_relief_unhot": f_unhot, "f_relief_c1": f_fini,
+                       "verdict": v_p5c},
+            "d2_min_positions": np.concatenate(d2min_all).tolist()[:0],
+        }
+        res["passe_D"][arm]["_d2min_stats"] = {
+            "mediane": float(np.median(np.concatenate(d2min_all))),
+            "min": float(np.concatenate(d2min_all).min())}
+        arrays[f"_d2min_D_{arm}"] = np.concatenate(d2min_all)
+        print(f"  bras {arm:<3} : V1a {v1a} (n={int(zero.sum())}) | V1b-1 {v1b1} "
+              f"(n={int(pos.sum())}) | V1b-2 {v1b2} | V1c {v1c} | V-var {vvar}")
+        print(f"            P5 : E3 max sur la grille c = {e3_max:+.6f} nats "
+              f"(budget {GB.E3_BUDGET}) → {v_p5} | par c : {e3_per_c}")
+        print(f"            P5f-borne : taux de bascule {flip_rate:.6f} ≤ "
+              f"borne_marge {borne:.6f} → {v_p5f} ({flips} bascules / {n_pos_total})")
+        print(f"            P5f-cond : {len(confident)} bascules confiantes "
+              f"(1ᵉʳ décile NLL) → {sorted(set(conf_verdicts)) or ['—']}")
+        print(f"            P5c-id : f_relief(un-hot) {f_unhot:.4f} < "
+              f"f_relief(c=1) {f_fini:.4f} → {v_p5c}")
+        csv_rows.append(["P5", arm, "E3_max_nats", e3_max, "", T * n_u])
+        csv_rows.append(["P5f-borne", arm, "taux_bascule", flip_rate, "", n_pos_total])
+        for nme, verd in (("V1a", v1a), ("V1b-1", v1b1), ("V1c", v1c),
+                          ("V-var", vvar), ("P5", v_p5), ("P5f-borne", v_p5f)):
+            if isinstance(verd, str) and verd in (GB.FAIL, GB.BUG):
+                _fail(out_dir, f"{nme}[{arm}]", res["passe_D"][arm], res)
+        if GB.BUG in conf_verdicts:
+            _fail(out_dir, f"P5f-cond[{arm}]",
+                  {"cause": "bascule confiante dont le gagnant est absent du store"},
+                  res)
+
+    # ================================================ h, F₁₀, P8, G
+    print("\n================ descriptifs : h, F₁₀, P8, G ================")
+    res["descriptifs"] = {}
+    for arm, kn in V3_ARMS:
+        hv = h_values[arm]
+        hm, hsd = mean_sd(hv)
+        boot = bootstrap_mean(hv)
+        f10 = [INV_LAMBDA_STAR * c["p10"] / (1.0 + c["p10"])
+               for r in cells[arm] for c in r]
+        succ_f10 = [f for f in f10 if f <= 1.0]
+        pts = sorted([(c["d2_min"], c["rank"]) for r in cells[arm] for c in r])
+        edges = np.quantile([p[0] for p in pts], np.linspace(0, 1, 11))
+        serie = []
+        for k in range(10):
+            sel = [r for d, r in pts if edges[k] <= d <= edges[k + 1]]
+            serie.append(float(np.mean(sel)) if sel else math.nan)
+        serie = [s for s in serie if not math.isnan(s)]
+        v_p8, d_p8 = GB.verdict_p8(serie)
+        # bras G : grille τ = déciles DÉDUPLIQUÉS des d²_min mesurés (passe D)
+        d2m = arrays[f"_d2min_D_{arm}"]
+        tau_grid = sorted(set(float(x) for x in
+                              np.quantile(d2m, np.linspace(0.1, 1.0, 10))))
+        e3_curve, p1_curve, na1, na0 = [], [], [], []
+        lpt = D_logp.astype(np.float64)[np.arange(T), D_tgt]
+        Q = arrays[f"D_{kn}"]
+        mass_by_unit, d2min_by_unit = [], []
+        for u in units:
+            i = u["i"]
+            d2mm = d2_matrix(Q, arrays[f"U{i}_keys_{kn}"])
+            _, d2k, valsk = neighbors_from_matrix(d2mm, arrays[f"U{i}_values"],
+                                                  K_NEIGHBORS)
+            m0, _ = target_mass_batch(d2k, valsk, D_tgt, UNHOT)
+            mass_by_unit.append(m0)
+            d2min_by_unit.append(d2k[:, 0])
+        MASS = np.stack(mass_by_unit)
+        DMIN = np.stack(d2min_by_unit)
+        for tau in tau_grid:
+            alpha = DMIN <= tau
+            dn = np.where(alpha, mix_delta_nll_vec(np.tile(lpt, (n_u, 1)),
+                                                   MASS, V3_G_LAMBDA), 0.0)
+            e3_curve.append(float(dn.mean()))
+            n1 = 0
+            for i in range(n_u):
+                ok = 0
+                for qi in (1, 2, 3):
+                    c0 = cells[arm][i][qi]
+                    if c0["d2_min"] <= tau:
+                        r = mix_rank(arrays[f"U{i}_q{qi}_logp"], c0["pk"],
+                                     V3_G_LAMBDA,
+                                     int(arrays[f"U{i}_q{qi}_target"][0]))
+                    else:
+                        r = c0["rank_base"]
+                    if r <= RANK_TOP:
+                        ok += 1
+                if ok >= P1_PARAPHRASE_MIN:
+                    n1 += 1
+            p1_curve.append(n1)
+            na1.append(int(alpha.sum()))
+            na0.append(int((~alpha).sum()))
+        v_g, d_g = GB.verdict_g(e3_curve, p1_curve, na1[0], na0[0],
+                                res["P1"][arm]["n"])
+        res["descriptifs"][arm] = {
+            "h": {"valeurs_30": hv, "moyenne": hm, "ecart_type": hsd,
+                  "mediane": statistics.median(hv), "bootstrap": boot,
+                  "sd_inter_unites_N13": hsd,
+                  "IC_Clopper_Pearson_si_h_nul": clopper_pearson(
+                      sum(1 for r in cells[arm] for qi in (1, 2, 3)
+                          if r[qi]["top10"]), 3 * n_u),
+                  "par_type_C3": {f"para{k}": float(np.mean(
+                      [1.0 if cells[arm][i][k]["top10"] else 0.0
+                       for i in range(n_u)])) for k in (1, 2, 3)},
+                  "note": "descriptive — n'entre dans AUCUNE porte (E-D5)"},
+            "ventilation_verbe": {
+                "legende_obligatoire": "verbe et owner sont aliasés "
+                                       "(verbe = f(owner)) ; aucun écart n'est "
+                                       "attribuable à l'un plutôt qu'à l'autre",
+                "par_verbe": {v: [i for i in range(n_u) if units[i]["verb"] == v]
+                              for v in sorted({u["verb"] for u in units})},
+                "P1_par_verbe": {v: sum(
+                    1 for i in range(n_u) if units[i]["verb"] == v
+                    and res["P1"][arm]["succes_par_unite"][i] >= P1_PARAPHRASE_MIN)
+                    for v in sorted({u["verb"] for u in units})}},
+            "F10": {"taux_succes": len(succ_f10) / float(len(f10)),
+                    "n_echecs": len(f10) - len(succ_f10),
+                    "log_F10_moyen_sur_succes": (float(np.mean(np.log(succ_f10)))
+                                                 if succ_f10 else math.nan),
+                    "note": "bimodale et CONSTANTE entre bras par construction ⇒ "
+                            "jamais comparée entre bras, jamais une médiane seule"},
+            "P8": {"verdict": v_p8, **d_p8, "serie_rang_par_decile_d2min": serie},
+            "G": {"verdict": v_g, **d_g, "tau_grille": tau_grid,
+                  "E3_courbe": e3_curve, "P1_courbe": p1_curve,
+                  "n_alpha1": na1, "n_alpha0": na0, "lambda": V3_G_LAMBDA},
+        }
+        print(f"  bras {arm:<3} : h = {hm:.3f} ± {hsd:.3f} (médiane "
+              f"{statistics.median(hv):.3f}, N=30) | par type "
+              f"{res['descriptifs'][arm]['h']['par_type_C3']}")
+        print(f"            F₁₀ : {len(succ_f10)}/{len(f10)} succès "
+              f"({len(f10) - len(succ_f10)} échecs)")
+        print(f"            P8 : {v_p8} | G : {v_g}")
+        csv_rows.append(["h", arm, "taux_recuperation", hm, hsd, 30])
+
+    # ================================================ multi-clé (3 nulles)
+    print("\n================ multi-clé — nulle globale / stratifiée / ventilée ================")
+    res["multicle"] = {}
+    if "E_keys_final" in arrays:
+        pos_d = arrays["E_positions"]
+        for arm, kn in V3_ARMS:
+            DK = arrays[f"E_keys_{kn}"]
+            corr_idx = []
+            for u in units:
+                i = u["i"]
+                V = arrays[f"U{i}_values"]
+                t = int(arrays[f"U{i}_q0_target"][0])
+                hit = np.nonzero(V == t)[0]
+                corr_idx.append(int(hit[0]) if hit.size else 0)
+            Kc = np.stack([arrays[f"U{i}_keys_{kn}"][corr_idx[i]] for i in range(n_u)])
+            Qs = np.stack([arrays[f"U{i}_q{qi}_{kn}"] for i in range(n_u)
+                           for qi in range(4)])
+            cos_qd = _cos_matrix(Qs, DK)              # [120, 30000]
+            cos_qk = _cos_matrix(Qs, Kc)              # [120, 30]
+            max_d = cos_qd.max(axis=1)
+            nd = float(DK.shape[0])
+
+            def pct(qrow, target_cos):
+                return float((cos_qd[qrow] >= target_cos).sum()) / nd
+
+            pct_intra_para, pct_inter, m_intra, m_inter = [], [], [], []
+            pct_exact = []
+            # Ventilation par NOMBRE EXACT d'attributs partagés (owner/entity/
+            # verbe). Le §16 I déclare la diversité réduite (5 owners / 6 entités)
+            # ⇒ des paires à 2 attributs partagés EXISTENT : elles sont comptées
+            # à part, jamais repliées sur le bucket « 1 partagé ».
+            vent = {"0": [], "1": [], "2+": []}
+            for i in range(n_u):
+                for qi in range(4):
+                    r = i * 4 + qi
+                    p_own = pct(r, cos_qk[r, i])
+                    if qi == 0:
+                        pct_exact.append(p_own)
+                        continue
+                    pct_intra_para.append(p_own)
+                    m_intra.append(float(cos_qk[r, i] - max_d[r]))
+                    for j in range(n_u):
+                        if j == i:
+                            continue
+                        p_o = pct(r, cos_qk[r, j])
+                        pct_inter.append(p_o)
+                        m_inter.append(float(cos_qk[r, j] - max_d[r]))
+                        shared = sum([units[i]["owner"] == units[j]["owner"],
+                                      units[i]["entity"] == units[j]["entity"],
+                                      units[i]["verb"] == units[j]["verb"]])
+                        vent["2+" if shared >= 2 else str(shared)].append(p_o)
+            units_a = [sum(1 for qi in (1, 2, 3) if cells[arm][i][qi]["R1"] > 1)
+                       >= P1_PARAPHRASE_MIN for i in range(n_u)]
+            units_b = [(statistics.median(pct_intra_para[i * 3:(i + 1) * 3])
+                        >= GB.MULTIKEY_PCT_PARA)
+                       and (pct_exact[i] <= GB.MULTIKEY_PCT_EXACT)
+                       for i in range(n_u)]
+            # nulle STRATIFIÉE par bucket de position
+            edges = np.quantile(pos_d.astype(np.float64), np.linspace(0, 1, 11))
+            buckets, strat = [], []
+            for k in range(10):
+                sel = np.nonzero((pos_d >= edges[k]) & (pos_d <= edges[k + 1]))[0]
+                if len(sel) >= V3_BUCKET_MIN:
+                    buckets.append(sel)
+            strat_ok = len(buckets) >= V3_BUCKET_MIN_COUNT
+            for sel in buckets:
+                sub = cos_qd[:, sel]
+                nb = float(len(sel))
+                pi, pj = [], []
+                for i in range(n_u):
+                    for qi in (1, 2, 3):
+                        r = i * 4 + qi
+                        pi.append(float((sub[r] >= cos_qk[r, i]).sum()) / nb)
+                        j = (i + 1) % n_u
+                        pj.append(float((sub[r] >= cos_qk[r, j]).sum()) / nb)
+                strat.append({"n_cles": int(len(sel)),
+                              "median_intra": statistics.median(pi),
+                              "median_inter": statistics.median(pj),
+                              "c_vraie": statistics.median(pi) < statistics.median(pj)})
+            glob_c, voie = GB.multikey_clause_c(pct_intra_para, pct_inter,
+                                                m_intra, m_inter)
+            same = (all(s["c_vraie"] == glob_c for s in strat) if strat_ok else True)
+            v_mk, d_mk = GB.verdict_multikey(units_a, units_b, pct_intra_para,
+                                             pct_inter, m_intra, m_inter,
+                                             strat_qualitatif_identique=same)
+            v_vent = GB.verdict_ventilation(statistics.median(pct_intra_para),
+                                            statistics.median(vent["1"]) if vent["1"]
+                                            else math.nan,
+                                            statistics.median(vent["0"]) if vent["0"]
+                                            else math.nan)
+            res["multicle"][arm] = {
+                "verdict": v_mk, **d_mk,
+                "nulle_globale": {"median_pct_intra": statistics.median(pct_intra_para),
+                                  "median_pct_inter": statistics.median(pct_inter),
+                                  "median_pct_exact": statistics.median(pct_exact),
+                                  "median_m_intra": statistics.median(m_intra),
+                                  "median_m_inter": statistics.median(m_inter),
+                                  "median_cos_brut_intra": float(np.median(
+                                      [cos_qk[i * 4 + qi, i] for i in range(n_u)
+                                       for qi in (1, 2, 3)])),
+                                  "resolution": 1.0 / nd},
+                "nulle_stratifiee": {"buckets": strat, "evaluable": strat_ok,
+                                     "accord_qualitatif_avec_globale": same},
+                "nulle_ventilee_0_1_attribut": {
+                    "median_0_partage": (statistics.median(vent["0"])
+                                         if vent["0"] else math.nan),
+                    "median_1_partage": (statistics.median(vent["1"])
+                                         if vent["1"] else math.nan),
+                    "median_2plus_partages": (statistics.median(vent["2+"])
+                                              if vent["2+"] else math.nan),
+                    "median_intra": statistics.median(pct_intra_para),
+                    "verdict": v_vent,
+                    "n_paires_0": len(vent["0"]), "n_paires_1": len(vent["1"]),
+                    "n_paires_2plus": len(vent["2+"]),
+                    "note": "§16 I : diversité réduite (5 owners / 6 entités) ⇒ des "
+                            "paires partagent 2 attributs ; comptées à part"},
+            }
+            print(f"  bras {arm:<3} : {v_mk} (voie {d_mk['voie_de_decision_c']}) | "
+                  f"pct intra {statistics.median(pct_intra_para):.6f} vs inter "
+                  f"{statistics.median(pct_inter):.6f} | exact "
+                  f"{statistics.median(pct_exact):.6f}")
+            print(f"            stratifiée : {len(buckets)} buckets, accord = {same} "
+                  f"| ventilation 0/1 → {v_vent}")
+
+            # ------------------------------------------------------------ P7
+            deg_rows = []
+            for u in units:
+                i = u["i"]
+                K = np.concatenate([DK, arrays[f"U{i}_keys_{kn}"]], axis=0)
+                V = np.concatenate([arrays["E_values"], arrays[f"U{i}_values"]])
+                ok = 0
+                for qi in (1, 2, 3):
+                    e = _v3_eval(K, V, arrays[f"U{i}_q{qi}_{kn}"],
+                                 arrays[f"U{i}_q{qi}_logp"],
+                                 int(arrays[f"U{i}_q{qi}_target"][0]))
+                    if e["top10"]:
+                        ok += 1
+                deg_rows.append({"unite": i, "h_distracteur": ok / 3.0,
+                                 "h_fait_seul": h_values[arm][i],
+                                 "densite_locale_pct": statistics.median(
+                                     pct_intra_para[i * 3:(i + 1) * 3]),
+                                 "taille_store": int(len(arrays[f"U{i}_values"]))})
+            h_f = float(np.mean([r["h_fait_seul"] for r in deg_rows]))
+            h_d = float(np.mean([r["h_distracteur"] for r in deg_rows]))
+            degr = ((h_f - h_d) / h_f) if h_f > 0 else math.nan
+            v_p7 = GB.verdict_p7(degr) if not math.isnan(degr) else "NON ÉVALUABLE"
+            dd = [r["h_fait_seul"] - r["h_distracteur"] for r in deg_rows]
+            res.setdefault("P7", {})[arm] = {
+                "h_fait_seul_moyen": h_f, "h_distracteur_moyen": h_d,
+                "degradation": degr, "verdict": v_p7,
+                "corr_degradation_densite_locale": pearson(
+                    dd, [r["densite_locale_pct"] for r in deg_rows]),
+                "corr_degradation_taille_store": pearson(
+                    dd, [r["taille_store"] for r in deg_rows]),
+                "par_unite": deg_rows}
+            print(f"            P7 : h fait-seul {h_f:.3f} → distracteur {h_d:.3f} "
+                  f"(dégradation {degr:.1%}) → {v_p7}")
+            csv_rows.append(["P7", arm, "degradation", degr, "", 30])
+    else:
+        res["multicle"] = {"statut": "passe E non exécutée (data/rfc9293.txt absent)"}
+
+    # ================================================ additivité + E1c
+    print("\n================ descriptifs lus APRÈS verdict : additivité, E1c ================")
+    res["additivite"] = {}
+    for arm, kn in V3_ARMS:
+        rows = []
+        for u in units:
+            i = u["i"]
+            for qi in (1, 2, 3):
+                if f"M{i}_q{qi}_logp" not in arrays:
+                    continue
+                c0 = cells[arm][i][qi]
+                r_m = mix_rank(arrays[f"M{i}_q{qi}_logp"], c0["pk"], LAMBDA_STAR,
+                               int(arrays[f"M{i}_q{qi}_target"][0]))
+                rows.append({"unite": i, "para": qi, "rang_M_plus_kNN": int(r_m),
+                             "rang_kNN_seul": c0["rank"]})
+        res["additivite"][arm] = {
+            "n": len(rows),
+            "top10_M_plus_kNN": sum(1 for r in rows if r["rang_M_plus_kNN"] <= 10),
+            "top10_kNN_seul": sum(1 for r in rows if r["rang_kNN_seul"] <= 10),
+            "etiquette_obligatoire": "mesure du prior de GPT-2, pas du canal",
+            "lignes": rows}
+        print(f"  bras {arm:<3} : additivité — top-10 M+kNN "
+              f"{res['additivite'][arm]['top10_M_plus_kNN']}/{len(rows)} vs kNN seul "
+              f"{res['additivite'][arm]['top10_kNN_seul']}/{len(rows)}")
+    e1c = {}
+    for arm, kn in V3_ARMS:
+        out = {}
+        for tag in ("m0", "mload"):
+            lp = arrays[f"C_{tag}_w0_logp"]
+            tm = int(arrays[f"C_{tag}_w0_target"][0])
+            tp = int(arrays[f"C_{tag}_w1_target"][0])
+            p = np.exp(lp.astype(np.float64))
+            e = _v3_eval(arrays[f"C_keys_{kn}"], arrays["C_values"],
+                         arrays[f"C_{tag}_w0_{kn}"], lp, tm)
+            q_m = float(e["pk"].get(tm, 0.0))
+            q_p = float(e["pk"].get(tp, 0.0))
+            num = float(p[tp] - p[tm])
+            den = num + (q_m - q_p)
+            lam_renv = (num / den) if den > 0 else math.inf
+            out[tag] = {"p_Paris": float(p[tp]), "p_Marseille": float(p[tm]),
+                        "q_Marseille": q_m, "q_Paris": q_p,
+                        "lambda_renv": lam_renv,
+                        "F": (lam_renv / LAMBDA_STAR
+                              if math.isfinite(lam_renv) else math.inf),
+                        "clause_F_le_10.252": bool(math.isfinite(lam_renv)
+                                                   and lam_renv / LAMBDA_STAR
+                                                   <= F_HARD_BOUND),
+                        "rang_mix": e["rank"], "R3": e["R3"]}
+        e1c[arm] = out
+        print(f"  bras {arm:<3} : E1c λ_renv (M=0) = "
+              f"{out['m0']['lambda_renv']:.4f} → F = {out['m0']['F']:.3f} "
+              f"(clause F ≤ {F_HARD_BOUND:.3f} : {out['m0']['clause_F_le_10.252']})")
+    res["E1c"] = {"valeurs": e1c,
+                  "etiquette_obligatoire": "mesure du prior de GPT-2, pas du canal"}
+
+    # ================================================ table d'attribution (§6)
+    print("\n================ TABLE D'ATTRIBUTION R1 / R1v / R3 (PAR BRAS) ================")
+    attr = {}
+    for arm, kn in V3_ARMS:
+        ex = [cells[arm][i][0] for i in range(n_u)]
+        pa = [cells[arm][i][qi] for i in range(n_u) for qi in (1, 2, 3)]
+        med = lambda xs, k: statistics.median([x[k] for x in xs])   # noqa: E731
+        r1_p, r1v_p, r3_p = med(pa, "R1"), med(pa, "R1v"), med(pa, "R3")
+        r1_e, r1v_e, r3_e = med(ex, "R1"), med(ex, "R1v"), med(ex, "R3")
+        branche = ("A — échec côté CLÉ (V2-D non réfuté)"
+                   if (r1_p > 1 and r1v_p > 1) else
+                   ("B — échec côté INJECTION" if (r1_p == 1 and r1v_p == 1)
+                    else "ni A ni B (profil mixte)"))
+        attr[arm] = {"exact": {"R1_med": r1_e, "R1v_med": r1v_e, "R3_med": r3_e,
+                               "R1_eq1_frac": float(np.mean([x["R1"] == 1
+                                                             for x in ex])),
+                               "R4_med": med(ex, "R4")},
+                     "paraphrase": {"R1_med": r1_p, "R1v_med": r1v_p, "R3_med": r3_p,
+                                    "R1_eq1_frac": float(np.mean([x["R1"] == 1
+                                                                  for x in pa])),
+                                    "R1v_eq1_frac": float(np.mean([x["R1v"] == 1
+                                                                   for x in pa])),
+                                    "R4_med": med(pa, "R4")},
+                     "branche": branche,
+                     "P1": res["P1"][arm]["n"], "verdict_P1": res["P1"][arm]["verdict"]}
+        print(f"  bras {arm:<3} | exact      R1 {r1_e:5.1f}  R1v {r1v_e:7.1f}  "
+              f"R3 {r3_e:.6f}")
+        print(f"           | paraphrase R1 {r1_p:5.1f}  R1v {r1v_p:7.1f}  "
+              f"R3 {r3_p:.6f}  ⇒ Branche {branche}")
+    res["table_attribution"] = attr
+
+    # ================================================ covariables C1/C2/C3
+    tokenize, _ = GB.make_tokenizer(True)
+    enc = lambda s: frozenset(int(t) for t in tokenize(s))          # noqa: E731
+    cov = []
+    for u in units:
+        i = u["i"]
+        fact = enc(u["fact_no_secret"])
+        for qi, name in enumerate(V3_INDEX_NAMES):
+            src = u["exact"] if qi == 0 else u["paraphrases"][qi - 1]
+            e = enc(src)
+            j = len(e & fact) / len(e | fact) if (e | fact) else 0.0
+            cov.append({"unite": i, "indice": name, "C1_jaccard": j,
+                        "C2_p10_F": cells["F"][i][qi]["p10"],
+                        "C2_nll_base": float(arrays[f"U{i}_q{qi}_nll_base"][0]),
+                        "C3_type": name,
+                        "taille_store": int(len(arrays[f"U{i}_values"]))})
+    res["covariables"] = {"lignes": cov,
+                          "C3_note": "seul VRAI facteur intra-unité ; n'entre dans "
+                                     "aucune porte",
+                          "corr_rang_mix_logp_base_par_unite": {
+                              arm: [pearson([cells[arm][i][qi]["rank"] for qi in range(4)],
+                                            [cells[arm][i][qi]["logp_target"]
+                                             for qi in range(4)])
+                                    for i in range(n_u)] for arm, _ in V3_ARMS}}
+
+    # ================================================ sortie
+    res["interdictions_vocabulaire_§2"] = [
+        "(i) invariance à la paraphrase lexicale à l'intérieur d'un cadre "
+        "attributif unique — JAMAIS « généralisation » ; la propriété non mesurée "
+        "s'appelle transfert inter-constructionnel",
+        "(ii) seule phrase autorisée : « la couche 6 bat l'état final » — JAMAIS "
+        "« l'invariance vit dans les couches intermédiaires »",
+        "(iii) D15 — la borne ΔNLL_t ≤ −log(1−λ) appartient à la CONVEXITÉ DU "
+        "MÉLANGE, pas à l'étage des logits ; l'innocuité constatée sur (a) ne se "
+        "transporte pas à (b)",
+        "(iv) un succès L6 ne s'écrit JAMAIS « complétion de patterns » ni « CA3 » ; "
+        "seul mot autorisé : « lookup sous clé dégradée »"]
+    for f in raw.glob("gpu_raw_v3.npz"):
+        res["hash_bruts"] = {f.name: sha256_file(f)}
+    for f in (raw / "gpu_meta_v3.json", raw / "borne_marge_scellee.json"):
+        if f.exists():
+            res.setdefault("hash_bruts", {})[f.name] = sha256_file(f)
+    _dump(out_dir, res, csv_rows)
+    print(f"\n  → {out_dir / 'analysis.json'} | {out_dir / 'summary.csv'}")
+    return res
+
+
 def _dump(out_dir, res, csv_rows):
     with open(out_dir / "analysis.json", "w", encoding="utf-8") as f:
         json.dump(res, f, ensure_ascii=False, indent=1, default=str)
@@ -2425,12 +3835,25 @@ def main():
     ap.add_argument("--distractor-tokens", type=int, default=DISTRACTOR_TOKENS)
     ap.add_argument("--skip-distractor", action="store_true")
     ap.add_argument("--out", default=None)
+    # AMENDEMENT v3 : `--protocol v3` exécute le protocole
+    # experiments/EXP-2026-08-22-knn-borne-logits-v3.md (30 unités, deux bras).
+    # Défaut = `v2` ⇒ les chemins existants sont INCHANGÉS.
+    ap.add_argument("--protocol", default="v2", choices=["v2", "v3"])
     args = ap.parse_args()
 
     root = Path(__file__).resolve().parents[1]
+    default_out = ("knn-borne-logits-v3" if args.protocol == "v3"
+                   else "knn-borne-logits-v2")
     out_dir = Path(args.out) if args.out else \
-        root / "experiments" / "results" / "knn-borne-logits-v2"
+        root / "experiments" / "results" / default_out
     out_dir.mkdir(parents=True, exist_ok=True)
+
+    if args.protocol == "v3":
+        if args.phase in ("gpu", "all"):
+            _gpu_phase_v3(args, out_dir)
+        if args.phase in ("analysis", "all"):
+            _analysis_phase_v3(args, out_dir)
+        return
 
     if args.phase in ("gpu", "all"):
         _gpu_phase(args, out_dir)

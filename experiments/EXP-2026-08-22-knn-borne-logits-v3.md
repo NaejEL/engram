@@ -1,6 +1,6 @@
 # EXP — V2-D(a) v3 : borne de l'étage des logits, design refondé, sous gate de satisfiabilité
 
-**Statut : PRE-ENREGISTRE**
+**Statut : TERMINE — INCONCLUSIF**
 
 Origine : `docs/EXTENSIONS.md` §2 (V2-D, candidat a) · « Suite » du journal 2026-08-22 · décision PI « cycle méthode d'abord », arbitrages délégués au copilote (2026-08-22).
 Antécédents : `experiments/EXP-2026-08-21-knn-borne-logits.md` (INVALIDE) · `experiments/EXP-2026-08-21-knn-borne-logits-v2.md` (INVALIDE + ERRATUM).
@@ -750,6 +750,9 @@ l'enseignement le plus réutilisable du cycle méthode.
 
 
 ## Historique
+
+- 2026-08-22 : **TERMINE — verdict INCONCLUSIF** (confondant d'instrument : `knn_k ≥ |store|`,
+  pas d'étape d'adressage). Arrêt formel conforme par P3[L6], médiane 4/30.
 
 - 2026-08-22 : **PRE-ENREGISTRE par le PI** (gate franchie apres banc E = 0).
   A partir d'ici, les sections Predictions chiffrees (4.1-4.6) et Criteres d'abandon (6)
