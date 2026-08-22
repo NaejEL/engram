@@ -10,7 +10,9 @@ cache local), là où la clause n'est pas décidable sans lui.
 
   (i)    **`V-diversité` échoue sur le jeu v3 et passe sur `fact_pairs(80)`** ;
   (ii)   `V-puissance` rend K = 14 (N=30 FAIL), 16 (N=80 PASS), **FAIL sous
-         décision AUC à tout N ≤ 80** ;
+         décision AUC à tout N ≤ 80** — le chiffre 429 est RETIRÉ, la porte
+         calcule le K requis sous chaque opérationnalisation et **imprime le
+         facteur** ;
   (iii)  recensement **411/14/10/0** et **2880/160/120/0**, `P-both = ∅` prouvé
          par `lcm(16,20) = 80` ;
   (iv)   `V-paires` détecte 239 ou 241 ;
@@ -28,7 +30,8 @@ cache local), là où la clause n'est pas décidable sans lui.
          **indépendant des similarités mesurées** ;
   (xiii) **l'estimateur débiaisé diffère du max brut à effet nul**, « max des
          IC » rejeté ;
-  (xiv)  `V-bandes` classe quatre bandes, trois bords, et rend **I** quand un
+  (xiv)  `V-bandes` classe quatre bandes, trois bords, le cas `IC(ΔR1)`
+         **entièrement négatif** (⇒ N + sous-étiquette), et rend **I** quand un
          modèle est I et l'autre V.
 
 Les tests affirment ce qui est OBSERVÉ, jamais ce qui est souhaité : un désaccord
@@ -52,7 +55,8 @@ from gate_bench import (  # noqa: E402
     gate_nulle_cadre, gate_recensement_avec_classifieur,
     gate_recensement_identite, gate_v_1pass, gate_v_bandes, gate_v_diversite,
     gate_v_hooks, gate_v_paires, gate_v_plat, gate_v_puissance, gate_v_source,
-    gate_v_suffixe, make_offsets, _cas_estimateur_debiaise,
+    gate_v_puissance_auc, gate_v_suffixe, make_offsets,
+    _cas_estimateur_debiaise,
     _cas_max_des_ic_rejete, _forwards_boucle_sur_les_couches,
     _forwards_un_passage, _hooks_apres_capture, _hooks_fuite,
     _stratifier_avec_verbe, run_i2,
@@ -125,15 +129,29 @@ def test_ii_v_puissance_14_fail_16_pass_et_fail_sous_AUC(corpus80):
     v30, d30 = gate_v_puissance(k30)
     assert v30 == FAIL and "puissance du DESIGN" in d30["cause_du_FAIL"]
 
-    # décision AUC : FAIL à tout N ≤ 80, indécidabilité NOMMÉE
+    # décision AUC : le chiffre 429 est RETIRÉ (non re-dérivable, D14-R) ; la
+    # porte recalcule le K requis sous CHAQUE opérationnalisation, le compare au
+    # K disponible et IMPRIME LE FACTEUR. FAIL à tout N ≤ 80.
+    assert not hasattr(lp, "K_REQUIS_AUC_PROTOCOLE")
+    r = lp.enonce_robuste_auc()
+    assert sorted(t["K_requis_exact"] for t in r["table"]) == [437.7, 441.9,
+                                                              2744.6]
+    assert r["K_requis_min"] == 438 and r["K_requis_max"] == 2745
+    assert r["K_disponible"] == lp.K_PLAFOND_POOL == 20
+    assert r["facteur_min"] == 21.9 and r["robuste"] is True
+    assert "NE DÉPEND D'AUCUN choix de σ₀ ni de marge" in r["enonce"]
     for k in (14, 16, 20):
-        v, d = gate_v_puissance(k, statistique="AUC",
-                                k_requis=lp.K_REQUIS_AUC_PROTOCOLE)
+        v, d = gate_v_puissance_auc(k)
         assert v == FAIL
+        assert d["chiffre_429"].startswith("RETIRÉ")
         assert d["indecidable_a_tout_N"] is True
+        assert d["robuste_au_choix_d_operationnalisation"] is True
+        assert d["facteur_min"] >= 21.9                      # facteur IMPRIMÉ
+        assert "facteur" in d["cause_du_FAIL"]
         assert "aucune répétition ne lève cette porte" in \
             d["nom_de_l_indecidabilite"]
-    assert lp.K_REQUIS_AUC_PROTOCOLE == 429
+    # aucune opérationnalisation examinée ne rend le couloir décidable
+    assert all(t["K_requis"] > lp.K_PLAFOND_POOL for t in r["table"])
 
 
 # ----------------------------------------------------------------- (iii)
@@ -507,6 +525,12 @@ def test_xiv_les_quatre_bandes_trois_bords_et_la_precedence_de_D():
     assert lp.bande_modele((0.05, 0.40), (0.05, 0.60)) == lp.BANDE_I
     assert lp.bande_modele((0.05, 0.40), (0.55, 0.90)) == lp.BANDE_V
 
+    # correctif D18 du 2026-08-22 : `IC(ΔR1)` ENTIÈREMENT NÉGATIF avec
+    # `IC_inf(R1) < T` ⇒ **N** avec sous-étiquette, jamais HORS-PARTITION
+    assert lp.bande_modele((-0.20, -0.05), (0.00, 0.05)) == lp.BANDE_N
+    assert lp.delta_r1_negatif((-0.20, -0.05)) is True
+    assert lp.delta_r1_negatif((-0.10, 0.10)) is False
+
     # les TROIS bords gravés
     assert lp.bande_modele((0.05, 0.40), (0.05, T)) == lp.BANDE_I     # IC_sup = T
     assert lp.bande_modele((0.05, 0.40), (T, 0.60)) == lp.BANDE_V     # IC_inf = T
@@ -530,6 +554,11 @@ def test_xiv_les_quatre_bandes_trois_bords_et_la_precedence_de_D():
     assert det["hors_partition"] == []
     assert set(det["bandes_rencontrees"]) <= set(lp.BANDES)
     assert det["bords_conformes"] and det["precedence_conforme"]
+    cn = det["cas_delta_R1_entierement_negatif"]
+    assert det["cas_negatif_conforme"] is True
+    assert cn["bande"] == lp.BANDE_N
+    assert cn["sous_etiquette_delta_R1_negatif"] is True
+    assert "fait sur l'INSTRUMENT" in cn["lecture"]
 
 
 def test_xiv_les_quatre_cellules_sont_classees_y_compris_aux_bords():
@@ -624,6 +653,12 @@ def test_le_banc_i2_tourne_de_bout_en_bout_et_rapporte_E(tmp_path, gpt2_tokenize
     assert rep["partition_identite"]["clusters"]["P-own"]["K_N80"] == 16
     assert rep["partition_identite"]["clusters"]["P-own"]["K_N30"] == 14
     assert rep["puissance"]["K_requis_R1_36"] == 16
+    assert rep["puissance"]["chiffre_429"].startswith("RETIRÉ")
+    assert rep["puissance"]["decision_AUC"]["K_requis_min"] == 438
+    assert rep["puissance"]["decision_AUC"]["facteur_min"] == 21.9
+    assert set(rep["statut_des_operationnalisations"]) == {
+        "V-puissance (décision AUC)", "Bande N (ΔR1 négatif)",
+        "R1_36 — égalités", "R1_36 (P-ent)"}
     assert (tmp_path / "report.json").exists()
     en_cause = {r["clause"] for r in rep["clauses"] if r["compte_dans_E"]}
     assert rep["E"] == len(en_cause)

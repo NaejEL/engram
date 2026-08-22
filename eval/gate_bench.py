@@ -1720,24 +1720,15 @@ import layer_profile as lp  # noqa: E402
 I2_TOL_AUC = 1e-12            # égalité d'AUC sous transformation monotone
 I2_TOL_H = 1e-6               # égalité relative de H sous mise à l'échelle
 I2_TOL_SUFFIXE = 1e-9         # égalité aux constantes DÉRIVÉES de `V-suffixe`
-I2_K_PLAFOND_POOL = max(lp.N_ENTITES, lp.N_OWNERS)   # 20 : K max de ce pool
+I2_K_PLAFOND_POOL = lp.K_PLAFOND_POOL                # 20 : K max de ce pool
 
+# Deux sous-spécifications du premier passage ont été TRANCHÉES au
+# pré-enregistrement (protocole du 2026-08-22, second correctif) et ne figurent
+# donc plus ici : (i) le chiffre « K ≥ 429 » est RETIRÉ, remplacé par l'énoncé
+# robuste calculé sous toutes les opérationnalisations ; (ii) la bande N est
+# définie par `IC_inf(ΔR1) ≤ 0`, avec sous-étiquette descriptive pour le cas
+# significativement négatif. Les deux restantes sont ACCEPTÉES telles quelles.
 UNDERSPEC_I2 = {
-    "V-puissance (décision AUC)":
-        "le protocole PORTE le résultat « K ≥ 429 sous décision AUC à "
-        "T = 0.9622 » mais PAS la valeur de |θ−T| qui le produit. Le banc "
-        "recopie le K requis déclaré (%d) et publie EN PLUS sa propre "
-        "dérivation candidate (marge = largeur du couloir en AUC = %.6f ⇒ "
-        "K ≥ %d). Les deux rendent FAIL à tout N ≤ 80 (K plafonne à %d dans ce "
-        "pool) : la conclusion de la porte ne dépend pas de la levée."
-        % (lp.K_REQUIS_AUC_PROTOCOLE, lp.MARGE_AUC_BANC,
-           lp.k_requis(lp.SIGMA0, lp.MARGE_AUC_BANC), I2_K_PLAFOND_POOL),
-    "Bande N (ΔR1 négatif)":
-        "le protocole ne nomme pas le cas `ΔR1` significativement NÉGATIF. Le "
-        "banc déclare que la bande N est l'absence de `ΔR1` significativement "
-        "positif (`IC_inf(ΔR1) ≤ 0`) — seule lecture rendant la partition "
-        "exhaustive et mutuellement exclusive sans amender une clause. Le cas "
-        "négatif est publié comme SOUS-ÉTIQUETTE descriptive.",
     "R1_36 — égalités":
         "le protocole fixe « égalités ½ crédit » pour l'AUC ; le banc étend la "
         "règle au plus proche voisin : une égalité à `g` gagnants dont la cible "
@@ -1750,6 +1741,21 @@ UNDERSPEC_I2 = {
     "V-plat": "le protocole fixe `R = max−min`, le bootstrap et la courbe "
               "centrée par unité, pas la fabrique de `R*` ; le banc déclare le "
               "double centrage (par unité puis par couche) comme vérité plate.",
+}
+
+# Statut des opérationnalisations déclarées, après arbitrage du 2026-08-22.
+STATUT_OPERATIONNALISATIONS_I2 = {
+    "V-puissance (décision AUC)": "TRANCHÉE au pré-enregistrement — le chiffre "
+        "429 est RETIRÉ (non re-dérivable, D14-R) ; la porte calcule le K requis "
+        "sous chaque opérationnalisation et déclare le FACTEUR.",
+    "Bande N (ΔR1 négatif)": "TRANCHÉE au pré-enregistrement — bande N définie "
+        "par `IC_inf(ΔR1) ≤ 0` ; le cas significativement négatif est une "
+        "sous-étiquette DESCRIPTIVE (le corpus réel séparerait moins bien que sa "
+        "propre nulle : fait sur l'instrument, pas sur le cortex).",
+    "R1_36 — égalités": "ACCEPTÉE telle quelle (conservatrice, ne change aucun "
+        "verdict) — ira au journal.",
+    "R1_36 (P-ent)": "ACCEPTÉE telle quelle (conservatrice, ne change aucun "
+        "verdict) — ira au journal.",
 }
 
 # Chiffres de v3 interdits dans une porte, un seuil ou une prédiction (`V-amont`,
@@ -1779,28 +1785,56 @@ def gate_v_diversite(slots, n: int = None) -> tuple[str, dict]:
 
 
 def gate_v_puissance(k: int, sigma0: float = lp.SIGMA0, marge: float = lp.MARGE_R1,
-                     statistique: str = "R1_36",
-                     k_requis: int = None) -> tuple[str, dict]:
+                     statistique: str = "R1_36") -> tuple[str, dict]:
     """`V-puissance` (§4.7) : **PASS ssi** `K_S ≥ (1.96·σ₀/|θ−T|)²`.
 
     σ₀ = 0.5 (Bernoulli, conservateur), |θ−T| = 0.25 ⇒ **K ≥ 16**. **Fusion avec
-    `V-diversité` refusée** : un FAIL doit NOMMER sa cause. Sous décision AUC, la
-    porte **déclare elle-même l'indécidabilité**.
+    `V-diversité` refusée** : un FAIL doit NOMMER sa cause.
     """
-    kr = lp.k_requis(sigma0, marge) if k_requis is None else int(k_requis)
+    kr = lp.k_requis(sigma0, marge)
     ok = k >= kr
     det = {"statistique": statistique, "K": k, "K_requis": kr,
+           "K_requis_exact": round(lp.k_requis_exact(sigma0, marge), 2),
            "sigma0": sigma0, "marge_theta_moins_T": marge,
+           "formule": "K ≥ (1.96·σ₀/|θ−T|)²",
+           "facteur_requis_sur_disponible": round(kr / k, 2) if k else None,
+           "cause_du_FAIL": None}
+    if not ok:
+        det["cause_du_FAIL"] = f"K = {k} < {kr} requis (puissance du DESIGN)"
+    return (PASS if ok else FAIL, det)
+
+
+def gate_v_puissance_auc(k: int = lp.K_PLAFOND_POOL,
+                         operationnalisations=None) -> tuple[str, dict]:
+    """`V-puissance` **sous décision AUC** (§3, correctif du 2026-08-22).
+
+    Le chiffre « K ≥ 429 » est **RETIRÉ** : il n'est pas re-dérivable (D14-R —
+    un chiffre sans sa dérivation ne se cite pas). La porte **recalcule** le `K`
+    requis sous chaque opérationnalisation examinée, le compare au `K`
+    disponible, **imprime le facteur**, et déclare que la conclusion —
+    *le couloir en AUC est indécidable à tout N ≤ 80* — **ne dépend d'aucun
+    choix de σ₀ ni de marge**.
+    """
+    ops = lp.OPERATIONNALISATIONS_AUC if operationnalisations is None         else operationnalisations
+    r = lp.enonce_robuste_auc(k, ops)
+    ok = k >= r["K_requis_min"]
+    det = {"statistique": "AUC (T = 0.9622)", "K": k,
+           "chiffre_429": "RETIRÉ — non re-dérivable (D14-R)",
+           "K_requis_par_operationnalisation": r["table"],
+           "K_requis_min": r["K_requis_min"], "K_requis_max": r["K_requis_max"],
+           "facteur_min": r["facteur_min"],
+           "robuste_au_choix_d_operationnalisation": r["robuste"],
            "formule": "K ≥ (1.96·σ₀/|θ−T|)²",
            "cause_du_FAIL": None, "indecidable_a_tout_N": False}
     if not ok:
-        det["cause_du_FAIL"] = f"K = {k} < {kr} requis (puissance du DESIGN)"
-        if kr > I2_K_PLAFOND_POOL:
-            det["indecidable_a_tout_N"] = True
-            det["nom_de_l_indecidabilite"] = (
-                f"K plafonne à {I2_K_PLAFOND_POOL} dans ce pool (taille de la "
-                f"plus grande famille de composantes) ⇒ FAIL à tout N ≤ 80 : "
-                f"aucune répétition ne lève cette porte.")
+        det["cause_du_FAIL"] = (
+            f"K = {k} < {r['K_requis_min']} requis au minimum — facteur "
+            f"{r['facteur_min']}")
+        det["indecidable_a_tout_N"] = True
+        det["nom_de_l_indecidabilite"] = r["enonce"] + (
+            f" K plafonne à {lp.K_PLAFOND_POOL} dans ce pool (plus grande "
+            f"famille de composantes de slot), atteint dès N = 40 : aucune "
+            f"répétition ne lève cette porte.")
     return (PASS if ok else FAIL, det)
 
 
@@ -1961,6 +1995,18 @@ def gate_v_bandes(seuil=lp.T_COULOIR) -> tuple[str, dict]:
     bords_ok = (bords["IC_sup(R1) = T → I"] == lp.BANDE_I
                 and bords["IC_inf(R1) = T → V"] == lp.BANDE_V
                 and bords["IC(ΔR1) touche 0 par la borne inférieure → N"] == lp.BANDE_N)
+    # Correctif D18 du 2026-08-22 : le cas que la rédaction précédente laissait
+    # HORS-PARTITION — `IC(ΔR1)` entièrement NÉGATIF avec `IC_inf(R1) < T`.
+    ic_neg, ic_bas = (-0.20, -0.05), (0.00, 0.05)
+    cas_negatif = {
+        "ic_delta_R1": list(ic_neg), "ic_R1": list(ic_bas),
+        "bande": lp.bande_modele(ic_neg, ic_bas, seuil),
+        "sous_etiquette_delta_R1_negatif": lp.delta_r1_negatif(ic_neg),
+        "lecture": "le corpus réel séparerait MOINS BIEN que sa propre nulle — "
+                   "fait sur l'INSTRUMENT, pas sur le cortex ; descriptif, "
+                   "jamais décisionnel"}
+    negatif_ok = (cas_negatif["bande"] == lp.BANDE_N
+                  and cas_negatif["sous_etiquette_delta_R1_negatif"] is True)
     precedence = {
         "I + V → I": lp.bande_gate(lp.BANDE_I, lp.BANDE_V),
         "V + I → I": lp.bande_gate(lp.BANDE_V, lp.BANDE_I),
@@ -1975,11 +2021,13 @@ def gate_v_bandes(seuil=lp.T_COULOIR) -> tuple[str, dict]:
                and precedence["N + N → N"] == lp.BANDE_N)
     # mutuelle exclusivité : le classifieur rend UNE étiquette par observation
     exclusif = all(isinstance(c["bande"], str) for c in cas)
-    ok = (not hors) and bords_ok and prec_ok and exclusif
+    ok = (not hors) and bords_ok and prec_ok and exclusif and negatif_ok
     return (PASS if ok else FAIL,
             {"n_cas_balayes": len(cas), "hors_partition": hors,
              "bandes_rencontrees": sorted({c["bande"] for c in cas}),
              "bords": bords, "bords_conformes": bords_ok,
+             "cas_delta_R1_entierement_negatif": cas_negatif,
+             "cas_negatif_conforme": negatif_ok,
              "precedence_overlay_D": precedence, "precedence_conforme": prec_ok,
              "mutuellement_exclusive": exclusif})
 
@@ -2463,23 +2511,24 @@ def build_clauses_i2(tokenize, tok_name, offsets=None):
     clause("V-puissance",
            "`P-own` à N = 80 : K = 16 ≥ 16 requis ⇒ PASS **à l'égalité** (marge "
            "nulle, déclarée avant mesure)",
-           "`P-own` à N = 30 : K = 14 ⇒ FAIL ; **sous décision AUC : K ≥ 429 ⇒ "
-           "FAIL à tout N ≤ 80**, et la porte NOMME l'indécidabilité",
+           "`P-own` à N = 30 : K = 14 ⇒ FAIL ; **sous décision AUC, K requis "
+           "≥ 438 contre K ≤ 20 disponible (facteur ≥ 21.9) ⇒ FAIL à tout "
+           "N ≤ 80**, et la porte NOMME l'indécidabilité, robuste au choix "
+           "d'opérationnalisation",
            [(f"P-own, N=80 (K = {k_own80})", PASS,
              lambda: gate_v_puissance(k_own80)),
             (f"P-ent, N=80 (K = {k_ent80})", PASS,
              lambda: gate_v_puissance(k_ent80, statistique="R1_36 | P-ent"))],
            [(f"P-own, N=30 (K = {k_own30})", FAIL,
              lambda: gate_v_puissance(k_own30)),
-            ("décision AUC, K requis = 429 (recopié du §3)", FAIL,
-             lambda: gate_v_puissance(k_own80, statistique="AUC (T = 0.9622)",
-                                      k_requis=lp.K_REQUIS_AUC_PROTOCOLE)),
-            ("décision AUC, dérivation du banc (marge = couloir en AUC)", FAIL,
-             lambda: gate_v_puissance(k_own80, marge=lp.MARGE_AUC_BANC,
-                                      statistique="AUC (dérivation du banc)"))],
-           note=UNDERSPEC_I2["V-puissance (décision AUC)"] + " Fusion avec "
-                "`V-diversité` REFUSÉE (M-13) : un FAIL sans cause nommée est un "
-                "FAIL qu'on discute après coup.")
+            ("décision AUC, K disponible = 16 (P-own, N=80) — FACTEUR imprimé",
+             FAIL, lambda: gate_v_puissance_auc(k_own80)),
+            ("décision AUC, K disponible = 20 (plafond du pool) — FACTEUR "
+             "imprimé", FAIL, lambda: gate_v_puissance_auc(lp.K_PLAFOND_POOL))],
+           note="Le chiffre « K ≥ 429 » est RETIRÉ (non re-dérivable, D14-R). "
+                "Énoncé robuste calculé par la porte : " + lp.enonce_robuste_auc()[
+                    "enonce"] + " Fusion avec `V-diversité` REFUSÉE (M-13) : un "
+                "FAIL sans cause nommée est un FAIL qu'on discute après coup.")
 
     # ------------------------------ recensement d'identité (§4.2, N-10/N-11)
     att80 = {lp.P_0: 2880, lp.P_OWN: 160, lp.P_ENT: 120, lp.P_BOTH: 0}
@@ -2549,23 +2598,30 @@ def build_clauses_i2(tokenize, tok_name, offsets=None):
     # ---------------------------------------------------------- V-bandes
     clause("V-bandes (nouvelle, 0-9)",
            "la partition N / M / I / V est EXHAUSTIVE et MUTUELLEMENT EXCLUSIVE, "
-           "bords inclus, et la précédence de l'overlay `D` est vérifiée",
+           "bords inclus, `IC(ΔR1)` entièrement négatif compris, et la "
+           "précédence de l'overlay `D` est vérifiée",
            "un classifieur qui n'évalue pas `I` laisse un trou "
            "(`IC_inf < T ≤ IC_sup`) ⇒ HORS-PARTITION",
-           [("balayage complet + trois bords + précédence D", PASS,
-             lambda: gate_v_bandes())],
+           [("balayage complet + trois bords + précédence D + ΔR1 négatif", PASS,
+             lambda: gate_v_bandes()),
+            ("IC(ΔR1) entièrement négatif ET IC_inf(R1) < T ⇒ N + "
+             "sous-étiquette", lp.BANDE_N,
+             lambda: _bande((-0.20, -0.05), (0.00, 0.05)))],
            [("classifieur SANS la bande I (l'ancien §4.5)", lp.BANDE_HORS,
              lambda: (lambda b: (PASS if b in lp.BANDES else lp.BANDE_HORS,
                                  {"cas": "IC_inf < T ≤ IC_sup sans bande I",
                                   "bande_rendue": b}))(
                  lp.BANDE_HORS))],
            note="C'est la porte qui aurait empêché le protocole qui grave D18 de "
-                "violer D18 (défaut 0-9).")
+                "violer D18 (défaut 0-9) — et de la violer une SECONDE fois : la "
+                "clause réécrite pour réparer la première violation laissait "
+                "`IC(ΔR1)` entièrement négatif hors partition (correctif du "
+                "2026-08-22).")
 
     T = lp.T_COULOIR
     clause("Bande N — nulle (§4.5)",
-           "IC 95 % de `ΔR1` contient 0 ⇒ N, y compris quand il TOUCHE 0 par la "
-           "borne inférieure",
+           "`IC_inf(ΔR1) ≤ 0` ⇒ N : l'IC contient 0, TOUCHE 0 par la borne "
+           "inférieure, ou est ENTIÈREMENT NÉGATIF (sous-étiquette descriptive)",
            "`ΔR1` significativement > 0 ⇒ ce n'est plus N",
            [("IC(ΔR1) = [−0.10, 0.10]", lp.BANDE_N,
              lambda: _bande((-0.10, 0.10), (0.05, 0.60))),
@@ -2575,7 +2631,12 @@ def build_clauses_i2(tokenize, tok_name, offsets=None):
              lp.BANDE_N, lambda: _bande((-0.20, -0.05), (0.00, 0.05)))],
            [("IC(ΔR1) = [+1e-12, 0.30], R1 sous T", lp.BANDE_M,
              lambda: _bande((1e-12, 0.30), (0.05, T - 1e-12)))],
-           note=UNDERSPEC_I2["Bande N (ΔR1 négatif)"])
+           note="Bande N = **absence de `ΔR1` significativement positif** "
+                "(`IC_inf(ΔR1) ≤ 0`), correctif D18 du 2026-08-22 : l'IC "
+                "contient 0 OU est entièrement négatif. Le cas négatif porte la "
+                "sous-étiquette DESCRIPTIVE `delta_R1_significativement_negatif` "
+                "— le corpus réel séparerait moins bien que sa propre nulle, "
+                "fait sur l'instrument et non sur le cortex.")
 
     clause("Bande M — marginal (§4.5)",
            "`ΔR1` > 0 significatif ET `IC_sup(R1_36) < T = 0.25`",
@@ -2639,6 +2700,8 @@ def build_clauses_i2(tokenize, tok_name, offsets=None):
            "une observation qu'aucune clause ne couvre ⇒ HORS-PARTITION",
            [("IC(ΔR1) contient 0", "COUVERT",
              lambda: bande_couverte((-0.10, 0.10), (0.05, 0.60))),
+            ("IC(ΔR1) ENTIÈREMENT NÉGATIF, IC_inf(R1) < T", "COUVERT",
+             lambda: bande_couverte((-0.20, -0.05), (0.00, 0.05))),
             ("M", "COUVERT", lambda: bande_couverte((0.05, 0.40), (0.05, 0.20))),
             ("I (chevauche le seuil)", "COUVERT",
              lambda: bande_couverte((0.05, 0.40), (0.05, 0.60))),
@@ -3258,11 +3321,10 @@ def run_i2(use_hf: bool = True, out_dir: Path = OUT_DIR_I2) -> dict:
             "formule": "K ≥ (1.96·σ₀/|θ−T|)²",
             "sigma0": lp.SIGMA0, "marge_R1": lp.MARGE_R1,
             "K_requis_R1_36": lp.k_requis(),
-            "K_requis_AUC_recopié_du_protocole": lp.K_REQUIS_AUC_PROTOCOLE,
-            "K_requis_AUC_dérivation_du_banc":
-                lp.k_requis(lp.SIGMA0, lp.MARGE_AUC_BANC),
-            "marge_AUC_du_banc": lp.MARGE_AUC_BANC,
+            "chiffre_429": "RETIRÉ — non re-dérivable (D14-R)",
+            "decision_AUC": lp.enonce_robuste_auc(),
         },
+        "statut_des_operationnalisations": STATUT_OPERATIONNALISATIONS_I2,
         "paires": {"n_intra": len(lp.paires_intra_inter()[0]),
                    "n_inter": len(lp.paires_intra_inter()[1]),
                    "attendus": [lp.N_INTRA_ATTENDU, lp.N_INTER_ATTENDU]},
@@ -3345,10 +3407,13 @@ def main():
               f"{pi['strate_decisionnelle']}")
         pu = rep_i2["puissance"]
         print(f"puissance   : K requis (R1_36) = {pu['K_requis_R1_36']} ; "
-              f"K requis (AUC, protocole) = "
-              f"{pu['K_requis_AUC_recopié_du_protocole']} ; "
-              f"K requis (AUC, dérivation du banc) = "
-              f"{pu['K_requis_AUC_dérivation_du_banc']}")
+              f"chiffre 429 = {pu['chiffre_429']}")
+        da = pu["decision_AUC"]
+        for t in da["table"]:
+            print(f"              AUC | {t['nom']:<52} K requis = "
+                  f"{t['K_requis']:>5} (exact {t['K_requis_exact']}) ; "
+                  f"facteur = {t['facteur']}")
+        print(f"              AUC | {da['enonce']}")
         vs = rep_i2["V-suffixe"]
         print(f"V-suffixe   : observé N=80 "
               + ", ".join(f"{k}={v:.5f}" for k, v in vs["observe_N80"].items())

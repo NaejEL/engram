@@ -87,14 +87,26 @@ AUC_REPERE_050 = 0.50 ** (1.0 / S_LEURRES)
 SIGMA0 = 0.5                  # §3 : borne de Bernoulli, conservatrice
 MARGE_R1 = 0.25               # §3 : |θ − T| sous `R1_36`
 Z_975 = 1.96                  # §3 : quantile normal, recopié tel quel
-# §3/§4.7 : « sous décision AUC à T = 0.9622 : K ≥ 429 ». Le protocole PORTE le
-# résultat mais PAS la valeur de |θ−T| qui le produit ; le banc recopie donc le
-# K requis déclaré et publie EN PLUS sa propre dérivation candidate (marge =
-# largeur du couloir en AUC), en signalant l'écart. Les deux rendent FAIL à tout
-# N ≤ 80 : la conclusion de la porte ne dépend pas de la levée de cette
-# sous-spécification.
-K_REQUIS_AUC_PROTOCOLE = 429
-MARGE_AUC_BANC = AUC_REPERE_050 - AUC_REPERE_025
+MARGE_AUC_LARGEUR_COULOIR = AUC_REPERE_050 - AUC_REPERE_025   # T⁺ − T en AUC
+
+# §3, correctif du 2026-08-22 (second passage du banc) : **le chiffre « K ≥ 429 »
+# est RETIRÉ** — il n'est pas re-dérivable (D14-R : un chiffre sans sa dérivation
+# ne se cite pas). Ce qui est conservé est **l'énoncé robuste** : sur TOUTES les
+# opérationnalisations examinées, le `K` requis dépasse de plus d'un ordre de
+# grandeur le `K` disponible dans ce pool. La conclusion — le couloir en AUC est
+# indécidable à tout N ≤ 80 — **ne dépend d'aucun choix de σ₀ ni de marge**.
+OPERATIONNALISATIONS_AUC = (
+    {"nom": "σ₀ = √(T(1−T)), marge = 0.98 − T",
+     "sigma0": math.sqrt(AUC_REPERE_025 * (1.0 - AUC_REPERE_025)),
+     "marge": 0.98 - AUC_REPERE_025},
+    {"nom": "σ₀ = 0.19 (arrondi), marge = 0.0178",
+     "sigma0": 0.19, "marge": 0.0178},
+    {"nom": "σ₀ = 0.5, marge = T⁺ − T (largeur du couloir en AUC)",
+     "sigma0": 0.5, "marge": MARGE_AUC_LARGEUR_COULOIR},
+)
+# `K` disponible dans ce pool : la plus grande famille de composantes de slot
+# (20 entités) — plafond atteint dès N = 40, inchangé jusqu'à N = 80.
+K_PLAFOND_POOL = max(len(OWNERS), len(ENTITIES))
 
 # §7 — profondeurs attendues, re-lues du config par `V-L`.
 L_ATTENDU = {"gpt2": 12, "HuggingFaceTB/SmolLM2-360M": 32, "Qwen/Qwen2.5-1.5B": 28}
@@ -301,6 +313,43 @@ def k_requis(sigma0: float = SIGMA0, marge: float = MARGE_R1,
              z: float = Z_975) -> int:
     """`K_S ≥ (z·σ₀/|θ−T|)²`, arrondi à l'entier supérieur (§3)."""
     return int(math.ceil((z * sigma0 / abs(marge)) ** 2))
+
+
+def k_requis_exact(sigma0: float, marge: float, z: float = Z_975) -> float:
+    """La même quantité, **non arrondie** — publiée pour que l'énoncé robuste se
+    lise sans dépendre de l'arrondi."""
+    return float((z * sigma0 / abs(marge)) ** 2)
+
+
+def enonce_robuste_auc(k_disponible: int = K_PLAFOND_POOL,
+                       operationnalisations=OPERATIONNALISATIONS_AUC) -> dict:
+    """§3, correctif du 2026-08-22 : **l'énoncé robuste** qui remplace le chiffre
+    retiré.
+
+    Le `K` requis est recalculé sous **chaque** opérationnalisation examinée ; ce
+    qui est déclaré n'est pas un chiffre mais un **facteur** : `K` requis contre
+    `K` disponible. La conclusion — *le couloir en AUC est indécidable à tout
+    N ≤ 80* — ne dépend d'aucun choix de σ₀ ni de marge, puisqu'elle vaut sous
+    l'opérationnalisation la **plus favorable** du lot.
+    """
+    table = [{"nom": o["nom"], "sigma0": float(o["sigma0"]),
+              "marge": float(o["marge"]),
+              "K_requis": k_requis(o["sigma0"], o["marge"]),
+              "K_requis_exact": round(k_requis_exact(o["sigma0"], o["marge"]), 1),
+              "facteur": round(k_requis(o["sigma0"], o["marge"]) / k_disponible, 2)}
+             for o in operationnalisations]
+    k_min = min(t["K_requis"] for t in table)
+    return {"K_disponible": k_disponible, "table": table,
+            "K_requis_min": k_min,
+            "K_requis_max": max(t["K_requis"] for t in table),
+            "facteur_min": round(k_min / k_disponible, 2),
+            "robuste": all(t["K_requis"] > k_disponible for t in table),
+            "enonce": (f"K requis ≥ {k_min} sous toutes les opérationnalisations "
+                       f"examinées ({len(table)}), contre K ≤ {k_disponible} "
+                       f"disponible dans ce pool — facteur ≥ "
+                       f"{round(k_min / k_disponible, 2)}. La conclusion NE DÉPEND "
+                       f"D'AUCUN choix de σ₀ ni de marge : le couloir en AUC est "
+                       f"INDÉCIDABLE à tout N ≤ 80.")}
 
 
 # =========================================================================
@@ -1070,7 +1119,9 @@ BANDES = (BANDE_N, BANDE_M, BANDE_I, BANDE_V)
 def bande_modele(ic_delta_r1, ic_r1, seuil: float = T_COULOIR) -> str:
     """Bande d'UN modèle (§4.5), conditions **dans cet ordre** :
 
-    1. **N** — IC 95 % de `ΔR1` (appariée, argmax re-sélectionné) contient 0 ;
+    1. **N** — **`IC_inf(ΔR1) ≤ 0`**, c'est-à-dire **absence de `ΔR1`
+       significativement positif** : l'IC contient 0 **ou** est entièrement
+       négatif ;
     2. **M** — `ΔR1` > 0 significatif **et** `IC_sup(R1_36) < T` ;
     3. **I** — `ΔR1` > 0 significatif **et** `IC_inf < T ≤ IC_sup` ;
     4. **V** — `IC_inf(R1_36) ≥ T`.
@@ -1078,10 +1129,14 @@ def bande_modele(ic_delta_r1, ic_r1, seuil: float = T_COULOIR) -> str:
     Conventions de bord gravées : `IC_sup = T → I` ; `IC_inf = T → V` ; `ΔR1`
     dont l'IC touche 0 par la borne inférieure → **N**.
 
-    Opérationnalisation DÉCLARÉE (le protocole ne nomme pas le cas `ΔR1`
-    significativement NÉGATIF) : la bande **N** est l'absence de `ΔR1`
-    significativement positif (`IC_inf(ΔR1) ≤ 0`), seule lecture qui rende la
-    partition **exhaustive et mutuellement exclusive** sans amender une clause.
+    **Correctif D18 du 2026-08-22 (second passage du banc)** : la rédaction
+    précédente (« N : l'IC de `ΔR1` **contient** 0 ») laissait un cas non
+    couvert — `IC(ΔR1)` entièrement **négatif** avec `IC_inf(R1) < T`
+    n'appartenait à aucune bande. *Le protocole qui grave D18 le violait une
+    seconde fois, dans la clause même réécrite pour réparer la première
+    violation.* Le cas négatif est publié comme **sous-étiquette descriptive**
+    (`delta_r1_negatif`) : il signifierait que le corpus réel sépare **moins
+    bien** que sa propre nulle — un fait sur l'INSTRUMENT, pas sur le cortex.
     """
     lo_d = float(ic_delta_r1[0])
     if lo_d <= 0.0:
@@ -1095,8 +1150,10 @@ def bande_modele(ic_delta_r1, ic_r1, seuil: float = T_COULOIR) -> str:
 
 
 def delta_r1_negatif(ic_delta_r1) -> bool:
-    """Sous-étiquette DESCRIPTIVE du cas replié dans N : `ΔR1` significativement
-    négatif (`IC_sup < 0`). Publiée, jamais décisionnelle."""
+    """**Sous-étiquette DESCRIPTIVE** du cas replié dans N (§4.5, correctif D18) :
+    `ΔR1` significativement négatif (`IC_sup < 0`). Elle signifierait que le
+    corpus réel sépare **moins bien que sa propre nulle** — fait sur l'instrument,
+    pas sur le cortex. Publiée, **jamais décisionnelle**."""
     return float(ic_delta_r1[1]) < 0.0
 
 
