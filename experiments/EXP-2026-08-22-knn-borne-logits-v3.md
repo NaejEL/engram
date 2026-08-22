@@ -584,6 +584,171 @@ les **données** et les **portes d'intégrité** — c'est-à-dire exactement ce
 amender entre le banc et le run, et rien d'autre.
 
 
+## 16. Amendement du jeu d'unités (2026-08-22) — cause résiduelle du banc
+
+Second passage du banc : **E = 1**, `V-para (c′)`, **10 violations** (para1 = 0, para2 = 5,
+para3 = 5), **toutes des égalités exactes**, jamais des renversements, sur les paires
+`(1,21) (2,22) (3,23) (21,1) (22,2)`. La refonte de para1 (A-1) a rendu **0 violation** :
+la fuite structurelle est réparée. Ce qui reste n'est **ni une règle ni une porte** — c'est
+le **jeu d'unités**, donc la décision 14 de ce cycle.
+
+### A. La cause, dérivée et vérifiée par exécution
+
+Dans `pool.fact_pairs`, `entity = i mod 20` et `verb = i mod 5`. **5 divise 20**, donc le
+couple (entity, verb) a une **période de 20** : à N = 30 il n'existe que **20 couples
+distincts**, et **10 collisions sont inévitables**. Pour ces paires, l'owner est le seul
+discriminateur — et il est **effacé en BPE** dans deux des trois types, para2 minusculisant
+le premier caractère et para3 passant en `OWNER_OBJ` :
+
+| unité | owner | BPE dans le fait | BPE dans l'indice | partage |
+| --- | --- | --- | --- | --- |
+| 1 | `Her` | `[2332]` | `[607]` | **aucun** |
+| 2 | `His` | `[2399]` | `[465]` | **aucun** |
+| 3 | `Grandma's` | `[338, 2611, 5675]` | `[338, 49890]` | `[338]` |
+
+⇒ **`pool.fact_pairs(30)` ne peut pas porter 30 unités identifiables.**
+
+**Ma preuve du §7 était vraie et insuffisante** : « deux unités partagent les deux slots ssi
+`i ≡ j (mod 80)`, impossible pour n ≤ 30 » exclut le partage **owner+entity**, pas le partage
+**entity+verb sous owner effacé**.
+
+### B. Une correction incomplète, écartée avant d'être écrite
+
+Ma première proposition — *30 triplets à couples (entity, verb) deux à deux distincts* — est
+**insuffisante**, et il faut le dire avant de la remplacer. Elle répare para1 et para2, qui
+contiennent le verbe. Mais **para3 ne contient aucun verbe** : `So what's the name of the
+{entity} that belongs to {OWNER_OBJ}? It's` a pour contenu `{entity, owner_obj}`. Si l'owner
+s'efface, il ne reste que l'entité — et il n'y a que **20 entités pour 30 unités**. La
+collision reviendrait par la même porte, sur para3 seule.
+
+### C. La condition de design, dérivée
+
+Pour que **tout** indice désigne strictement son unité, sous **tout** type, il suffit que
+chaque type conserve **au moins deux slots discriminants dont le couple est unique**. Comme
+para3 n'a que `{entity, owner_obj}`, la condition mordante porte sur l'**owner** :
+
+> **C-1** — `(owner, entity)` deux à deux distincts sur les 30 unités.
+> *(Déjà acquis : partage des deux ssi `i ≡ j mod 80`, impossible pour n ≤ 30.)*
+> **C-2** — `(entity, verb)` deux à deux distincts sur les 30 unités.
+> *(Répare para1/para2 ; **non satisfait** par `fact_pairs(30)`, période 20.)*
+> **C-3** — pour **chaque** owner retenu, sa forme para2 (minusculisée) **et** sa forme
+> `OWNER_OBJ` partagent **au moins un token BPE** avec sa forme du fait.
+> *(Répare para3 ; **non satisfait** par les owners pronominaux `Her`, `His`, `Our`, `Their`,
+> dont la forme objet est un mot entièrement différent.)*
+
+Sous C-1 ∧ C-3, le contenu de para3 rencontre son propre fait sur **deux** slots (entity **et**
+un token d'owner) et tout autre fait sur **au plus un** — l'inégalité devient **stricte par
+construction**. Sous C-2, para1 et para2 ont la même propriété via le verbe. **La discrimination
+ne dépend alors plus de la casse, du tokenizer ni du modèle.**
+
+### D. Règle de sélection — déterministe, pré-déclarée
+
+Les 30 unités sont les **30 premiers triplets `(owner, entity, verb)`, dans l'ordre
+d'énumération `for e in range(len(ENTITIES)): for o in range(len(OWNERS)): for v in
+range(len(VERBS))`, qui satisfont C-1, C-2 et C-3** — C-3 étant évaluée **par exécution du
+tokenizer**, pas par jugement. Premier conforme, aucun choix à la main. Si moins de 30 triplets
+conformes existent, **arrêt** : ce serait un fait sur le pool, à consigner, pas à contourner.
+
+**Additif** : `OWNERS`, `ENTITIES`, `VERBS`, `SECRETS_80`, `fact_pairs` **intouchés** — X9
+reste reproductible. La table d'unités de v3 est une **nouvelle fonction** de `eval/pool.py`.
+La substitution du secret de l'unité 5 (A-1 du §15) est **recalculée** sur la nouvelle table,
+par la même règle (*premier `SECRETS_80[j]`, j ≥ 30, qui passe V-tok*), et peut donc changer
+d'unité ou disparaître si la collision `lighthouse` ne se présente plus.
+
+### E. Nouvelle porte `V-ident` (structurelle, sans mesure)
+
+> Les 30 unités vérifient **C-1**, **C-2** et **C-3**. Toute violation ⇒ **arrêt**.
+
+Comme `V-slot`, elle est **décidable sans aucune mesure** et elle aurait tué la décision 14
+avant le premier passage du banc. Contre-exemples obligatoires : `fact_pairs(30)` lui-même
+doit **échouer sur C-2** (période 20) et **sur C-3** (owners pronominaux) ; le nouveau jeu doit
+**passer les trois**.
+
+### F. Pourquoi ce n'est pas un contournement
+
+**Règle d'arbitrage, journalisée le 2026-08-22** :
+
+> *Tricher, c'est changer le **critère** pour que le design existant passe. Corriger, c'est
+> changer le **design** pour qu'il satisfasse un **critère inchangé**.*
+
+`V-para (c′)` n'est **pas** amendée — ni son seuil, ni sa définition, ni sa strictitude, ni
+l'égalité comptée comme violation. Aucune donnée n'a été mesurée : ce qui change est un **plan
+d'expérience**, pas un résultat.
+
+**Options écartées, avec leur coût mesuré :**
+
+| Option | Coût | Verdict |
+| --- | --- | --- |
+| **N = 20** (collisions impossibles par construction) | puissance **0.5881**, grise 0.4117 à p = 0.5 — *pire que le plan à 10 unités que ce cycle a servi à abandonner* (0.623). *(N = 24 : 0.7294 ; N = 30 : 0.8998.)* | honnête et **inutile** |
+| **Porte insensible à la casse** | — | **la seule vraie triche.** **Le modèle lit du BPE lui aussi** : si `" Her"` et `" her"` sont deux tokens sans rapport, l'ambiguïté entre *i* et *i+20* est **réelle du point de vue du cortex**, pas un artefact de l'instrument. Une porte aveugle à la casse déclarerait distinguable ce que le modèle ne distingue peut-être pas |
+| **Retoucher para2/para3** | — | affaiblir le stimulus pour satisfaire une porte — refusé par la règle gravée au §15 ; et inopérant, les owners pronominaux de para3 étant contraints par la grammaire |
+
+### G. Cascade D14(b) — obligatoire
+
+Le jeu d'unités change ⇒ **nouveau SHA-256**, et re-dérivation de : `V-tok` (et la substitution
+du secret 5), `V-hash`, `V-para (a)/(b)/(c′)`, `V-slot`, `V-indep`, `V-suffixe`, budget de la
+passe A. **N10** est **inchangée** (`h(para2) ≥ h(para1) ≥ h(para3)`) : son motif mécanique —
+para2 est le seul type conservant le verbe d'origine — ne dépend pas du jeu d'unités.
+**I2 hérite** : son corpus (a) **est** le jeu d'unités v3.
+
+### H. Prédiction avant re-run — la mienne, cette fois, et signée
+
+**0 violation sur les trois types sous `V-para (c′)`**, par la dérivation de C. Contrairement à
+la prédiction précédente, celle-ci ne repose pas sur une inspection des surfaces mais sur une
+**condition de design vérifiée par une porte** (`V-ident`) avant la mesure. **Si des violations
+subsistent, la porte ne sera PAS amendée** — ce sera un fait sur le pool, à consigner comme tel.
+
+
+### I. Résultat du re-run, et ce que la gate ne voit pas — À DÉCLARER AVANT PRÉ-ENREGISTREMENT
+
+**Banc rejoué en entier : 39 clauses, 115 cas, couverture 100 %, `E = 0`.** La prédiction du
+§16 H est **tenue** : `V-para (c′)` rend **0 violation sur les trois types** (para1 0, para2 0,
+para3 0 ; le passage précédent donnait 0 / 5 / 5), **porte inchangée**. `V-ident` **échoue**
+sur `pool.fact_pairs(30)` — C-2 sur les 10 paires exactement prévues `(0,20) … (9,29)`, C-3 sur
+les owners non conformes — et **passe** sur le nouveau jeu. Nouveau SHA-256 :
+`7380b285f89c06ca…`. 92 tests, exit 0. Sélection : **450 triplets examinés** pour 30 conformes
+(rejets C-1 = 60, C-2 = 252, C-3 = 108).
+
+**Correction de mon §16 C, par l'exécution** : j'y écrivais que C-3 excluait « les owners
+pronominaux `Her`, `His`, `Our`, `Their ` ». Le tokenizer en donne **cinq** : `Grandma's` est
+aussi non conforme — elle partage `[338]` (`'s`) côté para2 mais **rien** côté `OWNER_OBJ`
+(`"Grandma's"` → `[338, 2611, 23581]` vs `" grandma"` → `[49890]`). Onze owners sur seize sont
+conformes. *C'est précisément pourquoi C-3 est évaluée par exécution et non par jugement : mon
+jugement était faux d'une entrée.*
+
+**Deux coûts que le banc ne peut pas voir, parce que ce ne sont pas des défauts de clause mais
+des propriétés du plan** — tous deux **mesurés**, et à recopier au journal :
+
+| Propriété | `fact_pairs(30)` | Nouveau jeu | Conséquence |
+| --- | --- | --- | --- |
+| **Diversité lexicale** | 16 owners, 20 entités | **5 owners, 6 entités** (6 et 5 occurrences chacun) | Les unités se ressemblent **beaucoup plus** entre elles. `V-indep (d)` rapportera un cosinus inter-unités maximal nettement supérieur. Effet sur la clause multi-clé (c) : **conservateur** (elle devient plus dure à satisfaire) — donc acceptable, mais **à publier**, jamais à découvrir après. |
+| **Aliasing du verbe** | `verbe = f(entité)` (vérifié) | **`verbe = f(owner)`** (vérifié) | **L'aliasing n'est pas supprimé, il est DÉPLACÉ.** C'est la même classe de défaut que la façade (iv) de Neuro, sur un autre slot. |
+
+**Conséquences opératoires, pré-enregistrées :**
+
+1. **Aucune prédiction signée sur le verbe NI sur l'owner.** Les deux sont aliasés l'un sur
+   l'autre : tout écart entre niveaux de verbe est indiscernable d'un effet d'owner, et
+   réciproquement. La ventilation reste **descriptive** et sa légende obligatoire devient
+   **« verbe et owner sont aliasés (`verbe = f(owner)`) ; aucun écart n'est attribuable à l'un
+   plutôt qu'à l'autre »** — elle remplace la mention « aliasé sur l'entité » du §2, qui
+   décrivait `fact_pairs` et n'est plus vraie du jeu retenu.
+2. **`C3` (type de paraphrase) reste le seul vrai facteur intra-unité**, donc le seul
+   analysable — inchangé.
+3. **La diversité réduite est déclarée comme limite**, pas comme neutralité : ce run mesure
+   l'invariance à la paraphrase lexicale dans un cadre attributif unique **et sur un
+   vocabulaire de 5 owners et 6 entités**. L'interdiction de vocabulaire (i) du §2 s'applique
+   *a fortiori*.
+
+**Ce que ces deux coûts ne changent pas** : ni P1, ni ΔP6, ni P3, ni P4, ni aucun seuil. Ils
+n'entrent dans **aucune** porte. Ils sont déclarés ici parce qu'un pré-enregistrement doit
+porter ce que le plan a perdu, pas seulement ce qu'il a gagné.
+
+**Fait de méthode à consigner** : pour la deuxième fois consécutive, la porte qui trouve le
+défaut est celle qui **n'a besoin d'aucune donnée** — `V-slot` a tué l'ancienne para1, `V-ident`
+a tué `fact_pairs(30)`. Les deux sont décidables par lecture des règles et des tables. C'est
+l'enseignement le plus réutilisable du cycle méthode.
+
+
 ## Historique
 
 - 2026-08-22 : brouillon du Directeur (v3, option B)
@@ -592,6 +757,18 @@ amender entre le banc et le run, et rien d'autre.
 - 2026-08-22 : D12 / D13 / D14 / D14-S / D14-R / D15 gravées dans `docs/ARCHITECTURE.md` §3 ; correctifs documentaires du run 1 appliqués
 - 2026-08-22 : **tour 2** sur le consolidé — Math **FAVORABLE** sous 2 corrections bloquantes (E-D6 `P5f-borne`, E-D7 `τ_promu`) + 2 scellements ; Neuro **RÉSERVÉ → FAVORABLE** sous 2 corrections de fichier (collision `lighthouse`, porte V-tok) + façade (iv) aliasing et façade (v) complétion de patterns
 - 2026-08-22 : **vérification par exécution** des deux affirmations de fichier — collision `lighthouse` **confirmée** et corrigée par règle déterministe ; suspicion `catapult`/`cathedral` **infirmée** (30 premiers tokens BPE distincts) ; aliasing verbe/entité **confirmé**
+- 2026-08-22 : **banc rejoué après §15 — E = 1** (`V-para (c′)`, 10 égalités exactes sur
+  les paires `(i, i+20)`). para1 refondue rend **0 violation** : la fuite structurelle est
+  réparée. Cause résiduelle = **le jeu d'unités** (décision 14), pas une règle ni une porte.
+- 2026-08-22 : **banc rejoué après §16 — `E = 0`, GATE FRANCHIE** (39 clauses, 115 cas,
+  couverture 100 %). `V-para (c′)` rend **0 violation sur les trois types**, porte
+  inchangée. `V-ident` échoue sur `fact_pairs(30)` (C-2 sur les 10 paires prévues) et
+  passe sur le nouveau jeu. Deux coûts déclarés au §16 I : diversité lexicale réduite
+  (5 owners / 6 entités) et **aliasing du verbe déplacé** de l'entité vers l'owner.
+- 2026-08-22 : **amendement §16** — jeu d'unités refondu sous trois conditions de design
+  dérivées (C-1/C-2/C-3), porte structurelle `V-ident`, `V-para (c′)` **inchangée**.
+  Ma première correction (couples (entity, verb) distincts) était **insuffisante** :
+  para3 ne contient aucun verbe. Banc à rejouer en entier. Aucun GPU n'a tourné.
 - 2026-08-22 : **banc D14-S exécuté — E = 2, `H_méthode` REJETÉE** (34 clauses, 101 cas,
   couverture 100 %) : `V-para (c)` insatisfiable sur les données gelées (150 violations,
   23/30 unités) et `V-bord` vacuée par satisfaction à λ*. Défaut annexe trouvé hors banc :

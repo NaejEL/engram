@@ -63,8 +63,9 @@ from knn_ceiling import (  # noqa: E402  — primitives déjà pré-enregistrée
     mix_delta_nll, rank_of_index, squared_distances,
 )
 from pool import (  # noqa: E402
-    ENTITIES, OWNERS, OWNER_OBJ, POOL_PARAPHRASES, POOL_UNITS_N, VERBS,
-    unit_table,
+    ENTITIES, OWNERS, OWNER_OBJ, POOL_UNITS_N, VERBS,
+    owner_c3, pool_paraphrases, unit_table, v3_unit_triples_stats,
+    v3_unit_secrets_stats,
 )
 
 OUT_DIR = ROOT / "experiments" / "results" / "gate-bench"
@@ -468,6 +469,70 @@ def gate_v_slot(units, row_values=None) -> tuple[str, dict]:
     return (PASS if not bad else FAIL), det
 
 
+# --------------------------------------------------- V-ident (§16 E, NOUVELLE)
+def gate_v_ident(triples, tokenize) -> tuple[str, dict]:
+    """`V-ident` (§16 E) — porte **STRUCTURELLE**, décidable **sans aucune
+    mesure** : les 30 unités vérifient **C-1**, **C-2** et **C-3**. Toute
+    violation ⇒ arrêt.
+
+    `triples` : liste de `(indice owner, indice entity, indice verb)`.
+
+    - **C-1** `(owner, entity)` deux à deux distincts ;
+    - **C-2** `(entity, verb)` deux à deux distincts — **non satisfait** par
+      `fact_pairs(30)` : `entity = i mod 20`, `verb = i mod 5` et 5 divise 20,
+      donc le couple a une **période de 20** ;
+    - **C-3** pour chaque owner retenu, sa forme **para2** (minusculisée) **et**
+      sa forme **`OWNER_OBJ`** partagent **au moins un token BPE** avec sa forme
+      **du fait** — **évaluée par exécution du tokenizer**, jamais par jugement.
+      **Non satisfait** par les owners pronominaux (`Her`, `His`, `Our`,
+      `Their`), dont la forme objet est un mot entièrement différent.
+
+    Sous C-1 ∧ C-3, le contenu de para3 rencontre son propre fait sur **deux**
+    slots et tout autre fait sur **au plus un** ; sous C-2, para1 et para2 ont la
+    même propriété via le verbe. Comme `V-slot`, cette porte aurait tué la
+    décision 14 avant le premier passage du banc.
+    """
+    triples = [tuple(int(x) for x in t) for t in triples]
+    c1, c2 = {}, {}
+    v_c1, v_c2 = [], []
+    for i, (o, e, v) in enumerate(triples):
+        if (o, e) in c1:
+            v_c1.append({"paire": [c1[(o, e)], i], "owner": OWNERS[o],
+                         "entity": ENTITIES[e]})
+        else:
+            c1[(o, e)] = i
+        if (e, v) in c2:
+            v_c2.append({"paire": [c2[(e, v)], i], "entity": ENTITIES[e],
+                         "verb": VERBS[v]})
+        else:
+            c2[(e, v)] = i
+    v_c3, c3_det = [], {}
+    for i, (o, e, v) in enumerate(triples):
+        if o not in c3_det:
+            c3_det[o] = owner_c3(OWNERS[o], tokenize)[1]
+        if not c3_det[o]["ok"]:
+            v_c3.append({"unite": i, "owner": OWNERS[o],
+                         "partage_para2": c3_det[o]["partage_para2"],
+                         "partage_obj": c3_det[o]["partage_obj"]})
+    det = {"n_unites": len(triples),
+           "C-1_violations": len(v_c1), "C-1_nommees": v_c1[:12],
+           "C-2_violations": len(v_c2), "C-2_nommees": v_c2[:12],
+           "C-3_violations": len(v_c3), "C-3_nommees": v_c3[:12],
+           "C-3_owners_fautifs": sorted({x["owner"] for x in v_c3}),
+           "unites_fautives": sorted({j for x in v_c1 for j in x["paire"]}
+                                     | {j for x in v_c2 for j in x["paire"]}
+                                     | {x["unite"] for x in v_c3}),
+           "violations_total": len(v_c1) + len(v_c2) + len(v_c3)}
+    return (PASS if det["violations_total"] == 0 else FAIL), det
+
+
+def fact_pairs_triples(n: int = POOL_UNITS_N) -> list[tuple[int, int, int]]:
+    """Les triplets IMPLICITES de `pool.fact_pairs(n)` : `(i mod 16, i mod 20,
+    i mod 5)`. Contre-exemple ÉCHOUANT obligatoire de `V-ident` (§16 E)."""
+    return [(i % len(OWNERS), i % len(ENTITIES), i % len(VERBS))
+            for i in range(n)]
+
+
 # ------------------------------------------------------- OWNER_OBJ (A-5)
 def gate_owner_obj(table, tokenize) -> tuple[str, dict]:
     """`OWNER_OBJ` **injective**, et ses 16 images **deux à deux distinctes en
@@ -575,7 +640,9 @@ def frozen_dataset() -> dict:
     from pool import PARA1_VERB
     units = unit_table(POOL_UNITS_N)
     return {"PARA1_VERB": PARA1_VERB,
-            "POOL_PARAPHRASES": [list(p) for p in POOL_PARAPHRASES],
+            "POOL_UNIT_TRIPLES": [list(t) for t in
+                                  v3_unit_triples_stats(POOL_UNITS_N)["triplets"]],
+            "POOL_PARAPHRASES": [list(p) for p in pool_paraphrases(POOL_UNITS_N)],
             "OWNER_OBJ": dict(OWNER_OBJ),
             "unites": [{"i": u["i"], "exact": u["exact"], "secret": u["secret"],
                         "fait": u["fact_no_secret"],
@@ -1281,6 +1348,28 @@ def build_clauses(tokenize, tok_name):
                 "aussi la seule qui reste correcte si le tokenizer ou le modèle "
                 "change. Elle ne consomme aucune mesure.")
 
+    # ------------------------------------------------- V-ident (§16 E)
+    _triples = v3_unit_triples_stats(POOL_UNITS_N)["triplets"]
+    _triples_fact_pairs = fact_pairs_triples(POOL_UNITS_N)
+    # Triplet de l'unité 0 dupliqué en 30ᵉ position : viole C-1 (même
+    # (owner, entity)) ET C-2 (même (entity, verb)) — un doublon pur de C-1 est
+    # IMPOSSIBLE dans ce jeu, les 5 verbes de l'entité étant déjà consommés.
+    _tri_c1_bad = list(_triples[:29]) + [_triples[0]]
+    clause("V-ident (§16 E)",
+           "le jeu d'unités v3 (30 premiers triplets conformes de l'énumération "
+           "§16 D) vérifie C-1, C-2 et C-3",
+           "`pool.fact_pairs(30)` ⇒ FAIL sur C-2 (période 20 : entity = i mod 20, "
+           "verb = i mod 5, et 5 divise 20) ET sur C-3 (owners pronominaux) ; "
+           "et un doublon (owner, entity) ⇒ FAIL sur C-1",
+           [("jeu d'unités v3 (§16 D)", PASS,
+             lambda: gate_v_ident(_triples, tokenize))],
+           [("pool.fact_pairs(30) — contre-exemple OBLIGATOIRE", FAIL,
+             lambda: gate_v_ident(_triples_fact_pairs, tokenize)),
+            ("triplet de l'unité 0 dupliqué ⇒ C-1 (et C-2)", FAIL,
+             lambda: gate_v_ident(_tri_c1_bad, tokenize))],
+           note="porte STRUCTURELLE, décidable sans aucune mesure. C-3 est "
+                "évaluée PAR EXÉCUTION du tokenizer, jamais par jugement.")
+
     # --------------------------------------------------- OWNER_OBJ (A-5)
     oo_bad = dict(OWNER_OBJ)
     oo_bad["His"] = OWNER_OBJ["Her"]                 # deux owners, même image
@@ -1642,6 +1731,60 @@ def _meta_replay():
 #  Exécution
 # =========================================================================
 
+def _unit_set_facts(tokenize) -> dict:
+    """Faits BRUTS sur le jeu d'unités du §16 + **budget de la passe A**
+    re-dérivé (cascade D14(b), §16 G). Descriptif : n'entre dans aucune porte.
+
+    Le budget de la passe A est le compte de tokens BPE des 30 faits (une entrée
+    de store par token du fait, §5.7) et des 30 × 4 indices.
+    """
+    st = v3_unit_triples_stats(POOL_UNITS_N)
+    sec = v3_unit_secrets_stats(POOL_UNITS_N)
+    units = unit_table(POOL_UNITS_N)
+    tok_faits = [len(tokenize(u["fact_template"].replace("{secret}", u["secret"])))
+                 for u in units]
+    tok_exact = [len(tokenize(u["exact"])) for u in units]
+    tok_para = [[len(tokenize(p)) for p in u["paraphrases"]] for u in units]
+    return {
+        "regle": st["enumeration"] + " ; 30 premiers triplets C-1 ∧ C-2 ∧ C-3",
+        "triplets_examines_avant_30_conformes": st["triplets_examines"],
+        "rejets_par_condition": st["rejets"],
+        "owners_conformes_c3": st["owners_conformes_c3"],
+        "owners_non_conformes_c3": [OWNERS[o] for o in st["owners_non_conformes_c3"]],
+        "triplets": [list(t) for t in st["triplets"]],
+        "entites_utilisees": sorted({ENTITIES[t[1]] for t in st["triplets"]}),
+        "owners_utilises": sorted({OWNERS[t[0]] for t in st["triplets"]}),
+        # FAIT BRUT sur le plan (aucune interprétation) : le verbe est-il une
+        # fonction déterministe de l'owner ? de l'entité ? — la note de design
+        # du §2 portait sur `fact_pairs` (verbe = f(entité)) ; le jeu du §16 est
+        # un autre plan et cette ligne le mesure, elle ne la recopie pas.
+        "verbe_fonction_de_l_owner": len({(t[0], t[2]) for t in st["triplets"]})
+        == len({t[0] for t in st["triplets"]}),
+        "verbe_fonction_de_l_entite": len({(t[1], t[2]) for t in st["triplets"]})
+        == len({t[1] for t in st["triplets"]}),
+        "occurrences_par_owner": {OWNERS[o]: sum(1 for t in st["triplets"]
+                                                 if t[0] == o)
+                                  for o in sorted({t[0] for t in st["triplets"]})},
+        "occurrences_par_entite": {ENTITIES[e]: sum(1 for t in st["triplets"]
+                                                    if t[1] == e)
+                                   for e in sorted({t[1] for t in st["triplets"]})},
+        "occurrences_par_verbe": {VERBS[v]: sum(1 for t in st["triplets"]
+                                                if t[2] == v)
+                                  for v in sorted({t[2] for t in st["triplets"]})},
+        "substitutions_de_secret": sec["substitutions"],
+        "regle_substitution": sec["regle"],
+        "secrets": sec["secrets"],
+        "budget_passe_A": {
+            "tokens_des_30_faits": int(sum(tok_faits)),
+            "entrees_de_store_par_unite": tok_faits,
+            "tokens_des_30_indices_exacts": int(sum(tok_exact)),
+            "tokens_des_90_paraphrases": int(sum(sum(r) for r in tok_para)),
+            "tokens_par_type_de_paraphrase": [
+                int(sum(r[k] for r in tok_para)) for k in range(3)],
+        },
+    }
+
+
 def run(use_hf: bool = True, out_dir: Path = OUT_DIR) -> dict:
     t0 = time.time()
     tokenize, tok_name = make_tokenizer(use_hf)
@@ -1710,8 +1853,10 @@ def run(use_hf: bool = True, out_dir: Path = OUT_DIR) -> dict:
                        "pct": round(100.0 * n_cov / len(rows), 2)},
         "n_cas": sum(len(r["cas"]["pass_case"]) + len(r["cas"]["fail_case"])
                      for r in rows),
-        "amendement": "§15 (post-banc, 2026-08-22) — A-1..A-8, cascade D14(b)",
+        "amendement": "§15 (A-1..A-8) puis §16 (jeu d'unités refondu, C-1/C-2/"
+                      "C-3, porte V-ident) — cascade D14(b) rejouée",
         "sha256_donnees_gelees": sha256_obj(frozen_dataset()),
+        "jeu_unites_v3": _unit_set_facts(tokenize),
         "descriptifs_A7": {
             "jaccard_brut": descriptif_jaccard_brut(unit_table(POOL_UNITS_N),
                                                     tokenize),
@@ -1765,6 +1910,16 @@ def main():
             print(f"      >>> {reason}")
     print("-" * 78)
     print(f"SHA-256 des données gelées AMENDÉES : {rep['sha256_donnees_gelees']}")
+    js = rep["jeu_unites_v3"]
+    print(f"§16 jeu d'unités : {js['triplets_examines_avant_30_conformes']} triplets "
+          f"examinés pour 30 conformes ; rejets {js['rejets_par_condition']}")
+    print(f"           owners hors C-3 : {js['owners_non_conformes_c3']}")
+    print(f"           substitutions de secret : {js['substitutions_de_secret']} "
+          f"({js['regle_substitution']})")
+    print(f"           budget passe A : {js['budget_passe_A']['tokens_des_30_faits']} "
+          f"tokens de faits, "
+          f"{js['budget_passe_A']['tokens_des_30_indices_exacts']} exacts, "
+          f"{js['budget_passe_A']['tokens_des_90_paraphrases']} paraphrases")
     ls = rep["lambda_star"]
     print(f"λ* = {ls['expression']} = {ls['valeur']}  |  littéral du document "
           f"{ls['litteral_du_document']} → écart {ls['ulp_litteral_vs_expression']} ULP")

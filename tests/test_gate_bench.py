@@ -33,6 +33,15 @@ Amendement post-banc (§15), six tests de plus :
            est évaluée sur TOUTE la grille λ (A-6) ;
   (xxxi)   descriptifs A-7 publiés et non bloquants (Jaccard brut, `V-partage`) ;
   (xxxii)  cascade D14(b) — nouveau SHA-256 des données gelées (§15 C).
+
+Amendement du jeu d'unités (§16), deux tests de plus :
+
+  (xxxiii) **`V-ident` (§16 E)** — le test le plus important de cet amendement :
+           `pool.fact_pairs(30)` doit ÉCHOUER sur **C-2** (période 20) **et** sur
+           **C-3** (owners pronominaux), unités fautives nommées ; le **nouveau**
+           jeu doit PASSER les trois ;
+  (xxxiv)  règle de sélection §16 D — déterministe, premier conforme, ARRÊT si
+           moins de `n` triplets conformes ; substitution du secret recalculée.
 """
 
 import json
@@ -59,12 +68,15 @@ from gate_bench import (
     descriptif_jaccard_brut, descriptif_v_partage, frozen_dataset,
     gate_lambda_star_expression, gate_owner_obj, gate_v_para_c_prime,
     gate_v_slot, sha256_obj,
+    # --- amendement du jeu d'unités §16 (V-ident)
+    fact_pairs_triples, gate_v_ident,
 )
 from knn_ceiling import LAMBDA_STAR
 from pool import (
     ENTITIES, OWNERS, OWNER_OBJ, PARA1_VERB, POOL_PARAPHRASES,
-    POOL_UNIT_SECRETS, SECRETS_80, VERBS, pool_paraphrases_pre_amendment,
-    unit_table,
+    POOL_UNIT_SECRETS, SECRETS_80, VERBS, fact_pairs,
+    owner_c3, pool_paraphrases_pre_amendment, unit_table, v3_unit_secrets_stats,
+    v3_unit_triples, v3_unit_triples_stats,
 )
 
 
@@ -668,6 +680,79 @@ def test_xxvi_p3_refuses_an_even_b():
     assert verdict_p3([1] * 5, b=21)[0].startswith(REFUS)
 
 
+# ----------------------------------------------------------------- (xxxiii)
+
+def test_xxxiii_v_ident_fails_on_fact_pairs_and_passes_on_the_new_set(gpt2_tokenize):
+    """`V-ident` (§16 E). Contre-exemples OBLIGATOIRES : `pool.fact_pairs(30)`
+    doit ÉCHOUER sur **C-2** (période 20 : `entity = i mod 20`, `verb = i mod 5`,
+    et 5 divise 20) **et** sur **C-3** (owners pronominaux, dont la forme objet
+    est un mot entièrement différent) ; le **nouveau** jeu doit PASSER les trois.
+    """
+    # --- contre-exemple ÉCHOUANT : le jeu de la décision 14
+    v, det = gate_v_ident(fact_pairs_triples(30), gpt2_tokenize)
+    assert v == FAIL
+    # C-2 : exactement les 10 paires (i, i+20)
+    assert det["C-2_violations"] == 10
+    paires = {tuple(x["paire"]) for x in det["C-2_nommees"]}
+    assert paires == {(i, i + 20) for i in range(10)}
+    # C-3 : les owners pronominaux, et `Grandma's` (dont la forme OBJET ne
+    # partage aucun token avec la forme du fait) — vérifié PAR EXÉCUTION
+    assert det["C-3_violations"] > 0
+    assert set(det["C-3_owners_fautifs"]) == {"Her", "His", "Our", "Their",
+                                              "Grandma's"}
+    # C-1 tient sur fact_pairs : partage des deux slots ssi i ≡ j (mod 80)
+    assert det["C-1_violations"] == 0
+
+    # --- contre-exemple PASSANT : le jeu d'unités de v3
+    triples = v3_unit_triples(30)
+    v, det = gate_v_ident(triples, gpt2_tokenize)
+    assert v == PASS
+    assert (det["C-1_violations"], det["C-2_violations"],
+            det["C-3_violations"]) == (0, 0, 0)
+    assert det["unites_fautives"] == []
+
+    # C-1 et C-2 sont bien deux à deux distincts, sur les triplets eux-mêmes
+    assert len({(o, e) for o, e, _ in triples}) == 30
+    assert len({(e, v_) for _, e, v_ in triples}) == 30
+
+    # C-3, PAR EXÉCUTION du tokenizer, owner par owner
+    for o, _, _ in triples:
+        ok, d = owner_c3(OWNERS[o], gpt2_tokenize)
+        assert ok and d["partage_para2"] and d["partage_obj"]
+    assert owner_c3("Her", gpt2_tokenize)[0] is False
+    assert owner_c3("Grandma's", gpt2_tokenize)[1]["partage_obj"] == []
+
+    # une violation de C-1 est vue aussi
+    dup = list(triples[:29]) + [triples[0]]
+    v, det = gate_v_ident(dup, gpt2_tokenize)
+    assert v == FAIL and det["C-1_violations"] == 1
+    assert det["C-1_nommees"][0]["paire"] == [0, 29]
+
+
+# ------------------------------------------------------------------ (xxxiv)
+
+def test_xxxiv_selection_rule_is_deterministic_and_stops_when_short(gpt2_tokenize):
+    """§16 D — 30 premiers triplets conformes dans l'ordre d'énumération
+    `for e: for o: for v`, premier conforme, aucun choix à la main. ARRÊT si
+    moins de `n` triplets conformes existent : aucune condition n'est relâchée.
+    """
+    st = v3_unit_triples_stats(30, gpt2_tokenize)
+    assert st["arret"] is False and st["n_retenus"] == 30
+    assert st["enumeration"] == "for e in ENTITIES: for o in OWNERS: for v in VERBS"
+    # déterminisme : deux appels, même table
+    assert st["triplets"] == v3_unit_triples_stats(30, gpt2_tokenize)["triplets"]
+    # ordre d'énumération : l'indice d'entité est non décroissant
+    assert all(st["triplets"][i][1] <= st["triplets"][i + 1][1] for i in range(29))
+    # le tout premier triplet conforme est bien retenu en tête
+    assert st["triplets"][0] == (0, 0, 0)
+    assert st["triplets_examines"] >= 30
+    assert sum(st["rejets"].values()) + 30 == st["triplets_examines"]
+
+    # ARRÊT (pas de relâchement) : au plus 5 unités par entité sous C-2
+    with pytest.raises(RuntimeError, match="ARRÊT"):
+        v3_unit_triples(5 * len(ENTITIES) + 1, gpt2_tokenize)
+
+
 # ------------------------------------- gardes des données additives de pool.py
 
 def test_pool_additions_are_strictly_additive_and_frozen():
@@ -694,7 +779,11 @@ def test_pool_additions_are_strictly_additive_and_frozen():
         # l'unité i le verbe qui identifie l'unité i+1 (fuite STRUCTURELLE).
         assert u["paraphrases"][0] == f"{u['owner']} {u['entity']} {PARA1_VERB}"
         assert PARA1_VERB == "bears the codename" and PARA1_VERB not in VERBS
-        assert u["verb"] == VERBS[i % 5]
+        # §16 D : les trois slots viennent du TRIPLET SÉLECTIONNÉ, plus de
+        # `i mod 16 / i mod 20 / i mod 5`.
+        o, e, v = u["triplet"]
+        assert (u["owner"], u["entity"], u["verb"]) == (OWNERS[o], ENTITIES[e],
+                                                        VERBS[v])
         assert u["paraphrases"][0] != u["exact"]
         assert all(v not in u["paraphrases"][0] for v in VERBS)
         # para2 = préfixe gelé + owner minusculisé + entité + verbe D'ORIGINE
@@ -709,13 +798,21 @@ def test_pool_additions_are_strictly_additive_and_frozen():
     # les 30 unités partagent le même token final de para3 (prior local constant)
     assert len({u["paraphrases"][2][-6:] for u in U}) == 1
 
-    # la substitution du secret 5 est la SEULE
+    # substitutions recalculées sur la NOUVELLE table par la même règle (§16 D)
+    subs = v3_unit_secrets_stats(30)["substitutions"]
     assert [u["secret"] for u in U] == list(POOL_UNIT_SECRETS)
     for i, u in enumerate(U):
-        assert u["secret"] == (SECRETS_80[30] if i == 5 else SECRETS_80[i])
+        assert u["secret"] == SECRETS_80[subs.get(i, i)]
     assert len(set(POOL_UNIT_SECRETS)) == 30
 
-    # aliasing verbe/entité (note de design §2) : verbe = fonction de l'entité
+    # `fact_pairs` reste INTOUCHÉE (X9 reproductible) : elle garde son
+    # indexation `i mod 16 / i mod 20 / i mod 5` et son aliasing verbe/entité.
+    p = fact_pairs(30)
+    assert len(p) == 30
+    assert p[0] == ("The captain's ship is called {secret}.",
+                    "The captain's ship is called")
+    for i in range(30):
+        assert p[i][1] == (f"{OWNERS[i % 16]} {ENTITIES[i % 20]} {VERBS[i % 5]}")
     assert all(i % 5 == (i % 20) % 5 for i in range(30))
 
 
