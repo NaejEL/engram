@@ -167,16 +167,27 @@ l'argument — aucune ne suffit seule :
   traits, ensemblage de prédiction, affûtage résiduel). *Le numéro 2404.xxxx annoncé
   en note de cadrage était faux — vérifié le 2026-08-22.*
   Métrique : leur Eq. 1 = entropie matricielle d'ordre α (Giraldo et al. 2014), cas
-  α → 1 ≡ RankMe (Garrido et al., ICML 2023).
+  α → 1. **Correctif 2026-08-22** : l'équivalence « α → 1 ≡ RankMe (Garrido et al.,
+  ICML 2023) » est **inexacte** — RankMe est l'entropie des valeurs singulières
+  **ℓ1-normalisées** (`σ/Σσ`), l'entropie de von Neumann celle des **σ²**. Deux
+  distributions différentes, donc deux quantités différentes ; leurs argmin sont
+  souvent proches, jamais identiques par théorème. **Une seule convention est
+  implémentée : celle de la source citée en Eq. 1**, et la normalisation des lignes
+  y est **requise** (sans elle, `H` est confondue avec le profil de normes par couche).
 
 **Les deux quantités, par couche.**
 
-1. **Score contrastif d'invariance à la paraphrase** = (similarité cosinus
-   intra-fait entre paraphrases) / (similarité inter-faits), à la position de fin
-   d'indice. Candidate **« couche-clé »**. Le **ratio** est la bonne forme, pas le
-   cosinus brut : les états cachés sont fortement anisotropes et le décalage de mode
-   commun s'annule dans un contraste — c'est l'argument exact de Math sur la clause
-   multi-clé de V2-D(a) v3, transposé.
+1. **AUC d'invariance à la paraphrase par couche** = `P(cos_intra > cos_inter)`
+   (Mann-Whitney sur les paires intra-unité contre les paires inter-unités), à la
+   position de fin d'indice. Candidate **« couche-clé »**. **Correctif 2026-08-22** :
+   la version initiale prenait le **ratio** `s_intra / s_inter` en invoquant
+   « l'argument de Math sur la clause multi-clé de v3, transposé ». **La transposition
+   était fausse** — un ratio n'annule qu'un mode commun **multiplicatif**, alors que
+   l'anisotropie est **additive** (`cos ≈ c₀(ℓ) + δ`) : le ratio comprime l'effet en
+   `1/c₀(ℓ)`, et `c₀` croît avec la profondeur, si bien que l'instrument **pouvait
+   fabriquer un argmax médian à partir du seul profil d'anisotropie**. L'argument
+   médiane ne se transpose exactement qu'à une statistique **invariante par
+   transformation monotone** : l'AUC. Le ratio survit en ventilation descriptive.
 2. **Entropie matricielle par couche** (Eq. 1, α → 1). Localise la vallée de
    compression. Candidate **« couche-injection »**.
 
@@ -184,9 +195,14 @@ l'argument — aucune ne suffit seule :
 le rôle qui subsiste dans M_out, qui injecte aux logits) et « couche-injection »
 (écriture dans le flux résiduel, mécanisme v1) sont **deux rôles distincts**. Leur
 coïncidence éventuelle est une **SORTIE** de l'instrument, jamais une hypothèse. Le
-cas « une quantité près de D3, l'autre loin » n'est pas un échec : c'est le résultat
-le plus informatif du lot — *qualité représentationnelle ≠ tolérance à l'injection*,
-une distinction que Skean et al. ne font pas.
+cas « une quantité près de D3, l'autre loin » n'est pas un échec — *qualité
+représentationnelle ≠ tolérance à l'injection*, une distinction que Skean et al. ne
+font pas. **Correctif 2026-08-22** : il était écrit « c'est le résultat le plus
+informatif du lot ». **Faux comme argument d'évidence** — sous la nulle plate, cette
+cellule a une probabilité de **0.26 à 0.38**, contre 0.02 à 0.06 pour la coïncidence.
+Une cellule plus probable sous la nulle ne peut pas être la plus probante. Formulation
+retenue : *lecture la plus riche conditionnellement à des courbes non plates ; en tant
+qu'évidence, faible ; « compatible avec », jamais « démontré ».*
 
 **Rapport à V2-D.** I2 **ne motive pas** le bras L6 de v3 : ce bras vient de P6 et v3
 était rédigé avant. I2 en **prédit** l'issue. Le balayage Qwen {7, 14, 21} déjà prévu

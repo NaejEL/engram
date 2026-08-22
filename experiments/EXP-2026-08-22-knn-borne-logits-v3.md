@@ -550,7 +550,7 @@ se re-dérive sous les nouvelles données :
 - **`V-indep`** : re-jouée — les clés de requête changent avec les indices.
 - **Budget de la passe A** : la longueur des indices change ⇒ le compte de tokens du store change.
 - **`N10`** : re-signée (A-8).
-- **I2 hérite de l'amendement** : son corpus (a) **est** le jeu d'unités v3 ⇒ le hash scellé pour I2
+- ~~**I2 hérite de l'amendement** : son corpus (a) **est** le jeu d'unités v3~~ **— CADUC (erratum 2026-08-22, après re-cadrage d'I2)** : I2 **n'hérite pas** de ce jeu. Les conditions C-1/C-2/C-3 sont des conditions d'**identifiabilité pour une récupération** ; I2 ne récupère rien et n'en a aucun besoin, tandis que leur effet — diversité effondrée à 5 owners / 6 entités, `cos` inter-unités +0.99989 — confondrait « pas d'identité dans le cortex » avec « pas de diversité dans mon corpus ». Le corpus primaire d'I2 est `pool.fact_pairs(30)` ; **le jeu d'unités v3 y devient la strate S3, quasi-dégénérée**, ce qui transforme le confondant en mesure. Cf. `experiments/EXP-2026-08-22-layer-profile.md` §D. *(v3 étant TERMINE, ceci est un erratum documentaire et non un amendement de protocole.)* Le reste de la ligne originale se lisait : son corpus (a) ⇒ le hash scellé pour I2
   doit être le hash **amendé**. Deux des douze points de l'avis Neuro sur I2 (score-titre sans para3 ;
   ventilation même-verbe / verbe-différent de `s_inter`) deviennent **partiellement sans objet**, la
   fuite par bloc disparaissant. À traiter au traitement d'I2, **pas ici**.
