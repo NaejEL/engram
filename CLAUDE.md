@@ -36,7 +36,7 @@ Ce n'est PAS un produit — c'est une expérience falsifiable sur un laptop RTX 
   grep) — recalculé avec incertitude le 2026-08-21 (COR-02) : IC 95 % [0.56,
   0.99], médiane par secret 0.59 [0.45, 0.75] ; à citer « ~0.6–0.7, N=10 ».
 
-## État du projet (2026-08-21)
+## État du projet (2026-08-22)
 
 - Squelette v1 posé et **validé sur GPU** (torch 2.13+cu126 ; GPT-2, SmolLM2 et
   Qwen2.5-1.5B en cache). Parcours complet dans JOURNAL.md : X0 → X1 (gyrus
@@ -79,10 +79,57 @@ Ce n'est PAS un produit — c'est une expérience falsifiable sur un laptop RTX 
   historiques, Q-08 de l'audit).
 - **Audit externe 2026-08-21 : voir `AUDIT-lab.md`** — 22 corrections traitées,
   6 questions priorisées prêtes pour /lab-run (+ 2 en réserve). **v2 : chantier
-  prioritaire = V2-D**, devenu une course à trois candidats (2026-08-21) :
-  kNN-LM nu (instrument de plafond, en premier) → M_out sur les logits
-  (principal) → Fast-KV (contexte fantôme KV) — fiches et écartements dans
-  EXTENSIONS.md ; sommeil/LoRA basse priorité actée (verdict X9).
+  prioritaire = V2-D**, course à trois candidats : kNN-LM nu (instrument, **fait**)
+  → M_out sur les logits (principal, **non ouvert**) → Fast-KV — fiches et
+  écartements dans EXTENSIONS.md ; sommeil/LoRA basse priorité actée (verdict X9).
+- **Cycle méthode D14-ext (2026-08-22) — `H_méthode` REJETÉE.** Le banc de
+  satisfiabilité `eval/gate_bench.py` (D14-S) est né et devient **obligatoire à
+  vie** : sur sept défauts trouvés avant toute mesure, **deux n'étaient décidables
+  que par exécution** et **deux ont échappé aux trois passes d'auto-vérification
+  ET au premier tour d'experts**. Aucune relecture n'aurait suffi ; le banc coûte
+  ~6 s de CPU. Fait le plus réutilisable : **deux fois de suite, la porte qui a
+  trouvé le défaut est celle qui n'avait besoin d'aucune donnée** (`V-slot` a tué
+  l'ancienne para1, `V-ident` a tué `fact_pairs(30)`).
+- **V2-D(a) v3 (2026-08-22) — `INCONCLUSIF`, confondant d'instrument.** `knn_k = 8`
+  pour un store de 8-11 entrées ⇒ la cible est dans les 8 voisins sur 90/90
+  requêtes : **pas d'étape d'adressage dans le circuit mesuré**. P1 sort à 28/30
+  (F) et 30/30 (L6) contre un seuil de succès de 12/30, et **ne veut rien dire** :
+  le plancher sous **clé de bruit** vaut 12/30 et 23/30, et en L6 la clé d'une
+  **autre** unité rend 30/30 avec un **vecteur de succès identique** (contribution
+  de la clé exactement nulle). Arrêt formel conforme par P3[L6] (médiane 4/30).
+  **Deux acquis, indépendants de la clé** : (i) **le budget E3 n'est PAS le verrou
+  du top-10** — V2 30/30 et P1-exact 30/30, une hypothèse explicative du 0/10 tenu
+  depuis X0 est éliminée ; (ii) **divergence des deux nulles** — détruire la
+  liaison clé→valeur rend 3-4/30, détruire l'adresse en gardant le contenu rend
+  12-23/30 : l'effet est porté par **l'appartenance de la cible au store**, pas par
+  la récupération. **Rien** n'est acquis sur H, sur l'étage de clé, sur la couche 6,
+  ni sur V2-D — la branche B de la table d'attribution est logiquement inaccessible.
+  Le critère d'ouverture du candidat (b) **n'est pas franchi au sens de son intention**.
+- **Décisions gravées le 2026-08-22** (ARCHITECTURE §3) : **D12** (la ΔNLL borne le
+  gain, pas le dommage) · **D13** (toute prédiction signée énumère son antipode) ·
+  **D14** (clôture des portes) · **D14-S** (satisfiabilité machine, le banc) ·
+  **D14-R** (provenance des chiffres) · **D15** (la borne de dommage appartient à la
+  convexité du mélange, pas à l'étage des logits) · **D16** (*toute primaire est une
+  différence, jamais un taux* — et « la couche 6 bat l'état final » devient
+  **interdite**) · **D17** (une nulle bloquante par maillon) · **D18** (partition
+  exhaustive des clauses à seuils ; **E vaut sur le banc seul, pas sur le run**) ·
+  **D19** (couloir de faisabilité `C-null`) · **D20** (une clause d'audit exige un
+  plancher à produire, jamais un suspect à innocenter).
+- **Chantier courant = v4, « l'adressage apporte-t-il quelque chose ? »** Primaire
+  en **différence** clé correcte − clé nulle appariée (D16), plancher de hasard
+  dérivé **avant** le run et bloquant (D19). Verrou : il faut ~36 **leurres
+  appariés** par unité, et cette exigence tire en **sens opposé** des conditions
+  d'identifiabilité C-1/C-2/C-3 (§16 de v3) qui ont effondré la diversité à 5
+  owners / 6 entités. **Le pool actuel ne peut pas satisfaire les deux** : c'est un
+  travail de **construction de matériel**, pas de réglage, et il précède toute
+  rédaction de portes.
+- **Instrument I2 (`layer_profile`) — `PROPOSE`, deux avis RÉSERVÉ non traités.**
+  Profilage par couche (score contrastif d'invariance + entropie matricielle), un
+  forward instrumenté, aucune injection. Défauts à corriger avant implémentation :
+  le score en **ratio mesure l'anisotropie** autant que l'invariance (remplacer par
+  l'**AUC par couche**, invariante par transformation monotone) ; l'inférence
+  « P-A falsifiée ⇒ P6 falsifiée » est **illégitime** ; le contrôle `NEUTRAL_TEXT`
+  n'est **pas apparié**. Protocole : `experiments/EXP-2026-08-22-layer-profile.md`.
 - Runs : SmolLM2 `--model HuggingFaceTB/SmolLM2-360M --layer 16` ; Qwen
   `--model Qwen/Qwen2.5-1.5B --layer 14`.
 
