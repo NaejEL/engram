@@ -117,8 +117,11 @@ assert len(set(POOL_UNIT_SECRETS)) == POOL_UNITS_N
 # global (un choix appliqué 30 fois), jamais local (30 choix)* — sinon la
 # covariable C3 mesure le talent du rédacteur.
 #
-#   para1 — substitution du verbe attributif : `verb_index → (verb_index + 1) mod 5`
-#           sur `VERBS` gelée. Un seul nombre, et 1 est le moins arbitraire.
+#   para1 — substitution du verbe attributif par un VERBE GLOBAL UNIQUE, hors
+#           `VERBS` : `"bears the codename"` (§15, A-1). La rotation
+#           `+1 mod 5` est SUPPRIMÉE : elle logeait dans l'indice de l'unité i le
+#           matériel identifiant de l'unité i+1 (fuite STRUCTURELLE — la
+#           vérité-terrain était détruite, pas seulement bruitée).
 #   para2 — cadre + marqueur temporel : préfixe unique gelé
 #           `"Years later, everyone still remembered that "` + owner minusculisé
 #           (minusculisation mécanique du PREMIER caractère) + entité + verbe
@@ -130,6 +133,16 @@ assert len(set(POOL_UNIT_SECRETS)) == POOL_UNITS_N
 #
 # Ces trois lignes sont RECOPIÉES À LA LETTRE du §7 du protocole ; elles ne sont
 # pas « améliorées » ici (l'espace final de para3 y compris).
+# §15, A-1 — verbe attributif GLOBAL aux 30 unités, hors des cinq tables
+# indexées par l'unité. Vérifié par exécution le 2026-08-22 : aucune VALEUR DE
+# LIGNE de `OWNERS`, `ENTITIES`, `VERBS`, `SECRETS_80`, `OWNER_OBJ` n'y apparaît
+# verbatim (la règle A-4 porte sur les valeurs de ligne, pas sur les mots isolés :
+# l'article « the » ne compte pas). Premier candidat conforme de la liste de repli
+# déterministe `"bears the codename"` → `"translates as"` → `"carries the tag"`
+# → `"denotes"` : c'est donc le premier qui est retenu, sans choix à la main.
+PARA1_VERB = "bears the codename"
+PARA1_VERB_FALLBACKS = ("bears the codename", "translates as",
+                        "carries the tag", "denotes")
 PARA2_PREFIX = "Years later, everyone still remembered that "
 PARA3_HEAD = "So what's the name of the "
 PARA3_MID = " that belongs to "
@@ -155,8 +168,7 @@ def pool_paraphrases(n: int = POOL_UNITS_N) -> list[tuple[str, str, str]]:
         owner = OWNERS[i % len(OWNERS)]
         entity = ENTITIES[i % len(ENTITIES)]
         verb = VERBS[i % len(VERBS)]
-        verb_rot = VERBS[(i + 1) % len(VERBS)]          # para1 : +1 mod 5
-        para1 = f"{owner} {entity} {verb_rot}"
+        para1 = f"{owner} {entity} {PARA1_VERB}"        # §15 A-1 : verbe global
         para2 = f"{PARA2_PREFIX}{_lower_first(owner)} {entity} {verb}"
         para3 = f"{PARA3_HEAD}{entity}{PARA3_MID}{OWNER_OBJ[owner]}{PARA3_TAIL}"
         out.append((para1, para2, para3))
@@ -166,6 +178,50 @@ def pool_paraphrases(n: int = POOL_UNITS_N) -> list[tuple[str, str, str]]:
 POOL_PARAPHRASES = pool_paraphrases(POOL_UNITS_N)
 assert len(POOL_PARAPHRASES) == POOL_UNITS_N
 assert all(len(p) == 3 for p in POOL_PARAPHRASES)
+
+
+def pool_paraphrases_pre_amendment(n: int = POOL_UNITS_N) -> list[tuple[str, str, str]]:
+    """ANCIENNE para1 (rotation `+1 mod 5`), conservée UNIQUEMENT comme
+    contre-exemple ÉCHOUANT obligatoire de la porte `V-slot` (§15, A-4).
+
+    Elle n'est utilisée par aucune mesure : `V-slot` doit échouer dessus de façon
+    déterministe et sans aucun run — c'est la porte qui aurait tué le défaut
+    avant que 150 triples ne soient comptés.
+    """
+    assert n <= 80
+    out = []
+    for i in range(n):
+        owner = OWNERS[i % len(OWNERS)]
+        entity = ENTITIES[i % len(ENTITIES)]
+        verb = VERBS[i % len(VERBS)]
+        verb_rot = VERBS[(i + 1) % len(VERBS)]          # ANCIENNE règle : +1 mod 5
+        para1 = f"{owner} {entity} {verb_rot}"
+        para2 = f"{PARA2_PREFIX}{_lower_first(owner)} {entity} {verb}"
+        para3 = f"{PARA3_HEAD}{entity}{PARA3_MID}{OWNER_OBJ[owner]}{PARA3_TAIL}"
+        out.append((para1, para2, para3))
+    return out
+
+
+def unit_slots(i: int, n: int = POOL_UNITS_N) -> dict[str, str]:
+    """Les **valeurs de ligne** des cinq tables indexées par l'unité `i` (§15, A-4).
+
+    Une valeur de ligne d'une unité `j ≠ i` apparaissant verbatim dans
+    `para_t(i)` est une **fuite structurelle** : l'indice de `i` porte alors le
+    matériel qui identifie `j`, et la vérité-terrain est détruite.
+    """
+    owner = OWNERS[i % len(OWNERS)]
+    return {"OWNERS": owner,
+            "ENTITIES": ENTITIES[i % len(ENTITIES)],
+            "VERBS": VERBS[i % len(VERBS)],
+            "SECRETS_80": SECRETS_80[POOL_UNIT_SECRET_SUBSTITUTIONS.get(i, i)],
+            "OWNER_OBJ": OWNER_OBJ[owner]}
+
+
+def all_row_values() -> list[str]:
+    """Toutes les valeurs de ligne des cinq tables indexées par l'unité."""
+    out = set(OWNERS) | set(ENTITIES) | set(VERBS) | set(SECRETS_80)
+    out |= set(OWNER_OBJ.values())
+    return sorted(out, key=lambda s: (-len(s), s))
 
 
 def unit_table(n: int = POOL_UNITS_N) -> list[dict]:
@@ -185,6 +241,7 @@ def unit_table(n: int = POOL_UNITS_N) -> list[dict]:
          "fact_no_secret": pairs[i][0].replace(" {secret}", ""),
          "exact": pairs[i][1],
          "paraphrases": list(paras[i]),
+         "slots": unit_slots(i, n),
          "secret": secrets[i]}
         for i in range(n)
     ]

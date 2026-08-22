@@ -1084,6 +1084,128 @@ Modèle d'entrée :
 - *Modèles : director.cadrage inherit, director.interpretation fable, math fable,
   neuro inherit, builder inherit, verifier inherit.*
 
+## 2026-08-22 — Cycle méthode D14-ext : le banc de satisfiabilité, `H_méthode` REJETÉE
+
+- **Commits** : `10627d2` (D12-D15 gravées, v3 rédigé, correctifs documentaires) ·
+  `3fb4579` (banc, E = 2) · `25e10ea` (amendement post-banc). Nouveaux :
+  `eval/gate_bench.py`, `tests/test_gate_bench.py`,
+  `experiments/EXP-2026-08-22-knn-borne-logits-v3.md`,
+  `experiments/EXP-2026-08-22-layer-profile.md` ; modifiés : `eval/pool.py`
+  (strictement additif), `docs/ARCHITECTURE.md` §3, `docs/EXTENSIONS.md`, ce journal.
+- **Nature** : cycle de **méthode**, pas de mesure. **Aucun GPU n'a tourné de bout en
+  bout.** Le seul modèle chargé est le tokenizer GPT-2, sur CPU.
+- **Protocole pré-enregistré** : `experiments/EXP-2026-08-22-knn-borne-logits-v3.md`
+  (statut `PROPOSE` — la gate de pré-enregistrement **n'est pas franchie**).
+- **Hypothèse testée** : `H_méthode` — « les trois passes d'auto-vérification du §4bis
+  suffisent désormais ; le banc ne trouvera aucune clause défectueuse échappée (**E = 0**) ».
+
+- **Résultat** :
+
+  | Étape | Pré-enregistré | Mesuré | Verdict |
+  | --- | --- | --- | --- |
+  | Couverture du banc | 100 % des clauses ont un contre-exemple passant ET échouant | 34 clauses, 101 cas, **100 %** | ✓ |
+  | **E** (1ᵉʳ passage) | **0** | **2** — `V-para (c)`, `V-bord` | ✗ ⇒ **`H_méthode` REJETÉE** |
+  | Réduction de portée | déclenchée si `E ≥ 3` | E = 2 | non déclenchée |
+  | Cellules qui avaient tué les runs 1 et 2 | doivent passer | `V1b-1` à `r = 1e-30`, `P5f-borne` voisin 5, `G` grille non connexe → `τ_promu = idx3`, table `k(n)` entiers (n = 16/23/30), `V-tok` nommant l'unité 5, `P3` refusant B pair | ✓ toutes |
+  | **E** (après amendement) | **0** | **1** — `V-para (c′)` | ✗ ⇒ gate toujours fermée |
+  | Prédiction signée de Neuro avant re-run | 0 violation sur les 3 types | para1 **0**, para2 **5**, para3 **5** | ✗ non tenue |
+
+- **Ce que le banc a trouvé** :
+  1. **`V-para (c)` insatisfiable sur les données gelées** — 150 violations de fuite croisée
+     sur 23/30 unités (para1 = 70, para2 = 0, para3 = 80), **reproduites indépendamment**.
+     L'indice para1 de l'unité 1 était plus proche du fait de l'**unité 2** (J = 0.4286) que
+     du sien (0.2857).
+  2. **`V-bord` vacuée par satisfaction** — à λ* calculé, `−log1p(−λ)` et `−log(1−λ)` sont
+     bit-identiques (0 ULP). Corrigée en l'évaluant sur toute la grille λ, où elle est
+     discriminante (5 ULP à 0.02, 6 à 0.05, 2 à 0.10).
+
+- **Distinction apportée par Neuro, et c'est le vrai acquis du cycle** : le banc avait
+  confondu deux fuites sous un même Jaccard. La **fuite structurelle** (la règle *lit la
+  ligne d'une autre unité* — para1, dont la rotation `+1 mod 5` prenait le verbe du voisin
+  alors que `VERBS` recycle tous les 5) **détruit la vérité-terrain** : on ne peut plus dire
+  de quoi un succès serait un succès. La **fuite de cadre** (matériel partagé par les 30,
+  qui n'identifie aucune unité — para3) est le **prix inévitable d'un vrai recadrage**.
+  *C'est l'instrument qui doit se scinder, pas la donnée qui doit s'affaiblir.*
+  D'où la porte structurelle **`V-slot`** ajoutée : elle échoue sur l'ancienne para1 de
+  façon **déterministe, sans tokenizer et sans aucune mesure** (30 violations) — elle aurait
+  tué le défaut avant qu'on ne compte 150 triples.
+
+- **Cause résiduelle après amendement — et elle invalide une décision de ce cycle** :
+  les 10 violations restantes sont **toutes des égalités exactes**, jamais des renversements,
+  sur les paires `(i, i+20)`. Dans `fact_pairs`, `entity = i mod 20` et `verb = i mod 5` ; **5
+  divise 20**, donc le couple (entity, verb) a une **période de 20**. À N = 30 il n'existe que
+  **20 couples distincts : 10 collisions sont inévitables**. L'owner est alors le seul
+  discriminateur, et il est **effacé en BPE** dans deux des trois types (para2 minusculise,
+  para3 passe en forme objet) : `Her`→`her` donne `2332`→`607`, `His`→`him` donne `2399`→`465`,
+  **aucun token partagé**. Vérifié par exécution.
+  ⇒ **`pool.fact_pairs(30)` ne peut pas porter 30 unités identifiables.**
+
+- **Erreurs de ce cycle, consignées** (c'est l'objet de l'entrée autant que le résultat) :
+
+  | # | Erreur | Auteur | Trouvée par |
+  | --- | --- | --- | --- |
+  | E-D3 | `1/λ* = 20.50413` et `w₁(c=1) = 0.27972`, faux au dernier digit | Directeur | Math, tour 1 |
+  | E-D4 | dérivation ULP « par comptage d'opérations » — pas une borne d'erreur valide | Directeur | Math, tour 1 |
+  | E-D5 | « h est l'image exacte de P1 » suppose une indépendance que le protocole prédit fausse | Directeur | Neuro, tour 1 |
+  | E-D6 | `P5f-borne` écrite sur le seul `v_nn` : fausse à k = 8 voisins, pouvait déclarer « bug » une implémentation **correcte** | Directeur | Math, tour 2 |
+  | E-D7 | `τ_promu` = « le plus grand τ admissible » : faux, `E3(τ)` n'est pas monotone (T2 donne `δ(p) < 0`) | **copilote** — c'était ma correction d'un amendement de Math | Math, tour 2 |
+  | — | « le verbe partagé avec 5 autres faits est la condition la plus dure, et c'est voulu » (§7) | Neuro | **Neuro lui-même**, acquittée |
+  | — | risque I annoncé « ≈ 2e-5 » | Math, tour 1 | Math, tour 2 (exact : **1.528e-5**) |
+  | — | puissance écrite « ≥ 0.90 » | Directeur | Math (exact : **0.89976**) |
+  | — | λ* écrit comme **littéral décimal**, à **2 ULP** de `1 − exp(−0.05)` | **copilote** | trouvé hors banc, en contre-vérifiant le banc |
+  | — | « Qwen2.5-1.5B est instruct + RLHF » propagé du cadrage **sans vérification** | **copilote** | Neuro ; carte de modèle : « Training Stage: Pretraining » |
+  | — | test local du verbe par recouvrement de **mots**, plus strict que la règle (qui porte sur les **valeurs de ligne**) | **copilote** | moi, en relisant la règle |
+  | — | test « instruct » par présence d'un `chat_template` : **trompeur**, Qwen le livre avec les tokenizers base | **copilote** | la carte de modèle |
+  | — | **décision 14 : `pool.fact_pairs(30)` comme jeu d'unités** — le jeu ne peut pas porter 30 unités identifiables | **copilote** | le banc, deuxième passage |
+  | — | preuve de séparation du §7 (« les deux slots ssi `i ≡ j mod 80` ») : **vraie mais insuffisante** — elle exclut le partage owner+entity, pas entity+verb sous owner effacé | **copilote** | le banc, deuxième passage |
+  | — | prédiction signée « 0 violation sur les 3 types » | Neuro | le banc, deuxième passage |
+
+- **Décision, et la règle qui la justifie** — le jeu d'unités de v3 cesse d'être
+  `fact_pairs(30)` et devient **30 triplets à couples (entity, verb) deux à deux distincts**,
+  par règle déterministe, **additif** (`OWNERS`, `ENTITIES`, `VERBS`, `SECRETS_80`,
+  `fact_pairs` intouchés — X9 préservé). Règle posée pour arbitrer :
+
+  > **Tricher, c'est changer le critère pour que le design existant passe. Corriger, c'est
+  > changer le design pour qu'il satisfasse un critère inchangé.**
+
+  Aucune donnée n'ayant été mesurée, ce qu'on ajuste est un **plan d'expérience**, pas un
+  résultat — et le faire avant de mesurer est ce à quoi sert un pré-enregistrement. Les trois
+  runs morts l'ont été de l'inverse : on touchait au critère, après coup. Le nouveau jeu a une
+  propriété que la simple réparation du symptôme n'aurait pas : deux unités ne partageant
+  jamais les deux slots, **la discrimination survit même si l'owner est effacé en BPE** — le
+  mode d'échec devient impossible, indépendamment de la casse, du tokenizer et du modèle.
+
+- **Options écartées, avec leur coût mesuré** :
+  - **N = 20** (élimine les collisions par construction) : **puissance 0.5881**, zone grise
+    0.4117 à p = 0.5 — *pire que le plan à 10 unités que ce cycle a servi à abandonner*
+    (0.623). Honnête et inutile. *(N = 24 : 0.7294. N = 30 : 0.8998.)*
+  - **Porte insensible à la casse** : **la seule qui soit vraiment de la triche**, et pas
+    seulement parce que ce serait un troisième amendement de porte. **Le modèle lit du BPE
+    lui aussi** : si `" Her"` et `" her"` sont deux tokens sans rapport, l'ambiguïté entre *i*
+    et *i+20* est **réelle du point de vue du cortex**, pas un artefact de l'instrument. Une
+    porte aveugle à la casse déclarerait distinguable ce que le modèle ne distingue
+    peut-être pas.
+  - **Retoucher para2/para3** : affaiblir le stimulus pour satisfaire une porte — refusé par
+    la règle gravée à l'amendement ; et inopérant, les owners pronominaux de para3 étant
+    contraints par la grammaire.
+
+- **Conclusion** : **`H_méthode` est REJETÉE.** Les trois passes d'auto-vérification du
+  Directeur ne suffisent pas — elles vérifient qu'une clause n'est pas contredite par un
+  phénomène **déjà listé**, elles ne vérifient ni que la liste est complète, ni qu'une clause
+  est vraie **arithmétiquement**, ni qu'elle est vraie **des données**. **Le banc devient
+  obligatoire à vie** (D14-S). Fait décisif du cycle : sur les sept défauts trouvés, **deux
+  n'étaient décidables que par exécution** (collision `lighthouse`, aliasing verbe/entité) et
+  **deux ont échappé aux trois passes ET au premier tour d'experts** (E-D6, E-D7). Aucune
+  relecture n'aurait suffi. En regard, le banc a coûté **5.4 s de CPU**.
+  **Rien ici ne parle pour ou contre H** : P1 n'a pas été mesurée, et le GPU n'a pas démarré.
+
+- **Suite** : nouveau jeu d'unités, cascade D14(b) re-jouée, **banc rejoué en entier**. La
+  gate `E = 0` reste la condition d'entrée du pré-enregistrement, et le GPU reste fermé tant
+  qu'elle n'est pas verte. Si `E` ne tombe pas à 0, la porte ne sera **pas** amendée : ce
+  qu'elle trouve sera consigné.
+- *Modèles : director.cadrage inherit, director.interpretation fable, math fable,
+  neuro inherit, builder inherit, verifier non sollicité (aucune mesure à vérifier).*
+
 ## 2026-08-20 — v0 : squelette posé
 
 - **Commit** : (initial)

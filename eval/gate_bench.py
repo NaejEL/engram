@@ -295,7 +295,7 @@ def _jaccard(a: frozenset, b: frozenset) -> float:
     return (len(a & b) / len(u)) if u else 0.0
 
 
-def gate_v_para(units, tokenize) -> tuple[str, dict]:
+def gate_v_para(units, tokenize, check_cross: bool = True) -> tuple[str, dict]:
     """(a) aucun indice paraphrasé n'est sous-chaîne de son fait ; (b) Jaccard
     BPE(indice, fait \\ secret) **strictement inférieur** à celui de l'indice
     exact ; (c) **fuite croisée** : le recouvrement de chaque paraphrase de
@@ -322,7 +322,7 @@ def gate_v_para(units, tokenize) -> tuple[str, dict]:
             if not j_own < j_exact:
                 b_bad.append({"i": i, "para": k + 1, "J_para": j_own,
                               "J_exact": j_exact})
-            for j in range(n):
+            for j in range(n) if check_cross else ():
                 if j == i:
                     continue
                 j_other = _jaccard(ep, facts[j])
@@ -341,11 +341,245 @@ def gate_v_para(units, tokenize) -> tuple[str, dict]:
     return (PASS if not (a_bad or b_bad or c_bad) else FAIL), det
 
 
+# ------------------------------------------------------- V-para (c′) — A-3
+def _jacc_ratio(a: frozenset, b: frozenset) -> tuple[int, int]:
+    """Jaccard comme **rapport de deux entiers exacts** `(|A∩B|, |A∪B|)`.
+
+    §15 A-3, gain D14-S : le Jaccard est un rapport de petits entiers ; toute
+    comparaison se fait par **produit croisé sur des `int`** — jamais en
+    flottant, donc **aucune** analyse ULP à faire.
+    """
+    u = len(a | b)
+    return (len(a & b), u if u else 1)
+
+
+def _ratio_gt(x: tuple[int, int], y: tuple[int, int]) -> bool:
+    """`x > y` **strictement**, en arithmétique entière exacte : `a·d > c·b`."""
+    (a, b), (c, d) = x, y
+    assert isinstance(a, int) and isinstance(b, int)
+    assert isinstance(c, int) and isinstance(d, int)
+    assert b > 0 and d > 0
+    return a * d > c * b
+
+
+def gate_v_para_c_prime(units, tokenize) -> tuple[str, dict]:
+    """`V-para (c′)` (§15, A-3) — Jaccard sur le **CONTENU**, pas sur les tokens
+    bruts, et comparaison en arithmétique entière exacte.
+
+    `F_t := ⋂_{i} tokens_BPE(para_t(i))` (**intersection ensembliste sur les 30**,
+    jamais un préfixe/suffixe commun : le cadre de para3 est entrelacé et un
+    préfixe/suffixe laisserait `" that belongs to "` dans le contenu, recréant la
+    fuite). `C_t(i) := tokens_BPE(para_t(i)) \\ F_t` ; symétriquement `F_fait` et
+    `C(fait_i)`.
+
+    Clause : pour tout `i`, tout `t`, `J(C_t(i), C(fait_i)) > J(C_t(i), C(fait_j))`
+    pour tout `j ≠ i`, **strictement — une égalité compte comme violation** (si
+    l'indice n'est pas strictement plus proche de son fait, il ne désigne pas son
+    unité).
+    """
+    enc = lambda s: frozenset(int(t) for t in tokenize(s))          # noqa: E731
+    n = len(units)
+    n_types = len(units[0]["paraphrases"])
+    raw_facts = [enc(u["fact_no_secret"]) for u in units]
+    f_fait = frozenset.intersection(*raw_facts) if raw_facts else frozenset()
+    c_facts = [f - f_fait for f in raw_facts]
+
+    f_t, c_t = [], []
+    for k in range(n_types):
+        raw = [enc(u["paraphrases"][k]) for u in units]
+        fk = frozenset.intersection(*raw) if raw else frozenset()
+        f_t.append(fk)
+        c_t.append([r - fk for r in raw])
+
+    viol, par_type = [], {}
+    for k in range(n_types):
+        cnt = 0
+        for i in range(n):
+            ci = c_t[k][i]
+            own = _jacc_ratio(ci, c_facts[i])
+            for j in range(n):
+                if j == i:
+                    continue
+                other = _jacc_ratio(ci, c_facts[j])
+                if not _ratio_gt(own, other):          # égalité = violation
+                    cnt += 1
+                    if len(viol) < 12:
+                        viol.append({"paire": [i, j], "para": k + 1,
+                                     "J_vers_i": list(own), "J_vers_j": list(other),
+                                     "egalite": own[0] * other[1] == other[0] * own[1]})
+        par_type[f"para{k + 1}"] = cnt
+    det = {"F_t_tailles": {f"para{k + 1}": len(f_t[k]) for k in range(n_types)},
+           "F_fait_taille": len(f_fait),
+           "violations_par_type": par_type,
+           "violations_total": sum(par_type.values()),
+           "violations_nommees": viol,
+           "arithmetique": "entiers exacts (produit croisé a·d > c·b), aucun flottant"}
+    return (PASS if det["violations_total"] == 0 else FAIL), det
+
+
+# ------------------------------------------------------- V-slot (A-4, NOUVELLE)
+def _contains_verbatim(hay: str, needle: str) -> bool:
+    """Occurrence **verbatim** délimitée : la valeur de ligne doit apparaître
+    entourée de non-alphanumériques (sinon `cat` serait « trouvé » dans
+    `catapult`, ce qui n'est pas une occurrence de la valeur de ligne)."""
+    start = 0
+    while True:
+        p = hay.find(needle, start)
+        if p < 0:
+            return False
+        before = hay[p - 1] if p > 0 else " "
+        after = hay[p + len(needle)] if p + len(needle) < len(hay) else " "
+        if not (before.isalnum() or before == "'") and not after.isalnum():
+            return True
+        start = p + 1
+
+
+def gate_v_slot(units, row_values=None) -> tuple[str, dict]:
+    """`V-slot` (§15, A-4) — porte **STRUCTURELLE**, sans tokenizer ni mesure.
+
+    Pour tout type `t` et toute unité `i` : l'ensemble des **valeurs de ligne**
+    des tables indexées par l'unité (`OWNERS`, `ENTITIES`, `VERBS`, `SECRETS_80`,
+    `OWNER_OBJ`) apparaissant verbatim dans `para_t(i)` est **inclus dans les
+    slots de l'unité i**. Toute occurrence d'un slot d'une unité `j ≠ i` ⇒ arrêt.
+
+    Raison d'être : `V-para (c′)` **neutralise** la fuite structurelle (elle la
+    met hors contenu) mais **ne la détecte pas**. Une fuite de **règle** se prend
+    par une porte de **règle** — et celle-ci reste correcte si le tokenizer ou le
+    modèle change.
+    """
+    from pool import all_row_values
+    vals = all_row_values() if row_values is None else list(row_values)
+    bad = []
+    for u in units:
+        i = int(u["i"])
+        own = set(u["slots"].values())
+        for k, p in enumerate(u["paraphrases"]):
+            for v in vals:
+                if v in own:
+                    continue
+                if _contains_verbatim(p, v):
+                    bad.append({"i": i, "para": k + 1, "valeur_etrangere": v,
+                                "indice": p})
+    par_type = {f"para{k}": sum(1 for x in bad if x["para"] == k)
+                for k in (1, 2, 3)}
+    det = {"violations_total": len(bad), "violations_par_type": par_type,
+           "violations_nommees": bad[:12],
+           "unites_fautives": sorted({x["i"] for x in bad})}
+    return (PASS if not bad else FAIL), det
+
+
+# ------------------------------------------------------- OWNER_OBJ (A-5)
+def gate_owner_obj(table, tokenize) -> tuple[str, dict]:
+    """`OWNER_OBJ` **injective**, et ses 16 images **deux à deux distinctes en
+    BPE** (§15, A-5).
+
+    Motif : la table écrase de l'information (« Her » → « her », « His » → « him »,
+    « Our » → « us ») ; deux owners tombant sur la même forme objet rendraient
+    deux unités **indiscernables dans para3**.
+    """
+    imgs = list(table.values())
+    inj = len(set(imgs)) == len(imgs)
+    bpe = [tuple(int(t) for t in tokenize(" " + s)) for s in imgs]
+    bpe_ok = len(set(bpe)) == len(bpe)
+    dup_s = sorted({s for s in imgs if imgs.count(s) > 1})
+    dup_b = sorted({imgs[i] for i in range(len(imgs))
+                    if bpe.count(bpe[i]) > 1})
+    det = {"n": len(imgs), "injective": bool(inj), "distinctes_bpe": bool(bpe_ok),
+           "doublons_chaines": dup_s, "doublons_bpe": dup_b}
+    return (PASS if inj and bpe_ok else FAIL), det
+
+
+# ------------------------------- V-bord, littéral λ* vs expression (A-6 ii)
+LAMBDA_STAR_LITERAL_DOC = 0.048770575499286      # DOCUMENTATION SEULE (D14-R)
+
+
+def gate_lambda_star_expression(value: float) -> tuple[str, dict]:
+    """`λ*` est défini comme l'**EXPRESSION** `1 − exp(−0.05)`, jamais comme un
+    décimal recopié (§15, A-6 ii).
+
+    Défaut trouvé hors banc : le littéral `0.048770575499286` du protocole est à
+    **2 ULP** de `1 − math.exp(-0.05)`. C'est la classe de bug que `V-bord` garde,
+    **un étage au-dessus** : le décimal reste dans le document comme
+    documentation seule, étiqueté comme tel.
+    """
+    expr = 1.0 - math.exp(-0.05)
+    g = ulp_gap(float(value), expr)
+    return (PASS if float(value) == expr else FAIL), {
+        "expression": repr(expr), "valeur": repr(float(value)), "ulp": g,
+        "litteral_du_document": repr(LAMBDA_STAR_LITERAL_DOC),
+        "ulp_litteral_vs_expression": ulp_gap(LAMBDA_STAR_LITERAL_DOC, expr)}
+
+
+# ------------------------------------------- descriptifs A-7 (hors clause)
+def descriptif_jaccard_brut(units, tokenize) -> dict:
+    """Jaccard **BRUT** (avec cadre) publié par type avec son compte de
+    violations (§15, A-7). On ne cache rien : *deux quantités, deux noms, une
+    seule bloquante*. Descriptif — n'entre dans aucune porte, ni dans E."""
+    enc = lambda s: frozenset(int(t) for t in tokenize(s))          # noqa: E731
+    facts = [enc(u["fact_no_secret"]) for u in units]
+    n = len(units)
+    par_type = {}
+    for k in range(len(units[0]["paraphrases"])):
+        cnt = 0
+        for i, u in enumerate(units):
+            ep = enc(u["paraphrases"][k])
+            own = _jacc_ratio(ep, facts[i])
+            for j in range(n):
+                if j != i and not _ratio_gt(own, _jacc_ratio(ep, facts[j])):
+                    cnt += 1
+        par_type[f"para{k + 1}"] = cnt
+    return {"violations_jaccard_brut_par_type": par_type,
+            "violations_total": sum(par_type.values()),
+            "lecture": "quantité DESCRIPTIVE : un compte élevé sur para3 se lit "
+                       "« poids du cadre », pas « fuite d'identité » — c'est "
+                       "V-para (c′) qui tranche l'identité."}
+
+
+def descriptif_v_partage(units, tokenize) -> dict:
+    """`V-partage` (§15, A-7) — plus long **préfixe** ET plus long **suffixe**
+    communs en BPE, par type, sur les 30.
+
+    Troisième propriété, que ni `V-para (c′)` ni le Jaccard brut ne rapportent :
+    **position et volume** du matériel commun. C'est elle qui voit le préfixe de
+    ~8 tokens de para2, que le Jaccard croisé laisse passer à 0 violation.
+    """
+    out = {}
+    for k in range(len(units[0]["paraphrases"])):
+        seqs = [[int(t) for t in tokenize(u["paraphrases"][k])] for u in units]
+        m = min(len(s) for s in seqs)
+        pre = 0
+        while pre < m and len({s[pre] for s in seqs}) == 1:
+            pre += 1
+        suf = 0
+        while suf < m and len({s[-1 - suf] for s in seqs}) == 1:
+            suf += 1
+        out[f"para{k + 1}"] = {"prefixe_bpe": pre, "suffixe_bpe": suf,
+                               "longueur_min": m}
+    return out
+
+
 # --------------------------------------------------------------- V-hash
 def sha256_obj(obj) -> str:
     return hashlib.sha256(
         json.dumps(obj, ensure_ascii=False, sort_keys=True).encode("utf-8")
     ).hexdigest()
+
+
+def frozen_dataset() -> dict:
+    """Les DONNÉES GELÉES du protocole, sous la forme exacte qui est hashée.
+
+    Cascade D14(b) (§15 C) : l'amendement A-1 change `POOL_PARAPHRASES` ⇒ le
+    SHA-256 change, et c'est le hash **amendé** qui doit être scellé (y compris
+    pour I2, dont le corpus (a) EST le jeu d'unités v3).
+    """
+    from pool import PARA1_VERB
+    units = unit_table(POOL_UNITS_N)
+    return {"PARA1_VERB": PARA1_VERB,
+            "POOL_PARAPHRASES": [list(p) for p in POOL_PARAPHRASES],
+            "OWNER_OBJ": dict(OWNER_OBJ),
+            "unites": [{"i": u["i"], "exact": u["exact"], "secret": u["secret"],
+                        "fait": u["fact_no_secret"],
+                        "paraphrases": list(u["paraphrases"])} for u in units]}
 
 
 def gate_v_hash(before, after) -> tuple[str, dict]:
@@ -863,25 +1097,34 @@ def build_clauses(tokenize, tok_name):
            note="rejeu sur bruts archivés : voir `meta_replay` à la racine.")
 
     # ------------------------------------------------------------- V-bord
-    def _vbord_struct():
-        left, right = bord(LAMBDA_STAR), bord_naif(LAMBDA_STAR)
-        if left == right:
-            return ["vacuée par satisfaction AU SEUL λ* : `−log1p(−λ*)` et "
-                    "`−log(1−λ*)` sont bit-identiques (écart 0 ULP), donc la porte "
-                    "ne discrimine RIEN à la cellule décisionnelle. Elle n'est "
-                    "discriminante que sur le reste de la grille λ "
-                    "(0.02 → 5 ULP, 0.05 → 6 ULP, 0.10 → 2 ULP)."]
-        return []
-
-    clause("V-bord", "`bord` par `−log1p(−λ)` des deux côtés ⇒ égalité bit-à-bit",
-           "`bord` par `−log(1−λ)` d'un côté ⇒ FAIL, écart ~2 ULP exhibé",
+    # §15, A-6 (i) : la porte est évaluée sur TOUTE LA GRILLE λ, pas au seul λ*.
+    # À λ* les deux expressions sont bit-identiques (0 ULP) : la porte y est
+    # vacuée par satisfaction, ce qui est DOCUMENTÉ (ci-dessous, descriptif) et
+    # n'est plus un cas de la clause — le domaine de la clause est la grille.
+    clause("V-bord", "`bord` par `−log1p(−λ)` des deux côtés ⇒ égalité bit-à-bit "
+           "sur TOUTE la grille λ (A-6 i)",
+           "`bord` par `−log(1−λ)` d'un côté sur la grille λ ⇒ FAIL, écarts ULP "
+           "exhibés par λ",
            [("log1p des deux côtés, grille λ", PASS,
              lambda: gate_v_bord(LAMBDA_GRID, False))],
            [("−log(1−λ) d'un côté, grille λ", FAIL,
-             lambda: gate_v_bord(LAMBDA_GRID, True)),
-            ("−log(1−λ) au SEUL λ*", FAIL,
-             lambda: gate_v_bord([LAMBDA_STAR], True))],
-           structural=_vbord_struct)
+             lambda: gate_v_bord(LAMBDA_GRID, True))],
+           note="A-6 (i) : évaluée sur la grille λ entière. Au SEUL λ* les deux "
+                "expressions sont bit-identiques (0 ULP) — la porte y serait "
+                "vacuée par satisfaction ; l'écart par λ est publié dans le "
+                "détail du cas échouant (descriptif).")
+
+    # §15, A-6 (ii) : λ* est l'EXPRESSION `1 − exp(−0.05)`, jamais un décimal.
+    clause("V-λ*-expression (A-6 ii)",
+           "`LAMBDA_STAR` produit par l'expression `1 − exp(−0.05)` ⇒ 0 ULP",
+           "le littéral décimal `0.048770575499286` du document ⇒ FAIL, écart "
+           "2 ULP exhibé",
+           [("LAMBDA_STAR (expression)", PASS,
+             lambda: gate_lambda_star_expression(LAMBDA_STAR))],
+           [("littéral décimal du protocole", FAIL,
+             lambda: gate_lambda_star_expression(LAMBDA_STAR_LITERAL_DOC))],
+           note="le décimal reste dans le document comme DOCUMENTATION SEULE, "
+                "étiqueté comme tel (D14-R).")
 
     # ----------------------------------------------------------------- V0
     k0 = _rng(2).standard_normal((6, 16)).astype(np.float32)
@@ -923,6 +1166,11 @@ def build_clauses(tokenize, tok_name):
 
     # -------------------------------------------------------------- V-tok
     units = unit_table(POOL_UNITS_N)
+    # Jeu d'unités AVANT l'amendement §15 A-1 (ancienne para1, rotation +1 mod 5).
+    # Conservé UNIQUEMENT comme contre-exemple échouant de V-slot / V-para (c′).
+    from pool import pool_paraphrases_pre_amendment
+    _paras_avant = pool_paraphrases_pre_amendment(POOL_UNITS_N)
+    units_avant = [dict(u, paraphrases=list(_paras_avant[u["i"]])) for u in units]
     sec_apres = [u["secret"] for u in units]
     from pool import SECRETS_80
     sec_avant = list(SECRETS_80[:POOL_UNITS_N])          # jeu réel AVANT correction
@@ -942,8 +1190,8 @@ def build_clauses(tokenize, tok_name):
            note=f"tokenizer : {tok_name}")
 
     # ------------------------------------------------------------- V-para
-    def _syn_units(cross_leak=False, substring=False):
-        """Unités SYNTHÉTIQUES : trois familles lexicales disjointes, donc (c)
+    def _syn_units(cross_leak=False, substring=False, weak_exact=False):
+        """Unités SYNTHÉTIQUES : trois familles lexicales disjointes, donc (c′)
         satisfiable par construction — c'est le contre-exemple PASSANT."""
         out = []
         fam = [("alpha", "bravo"), ("charlie", "delta"), ("echo", "foxtrot")]
@@ -954,34 +1202,103 @@ def build_clauses(tokenize, tok_name):
             no_sec = fact.replace(" {secret}", "")
             exact = f"{tag} {w1} {w2} zzz{i} qqq{i}"
             paras = [f"{tag} {w1} zzz{i}", f"{tag} {w2} qqq{i}", f"{tag} zzz{i}"]
+            slots = {"tag": tag, "w1": w1, "w2": w2,
+                     "z": f"zzz{i}", "q": f"qqq{i}"}
             if substring:
                 paras[0] = exact
+            if weak_exact:
+                exact = tag                     # indice exact appauvri ⇒ (b) viole
             if cross_leak:
                 j = (i + 1) % 6
                 paras[0] = f"u{j} {fam[j % 3][0]} {fam[j % 3][1]} zzz{j} qqq{j}"
             out.append({"i": i, "fact_template": fact, "fact_no_secret": no_sec,
-                        "exact": exact, "paraphrases": paras})
+                        "exact": exact, "paraphrases": paras, "slots": slots})
         return out
 
-    clause("V-para (a)(b)(c)",
-           "Jaccard paraphrase < Jaccard exact sur les 30, et croisé",
-           "paraphrase = préfixe littéral de son fait ⇒ FAIL ; et paraphrase de "
-           "l'unité *i* recouvrant le fait de *j ≠ i* plus que le sien ⇒ FAIL "
-           "croisé, paire (i, j) nommée",
+    # §15, A-3 : (c) devient (c′) ; (a) et (b) restent sur le Jaccard BRUT et
+    # sont RE-JOUÉES sur les nouveaux indices (cascade D14(b), §15 C).
+    clause("V-para (a)(b)",
+           "aucun indice n'est sous-chaîne de son fait, et Jaccard brut "
+           "paraphrase < Jaccard brut exact sur les 30",
+           "paraphrase = préfixe littéral de son fait ⇒ FAIL (a) ; indice exact "
+           "appauvri ⇒ Jaccard paraphrase ≥ Jaccard exact ⇒ FAIL (b)",
            [("jeu synthétique conforme", PASS,
-             lambda: gate_v_para(_syn_units(), tokenize)),
-            ("POOL_PARAPHRASES réel (§7) — la porte est BLOQUANTE avant le run",
-             PASS, lambda: gate_v_para(units, tokenize))],
+             lambda: gate_v_para(_syn_units(), tokenize, check_cross=False)),
+            ("POOL_PARAPHRASES réel AMENDÉ (§15 A-1) — BLOQUANTE avant le run",
+             PASS, lambda: gate_v_para(units, tokenize, check_cross=False))],
            [("paraphrase = indice exact (sous-chaîne)", FAIL,
-             lambda: gate_v_para(_syn_units(substring=True), tokenize)),
-            ("fuite croisée i → j", FAIL,
-             lambda: gate_v_para(_syn_units(cross_leak=True), tokenize))])
+             lambda: gate_v_para(_syn_units(substring=True), tokenize,
+                                 check_cross=False)),
+            ("indice exact appauvri ⇒ (b) violée", FAIL,
+             lambda: gate_v_para(_syn_units(weak_exact=True), tokenize,
+                                 check_cross=False))])
+
+    clause("V-para (c′)",
+           "Jaccard sur le CONTENU (`F_t` = intersection ensembliste des tokens "
+           "BPE sur les 30), comparaison STRICTE en entiers exacts, sur les 30 "
+           "faits ⇒ 0 violation",
+           "fuite croisée i → j (le contenu de la paraphrase de *i* désigne le "
+           "fait de *j*) ⇒ FAIL, paire (i, j) nommée ; et égalité ⇒ violation",
+           [("jeu synthétique conforme", PASS,
+             lambda: gate_v_para_c_prime(_syn_units(), tokenize)),
+            ("POOL_PARAPHRASES réel AMENDÉ (§15 A-1) — BLOQUANTE avant le run",
+             PASS, lambda: gate_v_para_c_prime(units, tokenize))],
+           [("fuite croisée i → j", FAIL,
+             lambda: gate_v_para_c_prime(_syn_units(cross_leak=True), tokenize)),
+            ("ANCIENNE para1 (rotation +1 mod 5) sur le jeu réel", FAIL,
+             lambda: gate_v_para_c_prime(units_avant, tokenize))],
+           note="A-3 : `F_t` par INTERSECTION sur les 30, jamais un préfixe/"
+                "suffixe commun — le cadre de para3 est entrelacé et un "
+                "préfixe/suffixe laisserait `\" that belongs to \"` dans le "
+                "contenu, recréant la fuite. Comparaison par produit croisé sur "
+                "des `int` : aucune analyse ULP à faire.")
+
+    # ------------------------------------------------------- V-slot (A-4)
+    def _syn_slot_leak():
+        u = _syn_units()
+        u[0]["paraphrases"][0] = u[0]["paraphrases"][0] + " zzz1"   # slot de u1
+        return u
+
+    clause("V-slot",
+           "aucune valeur de ligne d'une unité j ≠ i n'apparaît verbatim dans "
+           "para_t(i) — jeu réel AMENDÉ (§15 A-1)",
+           "ANCIENNE para1 (rotation `+1 mod 5`) ⇒ FAIL DÉTERMINISTE : "
+           "`VERBS[(i+1) mod 5]` est le slot verbe d'unités j ≠ i",
+           [("jeu réel AMENDÉ (verbe global hors tables)", PASS,
+             lambda: gate_v_slot(units)),
+            ("jeu synthétique conforme", PASS,
+             lambda: gate_v_slot(_syn_units(),
+                                 row_values=sorted({v for u in _syn_units()
+                                                    for v in u["slots"].values()})))],
+           [("ANCIENNE para1 (rotation +1 mod 5) — contre-exemple OBLIGATOIRE",
+             FAIL, lambda: gate_v_slot(units_avant)),
+            ("slot d'une autre unité injecté (synthétique)", FAIL,
+             lambda: gate_v_slot(_syn_slot_leak(),
+                                 row_values=sorted({v for u in _syn_units()
+                                                    for v in u["slots"].values()})))],
+           note="porte de RÈGLE : `V-para (c′)` NEUTRALISE la fuite structurelle "
+                "(elle la met hors contenu) mais ne la DÉTECTE pas. V-slot est "
+                "aussi la seule qui reste correcte si le tokenizer ou le modèle "
+                "change. Elle ne consomme aucune mesure.")
+
+    # --------------------------------------------------- OWNER_OBJ (A-5)
+    oo_bad = dict(OWNER_OBJ)
+    oo_bad["His"] = OWNER_OBJ["Her"]                 # deux owners, même image
+    clause("OWNER_OBJ (A-5)",
+           "table injective et 16 images deux à deux distinctes en BPE",
+           "deux owners de même forme objet ⇒ FAIL (deux unités indiscernables "
+           "dans para3)",
+           [("OWNER_OBJ réelle", PASS,
+             lambda: gate_owner_obj(OWNER_OBJ, tokenize))],
+           [("His → her (collision d'image)", FAIL,
+             lambda: gate_owner_obj(oo_bad, tokenize))])
 
     # ------------------------------------------------------------- V-hash
-    frozen = {"POOL_PARAPHRASES": POOL_PARAPHRASES, "OWNER_OBJ": OWNER_OBJ,
-              "unites": sec_apres}
+    # Cascade D14(b) (§15 C) : l'amendement change les DONNÉES GELÉES ⇒ nouveau
+    # SHA-256. Il est publié en tête du rapport (`sha256_donnees_gelees`).
+    frozen = frozen_dataset()
     touched = json.loads(json.dumps(frozen, ensure_ascii=False))
-    touched["unites"][0] = touched["unites"][0] + "x"
+    touched["unites"][0]["secret"] = touched["unites"][0]["secret"] + "x"
     clause("V-hash", "jeu inchangé", "un caractère modifié",
            [("SHA-256 identique", PASS, lambda: gate_v_hash(frozen, frozen))],
            [("un caractère modifié", FAIL, lambda: gate_v_hash(frozen, touched))])
@@ -1393,6 +1710,20 @@ def run(use_hf: bool = True, out_dir: Path = OUT_DIR) -> dict:
                        "pct": round(100.0 * n_cov / len(rows), 2)},
         "n_cas": sum(len(r["cas"]["pass_case"]) + len(r["cas"]["fail_case"])
                      for r in rows),
+        "amendement": "§15 (post-banc, 2026-08-22) — A-1..A-8, cascade D14(b)",
+        "sha256_donnees_gelees": sha256_obj(frozen_dataset()),
+        "descriptifs_A7": {
+            "jaccard_brut": descriptif_jaccard_brut(unit_table(POOL_UNITS_N),
+                                                    tokenize),
+            "V-partage": descriptif_v_partage(unit_table(POOL_UNITS_N), tokenize),
+        },
+        "lambda_star": {
+            "expression": "1 - math.exp(-0.05)",
+            "valeur": repr(LAMBDA_STAR),
+            "litteral_du_document": repr(LAMBDA_STAR_LITERAL_DOC),
+            "ulp_litteral_vs_expression": ulp_gap(LAMBDA_STAR_LITERAL_DOC,
+                                                  1.0 - math.exp(-0.05)),
+        },
         "clauses_sous_specifiees": UNDERSPEC,
         "meta_replay": _meta_replay(),
         "duree_s": round(time.time() - t0, 2),
@@ -1432,6 +1763,16 @@ def main():
                       f"→ {d['observé']!r}")
         for reason in r["raisons_E"]:
             print(f"      >>> {reason}")
+    print("-" * 78)
+    print(f"SHA-256 des données gelées AMENDÉES : {rep['sha256_donnees_gelees']}")
+    ls = rep["lambda_star"]
+    print(f"λ* = {ls['expression']} = {ls['valeur']}  |  littéral du document "
+          f"{ls['litteral_du_document']} → écart {ls['ulp_litteral_vs_expression']} ULP")
+    d7 = rep["descriptifs_A7"]
+    print(f"A-7 Jaccard BRUT (descriptif) : "
+          f"{d7['jaccard_brut']['violations_jaccard_brut_par_type']} "
+          f"total={d7['jaccard_brut']['violations_total']}")
+    print(f"A-7 V-partage (descriptif)    : {d7['V-partage']}")
     print("-" * 78)
     print(f"meta_replay : {rep['meta_replay']['status']}")
     for k, v in rep["clauses_sous_specifiees"].items():

@@ -21,8 +21,21 @@ Les quatorze tests du §10 au-delà des douze de v2 :
   (xxiv)  **V-tok échoue sur le jeu réel AVANT correction (`lighthouse`) et passe après** ;
   (xxv)   **`P5f-borne` passe sur une bascule portée par la valeur du voisin 5** ;
   (xxvi)  **P3 refuse un B pair**.
+
+Amendement post-banc (§15), six tests de plus :
+
+  (xxvii)  `V-para (c′)` — arithmétique entière exacte, égalité = violation,
+           cadre ENTRELACÉ retiré par intersection ensembliste, jeu réel amendé ;
+  (xxviii) **`V-slot` échoue sur l'ANCIENNE para1 et passe sur la nouvelle** —
+           le test le plus important de l'amendement (A-4) ;
+  (xxix)   `OWNER_OBJ` injective et distincte en BPE (A-5) ;
+  (xxx)    λ* est l'EXPRESSION, le littéral du document est à 2 ULP ; `V-bord`
+           est évaluée sur TOUTE la grille λ (A-6) ;
+  (xxxi)   descriptifs A-7 publiés et non bloquants (Jaccard brut, `V-partage`) ;
+  (xxxii)  cascade D14(b) — nouveau SHA-256 des données gelées (§15 C).
 """
 
+import json
 import math
 import sys
 from math import comb
@@ -41,11 +54,17 @@ from gate_bench import (
     gate_v_para, gate_v_tok, k_of_n, k_tail_ratio, margins_over_vk,
     margins_over_vnn, multikey_clause_c, tau_promu, ulp_gap, verdict_dp6,
     verdict_g, verdict_multikey, verdict_p1, verdict_p3, verdict_p5f_borne,
+    # --- amendement post-banc §15 (A-3 à A-7) + cascade D14(b)
+    LAMBDA_STAR_LITERAL_DOC, _contains_verbatim, _jacc_ratio, _ratio_gt,
+    descriptif_jaccard_brut, descriptif_v_partage, frozen_dataset,
+    gate_lambda_star_expression, gate_owner_obj, gate_v_para_c_prime,
+    gate_v_slot, sha256_obj,
 )
 from knn_ceiling import LAMBDA_STAR
 from pool import (
-    ENTITIES, OWNERS, OWNER_OBJ, POOL_PARAPHRASES, POOL_UNIT_SECRETS,
-    SECRETS_80, VERBS, unit_table,
+    ENTITIES, OWNERS, OWNER_OBJ, PARA1_VERB, POOL_PARAPHRASES,
+    POOL_UNIT_SECRETS, SECRETS_80, VERBS, pool_paraphrases_pre_amendment,
+    unit_table,
 )
 
 
@@ -108,8 +127,14 @@ def _syn_units(cross_leak=False, substring=False):
             paras[0] = f"u{j} {fam[j % 3][0]} {fam[j % 3][1]} zzz{j} qqq{j}"
         out.append({"i": i, "fact_template": fact,
                     "fact_no_secret": fact.replace(" {secret}", ""),
-                    "exact": exact, "paraphrases": paras})
+                    "exact": exact, "paraphrases": paras,
+                    "slots": {"tag": tag, "w1": w1, "w2": w2,
+                              "z": f"zzz{i}", "q": f"qqq{i}"}})
     return out
+
+
+def _syn_row_values():
+    return sorted({v for u in _syn_units() for v in u["slots"].values()})
 
 
 def test_xiv_v_para_detects_substring_and_cross_leak_with_named_pair():
@@ -133,15 +158,200 @@ def test_xiv_v_para_detects_substring_and_cross_leak_with_named_pair():
         assert x["J_vers_j"] > x["J_vers_i"]
 
 
-def test_xiv_v_para_on_the_real_frozen_dataset(gpt2_tokenize):
-    """La porte appliquée aux **données gelées du §7**. Le résultat est un
-    CONSTAT du banc, pas une correction : V-para (c) telle qu'écrite n'est pas
-    satisfaite par `POOL_PARAPHRASES`."""
-    v, det = gate_v_para(unit_table(30), gpt2_tokenize)
+def test_xiv_v_para_ab_on_the_real_amended_dataset(gpt2_tokenize):
+    """(a) et (b) — Jaccard BRUT — **re-jouées** sur les indices amendés (§15 C,
+    cascade D14(b))."""
+    v, det = gate_v_para(unit_table(30), gpt2_tokenize, check_cross=False)
     assert det["a_sous_chaine"] == []                # (a) tenue
     assert det["b_jaccard"] == []                    # (b) tenue
-    assert v == FAIL and det["c_fuite_croisee_n"] > 0
-    assert det["c_par_type_de_paraphrase"]["para2"] == 0   # para2 seule est nette
+    assert v == PASS
+
+
+# ------------------------------------------------- (xxvii) V-para (c′), A-3
+
+def test_xxvii_v_para_c_prime_uses_exact_integer_arithmetic():
+    """A-3 : le Jaccard est un **rapport de petits entiers** et la comparaison se
+    fait par produit croisé sur des `int` — **aucun flottant**, donc aucune
+    analyse ULP à faire."""
+    assert _jacc_ratio(frozenset({1, 2, 3}), frozenset({2, 3, 4})) == (2, 4)
+    assert _jacc_ratio(frozenset(), frozenset()) == (0, 1)   # union vide : pas de /0
+    assert _ratio_gt((2, 4), (1, 4)) is True
+    assert _ratio_gt((1, 3), (1, 3)) is False        # ÉGALITÉ ⇒ pas « > »
+    assert _ratio_gt((1, 3), (2, 3)) is False
+    # produit croisé exact là où le flottant mentirait : 1/3 vs 3_333_333/10_000_000
+    assert _ratio_gt((1, 3), (3333333, 10000000)) is True
+
+
+def test_xxvii_v_para_c_prime_equality_counts_as_a_violation():
+    """A-3 : comparaison **strictement** supérieure — une égalité de Jaccard de
+    contenu est une VIOLATION (si l'indice n'est pas strictement plus proche de
+    son fait, il ne désigne pas son unité)."""
+    # deux unités au contenu de paraphrase et de fait rigoureusement symétrique
+    units = [{"i": 0, "fact_template": "aaa ccc {secret}.",
+              "fact_no_secret": "aaa ccc", "exact": "aaa ccc",
+              "paraphrases": ["zzz ccc"], "slots": {}},
+             {"i": 1, "fact_template": "bbb ccc {secret}.",
+              "fact_no_secret": "bbb ccc", "exact": "bbb ccc",
+              "paraphrases": ["zzz ccc"], "slots": {}}]
+    v, det = gate_v_para_c_prime(units, _toy_tokenize)
+    assert v == FAIL
+    assert det["violations_total"] > 0
+    assert any(x["egalite"] for x in det["violations_nommees"])
+
+
+def test_xxvii_v_para_c_prime_frame_is_removed_by_set_intersection():
+    """A-3 : `F_t` est l'**intersection ensembliste des tokens BPE sur les 30**,
+    jamais un préfixe/suffixe commun — le cadre de para3 est ENTRELACÉ, et un
+    préfixe/suffixe y laisserait `" that belongs to "` dans le contenu."""
+    units = _syn_units()
+    for u in units:                       # cadre entrelacé : début, MILIEU, fin
+        u["paraphrases"] = ["CADRE " + p.replace(" ", " MID ", 1) + " FIN"
+                            for p in u["paraphrases"]]
+    v, det = gate_v_para_c_prime(units, _toy_tokenize)
+    assert v == PASS, det
+    # les trois tokens de cadre sont bien sortis du contenu
+    assert all(n >= 3 for n in det["F_t_tailles"].values())
+
+
+def test_xxvii_v_para_c_prime_on_the_real_amended_dataset(gpt2_tokenize):
+    """La porte appliquée aux **données gelées AMENDÉES**. Le résultat est un
+    CONSTAT du banc, jamais une correction (§15 : « le banc ne corrige aucune
+    clause »).
+
+    para1 — la règle refondue par A-1 — est à **0 violation**. Les violations
+    résiduelles sont des **ÉGALITÉS** portées par des paires `(i, i+20)`, qui
+    partagent ENTITY *et* VERB : un recyclage de table, pas un défaut de règle.
+    """
+    v, det = gate_v_para_c_prime(unit_table(30), gpt2_tokenize)
+    assert det["violations_par_type"]["para1"] == 0
+    for x in det["violations_nommees"]:
+        assert x["egalite"] is True                  # jamais un renversement
+        i, j = x["paire"]
+        assert abs(i - j) == 20                      # période des tables
+        assert i % 20 == j % 20 and i % 5 == j % 5   # ENTITY et VERB partagés
+    assert v == (PASS if det["violations_total"] == 0 else FAIL)
+
+
+# ------------------------------------------------ (xxviii) V-slot, A-4
+
+def test_xxviii_v_slot_fails_on_the_old_para1_and_passes_on_the_new():
+    """**Le test le plus important de l'amendement.** `V-slot` est une porte de
+    RÈGLE : elle doit échouer sur l'ANCIENNE para1 (rotation `+1 mod 5`, qui loge
+    dans l'indice de *i* le verbe qui identifie *i+1*) de façon DÉTERMINISTE et
+    **sans aucune mesure**, et passer sur la nouvelle."""
+    units = unit_table(30)
+    v_new, det_new = gate_v_slot(units)
+    assert v_new == PASS, det_new["violations_nommees"]
+    assert det_new["violations_total"] == 0
+
+    avant = [dict(u, paraphrases=list(p))
+             for u, p in zip(units, pool_paraphrases_pre_amendment(30))]
+    v_old, det_old = gate_v_slot(avant)
+    assert v_old == FAIL
+    # 30 unités, 30 violations, TOUTES sur para1, toutes sur un slot de VERBS
+    assert det_old["violations_total"] == 30
+    assert det_old["violations_par_type"] == {"para1": 30, "para2": 0, "para3": 0}
+    assert det_old["unites_fautives"] == list(range(30))
+    for x in det_old["violations_nommees"]:
+        assert x["valeur_etrangere"] in VERBS
+        assert x["valeur_etrangere"] != VERBS[x["i"] % 5]     # slot d'un j ≠ i
+
+
+def test_xxviii_v_slot_needs_no_tokenizer_and_ignores_isolated_words():
+    """A-4 porte sur les **valeurs de ligne**, pas sur les mots isolés (l'article
+    « the » ne compte pas) ; et l'occurrence doit être délimitée (`cat` n'est pas
+    « trouvé » dans `catapult`)."""
+    assert _contains_verbatim("The captain's ship bears the codename", "ship")
+    assert not _contains_verbatim("a catapult here", "cat")
+    assert not _contains_verbatim("the codename", "The captain's")
+    v, det = gate_v_slot(_syn_units(), row_values=_syn_row_values())
+    assert v == PASS, det                            # aucun tokenizer appelé
+    leak = _syn_units()
+    leak[0]["paraphrases"][0] += " zzz1"             # slot de l'unité 1
+    v, det = gate_v_slot(leak, row_values=_syn_row_values())
+    assert v == FAIL and det["violations_nommees"][0]["valeur_etrangere"] == "zzz1"
+
+
+# --------------------------------------------------- (xxix) OWNER_OBJ, A-5
+
+def test_xxix_owner_obj_is_injective_and_bpe_distinct(gpt2_tokenize):
+    """A-5 : la table écrase de l'information (Her→her, His→him, Our→us) ; deux
+    owners de même forme objet rendraient deux unités indiscernables dans para3."""
+    v, det = gate_owner_obj(OWNER_OBJ, gpt2_tokenize)
+    assert v == PASS and det["n"] == 16
+    assert det["injective"] and det["distinctes_bpe"]
+
+    bad = dict(OWNER_OBJ)
+    bad["His"] = OWNER_OBJ["Her"]
+    v, det = gate_owner_obj(bad, gpt2_tokenize)
+    assert v == FAIL and det["injective"] is False
+
+
+# ------------------------------------------------- (xxx) λ*, A-6 (ii)
+
+def test_xxx_lambda_star_is_the_expression_never_the_decimal():
+    """A-6 (ii) : `λ*` est l'EXPRESSION `1 − exp(−0.05)`. Le littéral
+    `0.048770575499286` du document est à **2 ULP** de l'expression — il reste
+    documentation seule (D14-R)."""
+    expr = 1.0 - math.exp(-0.05)
+    assert LAMBDA_STAR == expr                       # bit-à-bit
+    assert LAMBDA_STAR_LITERAL_DOC != expr
+    assert ulp_gap(LAMBDA_STAR_LITERAL_DOC, expr) == 2
+
+    v, det = gate_lambda_star_expression(LAMBDA_STAR)
+    assert v == PASS and det["ulp"] == 0
+    v, det = gate_lambda_star_expression(LAMBDA_STAR_LITERAL_DOC)
+    assert v == FAIL and det["ulp"] == 2
+
+
+def test_xxx_v_bord_is_evaluated_over_the_whole_lambda_grid():
+    """A-6 (i) : `V-bord` est évaluée sur TOUTE la grille λ, pas au seul λ* — où
+    les deux expressions sont bit-identiques (0 ULP) et où elle serait donc
+    vacuée par satisfaction."""
+    from gate_bench import LAMBDA_GRID
+    assert len(LAMBDA_GRID) > 1 and LAMBDA_STAR in LAMBDA_GRID
+    v, gaps = gate_v_bord(LAMBDA_GRID, False)
+    assert v == PASS and all(g["ulp"] == 0 for g in gaps.values())
+    v, gaps = gate_v_bord(LAMBDA_GRID, True)
+    assert v == FAIL                                 # discriminante sur la grille
+    assert max(g["ulp"] for g in gaps.values()) > 0
+    # au SEUL λ*, elle ne discrimine rien : c'est bien la grille qui la porte
+    assert gate_v_bord([LAMBDA_STAR], True)[0] == PASS
+
+
+# -------------------------------------------- (xxxi) descriptifs A-7
+
+def test_xxxi_a7_descriptives_are_published_and_non_blocking(gpt2_tokenize):
+    """A-7 : le Jaccard BRUT reste publié par type avec son compte de violations,
+    et `V-partage` mesure une TROISIÈME propriété — position et volume du
+    matériel commun (le préfixe de ~8 tokens de para2, invisible au Jaccard)."""
+    units = unit_table(30)
+    brut = descriptif_jaccard_brut(units, gpt2_tokenize)
+    assert set(brut["violations_jaccard_brut_par_type"]) == {"para1", "para2", "para3"}
+    part = descriptif_v_partage(units, gpt2_tokenize)
+    assert set(part) == {"para1", "para2", "para3"}
+    # para2 : préfixe gelé long, aucun suffixe commun (le verbe varie)
+    assert part["para2"]["prefixe_bpe"] >= 7 and part["para2"]["suffixe_bpe"] == 0
+    # para3 : cadre ENTRELACÉ ⇒ préfixe ET suffixe communs
+    assert part["para3"]["prefixe_bpe"] > 0 and part["para3"]["suffixe_bpe"] > 0
+
+
+# ---------------------------------------- (xxxii) cascade D14(b), §15 C
+
+def test_xxxii_cascade_rehashes_the_amended_dataset(gpt2_tokenize):
+    """§15 C : l'amendement change les données gelées ⇒ **nouveau SHA-256**, et
+    `V-tok` / `V-hash` se re-dérivent dessus."""
+    frozen = frozen_dataset()
+    assert frozen["PARA1_VERB"] == "bears the codename"
+    h = sha256_obj(frozen)
+    assert len(h) == 64 and h == sha256_obj(frozen_dataset())   # déterministe
+    # le hash de l'AVANT diffère : la cascade n'est pas cosmétique
+    avant = json.loads(json.dumps(frozen, ensure_ascii=False))
+    avant["POOL_PARAPHRASES"] = [list(p)
+                                 for p in pool_paraphrases_pre_amendment(30)]
+    assert sha256_obj(avant) != h
+    # V-tok re-jouée sur les nouvelles données
+    assert gate_v_tok([u["secret"] for u in unit_table(30)], gpt2_tokenize)[0] == PASS
 
 
 # -------------------------------------------------------------------- (xv)
@@ -479,11 +689,14 @@ def test_pool_additions_are_strictly_additive_and_frozen():
     U = unit_table(30)
     for u in U:
         i = u["i"]
-        # para1 = rotation +1 mod 5 du verbe, owner et entité INCHANGÉS
-        assert u["paraphrases"][0] == \
-            f"{u['owner']} {u['entity']} {VERBS[(i + 1) % 5]}"
+        # para1 (§15 A-1) = VERBE GLOBAL hors tables ; owner et entité INCHANGÉS.
+        # La rotation `+1 mod 5` est SUPPRIMÉE : elle logeait dans l'indice de
+        # l'unité i le verbe qui identifie l'unité i+1 (fuite STRUCTURELLE).
+        assert u["paraphrases"][0] == f"{u['owner']} {u['entity']} {PARA1_VERB}"
+        assert PARA1_VERB == "bears the codename" and PARA1_VERB not in VERBS
         assert u["verb"] == VERBS[i % 5]
         assert u["paraphrases"][0] != u["exact"]
+        assert all(v not in u["paraphrases"][0] for v in VERBS)
         # para2 = préfixe gelé + owner minusculisé + entité + verbe D'ORIGINE
         assert u["paraphrases"][1] == (
             "Years later, everyone still remembered that "
