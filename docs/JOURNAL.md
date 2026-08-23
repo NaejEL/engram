@@ -1528,6 +1528,37 @@ devenir un **facteur manipulable**. Les deux specs ne se contredisent pas, mais 
 mécaniquement l'une après l'autre passerait à côté de ce que leur **conjonction** rend
 possible. **Signalé plutôt que tranché**, conformément à la consigne du PI.
 
+### Positions du PI sur le cadrage v4-matériel (2026-08-23, **avant consolidation**)
+
+Prises **à froid**, avant le protocole consolidé, pour ne pas les trancher le jour de la gate.
+Elles sont **amendables par la consolidation** — mais : *« si l'une des questions encore sous
+le rideau du Directeur contredit la scission `N-a`/`N-b` ou la lecture faible de S-4, je veux
+l'argument **structurel**, pas l'argument de prudence. La prudence a déjà coûté quatre tours. »*
+
+| # | Question | Position du PI |
+| --- | --- | --- |
+| **1** | **Scission de la bande `N` en `N-a` / `N-b`** | **OUI, sans hésitation.** *« Le couloir actuel envoie "pas d'identité" et "identité sous-dominante" vers le même verdict gravé, dont l'un serait **faux**. Scinder la bande n'est pas un raffinement, c'est la condition de vérité de la clause. »* `R1_inv` **décisionnelle** (l'invariance intra-type, la question réellement posée à v4), `R1_ident` en **plafond descriptif** (l'identité brute, legs d'I2), et la bande **M redevient atteignable** — *« la seule configuration où l'instrument peut rendre plus d'un verdict, ce qui est la définition minimale d'un instrument »*. **GARDE-FOU EXIGÉ** : *les conditions de séparation entre `N-a` et `N-b` passent elles-mêmes au banc* — **un cas synthétique dans chaque sous-bande** (D18). *« Une bande scindée dont la frontière n'est pas exécutable reproduirait le trou [4, 11] de v3, un cran plus bas. »* |
+| **2** | **Lecture de S-4** (longueur indépendante de `(unité, type)`) | **LECTURE FAIBLE**, contre le défaut proposé par le Directeur. Longueur **constante intra-type à travers les unités** (le canal v3 fermé **par construction**), **libre entre types** (le registre préservé). Argument, adossé à la doctrine gravée du cycle méthode : *« le canal qui a tué v3 était la longueur variable **entre unités** — signature per-unité, **fuite structurelle**. Le contraste de longueur **entre types** est constitutif du registre : un interrogatif n'a pas la longueur d'un déclaratif, c'est une propriété de la langue, pas une fuite — c'est du **cadre partagé** par toutes les unités, **qui n'identifie personne**. La littérale ferme les deux ensemble : elle sacrifie la validité écologique du matériau — des cadres rembourrés jusqu'à l'uniformité ne sont plus trois registres mais trois variantes cosmétiques d'un même moule — pour fermer un canal qui n'a jamais été le tueur. C'est de la sur-correction : **on audite ce dont on vient de souffrir, encore**. »* Corollaire gravé : *si une nulle exige un jour de comparer à travers les types, **c'est la statistique qui s'apparie par type, pas le matériau qui s'uniformise**.* |
+| **3** | **Vacuité de S-7** (survie à l'effacement de casse) | **UN TYPE CAPITALISÉ, OBLIGATOIREMENT** — la seconde option. *« Accepter la vacuité avec déclaration est une tentation à refuser par principe désormais : ce serait la **troisième** occurrence du mode 0-6/0-8, et **D24 est née du constat qu'à la deuxième occurrence un incident devient un motif de porte**. Une clause vraie par vacuité n'est pas une clause affaiblie, c'est une **fausse assurance** — pire qu'une absence (le blanc-seing de N11, même famille). »* Mise en œuvre : **un des trois types garde l'owner en position capitalisée** (début de phrase, la grammaire le donne gratuitement) ⇒ la porte BPE **mord sur du réel**. Coût nul ; la leçon `Her`/`her` de v3 **reste testée** au lieu de devenir un souvenir. |
+| **4** | **Budget de contenu** : design A (40 entités, `K = 20`, bin dur 2AFC) vs B (64, `K = 16`, 4AFC) | **DESIGN A**, et *« l'argument est statistique avant d'être économique »*. `K = 16` **sans marge** signifie qu'un seul item mort — entité au BPE pathologique, collision imprévue, doublon de surface découvert tard — **fait tomber une cellule sous son plancher de puissance** ; *« l'histoire du projet est sans ambiguïté sur la probabilité qu'un item meure : elle est de **un**. Toutes les estimations de budget du projet ont été fausses (27 min → 105 s, VRAM ×3) ; la seule réponse rationnelle est d'**acheter de la marge, pas de la résolution**. »* Vertu propre du 2AFC : *« c'est le format de la MST réelle (Bakker / Yassa — old/similar/new se décide par paires), le plus simple à analyser, le plus dur à faire fuir. »* Et : *« la résolution perdue se rachète plus tard en ajoutant des entités **au matériau qualifié** ; la marge perdue ne se rachète qu'en **reconstruisant**. »* |
+
+**D25 — durcie par le PI et gravée le 2026-08-23** (`docs/ARCHITECTURE.md` §3). Le PI la juge
+*« la meilleure décision du cycle »* mais exige qu'elle soit **exécutable et non déclarative** :
+
+> *« La qualification d'un matériau pour une classe d'instruments doit être **adossée aux
+> propriétés vérifiées**, pas à l'usage historique. L'en-tête du matériau liste les propriétés
+> testées par le banc ; un instrument futur **déclare ses prérequis**, et la compatibilité se
+> **vérifie mécaniquement**. Sinon D25 devient une liste blanche entretenue à la main, qui
+> vieillira comme les acquis de régime du run 1 : recopiée sans re-dérivation. **La leçon des
+> quatre tours n'est pas "`fact_pairs` était mauvais", c'est "personne n'avait écrit ce que
+> `fact_pairs` garantissait"** — D25 doit graver les **garanties** ; la liste des instruments
+> n'en est que l'ombre portée. »*
+
+**Trois questions du Directeur restent sous le rideau** (avis Math et Neuro en cours au moment
+de la prise de position) : cartographie fine des sous-bandes, emplacement du module, et les
+points que la consolidation soulèvera. Elles seront posées au PI à la gate.
+
+
 - **Suite** : rédaction du protocole **v4-matériel**, format maison, **banc complet avant tout
   GPU**. Toute contradiction entre un avis d'expert de la consolidation et une spec S-1..S-8
   est **remontée au PI**, jamais tranchée en cours de rédaction — ces specs viennent des avis
