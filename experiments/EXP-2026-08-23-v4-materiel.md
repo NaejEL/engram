@@ -124,6 +124,34 @@ qui n'a besoin d'aucune donnée** — et, nouveau cette fois, **celle qui n'a pa
 | **0-85** *(majeur)* | **Les suites de `C-ind` étaient PÉRIMÉES à deux endroits** — §2 (antipode) et §6.D — qui prescrivaient encore « augmenter la résolution » **inconditionnellement**, alors que la scission 0-71 venait d'établir que cette suite est **fausse en régime de saturation**. | Ce sont **les frères exacts** de la condition périmée d'`ORD-4`, dans la famille que le mandat d'audit demandait explicitement de chercher. **Un protocole amendé quatre fois porte des conditions qui référencent des états disparus** — et rien ne les signale. Correctif : renvoi au §6.G partout. |
 | **0-86** *(mineur, mais porte exécutable)* | **Cardinaux périmés** : la porte `V-ord` exigeait « une et une seule des **5** classes ORD » alors qu'il y en avait **6** depuis la création d'`ORD-0` (le §10 en énumérait bien 6). Même cardinal périmé au §11-Q3. Et : `INVALIDE-INSTRUMENT` se déclenchait sur `IC = [−0.14, −0.01]`, **entièrement dans le corridor de résolution déclaré**, quand son miroir exact recevait un verdict bénin. | Une **porte exécutable** portant un cardinal faux échoue ou passe pour la mauvaise raison. Et l'asymétrie de seuil — une phrase d'un côté, **l'abandon du run** de l'autre — n'était **écrite nulle part**. Correctifs : cardinal à 6 ; `INVALIDE-INSTRUMENT ≡ IC_sup < −τ` (exigence de magnitude) ; **asymétrie assumée et déclarée** : *les seuils sont pondérés par le coût du verdict*. |
 
+### 0-87 … 0-95 — **Seconde passe d'audit indépendant**, sur la version corrigée
+
+*Les correctifs de la première passe ont modifié les seuils des **trois** partitions ; **personne
+n'avait relu la version corrigée**. Seconde passe par le même lecteur indépendant, mandatée pour
+chercher **ce que les correctifs ont cassé**. Résultat : **neuf défauts, dont deux critiques, tous
+introduits par les correctifs eux-mêmes**.*
+
+*Fait de méthode, à retenir : **une passe de correction est une passe d'écriture, et elle appelle sa
+propre relecture indépendante**. Neuf défauts sur dix-neuf lignes réécrites.*
+
+*La même passe **certifie sain**, par énumération et simulation (200 000 tirages) : le recomptage
+1 + 2 + 6 + 9 + 9 = 27 (exhaustif, exclusif, zéro orpheline) ; l'unicité des lignes canoniques de `ε`
+et `ε_M` ; l'**atteignabilité et la non-trivialité des 14 classes** des trois partitions ; l'absence
+de verdicts jumeaux ; et **l'efficacité réelle du schéma 1×/2×** — classe d'équivalence modale à
+**92.5-93.2 %** sous la nulle, **stable en `K_eff`** — vérifiée plutôt que crue sur parole.*
+
+| # | Défaut | Pourquoi il était fatal |
+| --- | --- | --- |
+| **0-87** *(critique)* | **Les cas de banc d'exclusivité encodaient les seuils d'AVANT 0-83 et 0-86.** Ils exigeaient qu'`IC = [0.01, 0.09]` tombe en **`C+`** — alors que `C+` exige désormais `IC_inf > ε` — et qu'`IC = [−0.14, −0.01]` tombe en **`INVALIDE-INSTRUMENT`** — alors que 0-86 écrit noir sur blanc qu'il *« route désormais en `N-a` »*. | **C'est une porte EXÉCUTABLE** (`V-ord` / `V-calib` passent par ce banc, D14-S). **L'implémenteur qui fait passer le banc restaure le bug ; celui qui suit la spec fait échouer le banc.** Un cas de banc périmé est pire qu'un cas absent : il **commande** le comportement erroné. Frère exact de 0-86. |
+| **0-88** *(critique)* | **Deux conditions incompatibles pour le même rang, dans le même bloc.** La table normative des maillons portait `+ ≡ IC_inf > 0` / `− ≡ IC_sup < 0` (seuil d'existence), tandis que la parenthèse immédiatement dessous **et** la table transversale du schéma 1×/2× disaient `±ε_M`. | **C'est la TABLE que `V-ord` commande d'implémenter** (« les trois maillons sont classés par l'ordre gravé du §4.6 »). Contre-exemple : `ε_M = hw`, `Δ̂ = 1.2 ε_M` ⇒ `IC = [0.2 ε_M, 2.2 ε_M]` ⇒ **`+` sous la table, `0-résolu` sous la parenthèse**. C'est **0-83 rejoué à l'étage du maillon**, là où `+` sur M2/M3 est la **porte d'entrée d'`ORD-1` et `ORD-4`**, les seules issues positives. Écart chiffré par simulation : `P(+)` sous la nulle = **4.04 % sous la table contre 0.02 % sous la parenthèse** ; `P(ORD-ind)` de 12.6 % à 19.0 %. |
+| **0-89** *(majeur)* | **Le §6.G ne couvrait pas tout `C-ind`.** Après le correctif 0-85, **trois** endroits renvoient la suite de `C-ind` au §6.G — mais le §6.G était **entièrement conditionné à une famine** (globale ou partielle). Le `C-ind` du « tout le reste » — `Σ_q m_q ≥ 60`, `K_eff^support ≥ 9`, IC ni significatif ni inclus dans `±2ε` — n'avait **aucune ligne**. | **Trou [4,11] au niveau de la suite, créé par le correctif de 0-80** — le motif même qu'il corrigeait, déplacé d'un cran. Ce n'est pas un cas exotique : c'est **exactement la zone morte déclarée** (effet vrai entre ≈`ε` et ≈`3ε`), soit **6.7 % des issues sous la nulle**. Un opérateur y trouvait soit rien, soit la ligne `N-b` dont la cause écrite (« famine par saturation ») est **fausse**. Corollaire : le §10 ne commandait qu'un cas de banc `C-ind` **de famine** — la branche de résolution n'était **exercée nulle part**. |
+| **0-90** *(majeur)* | **α périmé sur une clause d'accusation.** `INVALIDE-INSTRUMENT` a reçu l'exigence de magnitude (`IC_sup < −τ`, correctif 0-86) mais **l'α déclaré est resté celui de l'ancienne règle** : « `P(IC_sup < 0) ≈ 0.025` … 1 faux sur 40 runs ». Simulation : sous la nouvelle règle, `P ≈ 1.5 × 10⁻⁴`. | **Faux d'un facteur ~170.** Le chiffre gravé servait explicitement à interpréter un `INVALIDE-INSTRUMENT` observé (« sinon un faux sur 40 runs serait lu comme une panne réelle ») — sous la vraie valeur, c'est 1 sur ~6700, et un `INVALIDE-INSTRUMENT` observé est **beaucoup plus informatif** que le protocole ne le disait. Une constante d'interprétation périmée fait mal lire un résultat vrai. |
+| **0-91** *(majeur)* | **`ORD-0` a gardé un verdict d'ABSENCE ABSOLUE après être devenue une classe d'ÉQUIVALENCE.** Le correctif 0-81 grave que *« une classe d'équivalence ne dit jamais "pas d'effet", elle dit "effet borné par 2× la résolution" »* ; `N-a` et `C-0` ont reçu cette reformulation, **`ORD-0` non** : elle disait encore *« l'information de tige N'ATTEINT PAS la capture »*, *« le zéro est résolu »*, *« jamais augmenter la résolution »*. | Or `M2 = 0-résolu` ne dit que `\|effet\| < 2ε_M`, et **`ε_M ∝ 1/√K_eff`** : augmenter `K_eff` **peut** faire sortir l'effet. Et c'est la classe **modale sous la nulle (80 %)**, dont la suite gravée — « le chantier suivant déplace la capture » — est **une dépense de tour entier**. Le correctif 0-81 avait été appliqué aux seuils **partout**, et à la **sémantique** seulement aux deux tiers. |
+| **0-92** *(majeur)* | **Unité périmée dans un critère d'abandon.** Le §6.I portait encore « **> 1 famille** touchée » alors que `V-dtype` v2 grave « **> 1 TIGE** », avec la dérivation explicite de Math : *« "famille" laisserait passer deux familles de la même tige, c'est-à-dire un cluster entier corrompu, sans déclencher »*. | **Le §6 est la version EXÉCUTABLE (D22)** — c'est lui qui bloque le rapport. Il portait l'unité que Math avait **explicitement écartée**, contre la porte du §4.7. Deux textes, deux unités, et le contraignant portait la mauvaise. |
+| **0-93** *(majeur)* | **Le Registre des engagements contredisait une porte exécutable.** Il portait encore *« substituer une famille pontée impose de substituer les deux familles de sa tige »*, règle que 0-69 avait établie comme **ne sauvant rien** (la réserve n'a que des tiges simples) et remplacée par **l'interdiction** de la substitution pontée. | Le Registre est l'organe de **traçabilité des engagements** — l'endroit précis dont le PI a exigé qu'il ne porte jamais de ligne CADUC silencieuse (A-7). Y laisser une règle abrogée « gravée » est le défaut que le Registre existe pour empêcher. |
+| **0-94** *(mineur)* | **Cardinal « 5 classes ORD » survivant à trois endroits** — budget du banc (§9, qui **chiffre le nombre de cas**), Arbitrage C, et Registre — après correction aux deux endroits repérés au tour précédent. | Un cardinal faux dans le **budget du banc** sous-dimensionne la couverture commandée. Troisième occurrence de la famille « cardinal périmé » (0-76(i), 0-86, celle-ci) : **le mode est désormais établi, et il justifie à lui seul une passe de relecture dédiée après toute correction**. |
+| **0-95** *(mineur)* | **Ternaire naïf survivant** : le §4.6 ouvrait encore sur *« trois maillons, chacun jugé **+ / − / 0** »*, périmé par la pré-évaluation à quatre états introduite **vingt-cinq lignes plus bas** (« jamais en ternaire naïf »). | Le lecteur qui s'arrête à la phrase d'ouverture implémente le ternaire. Même famille que 0-88 : **la version normative et la version corrigée coexistaient dans le même paragraphe**. |
+
 ---
 
 ## 1. Question
@@ -316,7 +344,7 @@ d'invalidation, **chacune avec son cas synthétique au banc, frontière `N-ind` 
 | **`N-b`** | `IC_inf > 0` | l'état porte **au moins** de la surface encodée — *formulation (xiii) obligatoire* |
 | **`N-a`** | **`IC ⊂ [−2τ, +2τ] = [−0.30, +0.30]`** | **« écart BORNÉ par la résolution : `\|Δ\| < 2τ` établi »** — lecture d'**équivalence**, **jamais** « pas d'écart ». *Sans le facteur 2, `N-a` souffrait du même vice d'atteignabilité : à `τ = 0.15 ≈ hw = 0.142`, l'inclusion aurait exigé `\|Δ̄\| ≤ 0.008`.* |
 | **`N-ind`** | tout le reste | **« indécidable ICI, matériel ou `K_eff` insuffisant »** ⇒ **« augmenter la résolution »** — *jamais un demi-`N-a`* |
-| **`INVALIDE-INSTRUMENT`** | `ΔR1_inv` **significativement sous la clé nulle elle-même** : **`IC_sup < −τ`** (exigence de **magnitude**, défaut D10 de l'audit) | **c'est l'INSTRUMENT qui est accusé, pas le cortex** : si même le lexical échoue sur `C5`, la chaîne de mesure est en cause ⇒ arrêt, retour au banc. **α propre déclaré (Math) : sous encodage exactement nul, `P(IC_sup < 0) ≈ 0.025`** — l'accusation de l'instrument est portée à **α = 0.025**, à écrire, sinon un faux `INVALIDE-INSTRUMENT` sur 40 runs serait lu comme une panne réelle |
+| **`INVALIDE-INSTRUMENT`** | `ΔR1_inv` **significativement sous la clé nulle elle-même** : **`IC_sup < −τ`** (exigence de **magnitude**, défaut D10 de l'audit) | **c'est l'INSTRUMENT qui est accusé, pas le cortex** : si même le lexical échoue sur `C5`, la chaîne de mesure est en cause ⇒ arrêt, retour au banc. **α propre déclaré, RECALCULÉ sous l'exigence de magnitude (défaut 0-90)** : sous encodage exactement nul, `P(IC_sup < −τ) ≈ 1.5 × 10⁻⁴` (simulation seedée, `K_eff = 10`, `hw ≈ 0.142`) — **l'accusation de l'instrument est portée à α ≈ 2 × 10⁻⁴, PAS à 0.025**, qui était la valeur de l'ancienne règle `IC_sup < 0`. *Le chiffre gravé au tour précédent était faux d'un facteur ~170, et la phrase qui le justifiait (« 1 faux sur 40 runs ») devenait « 1 sur ~6700 ».* |
 
 **Ordre d'évaluation, gravé (défaut 0-68 — exclusivité D18)** :
 **`INVALIDE-INSTRUMENT` → `N-b` → `N-a` → `N-ind`**. La première condition satisfaite emporte la
@@ -451,7 +479,8 @@ ajustement. D19 est respectée **si et seulement si** la barrière d'information
 
 ### 4.6 Partition exhaustive des ORDRES (D18)
 
-Trois maillons, chacun jugé **+ / − / 0** par son **test de permutation intra-tige** (nulle exacte,
+Trois maillons, chacun jugé en **quatre états** (`+` / `−` / `0-résolu` / `ind`, table ci-dessous)
+par son **test de permutation intra-tige** (nulle exacte,
 `C(6,3) = 20` partitions par tige, MC seedé, **calculé PAR DOMAINE et jamais poolé**, `C7`/0-67) —
 **jamais par comparaison de moyennes de strates** (mauvaise unité d'échange, mention gravée) :
 
@@ -506,12 +535,10 @@ DERNIER** :
 
 | Rang | État | Condition sur l'IC de permutation |
 | --- | --- | --- |
-| 1 | `+` | `IC_inf > 0` |
-| 2 | `−` | `IC_sup < 0` |
-| 3 | **`0-résolu`** | `IC ⊂ [−2ε_M, +2ε_M]` (couloir d'**équivalence**) |
+| 1 | `+` | **`IC_inf > ε_M`** (marge de significativité, **1×**) |
+| 2 | `−` | **`IC_sup < −ε_M`** (marge de significativité, **1×**) |
+| 3 | **`0-résolu`** | `IC ⊂ [−2ε_M, +2ε_M]` (couloir d'**équivalence**, **2×**) |
 | 4 | **`ind`** | **tout le reste** |
-
-*(Rangs 1 et 2 : `IC_inf > ε_M`, resp. `IC_sup < −ε_M` — marge de significativité à **1×**.)*
 
 **`ε_M` — enveloppe nulle du maillon, DÉRIVÉE PAR RUN (défaut D3 de l'audit, résolu par Math).**
 Aucune constante absolue n'existe et **en poser une serait 0-52 sous une autre forme** :
@@ -554,7 +581,7 @@ pré-évaluation, puisque le `0-résolu` en sort désormais avant : défaut 0-76
 | **ORD-1** | `M2 = +`, **`M3 = +`**, `M1 = +` | 1 | chaîne complète `S3 > S2 > S1 > S0` | les deux facteurs sont instanciés et ordonnés |
 | **ORD-2** | `M2 = +`, **`M3 ≤ 0`** (c'est-à-dire `M3 ∈ {−, 0-résolu}`), tout `M1` — **contient l'issue modale `(0, +, 0)`** | **6** | **« le facteur domaine n'a pas été instancié — retour au matériau »** | **JAMAIS** « le token domine, comme prédit » (défaut 0-56) |
 | **ORD-3** | `M2 = −` (tout M1, M3) | 9 | **le domaine domine la tige** ⇒ géométrie **sémantique**, `C5` insuffisante | retour au banc ; **la mesure ne s'interprète pas** |
-| **ORD-0** *(nouvelle, défaut 0-76)* | `M2 = 0-résolu` (tout M1, M3) | 9 | **l'information de tige N'ATTEINT PAS la capture** — diagnostic **opposé** à ORD-3 : là le domaine écrase la tige, ici la tige n'arrive pas | **même SUITE qu'ORD-3** (arrêt de l'interprétation représentationnelle), **verdict distinct** : la cause est le **locus de capture**, pas la géométrie ⇒ le chantier suivant déplace la capture, il ne change pas le pool. *Et **jamais** « augmenter la résolution » : le zéro est résolu.* |
+| **ORD-0** *(nouvelle, défaut 0-76 ; verdict corrigé en lecture d'équivalence, défaut 0-91)* | `M2 = 0-résolu` (tout M1, M3) | 9 | **l'effet de tige à la capture est BORNÉ par `2ε_M`** — lecture d'**équivalence**, **jamais** « la tige n'atteint pas la capture ». Diagnostic **opposé** à ORD-3 : là le domaine écrase la tige, ici l'effet de tige est **sous la résolution** | **même SUITE qu'ORD-3** (arrêt de l'interprétation représentationnelle), **verdict distinct** : la cause candidate est le **locus de capture**, pas la géométrie ⇒ le chantier suivant **déplace la capture OU resserre `ε_M` en augmentant `K_eff`** ; il ne change pas le pool. *`ε_M ∝ 1/√K_eff` : augmenter la résolution **peut** faire sortir l'effet — c'est ce que le verdict d'absence absolue interdisait de voir.* |
 | **ORD-4** | `M2 = +`, **`M3 = +`**, `M1 ∈ {−, 0-résolu}` | **2** | domaine instancié, chaîne incomplète | rapporter le maillon manquant ; pas d'ordre global |
 | **ORD-ind** | **tout maillon en état `ind`** (règle de routage ci-dessus) | hors espace résolu | **« ordre indécidable ICI »** | **augmenter la résolution** — *jamais « retour au matériau »* |
 
@@ -771,6 +798,7 @@ lisible**). Les quatre cellules conjointes sont donc énumérées, et **aucune n
 | **`N-a`** | **famine par PUISSANCE** — l'écart à la clé nulle est indécelable à résolution suffisante | **« augmenter la résolution »** |
 | **`N-ind`** | **ni la question ni l'instrument ne sont résolus** | **« re-qualifier l'instrument AVANT de re-mesurer »** — *le discriminant lui-même est indécidable, donc aucune suite sur la question n'est prononçable* |
 | **`INVALIDE-INSTRUMENT`** | la chaîne de mesure est en cause | **arrêt** (§6.F-bis) ; aucune lecture de la primaire |
+| **`C-ind` DE RÉSOLUTION** *(défaut 0-89)* — **hors famine**, la classe du calibrateur ne discrimine rien ici | `Σ_q m_q ≥ 60` **et** `K_eff^support ≥ 9`, IC **ni** au-delà de `±ε` **ni** inclus dans `±2ε` | **« effet vrai dans la zone morte déclarée »** (≈`ε` à ≈`3ε`) ⇒ **« augmenter la résolution »** — `K_eff`, requêtes contributives. *C'est le seul cas où cette suite est correcte, et elle n'était couverte par aucune ligne : le §6.G était entièrement conditionné à une famine, alors que trois endroits y renvoyaient la suite de `C-ind`. **6.7 % des issues sous la nulle** (simulation de l'audit).* |
 | **famine PARTIELLE** (défaut 0-74), *quelle que soit la classe* | `Σ_q m_q ≥ 60` **mais** `K_eff^support ≤ 8` | **« le support s'est effondré sur une minorité de clusters »** ⇒ la suite se lit sur la **distribution des `m_q`**, publiée : concentration sur peu de tiges ⇒ **matériau non homogène**, retour au banc ; étalement avec beaucoup de `m_q = 0` ⇒ **saturation**, suite de la ligne `N-b`. **Jamais** « augmenter la résolution » par défaut |
 
 **G-bis. Issue conjointe modale, formulation gravée AVANT le run (défaut 0-70)** : les deux maillons
@@ -789,8 +817,11 @@ que cette phrase à recopier.*
 
 **H. Fuite de couche 0** : `B0 > 0` ⇒ **arrêt**, aucune interprétation d'ordre.
 
-**I. Précision** : > 1 famille touchée par l'une des deux marges de `V-dtype` ⇒
-`INCONCLUSIF-précision` ⇒ **repli fp32, chemin nominal déclaré avant le run**.
+**I. Précision** : **> 1 TIGE** touchée par l'une des deux marges de `V-dtype` ⇒
+`INCONCLUSIF-précision` ⇒ **repli fp32, chemin nominal déclaré avant le run**. *(Défaut 0-92 :
+le §6 portait encore « famille », l'unité que Math a explicitement écartée — « famille » laisserait
+passer deux familles de la même tige, c'est-à-dire un cluster entier corrompu, sans déclencher. Le
+§6 est la version **exécutable** (D22) : c'est celle qui doit porter l'unité correcte.)*
 
 **J. Périmètre** : si `V-perimetre` échoue (un des trois éléments du §4.9 manquant) ⇒ **le rapport ne
 peut pas être écrit**.
@@ -840,7 +871,7 @@ l'invariance mesurée est l'invariance à **trois transformations nommées, rép
 | **Nulle MC hypergéométrique seedée + permutation intra-tige par domaine** | 60 requêtes × MC ; 10 tiges × 20 partitions × 4 domaines | **~1 h** | ~5 s |
 | **Bootstrap joint 3 modèles (`V-joint`)** | — | **~45 min** | ~2 s |
 | **Capture `t−1` + NLL scalaire par strate** | même forward | **~30 min** | — |
-| Banc D14-S étendu (≈ 30 clauses × 2 cas + **4 classes calibrateur + 4 bandes primaire + 5 classes ORD** + `V-plafond`, `V-calib`, `V-perimetre`, `V-var-dist`, `V-surprise`, `V-compo`, `V-joint`, `V-subst`, `V-leak` + contre-exemple `fact_pairs`) | **~120 cas** | **~5-6 h** | ~15 s |
+| Banc D14-S étendu (≈ 30 clauses × 2 cas + **4 classes calibrateur + 4 bandes primaire + 6 classes ORD** + `V-plafond`, `V-calib`, `V-perimetre`, `V-var-dist`, `V-surprise`, `V-compo`, `V-joint`, `V-subst`, `V-leak` + contre-exemple `fact_pairs`) | **~120 cas** | **~5-6 h** | ~15 s |
 | **Total avant tout GPU** | | **~16-21 h d'agent** | **< 60 s** |
 | Mesure I2 sur le matériau (3 modèles) | ~792-870 séquences/modèle | — | **~3-5 min GPU**, VRAM **en réservé** |
 
@@ -868,12 +899,15 @@ qui a tué **vingt-deux défauts fatals avant tout GPU**.
    - **`fact_pairs` en contre-exemple échouant OBLIGATOIRE** (`C1`, `C2`, S-1) ;
    - **un cas synthétique par classe du calibrateur** : `N-b`, `N-a`, **`N-ind`**,
      **`INVALIDE-INSTRUMENT`** ;
-   - **un cas synthétique par bande de la primaire** : `C+`, `C−`, `C-0`, **`C-ind` (famine)** ;
+   - **un cas synthétique par bande de la primaire** : `C+`, `C−`, `C-0`, **`C-ind` (famine)**, et
+     **`C-ind` de RÉSOLUTION, hors famine** (défaut 0-89 — cette branche n'était exercée nulle part) ;
    - **un cas synthétique par classe d'ordre** : `ORD-1`, `ORD-2`, `ORD-3`, **`ORD-0`**, `ORD-4`,
      **`ORD-ind`** ;
-   - **cas de banc d'EXCLUSIVITÉ (défaut 0-68)** : « IC petit et strictement positif » doit tomber
-     en `N-b` (et en `C+`), **jamais en deux classes** ; « IC petit et strictement négatif » doit
-     tomber en `INVALIDE-INSTRUMENT`, jamais aussi en `N-a` ;
+   - **cas de banc d'EXCLUSIVITÉ (défaut 0-68, seuils MIS À JOUR par 0-83 et 0-86 — défaut 0-87)** :
+     `IC = [0.01, 0.09]` doit tomber en **`N-b`** au calibrateur **et en `C-0`** à la primaire
+     (puisque `C+` exige `IC_inf > ε`), **jamais en deux classes** ; `IC = [−0.14, −0.01]` doit
+     tomber en **`N-a`**, **jamais** en `INVALIDE-INSTRUMENT` (qui exige `IC_sup < −τ`) ;
+     `IC = [−0.40, −0.20]` doit tomber en **`INVALIDE-INSTRUMENT`** ;
    - **un cas synthétique pour `M2 = 0-résolu`** (défaut 0-72), distinct de `M2 = ind`, **tombant en
      `ORD-0` et non en `ORD-3`** (défaut 0-76) ;
    - **un cas « famine partielle concentrée »** (défaut 0-74) : `Σ_q m_q ≥ 60` obtenu par une
@@ -1127,7 +1161,7 @@ suffixe-ponts (collision `C7`).
 
 ### C. Avis Neuro — traitement
 
-Intégrés : **A1** (partition ORD à 5 classes) ; **M2 en porte de sanité** ; **`C7`/A2** (adoptée par
+Intégrés : **A1** (partition ORD, **portée de 5 à 6 classes** par la création d'`ORD-0`, 0-76) ; **M2 en porte de sanité** ; **`C7`/A2** (adoptée par
 le PI) ; **A4 amendée** (`t` décisionnel, `t−1` descriptif, cardinal 14) ; **A5** dans l'ordre de
 préférence de Math ; **A7** (`V-var-dist`) ; **A8** (nulle de cadre en 40 paires) ; **A3** en
 descriptif avec antipode ; les **trois façades** traitées, la (b) versée au vocabulaire interdit (ix) ;
@@ -1177,7 +1211,7 @@ de l'auteur* (A-7). **Déclassée** : **`P-N1`** (non-monotonicité démontrée)
 | Engagement | Auteur | Signature | Statut | Motif |
 | --- | --- | --- | --- | --- |
 | Prédiction de variante (design 2 membres, adjoint postposé) | lab-neuro | tour matériau | **ANNULÉE — non reportée** | D24-b : contraste bit-identique au point de capture ⇒ **sans objet**. |
-| Prédiction ordinale `S3 > S2 > S1 > S0` (chaîne unique, un antipode) | lab-neuro | tour 1 | **CADUQUE** | Remplacée par la **partition ORD à 5 classes** (son propre A1). Défaut 0-56. |
+| Prédiction ordinale `S3 > S2 > S1 > S0` (chaîne unique, un antipode) | lab-neuro | tour 1 | **CADUQUE** | Remplacée par la **partition ORD** (son propre A1), **portée de 5 à 6 classes** par la création d'`ORD-0` (0-76). Défaut 0-56. |
 | **M1** (`S3 > S2`) | lab-neuro | — | **NON SIGNÉE** ; conditionnée à `C7` | Sans `C7`, la permutation intra-tige est la vérité du générateur. |
 | **M2** (`S2 > S1`) | lab-neuro | tour 2 | **SIGNÉE** — **porte de sanité** | Arrêt si `cos̄(S2) ≤ cos̄(S1)`. |
 | **M3** (`S1 > S0`) | lab-neuro | — | **EN ATTENTE** (§11-Q2) | `C7` est adoptée ; la condition est levée. |
@@ -1191,7 +1225,7 @@ de l'auteur* (A-7). **Déclassée** : **`P-N1`** (non-monotonicité démontrée)
 | **§14-2** (seconde primaire inter-pools + `V-lex`) | **copilote**, gate 1 | — | **RETIRÉ, ratifié gate 2** | Deux impossibilités démontrées, avis convergents et indépendants. |
 | **Bande `M`** (« `M` ssi `ΔR1_inv` dépasse le plancher à 0 forward ») | **PI**, gate 1 | — | **RETIRÉE PAR SON AUTEUR, gate 2** | *« nécessaire mais pas suffisante » ; le plancher est une **borne inférieure** du canal lexical. Vacuité franchissable — refusée **alors qu'elle aurait été en faveur de l'hypothèse**.* Défaut 0-66. |
 | **Déclencheur observable de X5** | lab-neuro | tour 2 | **GRAVÉ, non ouvert** | `N-a` du calibrateur sur matériau qualifié + `V-dtype` PASS, sur ≥ 2 modèles / 3. |
-| **Substitution depuis la réserve** | lab-director | tour 2 | **GRAVÉE** (`V-subst`) | Recalcul et publication de `K_eff` et `m₁` **avant** le run ; substituer une famille pontée impose de substituer **les deux familles de sa tige**. |
+| **Substitution depuis la réserve** | lab-director | tour 2, **réécrite au tour de re-signature** | **GRAVÉE** (`V-subst`) | Recalcul et publication de `K_eff` et `m₁` **avant** le run ; **substitution d'une famille pontée INTERDITE** (0-69) ; réparation au niveau **UNITÉ** (suffixe du même sous-vivier, re-qualification complète) ; tige morte ⇒ `K_eff = 9` permis, `≤ 8` ⇒ retour au PI. *(Défaut 0-93 : le Registre portait encore la règle « substituer les deux familles de sa tige », que 0-69 avait établie comme **ne sauvant rien** — la réserve n'a que des tiges simples. Une règle « gravée » au Registre contredisait une porte exécutable.)* |
 | **`V-leak` / M4, forme corrigée `B0 ≤ 0`** | lab-neuro | **2026-08-23, tour de re-signature** | **SIGNÉE** | Correction acceptée sans réserve : *« c'est ma deuxième prédiction tuée par un porteur mal identifié — cohérent avec 0-53, et c'est moi qui ai réclamé `C7` »*. |
 | **`B0′`** (détecteur de fuite sans hypothèse) | lab-neuro | 2026-08-23 | **SIGNÉE, adoptée** | `B0` est garanti par `C7`, donc **faible** ; `B0′` est apparié en domaine et prédit **exactement 0**. |
 | **M3** (`S1 > S0`), **requalifié contrôle de manipulation de `C7`**, attendu **dès la couche 0** | lab-neuro | 2026-08-23 | **SIGNÉE** | Une confirmation dit « le vivier a été correctement typé », jamais « l'état encode le domaine ». |
@@ -1282,4 +1316,16 @@ amendement (réserve substituable avant le premier token) reste adopté incondit
   partitions, en **chiffrant et déclarant** le durcissement du seul maillon décisionnel (~26 % →
   ~52 % d'enrichissement requis). **Dix défauts de plus (0-77 … 0-86)** — **total du cycle :
   quarante et un (0-46 … 0-86)**, toujours aucun octet de matériau, aucun GPU.
+- **2026-08-23** — **SECONDE PASSE D'AUDIT**, sur la version corrigée (personne ne l'avait relue).
+  **Neuf défauts, deux critiques, TOUS introduits par les correctifs de la première passe** :
+  cas de banc encodant les anciens seuils (**0-87**, porte exécutable commandant le bug), table des
+  maillons contredisant sa propre parenthèse (**0-88**, `P(+)` de 4.04 % à 0.02 % selon la lecture),
+  `C-ind` hors famine sans aucune suite (**0-89**, 6.7 % des issues), α d'accusation faux d'un
+  facteur ~170 (**0-90**), `ORD-0` gardant un verdict d'absence absolue après être devenue une classe
+  d'équivalence (**0-91**), unité périmée dans un critère d'abandon (**0-92**), Registre contredisant
+  une porte (**0-93**), cardinaux (**0-94**), ternaire naïf (**0-95**). La même passe **certifie
+  sain** par énumération et simulation : 27 cellules exhaustives et exclusives, unicité de `ε`/`ε_M`,
+  **14 classes toutes atteignables et aucune toujours vraie**, aucun verdict jumeau, et le schéma
+  1×/2× **effectif à 92.5-93.2 %** sous la nulle. **Neuf défauts de plus (0-87 … 0-95)** — **total du
+  cycle : cinquante (0-46 … 0-95)**, toujours aucun octet de matériau, aucun GPU.
 - **2026-08-23** : proposé.
