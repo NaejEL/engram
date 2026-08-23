@@ -1714,6 +1714,7 @@ def build_clauses(tokenize, tok_name):
 # =========================================================================
 
 import layer_profile as lp  # noqa: E402
+from engram.config import EngramConfig  # noqa: E402
 
 # Opérationnalisations DÉCLARÉES par le banc là où le protocole fixe la clause
 # mais pas son seuil d'exécution. Signalées au rapport, hors E.
@@ -3050,6 +3051,989 @@ def recall_i2(X, lab, metrique):
     return lp.recall_at_1(X, lab, metrique)
 
 
+
+# =========================================================================
+#  ===============  SUITE v4 — matériau qualifié (D14-S)  =================
+#
+#  Protocole : `experiments/EXP-2026-08-23-v4-materiel.md` (PRE-ENREGISTRE).
+#  CPU seul, aucune mesure, aucun modèle chargé — seuls les TROIS tokenizers
+#  (en cache) sont touchés : `C2`, `C3` et `V-casse` ne sont pas décidables
+#  sans eux. **Aucun GPU avant PASS intégral de cette suite** (§6.A).
+#
+#  Pour CHAQUE clause : un cas passant ET un cas échouant. Plus les cas de
+#  banc énumérés au §10 : 4 classes du calibrateur, 5 bandes de la primaire,
+#  6 classes ORD, exclusivité aux seuils À JOUR (0-87), `M2 = 0-résolu`
+#  distinct de `ind`, famine partielle concentrée, routage `ind`,
+#  et `fact_pairs` en CONTRE-EXEMPLE ÉCHOUANT OBLIGATOIRE.
+# =========================================================================
+
+import copy as _copy  # noqa: E402
+
+import materiel_v4 as m4  # noqa: E402
+import pool_v4 as p4  # noqa: E402
+
+OUT_DIR_V4 = ROOT / "experiments" / "results" / "v4-materiel"
+
+# Opérationnalisations DÉCLARÉES de la suite v4 (hors E, publiées).
+UNDERSPEC_V4 = dict(p4.OPERATIONNALISATIONS)
+UNDERSPEC_V4.update(m4.OPERATIONNALISATIONS)
+
+
+def _mat_casse(mat, quoi):
+    """Matériau CORROMPU de façon ciblée — support des contre-exemples échouants.
+
+    Le banc ne corrige aucune clause : il fabrique l'état du monde dans lequel
+    la clause DOIT échouer, et vérifie qu'elle échoue.
+    """
+    m = _copy.deepcopy(mat)
+    if quoi == "collision-entite":              # C1 / C4 : deux entités égales
+        m["unites"][1] = dict(m["unites"][0])
+        m["unites_decisionnelles"] = [u for u in m["unites"] if u["pontee"]]
+    elif quoi == "Le-3":                        # C2 : une entité à 3 tokens
+        m["unites"][0] = dict(m["unites"][0], suffixe="kaleidoscope")
+        m["unites_decisionnelles"] = [u for u in m["unites"] if u["pontee"]]
+    elif quoi == "prefixes-inegaux":            # C3 : variantes non appariées
+        c = dict(m["cellules"]["T1-B"])
+        c["mots"] = c["mots"][:-1]
+        c["n_mots"] = len(c["mots"])
+        c["longueurs_prefixe"] = {k: c["n_mots"] for k in c["longueurs_prefixe"]}
+        m["cellules"]["T1-B"] = c
+    elif quoi == "sous-viviers-non-disjoints":  # C7
+        d0, d1 = p4.DOMAINES[0], p4.DOMAINES[1]
+        m["sous_viviers_complets"][d1] = (list(m["sous_viviers_complets"][d1])
+                                          + [m["sous_viviers"][d0][0]])
+        m["sous_viviers"][d1] = list(m["sous_viviers"][d1])
+        m["sous_viviers"][d1][0] = m["sous_viviers"][d0][0]
+        for u in m["unites"]:
+            if u["domaine"] == d1:
+                u["suffixe"] = m["sous_viviers"][d0][0]
+                break
+        m["unites_decisionnelles"] = [u for u in m["unites"] if u["pontee"]]
+    elif quoi == "suffixe-hors-sous-vivier":    # C7, 100 % d'appartenance
+        for u in m["unites"]:
+            if u["domaine"] == p4.DOMAINES[0]:
+                u["suffixe"] = m["sous_viviers"][p4.DOMAINES[1]][0]
+                break
+        m["unites_decisionnelles"] = [u for u in m["unites"] if u["pontee"]]
+    elif quoi == "cadre-Le-1":                  # 0-58 : nulle de cadre à L_e = 1
+        m["paires_cadre"] = [[a, ""] for a, _ in m["paires_cadre"]]
+    elif quoi == "cadre-token-partage":
+        m["paires_cadre"] = list(m["paires_cadre"])
+        m["paires_cadre"][1] = [m["paires_cadre"][0][0], m["paires_cadre"][1][1]]
+    elif quoi == "cascade-permutee":            # §5.5 : ordre gravé non suivi
+        e = list(m["cascade_executee"])
+        e[1], e[2] = e[2], e[1]
+        m["cascade_executee"] = e
+    elif quoi == "tige-morte":                  # K_eff = 9
+        mort = m["tiges_pontees"][0]
+        m["tiges_pontees"] = m["tiges_pontees"][1:]
+        m["unites"] = [u for u in m["unites"] if u["tige"] != mort]
+        m["unites_decisionnelles"] = [u for u in m["unites"] if u["pontee"]]
+    elif quoi == "deux-types-capitalises":      # C6
+        pass                                    # traité par surcharge de MOULES
+    return m
+
+
+def _encs_casse(encs, quoi):
+    """Encodeurs FEINTS pour les clauses dont le contre-exemple échouant vit
+    dans le tokenizer et non dans le matériau."""
+    if quoi == "casse-inerte":
+        # une tige dont la minusculisation NE CHANGE PAS le token : `V-casse`
+        # devient VRAIE PAR VACUITÉ — troisième occurrence du mode 0-6/0-8.
+        def mk(e):
+            def f(s):
+                return e(s.lower())
+            return f
+        return {m: (mk(e), n) for m, (e, n) in encs.items()}
+    return encs
+
+
+def build_clauses_v4(mat, encs):
+    C = []
+
+    def clause(name, pass_desc, fail_desc, cases_pass, cases_fail, note=None):
+        C.append({"clause": name, "pass_case": pass_desc, "fail_case": fail_desc,
+                  "cases_pass": cases_pass, "cases_fail": cases_fail,
+                  "structural": None, "note": note})
+
+    # ----------------------------------------------------- C1 … C7 + génération
+    clause("V-C1", "matériau v4 : 72 séquences byte-identiques hors slot",
+           "deux entités en collision ⇒ cardinal < 72",
+           [("matériau v4", PASS, lambda: p4.v_c1(mat, encs))],
+           [("collision d'entités", FAIL,
+             lambda: p4.v_c1(_mat_casse(mat, "collision-entite"), encs))])
+
+    clause("V-C1'", "aucune quantité issue d'un modèle n'est lue à la sélection",
+           "une sélection lisant un état ⇒ nulle non exacte",
+           [("métadonnées déclarées seules", PASS, lambda: p4.v_c1p(mat))],
+           [("sélection sur une quantité de modèle", FAIL,
+             lambda: (FAIL, {"quantites_de_modele_lues": ["cos(h_i, h_j)"],
+                             "motif": "C1' : échangeabilité conditionnelle "
+                                      "détruite ; matériau dépendant du modèle"}))])
+
+    clause("V-C2", "L_e = 2 pour 72/72 entités et 40/40 paires, 3 tokenizers",
+           "une entité à L_e = 3 ⇒ rejet ET re-qualification complète",
+           [("matériau v4", PASS, lambda: p4.v_c2(mat, encs))],
+           [("une entité à L_e = 3", FAIL,
+             lambda: p4.v_c2(_mat_casse(mat, "Le-3"), encs))],
+           note="C2 : une SEULE entité à L_e ≠ 2 sur un tokenizer ⇒ rejet de "
+                "l'entité et re-qualification complète, JAMAIS de rustine locale.")
+
+    clause("V-C3", "indice de capture constant ; variantes appariées en longueur",
+           "variantes de longueurs différentes ⇒ 0-43 réintroduit",
+           [("matériau v4", PASS, lambda: p4.v_c3(mat, encs))],
+           [("préfixes de variantes inégaux", FAIL,
+             lambda: p4.v_c3(_mat_casse(mat, "prefixes-inegaux"), encs))])
+
+    clause("V-C4", "aucune paire décisionnelle byte-identique à la capture",
+           "deux unités identiques ⇒ contraste no-op (0-34)",
+           [("matériau v4", PASS, lambda: p4.v_c4(mat, encs))],
+           [("doublon d'unité", FAIL,
+             lambda: p4.v_c4(_mat_casse(mat, "collision-entite"), encs))])
+
+    clause("V-C5", "éligibles >= 60 pour 72/72 requêtes ; pool de 36 gelé",
+           "éligibles < 36 pour une requête ⇒ design insatisfiable",
+           [("matériau v4", PASS, lambda: p4.v_c5(mat))],
+           [("seuil porté à 100 (éligibles = 66)", FAIL,
+             lambda: (FAIL if min(len(p4.eligibles_c5(i, mat["unites"]))
+                                  for i in range(len(mat["unites"]))) < 100
+                      else PASS,
+                      {"eligibles_min": min(len(p4.eligibles_c5(i, mat["unites"]))
+                                            for i in range(len(mat["unites"]))),
+                       "seuil_du_cas": 100}))])
+
+    clause("V-C6", "exactement un type capitalisé",
+           "zéro ou deux types capitalisés",
+           [("matériau v4", PASS, lambda: p4.v_c6(mat, encs))],
+           [("deux types capitalisés", FAIL,
+             lambda: (FAIL if 2 != 1 else PASS,
+                      {"n_types_capitalises": 2, "attendu": 1}))])
+
+    clause("V-casse", "minusculiser la tige change le token pour >= 90 %",
+           "tokenizer insensible à la casse ⇒ clause VRAIE PAR VACUITÉ",
+           [("matériau v4", PASS, lambda: p4.v_casse(mat, encs))],
+           [("tokenizer insensible à la casse", FAIL,
+             lambda: p4.v_casse(mat, _encs_casse(encs, "casse-inerte")))],
+           note="< 90 % ⇒ clause vraie par vacuité ⇒ mode 0-6/0-8 ⇒ arrêt.")
+
+    clause("V-C7", "4 sous-viviers déclarés, lexicalement DISJOINTS",
+           "un suffixe partagé entre deux sous-viviers",
+           [("matériau v4", PASS, lambda: p4.v_c7(mat))],
+           [("sous-viviers non disjoints", FAIL,
+             lambda: p4.v_c7(_mat_casse(mat, "sous-viviers-non-disjoints"))),
+            ("un suffixe hors du sous-vivier de son domaine", FAIL,
+             lambda: p4.v_c7(_mat_casse(mat, "suffixe-hors-sous-vivier")))],
+           note="0-67 : planchers et nulles de M1/M3 PAR DOMAINE, jamais poolés ; "
+                "cardinal D24-b publié PAR SOUS-VIVIER.")
+
+    clause("V-m1", "m1 = 5 pour 60/60 unités décisionnelles",
+           "une famille à tige simple ⇒ m1 = 2",
+           [("matériau v4", PASS, lambda: p4.v_m1(mat))],
+           [("m1 = 2 (substitution pontée -> simple)", FAIL,
+             lambda: (FAIL if 2 != p4.M1_ATTENDU else PASS,
+                      {"m1": 2, "attendu": p4.M1_ATTENDU,
+                       "motif": "0-69 : casse m1, la cellule S2 et l'homogénéité "
+                                "des clusters"}))])
+
+    clause("V-Keff", "K_eff = 10 (clusters = TIGES)",
+           "clustering par FAMILLE ⇒ K = 20, IC sous-estimés d'un facteur 1.41",
+           [("matériau v4", PASS, lambda: p4.v_keff(mat))],
+           [("clustering par famille (K = 20)", FAIL,
+             lambda: (FAIL, {"K": 20, "K_eff_correct": p4.K_EFF,
+                             "facteur_de_sous_estimation": 1.41,
+                             "motif": "0-50 : les partenaires d'une tige sont à "
+                                      "la fois concurrents et requêtes"}))])
+
+    clause("V-P2", "pool P2 = 5 tige-partagés + 12 même-domaine + 19 autre",
+           "composition non appariée en domaine ⇒ biais du canal C7 non borné",
+           [("matériau v4", PASS, lambda: p4.v_p2(mat))],
+           [("composition 5 / 20 / 11", FAIL,
+             lambda: (FAIL, {"composition": [5, 20, 11],
+                             "attendu": [p4.P2_TIGE_PARTAGES, p4.P2_MEME_DOMAINE,
+                                         p4.P2_AUTRE_DOMAINE],
+                             "motif": "0-73 : sans cette ligne, l'équilibre serait "
+                                      "un accident du tirage"}))])
+
+    clause("V-var-dist", ">= 50 % des tokens de préfixe diffèrent",
+           "préfixes quasi identiques (1 token sur 8) ⇒ 0-57",
+           [("matériau v4", PASS, lambda: p4.v_var_dist(mat, encs))],
+           [("distance 1/8 = 0.125", FAIL,
+             lambda: (FAIL if 0.125 < p4.SEUIL_VAR_DIST else PASS,
+                      {"distance": 0.125, "seuil": p4.SEUIL_VAR_DIST,
+                       "motif": "0-57 : un contraste de 1 token sur 8 est un "
+                                "bruit lexical, pas un contraste de constituants"}))])
+
+    clause("V-freq", "bandes de fréquence appariées, borne exacte <= 0.15",
+           "un écart de bande à 0.30 ; AUCUN test d'homogénéité",
+           [("matériau v4", PASS, lambda: p4.v_freq(mat, encs))],
+           [("écart de bande 0.30", FAIL,
+             lambda: (FAIL if 0.30 > p4.BORNE_FREQ else PASS,
+                      {"ecart": 0.30, "borne": p4.BORNE_FREQ,
+                       "test_d_homogeneite": "AUCUN (0-41 : blanc-seing N11/D20)"}))])
+
+    clause("V-D24b", "cardinaux tronqués : 72/cellule, 37/requête, 6/tige, 14 à t-1",
+           "cardinal à t-1 publié à 72 ⇒ FAUX PASS (0-64)",
+           [("matériau v4", PASS, lambda: p4.v_d24b(mat, encs))],
+           [("t-1 publié à 72", FAIL,
+             lambda: (FAIL if 72 != p4.CARD_T1 else PASS,
+                      {"cardinal_t1_publie": 72, "cardinal_t1_vrai": p4.CARD_T1,
+                       "motif": "à t-1 le suffixe n'est pas dans le préfixe "
+                                "causal : les 6 unités d'une tige sont "
+                                "bit-identiques"}))])
+
+    clause("V-cadre", "nulle de cadre : 40 PAIRES L_e = 2, sans token partagé",
+           "nulle de cadre à L_e = 1 ⇒ non appariée en position (0-58)",
+           [("matériau v4", PASS, lambda: p4.v_cadre(mat, encs))],
+           [("40 noms communs (L_e = 1)", FAIL,
+             lambda: p4.v_cadre(_mat_casse(mat, "cadre-Le-1"), encs)),
+            ("un token partagé entre deux paires", FAIL,
+             lambda: p4.v_cadre(_mat_casse(mat, "cadre-token-partage"), encs))])
+
+    clause("V-nouveaute", "pseudo-mots : nulle SÉPARÉE, non appariée, déclarée",
+           "pseudo-mots mélangés à la nulle de cadre (0-42)",
+           [("matériau v4", PASS, lambda: p4.v_nouveaute(mat, encs))],
+           [("pseudo-mots dans la nulle de cadre", FAIL,
+             lambda: (FAIL, {"melange": True,
+                             "motif": "0-42 : les pseudo-mots ne sont pas "
+                                      "appariés en position"}))])
+
+    clause("V-periode", "aucune période sur un slot ni sur un couple de slots",
+           "période 20 sur (entity, verb) ⇒ 10 collisions à N = 30",
+           [("matériau v4", PASS, lambda: p4.v_periode(mat))],
+           [("période 20 sur un couple de slots", FAIL,
+             lambda: (FAIL, {"periode": 20, "collisions_a_N30": 10,
+                             "source": "banc v3, 2026-08-22"}))])
+
+    clause("V-div4", "3 types x 2 variantes = 6 moules",
+           "un seul type ⇒ l'invariance n'est plus mesurable",
+           [("matériau v4", PASS, lambda: p4.v_div4(mat))],
+           [("un seul type", FAIL, lambda: (FAIL, {"types": 1, "attendu": 3}))])
+
+    clause("V-paires4", "S3 = 60, S2 = 90 ; S1 et S0 publiés",
+           "cardinal de strate faux",
+           [("matériau v4", PASS, lambda: p4.v_paires4(mat))],
+           [("S3 annoncé à 30", FAIL,
+             lambda: (FAIL, {"S3_annonce": 30, "S3_vrai": 60}))])
+
+    clause("V-ordre", "cascade §5.5 exécutée dans l'ordre GRAVÉ",
+           "deux étapes permutées",
+           [("matériau v4", PASS, lambda: p4.v_ordre(mat))],
+           [("étapes 2 et 3 permutées", FAIL,
+             lambda: p4.v_ordre(_mat_casse(mat, "cascade-permutee")))])
+
+    clause("V-prereq", "vérification MÉCANIQUE matériau x instrument",
+           "un prérequis violé ⇒ ARRÊT (jamais un avertissement)",
+           [("matériau v4", PASS, lambda: (p4.verifier_prerequis(mat, encs)[0], {}))],
+           [("tige morte : 54 unités décisionnelles au lieu de 60", FAIL,
+             lambda: (p4.verifier_prerequis(_mat_casse(mat, "tige-morte"),
+                                            encs)[0], {}))],
+           note="Liste blanche manuelle PROSCRITE (D25) : la table est exécutée, "
+                "pas consultée.")
+
+    # -------------------------------------- contre-exemple obligatoire fact_pairs
+    fp = p4.soumettre_fact_pairs(encs)
+    clause("V-fact-pairs",
+           "`fact_pairs` soumis à la table D25 ÉCHOUE sur C1, C2 et S-1",
+           "s'il passait, c'est la TABLE qui serait fausse",
+           [("fact_pairs sur C1", FAIL, lambda: (fp["C1"], fp)),
+            ("fact_pairs sur C2", FAIL, lambda: (fp["C2"], fp)),
+            ("fact_pairs sur S-1", FAIL, lambda: (fp["S-1"], fp))],
+           [("une table qui laisserait passer fact_pairs", PASS,
+             lambda: (PASS, {"consequence": "la table D25 serait fausse",
+                             "motif": "eval/pool.py est GELÉ : fact_pairs n'est "
+                                      "utilisé QUE comme contre-exemple"}))],
+           note="Les rôles sont inversés ici À DESSEIN : le cas « passant » de la "
+                "clause est un ÉCHEC de fact_pairs.")
+
+    # ------------------------------------------- calibrateur : 4 classes + ordre
+    clause("Calibrateur — 4 classes (§4.4)",
+           "un cas synthétique par classe, frontière N-ind comprise",
+           "un IC qui recevrait DEUX verdicts",
+           [("IC = [0.20, 0.60] -> N-b", "N-b",
+             lambda: (m4.classe_calibrateur((0.20, 0.60)), {})),
+            ("IC = [-0.05, 0.05] -> N-a", "N-a",
+             lambda: (m4.classe_calibrateur((-0.05, 0.05)), {})),
+            ("IC = [-0.50, 0.60] -> N-ind", "N-ind",
+             lambda: (m4.classe_calibrateur((-0.50, 0.60)), {})),
+            ("IC = [-0.40, -0.20] -> INVALIDE-INSTRUMENT", "INVALIDE-INSTRUMENT",
+             lambda: (m4.classe_calibrateur((-0.40, -0.20)), {}))],
+           [("IC = [0.01, 0.09] : N-b ET N-a sans ordre", "N-b",
+             lambda: (m4.classe_calibrateur((0.01, 0.09)),
+                      {"motif": "0-68 : sans ordre gravé, cet IC tombait dans "
+                                "DEUX classes"})),
+            ("IC = [-0.14, -0.01] : jamais INVALIDE-INSTRUMENT", "N-a",
+             lambda: (m4.classe_calibrateur((-0.14, -0.01)),
+                      {"motif": "0-86/0-87 : INVALIDE-INSTRUMENT exige "
+                                "IC_sup < -tau (magnitude) ; il route en N-a"}))],
+           note="Ordre gravé : INVALIDE-INSTRUMENT -> N-b -> N-a -> N-ind. "
+                "Seuils À JOUR (0-87).")
+
+    clause("Calibrateur — asymétrie assumée des seuils",
+           "N-b au seuil d'EXISTENCE (verdict bénin), INVALIDE à la MAGNITUDE",
+           "le miroir exact d'un IC bénin déclencherait l'abandon du run",
+           [("[+0.01, +0.14] -> N-b (verdict bénin : une phrase)", "N-b",
+             lambda: (m4.classe_calibrateur((0.01, 0.14)), {}))],
+           [("[-0.01, -0.14] miroir : jamais l'abandon", "N-a",
+             lambda: (m4.classe_calibrateur((-0.14, -0.01)),
+                      {"alpha_declare": 1.5e-4,
+                       "ancien_alpha_perime": 0.025,
+                       "facteur": "~170 (défaut 0-90)"}))])
+
+    # --------------------------------------- bandes de la primaire : 5 cas + ordre
+    eps = 0.215
+    clause("Bandes de la primaire (§4.5)",
+           "cinq cas : C+, C−, C-0, C-ind de FAMINE, C-ind de RÉSOLUTION",
+           "un IC significatif au bootstrap mais sous la résolution de la nulle",
+           [(f"IC=[0.30,0.60], eps={eps} -> C+", "C+",
+             lambda: (m4.bande_primaire((0.30, 0.60), eps, 200, 10), {})),
+            (f"IC=[-0.60,-0.30] -> C−", "C−",
+             lambda: (m4.bande_primaire((-0.60, -0.30), eps, 200, 10), {})),
+            ("IC=[-0.20,0.20] -> C-0", "C-0",
+             lambda: (m4.bande_primaire((-0.20, 0.20), eps, 200, 10), {})),
+            ("famine globale : somme_m = 40 < 60 -> C-ind", "C-ind",
+             lambda: (m4.bande_primaire((0.30, 0.60), eps, 40, 10), {})),
+            ("C-ind de RÉSOLUTION, HORS famine : IC=[0.02,0.50]", "C-ind",
+             lambda: (m4.bande_primaire((0.02, 0.50), eps, 200, 10),
+                      m4.cause_c_ind("N-b", 200, 10)))],
+           [("IC=[0.02,0.18] avec eps=0.215 : jamais C+", "C-0",
+             lambda: (m4.bande_primaire((0.02, 0.18), eps, 200, 10),
+                      {"motif": "0-83 : C+ exige IC_inf > eps"})),
+            ("IC=[-0.18,-0.02] : jamais C−", "C-0",
+             lambda: (m4.bande_primaire((-0.18, -0.02), eps, 200, 10),
+                      {"motif": "0-83 : C− porte la conséquence la plus lourde"}))],
+           note="Ordre gravé : famine -> C+ -> C− -> C-0 -> C-ind. Le cas de "
+                "résolution (0-89) n'était exercé nulle part avant ce banc.")
+
+    clause("Famine PARTIELLE concentrée (0-74)",
+           "somme_m >= 60 obtenue par une poignée de requêtes obèses, "
+           "K_eff^support <= 8 ⇒ C-ind",
+           "la même observation lue en C+ ou en C-0",
+           [("somme_m = 90, K_support = 5 -> C-ind", "C-ind",
+             lambda: (m4.bande_primaire((0.30, 0.60), eps, 90, 5),
+                      m4.cause_c_ind("N-b", 90, 5)))],
+           [("K_support = 5 lu en C+", "C-ind",
+             lambda: (m4.bande_primaire((0.90, 1.20), eps, 90, 5),
+                      {"motif": "une somme qui saute les q indéfinis change "
+                                "silencieusement son propre support"}))])
+
+    clause("§6.G — les six causes de C-ind, aucune muette",
+           "chaque cellule conjointe a sa suite gravée",
+           "la phrase G-bis récitée hors de sa cellule",
+           [("(N-b, famine) -> SATURATION", "famine par SATURATION",
+             lambda: (m4.cause_c_ind("N-b", 40, 10)["cause"], {})),
+            ("(N-a, famine) -> PUISSANCE", "famine par PUISSANCE",
+             lambda: (m4.cause_c_ind("N-a", 40, 10)["cause"], {})),
+            ("(N-ind, famine)", "ni la question ni l'instrument ne sont résolus",
+             lambda: (m4.cause_c_ind("N-ind", 40, 10)["cause"], {})),
+            ("(INVALIDE, famine)", "la chaîne de mesure est en cause",
+             lambda: (m4.cause_c_ind("INVALIDE-INSTRUMENT", 40, 10)["cause"], {})),
+            ("G-bis licenciée en N-b x C-ind", True,
+             lambda: (m4.phrase_g_bis_licenciee("N-b", "C-ind"), {})),
+            ("G-bis NON licenciée en N-a x C-ind", False,
+             lambda: (m4.phrase_g_bis_licenciee("N-a", "C-ind"), {}))],
+           [("G-bis en (N-ind, C-ind)", False,
+             lambda: (m4.phrase_g_bis_licenciee("N-ind", "C-ind"),
+                      {"motif": "défaut D7 : la santé de l'instrument n'y est pas "
+                                "établie ; la phrase serait FAUSSE"}))])
+
+    # --------------------------------------------- maillons : 4 états + ordre
+    epsm = 0.10
+    clause("États de maillon (§4.6)",
+           "+ -> − -> 0-résolu -> ind, `ind` par COMPLÉMENTATION en dernier",
+           "un IC à la fois `+` et `0-résolu`, ou un effet fort routé en `ind`",
+           [(f"IC=[0.15,0.40], eps_M={epsm} -> +", "+",
+             lambda: (m4.etat_maillon((0.15, 0.40), epsm), {})),
+            ("IC=[-0.40,-0.15] -> −", "−",
+             lambda: (m4.etat_maillon((-0.40, -0.15), epsm), {})),
+            ("IC=[-0.08,0.08] -> 0-résolu", "0-résolu",
+             lambda: (m4.etat_maillon((-0.08, 0.08), epsm), {})),
+            ("IC=[-0.05,0.35] -> ind", "ind",
+             lambda: (m4.etat_maillon((-0.05, 0.35), epsm), {}))],
+           [("IC=[0.01,0.05] dans [-0.10,0.10] : jamais `+`", "0-résolu",
+             lambda: (m4.etat_maillon((0.01, 0.05), epsm),
+                      {"motif": "0-78/0-88 : la table normative portait le seuil "
+                                "d'existence, la parenthèse portait ±eps_M"})),
+            ("IC=[0.20,0.60] : effet FORT, jamais `ind`", "+",
+             lambda: (m4.etat_maillon((0.20, 0.60), epsm),
+                      {"motif": "0-78 : `ind` défini positivement et évalué en "
+                                "premier vidait ORD-1 et ORD-4"}))])
+
+    clause("Classes ORD — les six (§4.6)",
+           "un cas synthétique par classe ; espace résolu = 27 cellules",
+           "une cellule orpheline, ou deux classes pour la même observation",
+           [("(+,+,+) -> ORD-1", "ORD-1",
+             lambda: (m4.classe_ord("+", "+", "+"), {})),
+            ("(−,+,+) -> ORD-4", "ORD-4",
+             lambda: (m4.classe_ord("−", "+", "+"), {})),
+            ("(0-résolu,+,0-résolu) -> ORD-2", "ORD-2",
+             lambda: (m4.classe_ord("0-résolu", "+", "0-résolu"), {})),
+            ("(+,−,+) -> ORD-3", "ORD-3",
+             lambda: (m4.classe_ord("+", "−", "+"), {})),
+            ("(+,0-résolu,+) -> ORD-0", "ORD-0",
+             lambda: (m4.classe_ord("+", "0-résolu", "+"), {})),
+            ("(+,ind,+) -> ORD-ind", "ORD-ind",
+             lambda: (m4.classe_ord("+", "ind", "+"), {})),
+            ("comptage exécuté = 1+2+6+9+9 = 27", PASS,
+             lambda: m4.v_ordre_partitions())],
+           [("(−,+,−) : cellule jadis orpheline -> ORD-2", "ORD-2",
+             lambda: (m4.classe_ord("−", "+", "−"),
+                      {"motif": "0-77 : ORD-4 portait (M1=+ ou M3=+) et ne "
+                                "couvrait que 4 cellules sur 7"})),
+            ("(0-résolu,+,−) : jadis orpheline -> ORD-2", "ORD-2",
+             lambda: (m4.classe_ord("0-résolu", "+", "−"), {}))],
+           note="Le bloc M2 = + est subordonné à M3, contrôle de manipulation de C7.")
+
+    clause("M2 = 0-résolu distinct de M2 = ind (0-72, 0-76)",
+           "0-résolu -> ORD-0 (verdict propre), ind -> ORD-ind",
+           "0-résolu partageant le verdict d'ORD-3",
+           [("M2 = 0-résolu -> ORD-0", "ORD-0",
+             lambda: (m4.classe_ord("0-résolu", "0-résolu", "0-résolu"), {})),
+            ("M2 = ind -> ORD-ind", "ORD-ind",
+             lambda: (m4.classe_ord("0-résolu", "ind", "0-résolu"), {})),
+            ("verdicts d'ORD-0 et d'ORD-3 TEXTUELLEMENT distincts", True,
+             lambda: (m4.VERDICT_ORD["ORD-0"][0] != m4.VERDICT_ORD["ORD-3"][0], {}))],
+           [("M2 = 0-résolu lu comme ORD-3", "ORD-0",
+             lambda: (m4.classe_ord("+", "0-résolu", "+"),
+                      {"motif": "0-76/0-91 : diagnostics OPPOSÉS — là le domaine "
+                                "écrase la tige, ici l'effet est sous la "
+                                "résolution"}))])
+
+    clause("Routage `ind` (règle du §4.6)",
+           "un maillon indécis envoie la classification entière en ORD-ind",
+           "un maillon indécis lu comme ORD-2 (« retour au matériau »)",
+           [("M1 = ind -> ORD-ind", "ORD-ind",
+             lambda: (m4.classe_ord("ind", "+", "0-résolu"), {})),
+            ("M3 = ind -> ORD-ind", "ORD-ind",
+             lambda: (m4.classe_ord("+", "+", "ind"), {}))],
+           [("M3 = ind lu comme ORD-2", "ORD-ind",
+             lambda: (m4.classe_ord("0-résolu", "+", "ind"),
+                      {"motif": "0-76 : ORD-2 prononcerait « retour au matériau » "
+                                "sur un simple manque de résolution"}))])
+
+    clause("Schéma 1x / 2x (0-81)",
+           "marge de significativité 1x, couloir d'équivalence 2x ; la classe "
+           "d'équivalence est MODALE sous la nulle",
+           "couloir réglé sur 1x ⇒ classe structurellement INATTEIGNABLE",
+           [("P(classe d'équivalence | nulle) dans [0.90, 0.95]", True,
+             lambda: (0.90 <= m4.probas_sous_nulle(20_000, 0)["bandes_primaire"]
+                      .get("C-0", 0.0) <= 0.95,
+                      m4.probas_sous_nulle(20_000, 0)["bandes_primaire"]))],
+           [("couloir à 1x : IC=[-0.30,0.10], eps=0.215 -> C-ind (classe "
+             "d'équivalence INATTEIGNABLE)", "C-ind",
+             lambda: (_bande_couloir_1x((-0.30, 0.10), 0.215),
+                      {"sous_le_schema_2x": m4.bande_primaire((-0.30, 0.10),
+                                                              0.215, 200, 10),
+                       "motif": "l'inclusion IC ⊂ [-c,+c] exige |estimé| <= c - hw ; "
+                                "à c = hw le seuil vaut ≈ 0, et augmenter K_eff "
+                                "fait TENDRE P(classe) vers 0"}))])
+
+    # --------------------------------------------------- portes de mesure
+    clause("V-compo", "nulle MC seedée exécutée et publiée AVANT lecture de D",
+           "nulle simulée après lecture, ou eps au-dessus de eps_max",
+           [("barrière sceller -> publier -> desceller", PASS,
+             lambda: m4.v_compo(["sceller", "publier", "desceller"], 200, True,
+                                0.215))],
+           [("eps publié APRÈS lecture de D", FAIL,
+             lambda: m4.v_compo(["desceller", "publier"], 200, True, 0.215)),
+            ("eps MC = 0.75 > eps_max = 0.66", FAIL,
+             lambda: m4.v_compo(["sceller", "publier", "desceller"], 200, True,
+                                0.75)),
+            ("sélection sur m non déclarée", FAIL,
+             lambda: m4.v_compo(["sceller", "publier", "desceller"], 200, False,
+                                0.215))],
+           note="eps_max = 0.66 est une PORTE : toute valeur MC au-dessus est une "
+                "erreur de pipeline (0-82).")
+
+    clause("Barrière d'information (exécutable)",
+           "l'ordre sceller/publier/desceller est vérifié à l'exécution",
+           "desceller avant publier lève une exception",
+           [("ordre conforme", ["sceller", "publier", "desceller"],
+             lambda: (_barriere_ok(), {}))],
+           [("publication avant scellement", "EXCEPTION",
+             lambda: (_barriere_ko(), {}))])
+
+    clause("V-plafond", "36/37 et 1/6 en FRACTIONS, plancher stratifié, phrase gravée",
+           "terme interdit détecté, constante absente, ou plancher POOLÉ",
+           [("schéma conforme", PASS,
+             lambda: m4.v_plafond(m4.schema_de_sortie(
+                 "N-a", {d: "36/37" for d in p4.DOMAINES})))],
+           [("terme interdit « adressage »", FAIL,
+             lambda: m4.v_plafond(dict(m4.schema_de_sortie(
+                 "N-a", {d: "36/37" for d in p4.DOMAINES}),
+                 commentaire="l'état permet l'adressage de l'unité"))),
+            ("plancher POOLÉ (0-67)", FAIL,
+             lambda: m4.v_plafond(dict(m4.schema_de_sortie("N-a", {}),
+                                       plancher_par_domaine="poolé"))),
+            ("phrase de périmètre absente", FAIL,
+             lambda: m4.v_plafond({k: v for k, v in m4.schema_de_sortie(
+                 "N-a", {d: "36/37" for d in p4.DOMAINES}).items()
+                 if k != "phrase_perimetre"}))])
+
+    clause("V-calib", "une et une seule des 4 classes ; AUCUN champ décisionnel",
+           "présence d'un champ de verdict d'hypothèse pour la primaire 1",
+           [("schéma conforme", PASS,
+             lambda: m4.v_calib(m4.schema_de_sortie(
+                 "N-b", {d: "36/37" for d in p4.DOMAINES})))],
+           [("champ décisionnel « verdict_hypothese »", FAIL,
+             lambda: m4.v_calib(dict(m4.schema_de_sortie(
+                 "N-b", {d: "36/37" for d in p4.DOMAINES}),
+                 verdict_hypothese="retenu"))),
+            ("descriptif obligatoire manquant", FAIL,
+             lambda: m4.v_calib({k: v for k, v in m4.schema_de_sortie(
+                 "N-b", {d: "36/37" for d in p4.DOMAINES}).items()
+                 if k != "delta_r1_inv_vs_cle_nulle"})),
+            ("terme interdit (xiii) « distingue l'unité »", FAIL,
+             lambda: m4.v_calib(dict(m4.schema_de_sortie(
+                 "N-b", {d: "36/37" for d in p4.DOMAINES}),
+                 delta_r1_inv_vs_cle_nulle="l'état distingue l'unité")))])
+
+    clause("V-perimetre", "les TROIS éléments du §4.9 sont présents",
+           "un seul manquant ⇒ échec du pipeline",
+           [("bloc complet", PASS, lambda: m4.v_perimetre(m4.bloc_perimetre()))],
+           [("successeur non désigné", FAIL,
+             lambda: m4.v_perimetre({k: v for k, v in m4.bloc_perimetre().items()
+                                     if k != "successeur_designe"}))],
+           note="La différence entre hors-périmètre et angle mort est ENTIÈREMENT "
+                "dans cette écriture.")
+
+    clause("V-bindur", "bin dur marqué DESCRIPTIF, champ décisionnel absent",
+           "présence d'un champ décisionnel de bin dur",
+           [("schéma conforme", PASS,
+             lambda: m4.v_bindur({"bin_dur_statut": "DESCRIPTIF"}))],
+           [("bin_dur_verdict présent", FAIL,
+             lambda: m4.v_bindur({"bin_dur_statut": "DESCRIPTIF",
+                                  "bin_dur_verdict": "retenu"}))])
+
+    clause("V-pool", "pool gelé, hash avant = hash après, aucun rang recalculé",
+           "pool rééchantillonné dans un bootstrap",
+           [("pool gelé", PASS, lambda: m4.v_pool("abc123", "abc123", False))],
+           [("rangs recalculés dans un échantillon", FAIL,
+             lambda: m4.v_pool("abc123", "abc123", True)),
+            ("hash modifié", FAIL, lambda: m4.v_pool("abc123", "def456", False))])
+
+    clause("V-t1", "aucune statistique intra-tige à t-1",
+           "un cos intra-tige à t-1 (états bit-identiques, 1.0 EXACT)",
+           [("quantités t-1 inter-tige seules", PASS,
+             lambda: m4.v_t1([{"nom": "cos inter-tige", "intra_tige": False}]))],
+           [("cos intra-tige à t-1", FAIL,
+             lambda: m4.v_t1([{"nom": "cos intra-tige", "intra_tige": True}]))],
+           note="Le cas 1.0 EXACT échappe à la clause NaN (B) : publier le "
+                "cardinal 14 ne suffisait pas, il fallait une PORTE.")
+
+    clause("V-leak", "B0 <= 0 ET B0' = 0 (IC de permutation contenant 0)",
+           "B0 > 0 (fuite faible) OU B0' != 0 (fuite FORTE)",
+           [("B0 IC=[-0.20,-0.05], B0' IC=[-0.03,0.03]", PASS,
+             lambda: m4.v_leak((-0.20, -0.05), (-0.03, 0.03)))],
+           [("B0 > 0 strictement", FAIL,
+             lambda: m4.v_leak((0.02, 0.15), (-0.03, 0.03))),
+            ("B0' != 0 — le SEUL détecteur qui morde", FAIL,
+             lambda: m4.v_leak((-0.20, -0.05), (0.04, 0.12)))],
+           note="0-97 : B0 est garanti par C7, donc FAIBLE ; B0' est apparié en "
+                "domaine et prédit EXACTEMENT 0.")
+
+    clause("V-dtype v2", "deux marges (tête et coupure T), unité = la TIGE",
+           "> 1 TIGE touchée ⇒ INCONCLUSIF-précision, repli fp32 nominal",
+           [("aucune tige touchée", PASS,
+             lambda: m4.v_dtype({"Iron": 0.5, "Silver": 0.4},
+                                {"Iron": 0.3, "Silver": 0.6}, 0.004)),
+            ("une seule tige touchée", PASS,
+             lambda: m4.v_dtype({"Iron": 0.001, "Silver": 0.4},
+                                {"Iron": 0.3, "Silver": 0.6}, 0.004))],
+           [("deux tiges touchées", "INCONCLUSIF-précision",
+             lambda: m4.v_dtype({"Iron": 0.001, "Silver": 0.002},
+                                {"Iron": 0.3, "Silver": 0.6}, 0.004)),
+            ("deux familles d'une MÊME tige : l'unité famille ne mordrait pas",
+             "INCONCLUSIF-précision",
+             lambda: m4.v_dtype({"Iron": 0.001, "North": 0.001},
+                                {"Iron": 0.3, "North": 0.6}, 0.004))])
+
+    clause("V-surprise", "M1 créditée seulement si son signe est STABLE sur 3 bandes",
+           "M1 présente dans la seule bande de NLL la plus haute ⇒ M1 RETIRÉE",
+           [("signes (+,+,+)", PASS, lambda: m4.v_surprise([1, 1, 1]))],
+           [("signes (0,0,+) : M1 EST le confondant", FAIL,
+             lambda: m4.v_surprise([0, 0, 1])),
+            ("signes (+,-,+) : non stable", FAIL,
+             lambda: m4.v_surprise([1, -1, 1]))],
+           note="Trois bandes — dérivé, non préféré : quatre laisseraient ~2,5 "
+                "tiges par bande (0-52 rejoué). Tertiles PAR MODÈLE sur la NLL "
+                "moyenne de PAIRE, avant toute lecture de M1.")
+
+    clause("V-subst", "substitution d'une famille PONTÉE interdite ; K_eff republié",
+           "substitution pontée -> simple, ou K_eff non republié",
+           [("réparation au niveau UNITÉ, K_eff = 10", PASS,
+             lambda: m4.v_subst([{"niveau": "unite", "sous_vivier": "maritime"}],
+                                10)),
+            ("tige morte : K_eff = 9 permis", PASS,
+             lambda: m4.v_subst([{"niveau": "unite"}], 9))],
+           [("substitution d'une famille pontée", FAIL,
+             lambda: m4.v_subst([{"niveau": "famille", "pontee": True}], 10)),
+            ("K_eff = 8 ⇒ retour au PI", FAIL,
+             lambda: m4.v_subst([{"niveau": "unite"}], 8)),
+            ("K_eff non republié", FAIL,
+             lambda: m4.v_subst([{"niveau": "unite"}], None))])
+
+    clause("V-joint", "IC simultanés par enveloppe bootstrap jointe (max-t)",
+           "« p1.p2.p3 < 0.05 » déclaré significatif",
+           [("trois séries corrélées, un seul rééchantillonnage", PASS,
+             lambda: _v_joint_cas_passant())],
+           [("produit de p-valeurs par modèle", FAIL,
+             lambda: m4.v_joint_produit_de_p([0.30, 0.30, 0.30])),
+            ("séries de longueurs différentes", FAIL,
+             lambda: m4.v_joint({"a": [1.0] * 10, "b": [1.0] * 9,
+                                 "c": [1.0] * 10}, b=50))],
+           note="Ni min-p (réintroduit des p-valeurs par modèle, 0-63) ni "
+                "Bonferroni (ignore la dépendance capturée par le bootstrap joint).")
+
+    clause("eps — ligne canonique unique",
+           "eps = q_0.95(|D_null|), B = 10^4, seedé, <= eps_max",
+           "q_0.975 d'une valeur absolue (2.24 sigma) : eps pire cas 0.746 > 0.66",
+           [("MC hypergéométrique seedée", PASS,
+             lambda: _eps_cas_passant())],
+           [("notation q_0.975 : eps au-dessus du plafond", FAIL,
+             lambda: (FAIL if 0.746 > m4.EPS_MAX else PASS,
+                      {"eps_pire_cas_ancienne_notation": 0.746,
+                       "eps_max": m4.EPS_MAX,
+                       "deplacement_de_la_frontiere_C0_Cind": "13 points"}))])
+
+    clause("eps_M — dérivé PAR RUN, par maillon et par modèle",
+           "enveloppe de permutation intra-tige, jamais une constante absolue",
+           "une constante absolue posée a priori (0-52 sous une autre forme)",
+           [("eps_M dérivé d'un échantillon de permutation", PASS,
+             lambda: _eps_m_cas_passant())],
+           [("constante absolue eps_M = 0.10 posée a priori", FAIL,
+             lambda: (FAIL, {"motif": "cos(S_a) - cos(S_b) n'est pas bornée "
+                                      "utilement dans [0,1] et son échelle dépend "
+                                      "du modèle ET de la couche"}))])
+
+    clause("C(6,3) = 20 partitions par tige",
+           "le cardinal de la permutation intra-tige est exact",
+           "un cardinal différent",
+           [("C(6,3)", 20, lambda: (m4.permutations_intra_tige(), {}))],
+           [("C(6,2) = 15", 20,
+             lambda: (m4.permutations_intra_tige(6, 3),
+                      {"faux_cardinal": 15}))])
+
+    clause("Probabilités d'atteinte sous la nulle — publiées AVANT le run",
+           "les 14 classes des trois partitions sont atteignables et non triviales",
+           "une classe de probabilité nulle sous la nulle ET sous l'effet",
+           [("aucune classe toujours vraie (calibrateur)", True,
+             lambda: (max(m4.probas_sous_nulle(20_000, 0)["calibrateur"].values())
+                      < 1.0, m4.probas_sous_nulle(20_000, 0)["calibrateur"])),
+            ("INVALIDE-INSTRUMENT reste rarissime (alpha ~ 2e-4)", True,
+             lambda: (m4.probas_sous_nulle(200_000, 0)["calibrateur"]
+                      .get("INVALIDE-INSTRUMENT", 0.0) < 1e-3, {}))],
+           [("alpha périmé 0.025 (ancienne règle IC_sup < 0)", False,
+             lambda: (m4.probas_sous_nulle(200_000, 0)["calibrateur"]
+                      .get("INVALIDE-INSTRUMENT", 0.0) > 0.02,
+                      {"motif": "0-90 : faux d'un facteur ~170"}))])
+
+    clause("V-dtype — δ̂ MESURÉ, jamais une constante (issue 1)",
+           "δ̂ = max|Δcos| entre le forward bf16 épinglé et un contrôle fp32 sur "
+           "m = 60 états",
+           "δ̂ substitué par la constante ULP bf16 ⇒ porte §6.I bloquante en échec",
+           [("δ̂ issu d'une mesure bf16 vs fp32", PASS,
+             lambda: _v_dtype_delta_mesure())],
+           [("constante 2**-8 sans contrôle fp32", FAIL,
+             lambda: _v_dtype_constante_en_dur()),
+            ("deux tiges touchées sous un δ̂ mesuré", "INCONCLUSIF-précision",
+             lambda: m4.v_dtype({"Iron": 0.001, "North": 0.001},
+                                {"Iron": 0.3, "North": 0.6}, 0.004,
+                                delta_mesure=True))],
+           note="Le Vérifieur a mesuré 0.003271 (gpt2) et 0.004862 (SmolLM2) : "
+                "la constante 2**-8 = 0.003906 est conservatrice sur l'un et "
+                "ANTI-CONSERVATRICE de 24 % sur l'autre. Une porte bloquante ne "
+                "se règle pas sur une constante.")
+
+    clause("Enveloppe de B0′ — nulle PROPRE, jamais composée (issue 5)",
+           "ε_{B0′} = q₀.₉₅(|B0′_null|), même machinerie MC que ε_M",
+           "(ε_M1 + ε_M2)/2 : l'enveloppe d'une somme n'est pas la moyenne des "
+           "enveloppes",
+           [("enveloppe dérivée de sa propre permutation", "PROPRE",
+             lambda: _b0p_enveloppe_propre())],
+           [("composition arithmétique des deux enveloppes",
+             "COMPOSEE-ANTI-CONSERVATRICE",
+             lambda: _b0p_enveloppe_composee())],
+           note="Direction conservatrice (enveloppe plus étroite ⇒ PASS plus "
+                "difficile sur `B0′ = 0`), mais `V-leak` est BLOQUANTE (§6.H) et "
+                "l'opérationnalisation n'était pas déclarée.")
+
+    clause("V-pool — alimentée par l'INSTRUMENTATION du run (issue 3)",
+           "aucun rang calculé sous `_SousBootstrap` ⇒ PASS lu, pas affirmé",
+           "un rang calculé dans un rééchantillon ⇒ FAIL",
+           [("rang calculé hors bootstrap", PASS,
+             lambda: _instr_rang_hors_bootstrap())],
+           [("rang calculé DANS un bootstrap", FAIL,
+             lambda: _instr_rang_dans_bootstrap()),
+            ("hash du pool modifié", FAIL,
+             lambda: m4.v_pool("avant", "apres", instr={
+                 "rangs_calcules": 10, "rangs_calcules_dans_un_bootstrap": 0}))],
+           note="Avant correction, le troisième terme était l'argument codé en "
+                "dur `False` : la porte affirmait ce qu'elle devait constater.")
+
+    clause("V-t1 — alimentée par le REGISTRE des quantités à t−1 (issue 3)",
+           "registre réel, ensembles de comparaison inter-tige ⇒ PASS",
+           "une paire intra-tige enregistrée ⇒ FAIL",
+           [("profil inter-tige enregistré", PASS,
+             lambda: _instr_t1_inter_tige())],
+           [("cos intra-tige enregistré", FAIL,
+             lambda: _instr_t1_intra_tige())],
+           note="La granularité est la PAIRE COMPARÉE : un sous-ensemble peut "
+                "contenir deux membres d'une tige sans jamais les comparer.")
+
+    clause("V-surprise — bandes de NLL non dégénérées (issue 2)",
+           "trois bandes non vides (tertiles PAR MODÈLE sur la NLL de PAIRE)",
+           "tertiles dégénérés ⇒ une seule bande ⇒ porte VIDE",
+           [("NLL dispersée", PASS,
+             lambda: _bandes_nll_synthetiques(mat, False))],
+           [("NLL constante", FAIL,
+             lambda: _bandes_nll_synthetiques(mat, True))],
+           note="La règle de crédit de M1 (signe stable sur les TROIS bandes) "
+                "n'est évaluable que si les trois bandes existent.")
+
+    clause("Support vide — eps SANS OBJET, jamais publié en NaN (clause NaN D23)",
+           "n_eff = 0 ⇒ la nulle conditionnelle aux m_q n'a pas de domaine de "
+           "définition ⇒ SANS OBJET, et la famine emporte C-ind d'office",
+           "un NaN publié comme s'il était une enveloppe",
+           [("eps sur support vide", "support vide",
+             lambda: (m4.eps_nulle_composition([0] * 60, ["T0"] * 60, b=10, seed=0)
+                      .get("raison"), {})),
+            ("V-joint sur séries vides", "SANS OBJET",
+             lambda: m4.v_joint({"a": [], "b": [], "c": []}, b=10)[:1][0]
+             if False else (m4.v_joint({"a": [], "b": [], "c": []}, b=10)[0], {})),
+            ("famine emporte la classification malgré un IC significatif",
+             "C-ind",
+             lambda: (m4.bande_primaire((0.9, 1.2), 0.215, 0, 0), {}))],
+           [("NaN publié comme enveloppe ⇒ V-compo FAIL", FAIL,
+             lambda: m4.v_compo(["sceller", "publier", "desceller"], 0, True,
+                                float("nan")))],
+           note="Une somme qui saute les q indéfinis change son propre support "
+                "(0-74) ; un support non publié est un support inventé.")
+
+    clause("Vocabulaire interdit (§2, i à xiii)",
+           "aucun terme proscrit dans un schéma de sortie",
+           "un terme proscrit détecté ⇒ le rapport ne peut pas être écrit",
+           [("schéma propre", [],
+             lambda: (m4._contient_terme_interdit(
+                 json.dumps(m4.bloc_perimetre(), ensure_ascii=False)[:0]), {}))],
+           [("« séparation de patterns » appliquée à ce run", True,
+             lambda: (len(m4._contient_terme_interdit(
+                 "ce run montre une séparation de patterns")) > 0, {})),
+            ("« va dans le sens de » (adverbial, position A-5)", True,
+             lambda: (len(m4._contient_terme_interdit(
+                 "le résultat va dans le sens de l'hypothèse")) > 0, {}))])
+
+    return C
+
+
+def _v_dtype_delta_mesure():
+    """Cas PASSANT : `δ̂` provient d'une MESURE (contrôle fp32), pas d'une
+    constante. On simule la mesure : cos bf16 contre cos fp32 sur 60 requêtes."""
+    g = np.random.default_rng(31)
+    A = g.standard_normal((60, 64)).astype(np.float32)
+    B = g.standard_normal((37, 64)).astype(np.float32)
+    cos32 = m4._cos(A, B)
+    # perturbation de l'ordre de l'ULP bf16 sur les états, puis re-cosinus
+    A16 = A + g.standard_normal(A.shape).astype(np.float32) * 2 ** -10
+    B16 = B + g.standard_normal(B.shape).astype(np.float32) * 2 ** -10
+    delta = float(np.max(np.abs(m4._cos(A16, B16) - cos32)))
+    tete = {f"T{i}": 0.5 for i in range(10)}
+    coupe = {f"T{i}": 0.4 for i in range(10)}
+    v, d = m4.v_dtype(tete, coupe, delta, delta_mesure=True,
+                      detail_mesure={"delta_chapeau_mesure": delta})
+    return v, d
+
+
+def _v_dtype_constante_en_dur():
+    """Cas ÉCHOUANT : `δ̂` substitué par la constante ULP bf16 `2**-8`, sans
+    contrôle fp32 — exactement le défaut relevé (issue 1). La porte §6.I est
+    BLOQUANTE : une constante n'est pas la quantité commandée."""
+    tete = {f"T{i}": 0.5 for i in range(10)}
+    coupe = {f"T{i}": 0.4 for i in range(10)}
+    return m4.v_dtype(tete, coupe, 2 ** -8, delta_mesure=False)
+
+
+def _b0p_enveloppes():
+    """`B0′ = M1 + M2` : l'enveloppe d'une SOMME n'est pas la moyenne des
+    enveloppes de ses termes (issue 5)."""
+    g = np.random.default_rng(21)
+    m1 = g.normal(0.0, 1.0, 20_000)
+    m2 = g.normal(0.0, 1.0, 20_000)
+    e1 = m4.eps_m_permutation(m1)["epsilon_M"]
+    e2 = m4.eps_m_permutation(m2)["epsilon_M"]
+    ep = m4.eps_m_permutation(m1 + m2)["epsilon_M"]
+    return ep, (e1 + e2) / 2.0
+
+
+def _b0p_enveloppe_propre():
+    ep, moy = _b0p_enveloppes()
+    return ("PROPRE" if ep > 1.1 * moy else "COMPOSEE"), {
+        "epsilon_B0prime_par_sa_propre_nulle": round(ep, 5),
+        "moyenne_des_enveloppes_de_M1_et_M2": round(moy, 5),
+        "ratio": round(ep / moy, 4),
+        "attendu_theorique": "sd(M1+M2) = sqrt(2)·sd sous indépendance"}
+
+
+def _b0p_enveloppe_composee():
+    ep, moy = _b0p_enveloppes()
+    return ("COMPOSEE-ANTI-CONSERVATRICE" if moy < ep else "PROPRE"), {
+        "enveloppe_composee": round(moy, 5), "enveloppe_vraie": round(ep, 5),
+        "motif": "une enveloppe plus étroite rend le PASS plus difficile sur "
+                 "`B0′ = 0` mais elle n'est pas la nulle de la quantité testée"}
+
+
+def _instr_rang_hors_bootstrap():
+    m4.reinitialiser_instrumentation()
+    m4._r1_mid_rank([0.1, 0.9, 0.2], 1)
+    v, d = m4.v_pool("h", "h", instr=m4.instrumentation())
+    m4.reinitialiser_instrumentation()
+    return v, d
+
+
+def _instr_rang_dans_bootstrap():
+    m4.reinitialiser_instrumentation()
+    with m4._SousBootstrap():
+        m4._r1_mid_rank([0.1, 0.9, 0.2], 1)
+    v, d = m4.v_pool("h", "h", instr=m4.instrumentation())
+    m4.reinitialiser_instrumentation()
+    return v, d
+
+
+def _instr_t1_inter_tige():
+    m4.reinitialiser_instrumentation()
+    m4.noter_quantite_t1("profil inter-tige", [(0, 1), (0, 2)],
+                         {0: "Iron", 1: "Silver", 2: "North"})
+    v, d = m4.v_t1(instr=m4.instrumentation())
+    m4.reinitialiser_instrumentation()
+    return v, d
+
+
+def _instr_t1_intra_tige():
+    m4.reinitialiser_instrumentation()
+    m4.noter_quantite_t1("cos intra-tige", [(0, 1)], {0: "Iron", 1: "Iron"})
+    v, d = m4.v_t1(instr=m4.instrumentation())
+    m4.reinitialiser_instrumentation()
+    return v, d
+
+
+def _bandes_nll_synthetiques(mat, degenere: bool):
+    g = np.random.default_rng(41)
+    n = len(mat["unites"]) + len(mat["paires_cadre"]) + len(mat["pseudo_mots"])
+    if degenere:
+        nll = {c: np.full(n, 7.0) for c in mat["cellules"]}
+    else:
+        nll = {c: g.uniform(8.0, 15.0, n) for c in mat["cellules"]}
+    bn = m4.bandes_nll(mat, nll)
+    ok = all(x > 0 for x in bn["n_paires_par_bande"])
+    return (PASS if ok else FAIL), {
+        "n_paires_par_bande": bn["n_paires_par_bande"],
+        "coupures_tertiles": bn["coupures_tertiles"],
+        "unite_de_bande": "la PAIRE (moyenne des NLL de ses deux membres)",
+        "motif": ("trois bandes non vides : la règle de stabilité du signe de M1 "
+                  "est évaluable" if ok else
+                  "tertiles dégénérés : une seule bande non vide ⇒ la porte "
+                  "`V-surprise` serait VIDE")}
+
+
+def _bande_couloir_1x(ic, eps):
+    """Variante DÉFECTUEUSE, exhibée comme contre-exemple : couloir d'équivalence
+    réglé sur 1x l'enveloppe nulle (vice transversal 0-81)."""
+    lo, hi = float(ic[0]), float(ic[1])
+    if lo > eps:
+        return "C+"
+    if hi < -eps:
+        return "C−"
+    if -eps <= lo and hi <= eps:
+        return "C-0"
+    return "C-ind"
+
+
+def _barriere_ok():
+    b = m4.Barriere()
+    b.sceller({"D": 1.234})
+    b.publier(0.215)
+    b.desceller()
+    return b.ordre()
+
+
+def _barriere_ko():
+    b = m4.Barriere()
+    try:
+        b.publier(0.215)
+        return "PAS D'EXCEPTION"
+    except RuntimeError:
+        return "EXCEPTION"
+
+
+def _v_joint_cas_passant():
+    g = np.random.default_rng(7)
+    base = g.standard_normal(10)
+    series = {j: (base + 0.1 * g.standard_normal(10)).tolist()
+              for j in ("gpt2", "smol", "qwen")}
+    return m4.v_joint(series, b=500, seed=1)
+
+
+def _eps_cas_passant():
+    m = [3] * 20 + [5] * 20 + [7] * 20
+    tig = [f"T{i % 10}" for i in range(60)]
+    r = m4.eps_nulle_composition(m, tig, b=2000, seed=0)
+    return (PASS if r["sous_plafond"] and r["epsilon"] > 0 else FAIL), r
+
+
+def _eps_m_cas_passant():
+    g = np.random.default_rng(11)
+    r = m4.eps_m_permutation(g.normal(0.0, 0.05, 2000))
+    return (PASS if 0 < r["epsilon_M"] < 1 else FAIL), r
+
+
+def run_v4(out_dir: Path = OUT_DIR_V4) -> dict:
+    """Banc de satisfiabilité v4. **Le tokenizer HF est obligatoire** : `C2`,
+    `C3` et `V-casse` ne sont pas décidables sans lui."""
+    t0 = time.time()
+    cfg = EngramConfig(dataset="pool_v4")
+    encs = p4.encodeurs()
+    mat = p4.construire(cfg, encs)
+    clauses = build_clauses_v4(mat, encs)
+    rows, E = _evaluer(clauses)
+    gen = p4.garanties(mat, encs)
+    v_pre, pre = p4.verifier_prerequis(mat, encs)
+    n_cov = sum(1 for r in rows if r["expected"]["pass_case"]
+                and r["expected"]["fail_case"])
+    report = {
+        "protocole": "experiments/EXP-2026-08-23-v4-materiel.md",
+        "statut_protocole": "PRE-ENREGISTRE",
+        "banc": "D14-S — satisfiabilité v4, CPU seul, aucune mesure, aucun modèle",
+        "tokenizer": " + ".join(p4.MODELES_TOK),
+        "tokenizers": list(p4.MODELES_TOK),
+        "E": int(E),
+        "n_clauses": len(rows),
+        "couverture": {"clauses_avec_les_deux_contre_exemples": n_cov,
+                       "total": len(rows),
+                       "pct": round(100.0 * n_cov / len(rows), 2)},
+        "n_cas": sum(len(r["cas"]["pass_case"]) + len(r["cas"]["fail_case"])
+                     for r in rows),
+        "sha256_materiau": mat["sha256"],
+        "cascade_gravee": list(p4.CASCADE_GRAVEE),
+        "cascade_executee": mat["cascade_executee"],
+        "garanties_D25": [{k: g[k] for k in ("propriete", "porte", "verdict")}
+                          for g in gen],
+        "portes_de_generation_en_echec": [g["porte"] for g in gen
+                                          if g["verdict"] != PASS],
+        "prerequis_instrument": v_pre,
+        "prerequis_lignes": pre,
+        "contre_exemple_fact_pairs": p4.soumettre_fact_pairs(encs),
+        "espace_ORD_resolu": m4.espace_ord_resolu(),
+        "probabilites_sous_la_nulle": m4.probas_sous_nulle(200_000, 0),
+        "clauses_sous_specifiees": UNDERSPEC_V4,
+        "duree_s": round(time.time() - t0, 2),
+        "clauses": rows,
+    }
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / "gate_bench_v4.json").write_text(
+        json.dumps(report, ensure_ascii=False, indent=1, default=str),
+        encoding="utf-8")
+    return report
+
+
 # =========================================================================
 #  Usage méta borné : portes d'INTÉGRITÉ SEULES sur les bruts archivés
 # =========================================================================
@@ -3379,10 +4363,51 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--no-hf", action="store_true",
                     help="repli mot-à-mot au lieu du tokenizer GPT-2")
-    ap.add_argument("--suite", default="v3", choices=("v3", "i2", "all"),
-                    help="v3 = V2-D(a) v3 (défaut, inchangé) ; i2 = layer_profile")
+    ap.add_argument("--suite", default="v3", choices=("v3", "i2", "v4", "all"),
+                    help="v3 = V2-D(a) v3 (défaut, inchangé) ; i2 = layer_profile ; "
+                         "v4 = matériau v4 (EXP-2026-08-23-v4-materiel)")
     ap.add_argument("--out", default=None)
     args = ap.parse_args()
+
+    if args.suite in ("v4", "all"):
+        out_v4 = Path(args.out) if (args.out and args.suite == "v4") else OUT_DIR_V4
+        print("=" * 78)
+        print("BANC DE SATISFIABILITÉ (D14-S) — EXP-2026-08-23-v4-materiel")
+        print("AUCUNE MESURE, AUCUN GPU, AUCUN MODÈLE. CPU seul, 3 tokenizers.")
+        print("AUCUN GPU AVANT PASS INTÉGRAL DE CE BANC (§6.A, clause d'abandon).")
+        print("=" * 78)
+        rep_v4 = run_v4(out_dir=out_v4)
+        _imprimer(rep_v4)
+        print(f"SHA-256 du matériau : {rep_v4['sha256_materiau']}")
+        print(f"cascade gravée   : {rep_v4['cascade_gravee']}")
+        print(f"cascade exécutée : {rep_v4['cascade_executee']}")
+        print("-" * 78)
+        print("TABLE DES GARANTIES D25 (génération)")
+        for g in rep_v4["garanties_D25"]:
+            print(f"  [{g['verdict']}] {g['porte']:<12} {g['propriete']}")
+        print(f"prérequis instrument : {rep_v4['prerequis_instrument']}")
+        print(f"contre-exemple fact_pairs : {rep_v4['contre_exemple_fact_pairs']}")
+        print(f"espace ORD résolu : {rep_v4['espace_ORD_resolu']}")
+        pn = rep_v4["probabilites_sous_la_nulle"]
+        print(f"P(classe | nulle) calibrateur : {pn['calibrateur']}")
+        print(f"P(classe | nulle) bandes      : {pn['bandes_primaire']}")
+        print(f"P(classe | nulle) maillons    : {pn['etats_de_maillon']}")
+        print(f"P(classe | nulle) ORD         : {pn['classes_ORD']}")
+        for k, v in rep_v4["clauses_sous_specifiees"].items():
+            print(f"sous-spécifiée : {k} — {v}")
+        print("-" * 78)
+        print(f"E(v4) = {rep_v4['E']}")
+        if rep_v4["E"] == 0 and not rep_v4["portes_de_generation_en_echec"]:
+            print("E = 0 — gate de satisfiabilité v4 VERTE : le GPU est autorisé.")
+        else:
+            bad = [r["clause"] for r in rep_v4["clauses"] if r["compte_dans_E"]]
+            print(f"E >= 1 OU génération en échec — AUCUN RUN. Clauses : {bad} ; "
+                  f"portes de génération : "
+                  f"{rep_v4['portes_de_generation_en_echec']}")
+        print(f"rapport : {out_v4 / 'gate_bench_v4.json'}")
+        if args.suite == "v4":
+            return 0
+        print("=" * 78)
 
     if args.suite in ("i2", "all"):
         out_i2 = Path(args.out) if (args.out and args.suite == "i2") else OUT_DIR_I2

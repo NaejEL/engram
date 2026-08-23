@@ -1674,6 +1674,132 @@ primaire dérivée par Neuro (défaut 0-70) est réelle et devient un fait de m�
 - *Modèles : director.cadrage inherit, math fable, neuro inherit, verifier inherit. Aucun run, aucune
   interprétation de mesure.*
 
+## 2026-08-23 — v4-matériel : matériau qualifié RETENU ; primaire `C-ind` par SATURATION (`N-b × C-ind`) ; `ORD-3` ×3 — l'instrument est sain, la question posée est restée sans réponse
+
+- **Commit** : consigné le 2026-08-23.
+- **Config** : aucune injection, **`M` jamais instanciée**, `engram/` non modifié (D8/D9 intactes) ;
+  `dataset = "pool_v4"` (flag ; défaut `"fact_pairs"` inchangé) ; **bf16 épinglé, aucun repli** ;
+  seed 0 ; `K_eff = 10` (clusters = tiges), pools de 36, `m₁ = 5`, `τ = 0.15`, `ε_max = 0.66`,
+  `B = 10⁴`.
+- **Run** : `eval/pool_v4.py` (génération, 7.4 s CPU) → `eval/gate_bench.py --suite v4`
+  (**`E = 0`** : 57 clauses, 167 cas, couverture 100 %, **`fact_pairs` échoue au contre-exemple**,
+  SHA du matériau `6f4da97…504e3b`, 10.6 s CPU) → gel → `eval/materiel_v4.py` (mesure, 792
+  séquences/modèle, 197 s GPU) — gpt2 L6, SmolLM2-360M L16, Qwen2.5-1.5B L14. **17 s de CPU avant
+  le premier forward.** Verifier : **`APPROVED`**, 228 tests, toutes les quantités recalculées
+  indépendamment depuis les états bruts sans écart, **2 itérations sur 3**.
+- **Protocole pré-enregistré** : `experiments/EXP-2026-08-23-v4-materiel.md` (§4/§6 **gelés**) —
+  `H_mat` (construire + certifier, **ET** primaire décidable), antipode §2 : *« ou la primaire rend
+  `C-ind` »* ; `P-N2` (`D > 0`) ; M1 `+` (sous `V-surprise`), M2 `+` (porte de sanité), M3 `+`
+  (contrôle de manipulation de `C7`) ; `V-leak` `B0 ≤ 0` **et** `B0′ = 0` ; `A3` compression
+  croissante ; `A4` discriminant de copie ; `P1 − P2` asymétriquement informatif ; issue conjointe
+  modale **0-70** gravée ; déclencheur X5 = `N-a` sur ≥ 2 modèles / 3.
+  **58 défauts fermés (0-46 … 0-103) avant qu'un octet de matériau n'existe**, dont 10 + 9 + 6 + 2
+  par quatre passes d'audit indépendant.
+- **Résultat** (gpt2 / SmolLM2 / Qwen, 792 séq./modèle, IC bootstrap de tiges, `K_eff = 10`) :
+  - **Calibrateur** : `ΔR1_inv` **0.9722 [0.9389, 1.0] / 0.9833 [0.9667, 1.0] / 0.9833 [0.9556,
+    1.0]** ⇒ **`N-b` ×3**. `R1 = 1.0000` partout (180/180) ; clé nulle 0.0278/0.0167/0.0167 ≈ `1/37`
+    (écart n.s., `P ≈ 0.28`). **`ΔR1_inv = 1 − R1_null` exactement** : aucun dépassement du plafond
+    `36/37` — l'encadrement observé est une fluctuation de la clé nulle, **pas** un signal
+    supra-lexical. Formulation obligatoire (xiii) : *« compatible avec un encodage de surface ; le
+    canal identité n'est pas adressé par cette primaire »*.
+  - **Primaire** : **`Σ_q m_q = 0`, `n_eff = 0`, `D` SANS OBJET ×3** — support vide, **pas un
+    zéro** : aucune borne n'est licenciée, pas même une équivalence TOST ⇒ **`C-ind` d'office**
+    (clause de famine D19). Cellule **`N-b × C-ind`** ⇒ formulation G-bis obligatoire : *« l'instrument
+    est sain, la question posée est restée sans réponse »*. Cause §6.G : **famine par SATURATION**
+    ⇒ suite gravée **« réduire la dominance de surface »**, jamais « augmenter la résolution ».
+    `R1 = 1` et `Σm = 0` sont **un seul fait, deux affichages** : `P(m_q = 0 ∀q) ≈ 10⁻⁹⁴` sous
+    échangeabilité, **≈ 1** sous le transcript lexical de 0-46.
+  - **Maillons** (±`ε_M`) : M1 **+0.0612 ± 0.0172 / +0.0470 ± 0.0142 / +0.0686 ± 0.0201** (`+`) ;
+    M2 **−0.0675 ± 0.0106 / −0.0480 ± 0.0080 / −0.0705 ± 0.0116** (`−`) ; M3 **+0.0565 ± 0.0104 /
+    +0.0383 ± 0.0075 / +0.0564 ± 0.0109** (`+`) ⇒ **`ORD-3` ×3** (`P` sous nulle : `ORD-3` 1.7e-4,
+    `ORD-0` 0.809 ; borne de conjonction = **min**, le produit est interdit — 0-63). **Portée : la
+    partition ORD et elle seule.** Effets principaux : domaine +0.063/+0.047/+0.066 ; tige
+    +0.025/+0.006/+0.030, **de même signe dans les deux conditions de domaine** — **`M2 = −` mesure
+    une DOMINANCE, pas une absence** : l'information de tige **atteint** la capture, elle est
+    dominée 2 à 10 fois. Interactions `(S3−S1) − (S2−S0)` = +0.002/+0.007/+0.007, 3 à 10× sous les
+    effets principaux : **régime additif, code d'entrée** — un étage conjonctif produirait de
+    l'interaction.
+  - **`V-surprise` : FAIL ×3** ([1,1,0] / [1,0,0] / [1,0,0]) ⇒ **M1 non créditée**. Puissance par
+    bande **2 à 6 %** ⇒ **insuffisance de résolution, pas une information contre M1**. **Clause de
+    retrait 0-55 NON déclenchée** : le patron est l'**antipode** de la signature du confondant
+    (M1 dans la bande de NLL basse, indécise dans la haute) — contraste non pré-enregistré, bandes
+    non indépendantes, ~20 paires S3/S2 par bande ⇒ **indécidable ici**. **N'inverse rien de D11**,
+    qui porte sur le **dommage d'une lecture injectée** ; ce run n'injecte rien (glissement d'étage
+    0-59).
+  - **`V-leak` : PASS ×3** — `B0` −0.0453 ± 0.0072 / −0.0565 ± 0.0117 / −0.0782 ± 0.0142 (≤ 0) ;
+    **`B0′` −0.0065 ± 0.0093 / −0.0027 ± 0.0162 / −0.0039 ± 0.0194, IC ∋ 0** ⇒ **tige et suffixe
+    physiquement séparables** dans ce matériau. **`V-dtype` : PASS ×3**, `δ̂` **mesuré**
+    0.0033/0.0049/0.0059, **0 tige touchée** (la constante `2⁻⁸` de la première itération était
+    anti-conservatrice sur 2 modèles / 3).
+  - **Descriptifs** : **`A3` — antipode réalisé en forme plus forte que l'écrite** : compression par
+    strate d'amplitude 0.0063/0.0121/0.0258 (facteurs 14 / 4.3 / 3.8 contre le cosinus brut),
+    **ordre des strates détruit sur 2 modèles / 3**, plancher commun **≈ 0.41-0.46** là où
+    l'indépendance à `k = 64` / `D = 8192` prédit **0.008** ⇒ sur **l'étage de lecture**,
+    `topk(G·h)` se comporte en **rééchelonnement**. *L'attribution représentationnelle de X1 est
+    désormais non soutenue par la seule mesure qui l'a approchée — et cette mesure porte sur l'étage
+    de lecture, non sur le chemin d'écriture où X1 vit* (le **+57 % d'E2 reste acquis**, 0-75).
+    **Aucune décision** : `C−` n'est pas réalisée, sa suite de chantier n'est pas déclenchée, et la
+    grandeur décisive — le **recouvrement des supports** `|A∩B|/k` — **n'est pas mesurée**.
+    **`A4` réalisée** : `M3_brut` +0.062/+0.043/+0.063 à `t`, **−0.00005/−0.0039/−0.0042 à `t−1`**
+    — le porteur du domaine **s'évanouit exactement quand il quitte le préfixe causal** ⇒ `C7` a
+    instancié **la manipulation, jamais son étiquette**. **`P1 − P2` = +0.0000** : **non informatif**,
+    comme gravé (0-49). NLL du token de capture 12.31 / 13.02 / 13.77 nats.
+  - **Issue conjointe 0-70 : réalisée mot pour mot, en forme extrême** (support vide). Paris hors
+    protocole, datés avant mesure : le **copilote** avait le mécanisme (saturation) **et** la
+    cellule ; le **PI** la cellule mais pas le mécanisme (« famine évitée de peu » : `Σm = 0`).
+- **Conclusion** : **matériau qualifié RETENU** (premier conjonct de `H_mat`) ; **second conjonct
+  REJETE** — l'antipode gravé du §2 est réalisé ; **`P-N2` INCONCLUSIF** (`C-ind` par saturation,
+  support vide) ; **`ORD-3` résolu ×3**.
+  **Réserve d'expert consignée (Neuro)** : le mot « sémantique » du verdict gravé d'`ORD-3` excède
+  ce que la mesure distingue — maximum licite : *« la géométrie à la capture est dominée par
+  l'appartenance du token de capture à son sous-vivier déclaré »* (canal nommé par le PI en
+  **0-67** : `C7` **crée** la corrélation domaine ↔ contenu).
+  **Neuro consigne sa propre erreur d'allocation de charge** : ayant dérivé lui-même **0-70** (les
+  deux maillons sont en tension par construction), il a accepté que **toute** la charge décisionnelle
+  repose sur celui qui en meurt. Ce qui reste valide de sa position : le run n'a pas montré qu'un
+  second maillon existait — il a montré que **le premier n'avait pas de domaine**.
+  **Livrable théorique proposé** (dérivation demandée à Math, gravure recommandée après) : sur tout
+  matériau `C1` + `C3` + `C5` avec l'entité cible **verbatim** dans le préfixe causal de la requête,
+  **`m_q = 0` est un théorème, pas un tirage** — une statistique de composition des intrusions et
+  l'identité du préfixe de requête sont des **contraintes incompatibles**. Il **ferme une famille
+  entière de protocoles**.
+  **Acquis chiffrés** : à ce locus, l'encodage de surface est **totalement dominant** ⇒ **tout
+  instrument de rang posé ici s'affamera** ; la nulle `1/37` est empiriquement exacte (11/540 poolé
+  contre 14.6 attendus, descriptif) ; `δ̂` bf16 = 0.0033-0.0059, 0 tige ; `B0′ = 0` ; `A4`.
+  **Seconde façade, nommée avant qu'elle ne s'installe** : `ΔR1_inv ≈ 0.97-0.98` avec `R1 = 1.0000`
+  ne se relira **jamais** « le modèle retrouve l'unité » — la formulation (xiii) **est** le résultat,
+  pas une précaution.
+- **Hors-périmètre déclaré (§4.9, porte `V-perimetre`, les trois éléments)** : **(i) mécanisme** —
+  le canal suffixe est invisible **par construction** aux deux quantités : les suffixes étant
+  globalement uniques, aucun concurrent ne partage le suffixe de la requête, donc ni la nulle `1/37`
+  ni la nulle hypergéométrique ne peuvent le monitorer (0-62) ; **(ii) limite nommée** — **aucune
+  formulation de ce rapport ne peut exclure que l'effet mesuré transite par le canal suffixe** ;
+  **(iii) successeur désigné** — l'expérience « canal suffixe », qui exige **son propre matériau**
+  (~20 tiges / 40 familles pour retrouver `K_eff = 10`) ; **sa prémisse vient de changer** (le locus
+  mesuré est écrasé par le suffixe) : il reste **désigné**, il n'est **pas ouvert** ce tour.
+- **Déclencheur X5 : NON franchi** (calibrateur `N-b` ×3, l'opposé exact de `N-a`), **maintenu tel
+  quel**. *Réserve pour le successeur, note et non modification* : tel qu'écrit, il est désormais
+  **inatteignable sur tout matériau de type `C5`**, le théorème de saturation forçant `ΔR1_inv` au
+  plafond.
+- **Registre des engagements — mises à jour de statut** : `P-N2` signée → **sondée, `C-ind`, support
+  vide** ; M2 porte de sanité → **a mordu (`ORD-3`)** ; M3 contrôle de manipulation → **confirmé** ;
+  `V-leak` / `B0′` → **PASS** ; bandes de NLL → **appliquées sans desserrement**, M1 non créditée ;
+  charge décisionnelle unique sur `P-N2` → **erreur d'allocation reconnue par son auteur** ;
+  déclencheur X5 → **non franchi**, réserve d'atteignabilité notée.
+- **Suite** : **(1) priorité 1, coût GPU nul** — recouvrement des supports de `topk(G·h)` sur les
+  états **déjà conservés** (`|A∩B|/k` par strate contre la nulle `k/D = 0.0078` ; idem après
+  **centrage des états** avant `G` ; fraction du top-64 commune à ≥ 90 % des états), avec un antipode
+  **capable de falsifier l'antipode `A3` lui-même** ; **(2)** suite gravée de `N-b` — **déplacer le
+  locus de capture** (fin d'empan clos, plusieurs tokens après l'entité), en écrivant d'avance que
+  **cela ne résout PAS la saturation** (les deux problèmes sont indépendants) ; **(3)** le successeur
+  « canal suffixe » n'est **pas** ouvert.
+- **Décisions candidates pour le PI** (`docs/ARCHITECTURE.md` §3, dernières gravées D29) : **D30**
+  incompatibilité composition / préfixe verbatim (*après* dérivation par Math) ; **D31** un support
+  vide n'est pas un zéro ; **D32** allocation de charge. Ne méritent **pas** gravure : la réserve X5,
+  le patron inverse de `V-surprise` (ce serait le bin dur adverbial), le plancher `A3` tant que le
+  recouvrement des supports n'a pas tranché.
+- *Modèles : director.interpretation fable, math fable, neuro inherit, builder inherit, verifier inherit.*
+
 ## 2026-08-20 — v0 : squelette posé
 
 - **Commit** : (initial)

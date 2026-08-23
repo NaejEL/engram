@@ -1,6 +1,6 @@
 # EXP — v4-matériel : construire un matériau qualifié pour un instrument représentationnel
 
-Statut : PRE-ENREGISTRE
+Statut : TERMINE — RETENU (matériau qualifié) / INCONCLUSIF (P-N2)
 
 *Protocole consolidé (2e tour) par `lab-director` le 2026-08-23, sous les avis Math (RÉSERVÉ, avis
 principal + complément) et Neuro (RÉSERVÉ, avis principal + complément), les positions PI A-1..A-7,
@@ -1407,6 +1407,10 @@ amendement (réserve substituable avant le premier token) reste adopté incondit
   autres réécritures sont **conformes**. **Total du cycle : cinquante-huit (0-46 … 0-103)**, aucun
   octet de matériau, aucun GPU.
 - **2026-08-23** : proposé.
+- **2026-08-23** : **TERMINÉ — verdict `RETENU` (matériau qualifié) / `INCONCLUSIF` (`P-N2`).**
+  Banc `E = 0`, Verifier `APPROVED` en 2 itérations, interprétation croisée Math + Neuro tous deux
+  FAVORABLE, consigné au journal. Second conjonct de `H_mat` **REJETE** : l'antipode du §2 est
+  réalisé (`C-ind` par saturation, `Σ_q m_q = 0`). `ORD-3` ×3.
 - **2026-08-23** : **PRÉ-ENREGISTRÉ par le PI.** Prédictions et critères d'abandon **gelés
   définitivement**. Suite : construction du matériau et **banc D14-S complet (`E = 0`,
   `fact_pairs` en contre-exemple échouant obligatoire)** ; **aucun GPU avant PASS intégral**.

@@ -78,6 +78,14 @@ class EngramConfig:
     # Inerte par défaut (§10) : le hook n'est même pas posé quand le flag est faux.
     capture_final_state: bool = False
 
+    # --- v4-matériel : jeu de données du matériau d'éval ---
+    # Protocole `experiments/EXP-2026-08-23-v4-materiel.md` §10-3 :
+    # « Flag EngramConfig : dataset = "fact_pairs" par défaut (= comportement
+    # actuel), "pool_v4" en option. Aucun défaut de config existant n'est
+    # modifié. » Champ DESCRIPTIF pour engram/ : aucun code du cœur ne le lit —
+    # les jeux vivent dans eval/ (eval/pool.py GELÉ, eval/pool_v4.py neuf).
+    dataset: str = "fact_pairs"   # "fact_pairs" (défaut, inchangé) | "pool_v4"
+
     # --- Gating par surprise ---
     surprise_threshold: float = 4.0  # NLL en nats au-dessus de laquelle on écrit
 
@@ -105,9 +113,12 @@ class EngramConfig:
             knn = (f" knn=λ{self.knn_lambda}/k{self.knn_k}/c{self.knn_temp_c}"
                    f"/{self.knn_key_layer}"
                    + (f"/τ{self.knn_gate_tau}" if self.knn_gate_tau else ""))
+        # `dataset` n'apparaît QUE s'il n'est pas au défaut : à "fact_pairs" la
+        # ligne de résumé est bit-à-bit celle d'avant v4-matériel.
+        ds = "" if self.dataset == "fact_pairs" else f" dataset={self.dataset}"
         return (
             f"model={self.model_name} layer={self.layer_index} lam={self.lam} "
             f"eta={self.eta} decay={self.decay} thr={self.surprise_threshold} "
             f"prune={self.prune_every}/{self.prune_keep} hebb_only={self.hebbian_only} {dg}"
-            f"{knn}"
+            f"{knn}{ds}"
         )
