@@ -1,6 +1,6 @@
 # EXP — I2 : existe-t-il une identité d'unité invariante et adressable dans un cortex gelé ? (`layer_profile`)
 
-**Statut : PRE-ENREGISTRE**
+**Statut : TERMINE — INCONCLUSIF**
 
 Origine : `docs/EXTENSIONS.md` §2 (I2) · cadrage PI 2026-08-22 · re-cadrage PI post-v3 · **consolidation post-banc D14-S (E = 3) et post-avis Math/Neuro (deux RÉSERVÉ, 15 changements), 2026-08-22**.
 Rôle : **gate scientifique de v4**. Instrument, pas mécanisme : aucune injection, aucune écriture, `M = 0`, `engram/` non modifié, aucun gradient (D8).
@@ -359,6 +359,10 @@ Numérique : cosinus et Gram **fp32**, valeurs propres **fp64**. Bootstrap par *
 | **8** | Qwen dans le run malgré la VRAM | **MAINTENU** (copilote) : descriptif, plus P-D prospective ; la règle des 30 min couvre le débordement, et la VRAM réelle est un livrable. |
 
 ## Historique
+
+- 2026-08-23 : **TERMINE — verdict INCONCLUSIF**, cause **NaN (§6)** : 1920 valeurs non
+  finies (SmolLM2, `nulle_cadre`, couche 32), forward fp16 dont le dtype n'etait pas
+  epingle au §7. Bande N robuste au bornage adversarial mais **descriptive**. Suite : I2-v2.
 
 - 2026-08-23 : **PRE-ENREGISTRE par le PI** (gate franchie apres banc E = 0 sur les deux
   suites, 35 clauses, 135 cas, couverture 100 %, 132 tests). A partir d'ici, les sections

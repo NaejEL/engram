@@ -1308,6 +1308,138 @@ Modèle d'entrée :
 - *Modèles : director.interpretation fable, math fable, neuro inherit, builder inherit,
   verifier inherit.*
 
+## 2026-08-23 — I2 `layer_profile` : NaN fp16 au §6 — INCONCLUSIF ; bande N descriptive, le cosinus mesure la paraphrase, pas le fait
+
+- **Commit** : non commité au moment de la rédaction (bruts dans
+  `experiments/results/layer-profile/`, SHA256 32/32 concordants ; ré-exécution Verifier :
+  écart max **0.000e+00**, bit-à-bit)
+- **Config** : `gpt2` (L=12) / `HuggingFaceTB/SmolLM2-360M` (L=32) / `Qwen/Qwen2.5-1.5B`
+  (L=28), `L` re-lu du config ; `seed=0`, `M=0` **jamais instanciée**, aucune injection,
+  `engram/` non modifié (D8) ; corpus (a) `pool.fact_pairs(80)` + constantes gelées,
+  `B-v3`, nulle de cadre, nulle mélangée ; capture au dernier token d'indice ;
+  cosinus/Gram fp32, valeurs propres fp64 — **forward fp16, dtype NON épinglé au §7
+  (la faille)**
+- **Run** : `.venv\Scripts\python eval\layer_profile.py --mode tout --go` — 12 forwards,
+  **53.82 s GPU**, VRAM Qwen **4.188 Gio alloués / 4.688 réservés** ; 144 tests exit 0
+- **Protocole pré-enregistré** : `experiments/EXP-2026-08-22-layer-profile.md` (gelé le
+  2026-08-23 après banc **E = 0**, 35 clauses, 135 cas). P-A/P-A′ (existence, 5 planchers
+  D17) ; couloir `ΔR1`/`R1_36` strate `P-own`, bandes N/M/I/V + overlay D, T = 0.25 ;
+  P-B/P-C jointes p ≤ 0.039 ; N-P1..N-P6 ; P-D prospective Qwen ; **§6 : « NaN / inf »
+  inconditionnel = invalidation**.
+- **Résultat** :
+
+  | Mesure | gpt2 | SmolLM2 | Qwen |
+  | --- | --- | --- | --- |
+  | Plancher le plus haut (maillon 1, **lexical, 0 forward**) | 0.6160 | 0.6078 | 0.6166 |
+  | `max_ℓ AUC(ℓ)` (ℓ*) | **0.4306** (12 = L) | **0.5224** (30) | **0.5442** (26) |
+  | **Écart au plancher lexical** | **−0.185** | **−0.085** | **−0.072** |
+  | `p_perm` | 1.0000 | 0.2154 | 0.0228 |
+  | `R1_36(P-own)`, toutes couches | **0.0000** | **0.0000** | **0.0000** |
+  | `ΔR1` | −1/37, IC < 0 | −1/37, IC < 0 | −1/37, IC < 0 |
+  | Bande | **N** + `delta_R1_significativement_negatif` | idem | idem |
+  | Cellule | **C4** (V-bord ×2) | **C3** | **C3** |
+  | Spearman(H, contraste) — N-P5 | −0.287 | −0.659 | −0.487 |
+  | **ppv de même TYPE / même FAIT** *(hasard 0.331 / 0.008)* | **1.000 / 0.000** | 0.996 / 0.008 | **1.000 / 0.000** |
+  | **Rang médian de la cible parmi 37** (moyenne) | **19** (20.1) | **19** (18.6) | **19** (18.5) |
+
+  Portes : **toutes PASS** sauf `V-puissance` sous décision AUC (FAIL à tout N ≤ 80 —
+  **attendu, la porte déclare l'indécidabilité**) et `V-bord` (gpt2 au bord sur les deux
+  quantités). `H` **conservée** (interprétable 2/3, retrait N-19 non déclenché).
+  P-A/P-A′ **non tenues** (descriptif) ; **N-P1, N-P3, P-B falsifiées** (descriptif — le
+  désaccord pré-enregistré N-P3 vs P-B est tranché : **les deux perdent**) ; **N-P5
+  tenue** ; **N-P6 : ANTIPODE réalisé sur les trois** (0.0 = 0.0 ; 0.0003 < 0.0062 ;
+  0.0 < 0.0102) ⇒ par la clause gravée, **l'AUC de `P-ent` ne mesure pas ce leurre**
+  (livrable §10). **P-D vivante** (couches Qwen consignées avant tout balayage : ℓ*_contrast
+  = 26, ℓ*_H = 27, contre la couche posée 14/28). Overlay D : verdict global **N** —
+  **descriptif, non décisionnel (§6)**.
+
+  **Invalidation (§6)** : SmolLM2, variante `nulle_cadre`, **couche 32 (= L) uniquement**,
+  **1920 valeurs non finies** (2 lignes × 960 dims — unités 55 et 71, type para1). Le §6
+  liste « NaN / inf » **sans qualificatif**, parmi des propriétés binaires inconditionnelles
+  dont deux à quantificateur universel explicite ; **la clause a mordu**. Y lire « NaN dans
+  une quantité *décisionnelle* » serait un **amendement après lecture de la courbe**, que le
+  §6 interdit lui-même (D14).
+
+  **Cause établie par ré-exécution (bit-reproductible)** : batch de 240 en **fp32 → aucun
+  NaN** ; en **fp16 → exactement `{32: [165, 213]}`**, déterministe ; les deux mêmes
+  séquences **isolées** (batch de 2) en fp16 sont **finies** (max|h| = 1058). ⇒ **perte de
+  précision fp16 dans le bloc final sous le noyau SDPA batché**, sur les lignes à plus forte
+  amplitude. **Le §7 fixe le dtype des cosinus, du Gram et des valeurs propres, mais jamais
+  celui du forward — la seule variable numérique non épinglée est exactement celle qui a
+  déclenché l'invalidation.**
+
+  **Bornage adversarial (Verifier)** : AUC(nulle_cadre, ℓ=32) = 0.350164 ; hors lignes
+  fautives 0.345029 ; **borne supérieure adversariale absolue 0.383462** — contre un plancher
+  de cadre retenu de **0.3758** (ℓ=1) et un plancher lexical de **0.6078** (0 forward, aucun
+  état impliqué). **Aucune quantité décisionnelle ne bouge sous aucune correction : la bande
+  N est robuste.** *C'est la règle qui n'a pas été honorée, pas le résultat qui est faux.*
+
+- **Acquis** (descriptifs, robustes au bornage, à re-juger par I2-v2) :
+  1. **Le mécanisme est établi sur les bruts** : le plus proche voisin d'un état d'indice est
+     de **même TYPE de paraphrase** à 240/240, 239/240, 240/240 ; il est **la cible 0/240
+     partout** ; ppv de même fait 0.000 / 0.008 / 0.000 (hasard : type **0.331**, fait
+     **0.008**). **Le cosinus sur ces états mesure la forme de la paraphrase, pas l'identité
+     du fait.** Ce seul mécanisme explique **à la fois** `R1 = 0` et l'AUC sous le plancher
+     lexical (les paires intra-fait sont inter-types par construction).
+  2. Les trois max AUC sont **sous le plancher lexical à 0 forward** : le cortex ne rend même
+     pas, en cosinus, ce que le recouvrement de tokens rend seul.
+  3. `R1 = 0` sur toutes les couches × trois modèles **n'est pas une anomalie** : rang médian
+     de la cible **19/37**, pile le hasard.
+  4. Clauses gravées honorées et recopiées : « **Conséquence sur P6 : aucune. Conséquence sur
+     le bras L6 de v3 : nulle. Ce qui est falsifié est la prémisse géométrique "une couche
+     médiane sépare mieux les faits" sous la seule métrique cosinus.** » — et **`P-both`
+     impossible** (`lcm(16,20) = 80 | d` : *le protocole n'a pas choisi le contraste d'owner,
+     l'arithmétique du pool le lui a imposé*) ; **asymétrie `P-ent`** (une bande N y n'engage
+     aucune décision, par design) ; interdictions de vocabulaire §2 (i)-(viii) respectées.
+  5. **Rapport de coût honnête** : I2 = **53.82 s de GPU et zéro contenu nouveau** ; le
+     matériel de v4 = 17 entités et une table d'indexation, des heures. **La gate tranche un
+     choix de mécanisme, pas un budget de rédaction.**
+- **Non-acquis** : aucune bande **décisionnelle** (run invalide §6) ; rien sur la tolérance à
+  l'injection ni la décodabilité (jamais mesurées, §2 vi) ; **P-C non testée** (C4) ; **P-D
+  vivante** (le balayage Q-08 reste le juge) ; les **deux spécifications dures du §10** pour
+  v4 restent dues par I2-v2, pas par ce run.
+- **Erreurs du cycle** (la règle du journal : elles se consignent) :
+  1. **Le pipeline n'évalue nulle part le §6** : le drapeau `nan_ou_inf: true` est correctement
+     calculé, écrit, **puis ignoré** ; `rapport.json` n'a **aucune** section d'invalidation, et
+     le pipeline a rendu un verdict de bande comme si la clause n'existait pas.
+  2. **La nulle de cadre est quasi vacuée sur para1** : ses 80 lignes se réduisent à **5
+     séquences distinctes** (verbe global + deux slots remplacés) ; les lignes 165 et 213 sont
+     **byte-identiques**. **C'est le mode de mort exact que le §5 avait été réécrit pour
+     réparer (défaut 0-8), réapparu sur un autre type.**
+  3. `auc_par_couche` **avale silencieusement les NaN** (comparaison NaN → False → paire
+     comptée comme défaite) : c'est ce qui a permis au run de continuer.
+  4. `ic_du_max` **filtre silencieusement** les échantillons bootstrap non finis en rapportant
+     `B` inchangé.
+  5. **VRAM : troisième estimation de budget fausse du projet** (4.188 alloués / **4.688
+     réservés** — c'est le réservé qui gouverne l'OOM). Le §9 la déclarait « à rapporter, pas
+     à confirmer » ⇒ **pas une contrainte violée**, mais consignée.
+  6. **N-P6 non nommée comme livrable** : l'antipode est réalisé sur les trois modèles ; la
+     conclusion pré-enregistrée devait être nommée explicitement — elle l'est ici.
+  7. **Clause « NaN / inf » sous-spécifiée** (états capturés ? intermédiaires ? quantités
+     publiées ?). Elle se lit inconditionnellement — c'est la lecture appliquée — mais **sa
+     portée doit être gravée avant mesure**.
+  8. **Copilote — nulle fausse sur `R1 = 0`** : annoncé « significativement pire que le
+     hasard » (`P(0|Bin(240, 1/37)) = 1.4e-3`). **La cible n'est pas échangeable avec les
+     concurrents** : elle est le seul candidat d'un type *différent* quand **12 des 36**
+     concurrents partagent le type de la requête. Rang médian **19/37** : **exactement au
+     hasard**. `R1 = 0` est la **prédiction quasi déterministe du design** sous le mécanisme
+     du type dominant, **pas une anomalie**.
+- **Conclusion** : **INCONCLUSIF — NaN (§6)**, cause **fp16 non épinglée au §7**, établie par
+  ré-exécution. Décision PI (2026-08-23) : consigner INCONCLUSIF **puis re-pré-enregistrer
+  avec le dtype épinglé** ; la boucle de correction est **inapplicable** — épingler fp32 après
+  lecture des données modifierait le §7, ce que D14 interdit. Descriptivement tout converge —
+  bande N robuste, cosinus = forme de la paraphrase — **mais ce verdict appartient à I2-v2**.
+- **Suite** : **I2-v2** — même question, mêmes prédictions re-pré-enregistrées, avec : **dtype
+  du forward épinglé au §7** (D21) ; **§6 en porte exécutable** (D22) ; **réductions
+  NaN-strictes** (D23) ; **nulle de cadre re-spécifiée** avec cardinal de séquences distinctes
+  en porte (D24) ; portée de la clause NaN gravée ; **budget VRAM en réservé**, pas en alloué.
+  **Contrainte à instruire avant gravure** : fp32 est établi propre, mais la VRAM Qwen
+  **réservée** (4.688 Gio en fp16) suggère qu'un forward fp32 sur Qwen **ne tient pas dans
+  6 Go** — le choix (fp32 partout avec Qwen par lots réduits, ou dtype gravé nominalement par
+  modèle) se décide **au pré-enregistrement, pas devant l'erreur d'allocation**.
+- *Modèles : director.interpretation fable, math fable, neuro inherit, builder inherit,
+  verifier inherit.*
+
 ## 2026-08-20 — v0 : squelette posé
 
 - **Commit** : (initial)

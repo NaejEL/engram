@@ -1257,12 +1257,1044 @@ def _prompts_du_corpus(corpus) -> list[str]:
     return [p for triple in corpus["paraphrases"] for p in triple]
 
 
+# =========================================================================
+#  EXÉCUTION COMPLÈTE (§9) — 12 forwards : capture GPU puis analyse CPU
+#
+#  Cette section ORCHESTRE les fonctions ci-dessus ; elle n'en modifie aucune.
+#  Tout ce qui y est vectorisé est vérifié contre son implémentation de
+#  référence par les tests CPU (`tests/test_layer_profile_run.py`).
+# =========================================================================
+
+ORDRE_MODELES = MODELES          # ordre des modèles FIXÉ (§5, compléments)
+ORDRE_VARIANTES = VARIANTES      # ordre des conditions FIXÉ (§5)
+MODELES_DECISIONNELS = ("gpt2", "HuggingFaceTB/SmolLM2-360M")   # §4.4, §4.5
+
+
+def index_intra(n: int = N_UNITES, n_para: int = N_PARA):
+    """Paires INTRA : unité, ligne a, ligne b, couple de types (§4.3)."""
+    u, ra, rb, cp = [], [], [], []
+    for i in range(n):
+        for s in range(n_para):
+            for t in range(s + 1, n_para):
+                u.append(i)
+                ra.append(i * n_para + s)
+                rb.append(i * n_para + t)
+                cp.append((s, t))
+    return (np.array(u), np.array(ra), np.array(rb), cp)
+
+
+def index_inter(n: int = N_UNITES, n_para: int = N_PARA):
+    """Paires INTER : unités i<j, types s,t, lignes a,b (§4.3)."""
+    ui, uj, ts, tt = [], [], [], []
+    for i in range(n):
+        for j in range(i + 1, n):
+            for s in range(n_para):
+                for t in range(n_para):
+                    ui.append(i)
+                    uj.append(j)
+                    ts.append(s)
+                    tt.append(t)
+    ui = np.array(ui)
+    uj = np.array(uj)
+    ts = np.array(ts)
+    tt = np.array(tt)
+    return ui, uj, ts, tt, ui * n_para + ts, uj * n_para + tt
+
+
+def classes_des_paires_inter(slots, ui, uj) -> np.ndarray:
+    """Classe d'identité de chaque paire inter, VECTORISÉE (§4.2)."""
+    o = np.array([s[0] for s in slots])
+    e = np.array([s[1] for s in slots])
+    mo = o[ui] == o[uj]
+    me = e[ui] == e[uj]
+    cls = np.full(ui.size, P_0, dtype=object)
+    cls[mo & ~me] = P_OWN
+    cls[me & ~mo] = P_ENT
+    cls[mo & me] = P_BOTH
+    return cls
+
+
+def matrice_candidats_R1(slots, strate: str = STRATE_DECISIONNELLE,
+                         s: int = S_LEURRES, n_para: int = N_PARA):
+    """`(requetes, candidats)` — candidats en colonne 0 = la CIBLE (§4.5).
+
+    Construction **déterministe et indépendante des données** : `jeu_candidats_R1`
+    ne reçoit aucune similarité.
+    """
+    req, cand = [], []
+    for i in range(len(slots)):
+        for t in range(n_para):
+            j = jeu_candidats_R1(i, t, slots, strate, s, n_para)
+            req.append(j["requete"])
+            cand.append([j["cible"]] + list(j["concurrents"]))
+    return np.array(req), np.array(cand)
+
+
+def r1_vectorise(cos3, req, cand) -> np.ndarray:
+    """Succès `R1` par requête et par couche — égalités à ½ crédit (§7).
+
+    `cos3` : (L+1, R, R). Rend (L+1, n_requetes).
+    """
+    vals = np.asarray(cos3, dtype=np.float64)[:, req[:, None], cand]
+    m = vals.max(axis=2)
+    eg = (vals == m[:, :, None]).sum(axis=2)
+    return np.where(vals[:, :, 0] == m, 1.0 / eg, 0.0)
+
+
+def recall_at_1_cos(cos1, etiquettes) -> float:
+    """`R1_full` en cosinus, à partir de la matrice déjà calculée."""
+    S = np.array(cos1, dtype=np.float64, copy=True)
+    np.fill_diagonal(S, -np.inf)
+    lab = np.asarray(etiquettes)
+    return float(np.mean(lab[np.argmax(S, axis=1)] == lab))
+
+
+def recall_at_1_l2(X, etiquettes) -> float:
+    """`R1_full` en L2, par l'identité de Gram (mémoire O(R²), pas O(R²d))."""
+    A = np.asarray(X, dtype=np.float64)
+    g = (A * A).sum(1)
+    D = g[:, None] + g[None, :] - 2.0 * (A @ A.T)
+    np.fill_diagonal(D, np.inf)
+    lab = np.asarray(etiquettes)
+    return float(np.mean(lab[np.argmin(D, axis=1)] == lab))
+
+
+def cos_par_couche(etats) -> np.ndarray:
+    """(L+1, R, R) des cosinus **fp32** (§7)."""
+    L = max(etats)
+    return np.stack([cosinus_matrice(etats[e]) for e in range(L + 1)], axis=0)
+
+
+def profil_vectorise(cos3, slots, etats=None, avec_H: bool = True,
+                     avec_R1: bool = True) -> dict:
+    """Toutes les quantités du §4.3, vectorisées par couche."""
+    n = len(slots)
+    Lp1 = cos3.shape[0]
+    ui_, ra_i, rb_i, couples = index_intra(n)
+    ui, uj, ts, tt, ra_e, rb_e = index_inter(n)
+    cls = classes_des_paires_inter(slots, ui, uj)
+    verbes = np.array([s[2] for s in slots])
+    vmask = verbes[ui] == verbes[uj]
+    CI = cos3[:, ra_i, rb_i].astype(np.float64)          # (L+1, n_intra)
+    CE = cos3[:, ra_e, rb_e].astype(np.float64)          # (L+1, n_inter)
+    couples_uniq = sorted(set(couples))
+    cpl = np.array([couples_uniq.index(c) for c in couples])
+    out = {"L": Lp1 - 1, "n_intra": int(CI.shape[1]), "n_inter": int(CE.shape[1]),
+           "auc": {}, "auc_par_classe": {}, "auc_par_verbe": {},
+           "auc_par_couple_de_types": {}, "N-P6": {},
+           "s_intra": {}, "s_inter": {}, "ratio": {}, "z": {}, "egalites": {},
+           "R1_36": {}, "R1_36_P-ent": {}, "R1_full": {}, "H": {}, "lambda1": {}}
+    for e in range(Lp1):
+        ci, ce = CI[e], CE[e]
+        out["auc"][e] = auc_par_couche(ci, ce)
+        out["egalites"][e] = compte_egalites(ci, ce)
+        out["s_intra"][e] = float(ci.mean())
+        out["s_inter"][e] = float(ce.mean())
+        out["ratio"][e] = float(ci.mean() / ce.mean()) if ce.mean() else float("nan")
+        sd = float(ce.std(ddof=1))
+        out["z"][e] = float((ci.mean() - ce.mean()) / sd) if sd else float("nan")
+        out["auc_par_classe"][e] = {
+            c: (auc_par_couche(ci, ce[cls == c]) if (cls == c).any() else float("nan"))
+            for c in PARTITIONS}
+        out["auc_par_verbe"][e] = {
+            "verbe=": auc_par_couche(ci, ce[vmask]) if vmask.any() else float("nan"),
+            "verbe≠": auc_par_couche(ci, ce[~vmask]) if (~vmask).any() else float("nan")}
+        out["auc_par_couple_de_types"][e] = {
+            f"{couples_uniq[k][0]+1}x{couples_uniq[k][1]+1}":
+                auc_par_couche(ci[cpl == k], ce) for k in range(len(couples_uniq))}
+        m3 = (cls == P_ENT) & (ts == 2) & (tt == 2)
+        m1 = (cls == P_ENT) & (ts == 0) & (tt == 0)
+        out["N-P6"][e] = {
+            "AUC(P-ent|para3xpara3)": (auc_par_couche(ci, ce[m3]) if m3.any()
+                                       else float("nan")),
+            "AUC(P-ent|para1xpara1)": (auc_par_couche(ci, ce[m1]) if m1.any()
+                                       else float("nan")),
+            "n_para3xpara3": int(m3.sum()), "n_para1xpara1": int(m1.sum())}
+    if avec_R1:
+        req_o, cand_o = matrice_candidats_R1(slots, P_OWN)
+        req_e, cand_e = matrice_candidats_R1(slots, P_ENT)
+        S_own = r1_vectorise(cos3, req_o, cand_o)
+        S_ent = r1_vectorise(cos3, req_e, cand_e)
+        out["succes_R1_P-own"] = S_own
+        out["succes_R1_P-ent"] = S_ent
+        for e in range(Lp1):
+            out["R1_36"][e] = float(S_own[e].mean())
+            out["R1_36_P-ent"][e] = float(S_ent[e].mean())
+    etiq = np.repeat(np.arange(n), N_PARA)
+    for e in range(Lp1):
+        out["R1_full"][e] = {"cos": recall_at_1_cos(cos3[e], etiq)}
+        if etats is not None:
+            out["R1_full"][e]["l2"] = recall_at_1_l2(etats[e], etiq)
+    if avec_H and etats is not None:
+        H, l1 = courbes_H(etats, Lp1 - 1)
+        out["courbes_H"] = H
+        for e in range(Lp1):
+            out["H"][e] = float(np.median(H[:, e]))
+            out["lambda1"][e] = float(np.median(l1[:, e]))
+    courbe = np.array([out["auc"][e] for e in range(Lp1)])
+    out["l_contrast"] = argmax_decisionnel(courbe)
+    if out["H"]:
+        out["l_H"] = argmin_decisionnel(np.array([out["H"][e] for e in range(Lp1)]))
+    out["courbes_contraste_par_unite"] = courbe_contraste_par_unite(
+        CI, CE, ui_, ui, uj, n)
+    return out
+
+
+def courbes_H(etats, L: int, n_a: int = N_A, b: int = B_SOUS_ECH,
+              seed: int = SEED):
+    """`H` et `λ₁/Σλ` par couche sur `b` sous-échantillons APPARIÉS de taille
+    `n_a` (§3) — les mêmes indices à toutes les couches, pour que `V-plat`
+    s'applique à des courbes."""
+    rng = np.random.default_rng(seed)
+    n = etats[0].shape[0]
+    idx = [rng.choice(n, size=min(n_a, n), replace=False) for _ in range(b)]
+    H = np.empty((b, L + 1))
+    l1 = np.empty((b, L + 1))
+    for e in range(L + 1):
+        X = etats[e]
+        for k, ii in enumerate(idx):
+            H[k, e] = entropie_matricielle(X[ii])
+            l1[k, e] = lambda1_ratio(X[ii])
+    return H, l1
+
+
+def courbe_contraste_par_unite(CI, CE, u_intra, ui, uj, n) -> np.ndarray:
+    """Courbe de contraste PAR UNITÉ (pour `V-plat`) : cos intra moyen de l'unité
+    moins cos inter moyen des paires qui la contiennent, par couche."""
+    Lp1 = CI.shape[0]
+    out = np.empty((n, Lp1))
+    for u in range(n):
+        mi = u_intra == u
+        me = (ui == u) | (uj == u)
+        out[u] = CI[:, mi].mean(axis=1) - CE[:, me].mean(axis=1)
+    return out
+
+
+# ------------------------------------------------ bootstrap AUC vectorisé
+
+def prep_bootstrap_auc(cos3, slots):
+    """Pré-calcule ce qui ne dépend PAS du rééchantillon : valeurs inter triées
+    par couche, rangs des valeurs intra dedans, unité de chaque valeur intra.
+
+    Le rééchantillonnage par CLUSTER (composante de slot) ne change que les
+    MULTIPLICITÉS des unités : les valeurs, elles, sont fixes. L'AUC d'un
+    rééchantillon est donc un Mann-Whitney PONDÉRÉ sur ces mêmes valeurs, avec
+    poids `m_u` (intra) et `m_u·m_v` (inter) — strictement la statistique de
+    `auc_stat_fn`, vérifiée par test.
+    """
+    n = len(slots)
+    u_i, ra_i, rb_i, _ = index_intra(n)
+    ui, uj, _, _, ra_e, rb_e = index_inter(n)
+    Lp1 = cos3.shape[0]
+    pf = (ui * n + uj).astype(np.int64)
+    PF = np.empty((Lp1, ui.size), dtype=np.int64)
+    LO = np.empty((Lp1, u_i.size), dtype=np.int64)
+    HI = np.empty((Lp1, u_i.size), dtype=np.int64)
+    for e in range(Lp1):
+        ce = cos3[e, ra_e, rb_e].astype(np.float64)
+        ci = cos3[e, ra_i, rb_i].astype(np.float64)
+        o = np.argsort(ce, kind="stable")
+        PF[e] = pf[o]
+        s = ce[o]
+        LO[e] = np.searchsorted(s, ci, side="left")
+        HI[e] = np.searchsorted(s, ci, side="right")
+    return {"n": n, "PF": PF, "LO": LO, "HI": HI, "u_intra": u_i,
+            "n_intra": u_i.size, "n_inter": ui.size, "Lp1": Lp1}
+
+
+def auc_ponderee(prep, m) -> np.ndarray:
+    """AUC par couche sous les multiplicités d'unité `m` (vecteur de taille n)."""
+    m = np.asarray(m, dtype=np.float64)
+    W = np.outer(m, m).ravel()[prep["PF"]]
+    C = np.concatenate([np.zeros((prep["Lp1"], 1)), np.cumsum(W, axis=1)], axis=1)
+    r = np.arange(prep["Lp1"])[:, None]
+    cl = C[r, prep["LO"]]
+    ce = C[r, prep["HI"]]
+    w_a = m[prep["u_intra"]][None, :]
+    num = (w_a * (cl + 0.5 * (ce - cl))).sum(axis=1)
+    Wi = float(w_a.sum())
+    We = C[:, -1]
+    with np.errstate(invalid="ignore", divide="ignore"):
+        return num / (Wi * We)
+
+
+def bootstrap_auc_max(prep, membres, b: int = B_BOOT, seed: int = SEED):
+    """Bootstrap par composante de slot, **argmax re-sélectionné** dans chaque
+    rééchantillon (M-15). Rend les max bootstrap et les argmax."""
+    rng = np.random.default_rng(seed)
+    K = len(membres)
+    n = prep["n"]
+    base = np.zeros(n)
+    ech = np.empty(b)
+    arg = np.empty(b, dtype=int)
+    for k in range(b):
+        m = base.copy()
+        for c in rng.integers(0, K, size=K):
+            m[list(membres[int(c)])] += 1.0
+        a = auc_ponderee(prep, m)
+        ell = int(1 + np.nanargmax(a[1:]))
+        ech[k] = a[ell]
+        arg[k] = ell
+    return ech, arg
+
+
+def jackknife_auc_max(prep, membres):
+    """Jackknife par cluster (leave-one-cluster-out) pour le BCa."""
+    K = len(membres)
+    n = prep["n"]
+    out = np.empty(K)
+    for c in range(K):
+        m = np.ones(n)
+        m[list(membres[c])] = 0.0
+        a = auc_ponderee(prep, m)
+        out[c] = float(np.nanmax(a[1:]))
+    return out
+
+
+# ------------------------------------------- permutation d'étiquettes d'unité
+
+def prep_permutation_auc(cos3):
+    """Rangs de CHAQUE paire de lignes parmi toutes les paires, par couche.
+
+    Sous une permutation des étiquettes d'unité, l'ensemble des valeurs de paires
+    est INVARIANT : seule la partition intra/inter change. Les rangs pré-calculés
+    rendent donc l'AUC permutée exacte, sans re-tri.
+    """
+    Lp1, R = cos3.shape[0], cos3.shape[1]
+    iu, ju = np.triu_indices(R, k=1)
+    LO = np.zeros((Lp1, R, R), dtype=np.int32)
+    HI = np.zeros((Lp1, R, R), dtype=np.int32)
+    for e in range(Lp1):
+        v = cos3[e, iu, ju].astype(np.float64)
+        s = np.sort(v, kind="stable")
+        lo = np.searchsorted(s, v, side="left").astype(np.int32)
+        hi = np.searchsorted(s, v, side="right").astype(np.int32)
+        LO[e, iu, ju] = lo
+        LO[e, ju, iu] = lo
+        HI[e, iu, ju] = hi
+        HI[e, ju, iu] = hi
+    return {"LO": LO, "HI": HI, "R": R, "Lp1": Lp1,
+            "n_paires": int(iu.size)}
+
+
+def _sommes_rangs(lo_a):
+    """Σ(rangs), Σ(#intra strictement inférieurs), Σ(#intra égaux) — vectorisé."""
+    s = np.sort(lo_a, axis=1)
+    k = np.arange(s.shape[1])
+    neuf = np.empty(s.shape, dtype=bool)
+    neuf[:, 0] = True
+    neuf[:, 1:] = s[:, 1:] != s[:, :-1]
+    premier = np.maximum.accumulate(np.where(neuf, k, 0), axis=1)
+    neufr = np.empty(s.shape, dtype=bool)
+    neufr[:, -1] = True
+    neufr[:, :-1] = s[:, 1:] != s[:, :-1]
+    dernier = np.minimum.accumulate(
+        np.where(neufr, k, s.shape[1] - 1)[:, ::-1], axis=1)[:, ::-1]
+    return premier.sum(axis=1), (dernier - premier + 1).sum(axis=1)
+
+
+def auc_permutee(prep, perm, n_para: int = N_PARA):
+    """AUC par couche sous une permutation des étiquettes d'unité."""
+    g = perm.reshape(-1, n_para)
+    ii, jj = [], []
+    for s in range(n_para):
+        for t in range(s + 1, n_para):
+            ii.append(g[:, s])
+            jj.append(g[:, t])
+    ii = np.concatenate(ii)
+    jj = np.concatenate(jj)
+    lo = prep["LO"][:, ii, jj].astype(np.int64)
+    hi = prep["HI"][:, ii, jj].astype(np.int64)
+    nlt, neq = _sommes_rangs(lo)
+    n_i = ii.size
+    n_e = prep["n_paires"] - n_i
+    num = (lo.sum(axis=1) - nlt) + 0.5 * (hi.sum(axis=1) - lo.sum(axis=1) - neq)
+    return num / (n_i * n_e)
+
+
+def permutation_auc_max(prep, b: int = B_BOOT, seed: int = SEED,
+                        n_para: int = N_PARA):
+    rng = np.random.default_rng(seed)
+    R = prep["R"]
+    ech = np.empty(b)
+    for k in range(b):
+        a = auc_permutee(prep, rng.permutation(R), n_para)
+        ech[k] = float(np.nanmax(a[1:]))
+    return ech
+
+
+# --------------------------------------------------- couloir : ΔR1 et R1_36
+
+def clusters_des_requetes(slots, strate: str = STRATE_DECISIONNELLE,
+                          n_para: int = N_PARA):
+    """Requêtes groupées par cluster de rééchantillonnage (composante de slot)."""
+    cl = clusters_de_strate(slots, strate)
+    par = {}
+    for i in range(len(slots)):
+        par.setdefault(cl["etiquette_par_unite"][i], []).extend(
+            [i * n_para + t for t in range(n_para)])
+    return [np.array(par[k]) for k in sorted(par)], cl
+
+
+def _stat_couloir(succ_reel, succ_plancher, cols):
+    """(ΔR1 max, ℓ*, R1 à ℓ*) sur un jeu de colonnes (requêtes)."""
+    d = (succ_reel[:, cols] - succ_plancher[:, cols]).mean(axis=1)
+    ell = int(1 + np.nanargmax(d[1:]))
+    return d[ell], ell, float(succ_reel[ell, cols].mean())
+
+
+def bootstrap_couloir(succ_reel, succ_plancher, blocs, b: int = B_BOOT,
+                      seed: int = SEED):
+    """Bootstrap par composante de slot du couple (ΔR1, R1_36), **argmax de ΔR1
+    re-sélectionné** dans chaque rééchantillon."""
+    rng = np.random.default_rng(seed)
+    K = len(blocs)
+    d = np.empty(b)
+    r = np.empty(b)
+    a = np.empty(b, dtype=int)
+    for k in range(b):
+        cols = np.concatenate([blocs[int(c)] for c in rng.integers(0, K, size=K)])
+        d[k], a[k], r[k] = _stat_couloir(succ_reel, succ_plancher, cols)
+    return d, r, a
+
+
+def jackknife_couloir(succ_reel, succ_plancher, blocs):
+    K = len(blocs)
+    d = np.empty(K)
+    r = np.empty(K)
+    for c in range(K):
+        cols = np.concatenate([blocs[j] for j in range(K) if j != c])
+        d[c], _, r[c] = _stat_couloir(succ_reel, succ_plancher, cols)
+    return d, r
+
+
+def permutation_couloir(succ_reel, succ_plancher, b: int = B_BOOT,
+                        seed: int = SEED, n_para: int = N_PARA):
+    """Permutation des étiquettes d'unité à couche fixée, avec recalcul de
+    `max_ℓ` : les requêtes sont ré-attribuées aux unités, réel et plancher
+    ensemble (l'appariement est préservé)."""
+    rng = np.random.default_rng(seed)
+    n_req = succ_reel.shape[1]
+    cols = np.arange(n_req)
+    ech = np.empty(b)
+    for k in range(b):
+        p = rng.permutation(n_req // n_para)
+        q = (np.repeat(p * n_para, n_para)
+             + np.tile(np.arange(n_para), n_req // n_para))
+        d = (succ_reel[:, cols] - succ_plancher[:, q]).mean(axis=1)
+        ech[k] = float(np.nanmax(d[1:]))
+    return ech
+
+
+# =========================================================================
+#  Capture GPU d'un modèle : 4 variantes, 1 forward chacune
+# =========================================================================
+
+def _encode_batch(seqs, pad_id):
+    import torch
+    lmax = max(len(s) for s in seqs)
+    ids = torch.full((len(seqs), lmax), pad_id, dtype=torch.long)
+    msk = torch.zeros((len(seqs), lmax), dtype=torch.long)
+    pos = torch.zeros(len(seqs), dtype=torch.long)
+    for r, s in enumerate(seqs):
+        ids[r, :len(s)] = torch.tensor(s, dtype=torch.long)
+        msk[r, :len(s)] = 1
+        pos[r] = len(s) - 1
+    return ids, msk, pos
+
+
+def sequences_des_variantes(corpus_prim, corpus_v3, tokenize, offsets, filler):
+    """Les quatre variantes du §9, en séquences de tokens."""
+    prompts = _prompts_du_corpus(corpus_prim)
+    return {
+        "a": [tokenize(p) for p in prompts],
+        "b_v3": [tokenize(p) for p in _prompts_du_corpus(corpus_v3)],
+        "nulle_cadre": nulle_cadre(corpus_prim["slots"], tokenize, filler,
+                                   offsets)["sequences"],
+        "nulle_melangee": nulle_melangee(prompts, tokenize),
+    }
+
+
+def capture_modele(nom_modele: str, out: Path, verbeux: bool = True) -> dict:
+    """Charge le modèle, exécute **un** forward par variante, écrit les états."""
+    import torch
+    from transformers import AutoModelForCausalLM, AutoTokenizer
+
+    t0 = time.time()
+    dispo = torch.cuda.is_available()
+    device = torch.device("cuda" if dispo else "cpu")
+    if dispo:
+        torch.cuda.empty_cache()
+        torch.cuda.reset_peak_memory_stats()
+    tok = AutoTokenizer.from_pretrained(nom_modele)
+    if tok.pad_token_id is None:
+        tok.pad_token = tok.eos_token
+    dtype = torch.float16 if device.type == "cuda" else torch.float32
+    modele = AutoModelForCausalLM.from_pretrained(nom_modele, dtype=dtype)
+    modele.to(device).eval().requires_grad_(False)
+    blocks = _blocs_du_modele(modele)
+    L = len(blocks)
+    t_charge = time.time() - t0
+
+    def tokenize(s):
+        return [int(t) for t in tok.encode(s)]
+
+    def offsets(s):
+        enc = tok(s, return_offsets_mapping=True, add_special_tokens=False)
+        return [int(x) for x in enc["input_ids"]], list(enc["offset_mapping"])
+
+    prim = corpus_a()
+    v3 = corpus_b_v3()          # jeu v3 GELÉ (défini par le BPE de GPT-2)
+    filler = tokenize(REMPLISSAGE_NEUTRE)[-1]
+    seqs = sequences_des_variantes(prim, v3, tokenize,
+                                   offsets if tok.is_fast else None, filler)
+    hash_avant = {"a": sha256_corpus(prim), "B-v3": sha256_corpus(v3)}
+
+    res = {"modele": nom_modele, "L": L, "device": str(device),
+           "cuda_disponible": bool(dispo),
+           "V-L": "PASS" if L == L_ATTENDU[nom_modele] else "FAIL",
+           "L_attendu": L_ATTENDU[nom_modele],
+           "duree_chargement_s": round(t_charge, 2),
+           "tokenizer_rapide": bool(tok.is_fast),
+           "token_de_remplissage": int(filler),
+           "sha256_avant": hash_avant, "variantes": {}, "forwards": {}}
+    if res["V-L"] == "FAIL":
+        return res
+    for var in ORDRE_VARIANTES:
+        t1 = time.time()
+        ids, msk, pos = _encode_batch(seqs[var], tok.pad_token_id)
+        cap = capture_un_forward(modele, blocks, ids.to(device), msk.to(device),
+                                 pos.to(device))
+        etats = cap["etats"]
+        np.savez_compressed(out / f"etats-{_slug(nom_modele)}-{var}.npz",
+                            **{str(e): etats[e].astype(np.float32)
+                               for e in sorted(etats)})
+        res["forwards"][var] = cap["n_forwards"]
+        res["variantes"][var] = {
+            "n_prompts": len(seqs[var]),
+            "longueur_max_tokens": int(max(len(s) for s in seqs[var])),
+            "n_forwards": cap["n_forwards"],
+            "hooks_restants": cap["hooks_restants"],
+            "duree_s": round(time.time() - t1, 2),
+            "dimension": int(etats[0].shape[1]),
+            "nan_ou_inf": bool(any(not np.isfinite(etats[e]).all()
+                                   for e in etats)),
+        }
+        if verbeux:
+            print(f"  {nom_modele} / {var} : {len(seqs[var])} prompts, "
+                  f"{res['variantes'][var]['duree_s']} s, "
+                  f"forwards={cap['n_forwards']}, "
+                  f"hooks_restants={cap['hooks_restants']}")
+    res["sha256_apres"] = {"a": sha256_corpus(prim), "B-v3": sha256_corpus(v3)}
+    res["vram_max_allouee_gio"] = (round(torch.cuda.max_memory_allocated() / 2 ** 30, 3)
+                                   if dispo else 0.0)
+    res["vram_max_reservee_gio"] = (round(torch.cuda.max_memory_reserved() / 2 ** 30, 3)
+                                    if dispo else 0.0)
+    res["duree_totale_s"] = round(time.time() - t0, 2)
+    res["V-hash"] = "PASS" if res["sha256_avant"] == res["sha256_apres"] else "FAIL"
+    res["V-1pass"] = ("PASS" if all(v == 1 for v in res["forwards"].values())
+                      else "FAIL")
+    res["V-hooks"] = ("PASS" if all(v["hooks_restants"] == 0
+                                    for v in res["variantes"].values()) else "FAIL")
+    # mesures de porte qui dépendent du tokenizer du modèle
+    res["V-suffixe"] = {t: partage_dernier_token(
+        [prim["paraphrases"][i][k] for i in range(N_UNITES)], tokenize)
+        for k, t in enumerate(POOL_PARAPHRASE_TYPES)}
+    res["plancher_lexical"] = _plancher_lexical(prim, tokenize)
+    del modele
+    if dispo:
+        torch.cuda.empty_cache()
+    return res
+
+
+def _plancher_lexical(corpus, tokenize) -> dict:
+    """Maillon 1 (§5) : vecteurs indicateurs de tokens BPE, **0 forward**."""
+    prompts = _prompts_du_corpus(corpus)
+    X = vecteurs_indicateurs_bpe(prompts, tokenize)
+    S = cosinus_matrice(X)
+    n = len(corpus["slots"])
+    intra, inter = paires_intra_inter(n, N_PARA)
+    auc = auc_par_couche([S[a, b] for a, b in intra], [S[a, b] for a, b in inter])
+    r_own = r1_36(S.astype(np.float64), corpus["slots"], P_OWN)
+    r_ent = r1_36(S.astype(np.float64), corpus["slots"], P_ENT)
+    return {"AUC_lex": auc, "R1_lex": r_own["R1"], "R1_lex_P-ent": r_ent["R1"],
+            "succes": r_own["succes"].tolist(),
+            "succes_P-ent": r_ent["succes"].tolist(),
+            "dimension_indicatrice": int(X.shape[1])}
+
+
+def _slug(nom: str) -> str:
+    return nom.replace("/", "_")
+
+
+def _blocs_du_modele(modele):
+    from engram.cortex import _find_blocks          # LECTURE SEULE
+    return _find_blocks(modele)
+
+
+def charger_etats(out: Path, nom_modele: str, var: str) -> dict:
+    z = np.load(out / f"etats-{_slug(nom_modele)}-{var}.npz")
+    return {int(k): z[k] for k in z.files}
+
+
+# =========================================================================
+#  Analyse CPU d'un modèle : planchers, P-A, couloir, bandes, cellules
+# =========================================================================
+
+NOMS_PLANCHERS = ("1_materiel_lexical", "2_capture_nulle_de_cadre",
+                  "3_encodage_l0", "4_ordre_nulle_melangee", "5_statistique")
+
+
+def planchers_du_modele(prof_a, prof_cadre, prof_mel, lex, L) -> dict:
+    """Les **cinq planchers** du §5, en AUC, plus la clause permissive du
+    maillon 4. Le **plus haut** entre dans P-A et dans `ΔR1`."""
+    auc_cadre = max(prof_cadre["auc"][e] for e in range(1, L + 1))
+    auc_mel = max(prof_mel["auc"][e] for e in range(1, L + 1))
+    perm = nulle_melangee_permissive(auc_mel)
+    auc = {"1_materiel_lexical": lex["AUC_lex"],
+           "2_capture_nulle_de_cadre": auc_cadre,
+           "3_encodage_l0": prof_a["auc"][0],
+           "4_ordre_nulle_melangee": auc_mel,
+           "5_statistique": 0.5}
+    retenus = {k: v for k, v in auc.items()
+               if not (perm["permissive"] and k == "4_ordre_nulle_melangee")}
+    haut = max(retenus, key=lambda k: retenus[k])
+    return {"AUC": auc, "AUC_retenus_pour_le_plus_haut": retenus,
+            "plancher_AUC_le_plus_haut": {"nom": haut, "valeur": retenus[haut]},
+            "clause_permissive_maillon_4": perm,
+            "argmax_couche_cadre": int(np.argmax(
+                [prof_cadre["auc"][e] for e in range(1, L + 1)]) + 1),
+            "argmax_couche_melangee": int(np.argmax(
+                [prof_mel["auc"][e] for e in range(1, L + 1)]) + 1)}
+
+
+def succes_planchers_R1(prof_a, prof_cadre, prof_mel, lex, L, permissive: bool,
+                        cle: str = "succes_R1_P-own", cle_lex: str = "succes"):
+    """Matrice `(L+1, n_req)` du plancher `R1` **le plus haut à chaque couche**,
+    le nom du plancher retenu par couche, et la moyenne de chaque plancher.
+    Appariement **par requête** (§4.3)."""
+    n_req = prof_a[cle].shape[1]
+    cands = {
+        "1_materiel_lexical": np.tile(np.asarray(lex[cle_lex]), (L + 1, 1)),
+        "2_capture_nulle_de_cadre": prof_cadre[cle],
+        "3_encodage_l0": np.tile(prof_a[cle][0], (L + 1, 1)),
+        "5_statistique": np.full((L + 1, n_req), HASARD_R1),
+    }
+    if not permissive:
+        cands["4_ordre_nulle_melangee"] = prof_mel[cle]
+    noms = sorted(cands)
+    M = np.stack([cands[k] for k in noms], axis=0)          # (P, L+1, n_req)
+    moy = M.mean(axis=2)                                    # (P, L+1)
+    choix = np.argmax(moy, axis=0)
+    succ = np.stack([M[int(choix[e]), e] for e in range(L + 1)], axis=0)
+    return (succ, {e: noms[int(choix[e])] for e in range(L + 1)},
+            {k: [float(x) for x in moy[i]] for i, k in enumerate(noms)})
+
+
+def _plat(courbes, b: int):
+    r = v_plat(courbes, b=b, seed=SEED)
+    return bool(r["plate"]), {"R_obs": r["R_obs"],
+                              "q_0.95_R_etoile": r["q_0.95_R_etoile"], "B": r["B"]}
+
+
+def _spearman(x, y) -> float:
+    x = np.asarray(x, dtype=np.float64)
+    y = np.asarray(y, dtype=np.float64)
+    rx = np.argsort(np.argsort(x)).astype(np.float64)
+    ry = np.argsort(np.argsort(y)).astype(np.float64)
+    rx -= rx.mean()
+    ry -= ry.mean()
+    d = float(np.sqrt((rx ** 2).sum() * (ry ** 2).sum()))
+    return float((rx * ry).sum() / d) if d else float("nan")
+
+
+def analyse_modele(nom_modele: str, out: Path, capture: dict,
+                   b_boot: int = B_BOOT, verbeux: bool = True) -> dict:
+    """Analyse CPU complète d'un modèle (§4.3 à §4.8)."""
+    t0 = time.time()
+    L = capture["L"]
+    prim = corpus_a()
+    slots = prim["slots"]
+    etats = {v: charger_etats(out, nom_modele, v) for v in ORDRE_VARIANTES}
+    cos_a = cos_par_couche(etats["a"])
+    prof_a = profil_vectorise(cos_a, slots, etats["a"], avec_H=True)
+    prof_cadre = profil_vectorise(cos_par_couche(etats["nulle_cadre"]), slots,
+                                  None, avec_H=False)
+    prof_mel = profil_vectorise(cos_par_couche(etats["nulle_melangee"]), slots,
+                                None, avec_H=False)
+    v3 = corpus_b_v3()
+    prof_v3 = profil_vectorise(cos_par_couche(etats["b_v3"]), v3["slots"], None,
+                               avec_H=False, avec_R1=False)
+    lex = capture["plancher_lexical"]
+
+    pl = planchers_du_modele(prof_a, prof_cadre, prof_mel, lex, L)
+    perm4 = pl["clause_permissive_maillon_4"]["permissive"]
+
+    # ---------------------------------------------- P-A : existence (AUC)
+    prep = prep_bootstrap_auc(cos_a, slots)
+    cl = clusters_de_strate(slots, P_OWN)
+    membres = [np.array(cl["membres"][k]) for k in sorted(cl["membres"])]
+    auc_obs = np.array([prof_a["auc"][e] for e in range(L + 1)])
+    l_contrast = int(1 + np.nanargmax(auc_obs[1:]))
+    ech, arg = bootstrap_auc_max(prep, membres, b=b_boot, seed=SEED)
+    jack = jackknife_auc_max(prep, membres)
+    ic_auc = ic_du_max(ech, float(auc_obs[l_contrast]), jack)
+    ech_p = permutation_auc_max(prep_permutation_auc(cos_a), b=b_boot, seed=SEED)
+    p_perm = float((ech_p >= auc_obs[l_contrast]).mean())
+    haut = pl["plancher_AUC_le_plus_haut"]
+    p_a = {"max_AUC": float(auc_obs[l_contrast]), "l_contrast": l_contrast,
+           "IC": {"bas": ic_auc["ic_bas"], "haut": ic_auc["ic_haut"],
+                  "methode": ic_auc["methode"]},
+           "theta_debiaise": ic_auc["theta_debiaise"],
+           "moyenne_bootstrap": ic_auc["moyenne_bootstrap"],
+           "p_perm": p_perm,
+           "q_0.95_permutation": float(np.percentile(ech_p, 95)),
+           "plancher_le_plus_haut": haut,
+           "superieur_a_chaque_plancher": bool(
+               all(auc_obs[l_contrast] > v
+                   for v in pl["AUC_retenus_pour_le_plus_haut"].values())),
+           "IC_disjoint_du_plus_haut": bool(ic_auc["ic_bas"] > haut["valeur"]),
+           "AUC(l_contrast)>AUC(L)": bool(auc_obs[l_contrast] > auc_obs[L]),
+           "AUC(L)": float(auc_obs[L]),
+           "argmax_bootstrap_median": int(np.median(arg))}
+    p_a["verdict_P-A"] = ("TENUE" if (p_a["superieur_a_chaque_plancher"]
+                                      and p_a["IC_disjoint_du_plus_haut"]
+                                      and p_perm <= 0.05
+                                      and p_a["AUC(l_contrast)>AUC(L)"])
+                          else "NON TENUE")
+
+    # ------------------------------------------------- couloir : ΔR1, R1_36
+    couloir = {}
+    for strate, cle, cle_lex in ((P_OWN, "succes_R1_P-own", "succes"),
+                                 (P_ENT, "succes_R1_P-ent", "succes_P-ent")):
+        succ_pl, noms_pl, moy_pl = succes_planchers_R1(
+            prof_a, prof_cadre, prof_mel, lex, L, perm4, cle, cle_lex)
+        blocs, cinfo = clusters_des_requetes(slots, strate)
+        sr = prof_a[cle]
+        d_obs, l_star, r_obs = _stat_couloir(sr, succ_pl, np.arange(sr.shape[1]))
+        db, rb, ab = bootstrap_couloir(sr, succ_pl, blocs, b=b_boot, seed=SEED)
+        jd, jr = jackknife_couloir(sr, succ_pl, blocs)
+        ic_d = ic_du_max(db, float(d_obs), jd)
+        ic_r = ic_du_max(rb, float(r_obs), jr)
+        ep = permutation_couloir(sr, succ_pl, b=b_boot, seed=SEED)
+        couloir[strate] = {
+            "K": cinfo["K"], "cluster": cinfo["cle"],
+            "l_star_delta_R1": l_star,
+            "delta_R1_observe": float(d_obs),
+            "R1_36_observe_a_l_star": float(r_obs),
+            "IC_delta_R1": [ic_d["ic_bas"], ic_d["ic_haut"]],
+            "methode_IC_delta_R1": ic_d["methode"],
+            "IC_R1_36": [ic_r["ic_bas"], ic_r["ic_haut"]],
+            "methode_IC_R1_36": ic_r["methode"],
+            "theta_debiaise_delta_R1": ic_d["theta_debiaise"],
+            "p_perm_delta_R1": float((ep >= d_obs).mean()),
+            "plancher_retenu_par_couche": noms_pl,
+            "R1_planchers_moyens_par_couche": moy_pl,
+            "R1_36_par_couche": {e: float(sr[e].mean()) for e in range(L + 1)},
+            "R1_36_a_l_contrast": float(sr[l_contrast].mean()),
+            "argmax_bootstrap_median": int(np.median(ab))}
+    b_own = couloir[P_OWN]
+    bande = bande_modele(b_own["IC_delta_R1"], b_own["IC_R1_36"])
+    b_own["bande"] = bande
+    b_own["sous_etiquette_delta_R1_negatif"] = delta_r1_negatif(b_own["IC_delta_R1"])
+    b_own["mention_V+"] = mention_v_plus(b_own["IC_R1_36"])
+    couloir[P_ENT]["bande_non_decisionnelle_par_design"] = bande_modele(
+        couloir[P_ENT]["IC_delta_R1"], couloir[P_ENT]["IC_R1_36"])
+
+    # ------------------------------------------------- H, λ₁ et localisation
+    H = np.array([prof_a["H"][e] for e in range(L + 1)])
+    l_H = int(1 + np.nanargmin(H[1:]))
+    plat_c, det_c = _plat(prof_a["courbes_contraste_par_unite"], b_boot)
+    plat_h, det_h = _plat(prof_a["courbes_H"], b_boot)
+    fen = fenetre_D3(L)
+    cell = cellule(l_contrast, l_H, fen, L, plat_c, plat_h)
+    lam = {e: prof_a["lambda1"][e] for e in range(L + 1)}
+
+    return {
+        "modele": nom_modele, "L": L, "seed": SEED,
+        "fenetre_D3": list(fen), "w": w_of_L(L),
+        "AUC_par_couche": {e: prof_a["auc"][e] for e in range(L + 1)},
+        "AUC_par_classe": prof_a["auc_par_classe"],
+        "AUC_par_verbe": prof_a["auc_par_verbe"],
+        "AUC_par_couple_de_types": prof_a["auc_par_couple_de_types"],
+        "N-P6": prof_a["N-P6"], "N-P6_a_l_contrast": prof_a["N-P6"][l_contrast],
+        "AUC_B-v3_par_couche": {e: prof_v3["auc"][e] for e in range(L + 1)},
+        "AUC_nulle_cadre_par_couche": {e: prof_cadre["auc"][e] for e in range(L + 1)},
+        "AUC_nulle_melangee_par_couche": {e: prof_mel["auc"][e] for e in range(L + 1)},
+        "s_intra": prof_a["s_intra"], "s_inter": prof_a["s_inter"],
+        "ratio": prof_a["ratio"], "z": prof_a["z"], "egalites": prof_a["egalites"],
+        "R1_full": prof_a["R1_full"],
+        "H": {e: float(H[e]) for e in range(L + 1)}, "lambda1": lam,
+        "planchers": pl,
+        "plancher_lexical": {k: v for k, v in lex.items()
+                             if not k.startswith("succes")},
+        "P-A": p_a, "couloir": couloir,
+        "l_contrast": l_contrast, "l_H": l_H,
+        "V-plat_contraste": {"verdict": "PLATE" if plat_c else "NON PLATE", **det_c},
+        "V-plat_H": {"verdict": "PLATE" if plat_h else "NON PLATE", **det_h},
+        "V-bord_contraste": "AU BORD" if l_contrast in (1, L) else "INTÉRIEUR",
+        "V-bord_H": "AU BORD" if l_H in (1, L) else "INTÉRIEUR",
+        "V-lambda1": "PASS" if len(lam) == L + 1 else "FAIL",
+        "H_interpretable": bool(l_H not in (1, L) and len(lam) == L + 1),
+        "cellule": cell,
+        "l_contrast_dans_fenetre_D3": bool(fen[0] <= l_contrast <= fen[1]),
+        "l_H_dans_fenetre_D3": bool(fen[0] <= l_H <= fen[1]),
+        "spearman_H_contraste": _spearman(H[1:], auc_obs[1:]),
+        "n_intra": prof_a["n_intra"], "n_inter": prof_a["n_inter"],
+        "recensement_identite": partition_identite(slots)["recensement"],
+        "duree_analyse_s": round(time.time() - t0, 2), "B_bootstrap": b_boot,
+        "bande": bande, "verbeux": bool(verbeux),
+    }
+
+
+# =========================================================================
+#  Orchestration des 12 forwards + rapport global
+# =========================================================================
+
+def _sha256_fichier(p: Path) -> str:
+    h = hashlib.sha256()
+    h.update(Path(p).read_bytes())
+    return h.hexdigest()
+
+
+def _diff_engram() -> str:
+    import subprocess
+    try:
+        return subprocess.run(["git", "diff", "--stat", "--", "engram/"],
+                              cwd=str(ROOT), capture_output=True, text=True,
+                              timeout=60).stdout
+    except Exception as exc:                     # pragma: no cover
+        return f"(git indisponible : {exc})"
+
+
+def run_complet(out: Path, modeles=None, b_boot: int = B_BOOT) -> dict:
+    """§9 : 4 forwards par modèle, 3 modèles ⇒ **12 forwards**, puis l'analyse."""
+    out.mkdir(parents=True, exist_ok=True)
+    modeles = list(modeles or ORDRE_MODELES)
+    t0 = time.time()
+    captures, analyses, t_gpu = {}, {}, 0.0
+    for m in modeles:
+        print(f"[capture] {m}")
+        c = capture_modele(m, out)
+        captures[m] = c
+        if c["V-L"] == "FAIL":
+            print(f"ARRÊT (§4.7 V-L) : L = {c['L']} ≠ {c['L_attendu']}")
+            return {"arret": "V-L", "captures": captures}
+        t_gpu += c["duree_totale_s"]
+        (out / f"capture-{_slug(m)}.json").write_text(
+            json.dumps(c, ensure_ascii=False, indent=1, default=str),
+            encoding="utf-8")
+    for m in modeles:
+        print(f"[analyse] {m}")
+        a = analyse_modele(m, out, captures[m], b_boot=b_boot)
+        analyses[m] = a
+        (out / f"analyse-{_slug(m)}.json").write_text(
+            json.dumps(a, ensure_ascii=False, indent=1, default=str),
+            encoding="utf-8")
+        print(f"  {m} : ℓ*_contrast={a['l_contrast']} "
+              f"AUC={a['AUC_par_couche'][a['l_contrast']]:.4f} "
+              f"IC=[{a['P-A']['IC']['bas']:.4f},{a['P-A']['IC']['haut']:.4f}] "
+              f"p_perm={a['P-A']['p_perm']:.4f} | "
+              f"ΔR1={a['couloir'][P_OWN]['delta_R1_observe']:.4f} "
+              f"R1={a['couloir'][P_OWN]['R1_36_observe_a_l_star']:.4f} "
+              f"bande={a['bande']} cellule={a['cellule']} ℓ*_H={a['l_H']}")
+
+    bandes = {m: analyses[m]["bande"] for m in modeles}
+    dispo_dec = [m for m in MODELES_DECISIONNELS if m in analyses]
+    global_ = (bande_gate(bandes[dispo_dec[0]], bandes[dispo_dec[1]])
+               if len(dispo_dec) == 2 else None)
+    retrait_H = not any(analyses[m]["H_interpretable"] for m in modeles)
+    rapport = {
+        "protocole": "experiments/EXP-2026-08-22-layer-profile.md",
+        "statut": "PRE-ENREGISTRE (gate franchie le 2026-08-23)",
+        "modeles": modeles, "B_bootstrap": b_boot, "seed": SEED,
+        "n_forwards_total": sum(sum(c["forwards"].values())
+                                for c in captures.values()),
+        "duree_gpu_s": round(t_gpu, 2),
+        "duree_totale_s": round(time.time() - t0, 2),
+        "vram_max_allouee_gio": {m: captures[m]["vram_max_allouee_gio"]
+                                 for m in modeles},
+        "vram_max_reservee_gio": {m: captures[m]["vram_max_reservee_gio"]
+                                  for m in modeles},
+        "bandes_par_modele": bandes,
+        "verdict_global_apres_overlay_D": global_,
+        "cellules": {m: analyses[m]["cellule"] for m in modeles},
+        "sort_de_H": "RETIRÉE" if retrait_H else "CONSERVÉE",
+        "H_interpretable_par_modele": {m: analyses[m]["H_interpretable"]
+                                       for m in modeles},
+        "couches_Qwen_consignees": {
+            "couche_D3_posee": 14, "L": L_ATTENDU["Qwen/Qwen2.5-1.5B"],
+            "fenetre_D3": list(fenetre_D3(L_ATTENDU["Qwen/Qwen2.5-1.5B"])),
+            "N-P3": [14, 21],
+            "clause": "P-D : couches consignées AVANT tout balayage E1 sur Qwen"},
+        "portes": _portes_globales(captures, analyses, modeles),
+        "captures": captures,
+    }
+    (out / "rapport.json").write_text(
+        json.dumps(rapport, ensure_ascii=False, indent=1, default=str),
+        encoding="utf-8")
+    _ecrire_runs(out, captures, analyses, modeles,
+                 ".venv\\Scripts\\python eval\\layer_profile.py --mode tout --go")
+    _ecrire_csv(out, analyses, modeles)
+    hashes = {p.name: _sha256_fichier(p) for p in sorted(out.iterdir())
+              if p.is_file()}
+    (out / "SHA256SUMS.json").write_text(
+        json.dumps(hashes, ensure_ascii=False, indent=1), encoding="utf-8")
+    rapport["hashes"] = hashes
+    return rapport
+
+
+def resume_config() -> str:
+    """Résumé des constantes du protocole (§7). **Aucun champ `EngramConfig`**
+    n'est créé ni lu : I2 est un instrument, `M` n'est jamais instanciée."""
+    return (f"N={N_UNITES} n_para={N_PARA} n_intra={N_INTRA_ATTENDU} "
+            f"n_inter={N_INTER_ATTENDU} strate={STRATE_DECISIONNELLE} "
+            f"s={S_LEURRES} jeu={TAILLE_JEU_R1} hasard={HASARD_R1:.5f} "
+            f"T={T_COULOIR} T+={T_COULOIR_PLUS} B={B_BOOT} n_a={N_A} "
+            f"B_H={B_SOUS_ECH} seed={SEED} cos/Gram=fp32 vp=fp64 "
+            f"BCa>{SEUIL_BCA} M=0 (jamais instanciée) gradients=aucun (D8)")
+
+
+def _ecrire_runs(out: Path, captures, analyses, modeles, commande: str):
+    """Un JSON par run (12) au format de compte rendu du laboratoire."""
+    for m in modeles:
+        c = captures[m]
+        a = analyses.get(m, {})
+        for var in ORDRE_VARIANTES:
+            d = c["variantes"][var]
+            cle = {"a": "AUC_par_couche", "b_v3": "AUC_B-v3_par_couche",
+                   "nulle_cadre": "AUC_nulle_cadre_par_couche",
+                   "nulle_melangee": "AUC_nulle_melangee_par_couche"}[var]
+            auc = a.get(cle, {})
+            met = {"AUC_par_couche": auc,
+                   "AUC_max_sur_[1,L]": (max(v for k, v in auc.items()
+                                             if int(k) >= 1) if auc else None),
+                   "n_prompts": d["n_prompts"],
+                   "longueur_max_tokens": d["longueur_max_tokens"],
+                   "dimension": d["dimension"], "nan_ou_inf": d["nan_ou_inf"]}
+            if var == "a" and a:
+                met |= {"l_contrast": a["l_contrast"], "l_H": a["l_H"],
+                        "R1_36_P-own_par_couche":
+                            a["couloir"][P_OWN]["R1_36_par_couche"],
+                        "delta_R1": a["couloir"][P_OWN]["delta_R1_observe"],
+                        "IC_delta_R1": a["couloir"][P_OWN]["IC_delta_R1"],
+                        "IC_R1_36": a["couloir"][P_OWN]["IC_R1_36"],
+                        "bande": a["bande"], "cellule": a["cellule"]}
+            (out / f"{_slug(m)}-{var}.json").write_text(json.dumps({
+                "command": commande, "condition": f"{m}/{var}", "seed": SEED,
+                "config": resume_config(), "metrics": met,
+                "writes": {"n": 0, "note": "INSTRUMENT : aucune écriture, M "
+                                           "jamais instanciée, aucun gradient "
+                                           "(D8) — l'avertissement « 0 write = "
+                                           "run INVALIDE » ne s'applique pas"},
+                "duration_s": d["duree_s"], "device": c["device"],
+                "stdout": f"{m} / {var} : {d['n_prompts']} prompts, "
+                          f"{d['duree_s']} s, forwards={d['n_forwards']}, "
+                          f"hooks_restants={d['hooks_restants']}",
+            }, ensure_ascii=False, indent=1, default=str), encoding="utf-8")
+
+
+def _verdict_v_amont() -> dict:
+    """`V-amont` (§4.7) : la liste des motifs vit dans le banc — aucun chiffre de
+    v3 n'est recopié ici, la porte se mordrait elle-même."""
+    from gate_bench import gate_v_amont
+    v, det = gate_v_amont(Path(__file__).read_text(encoding="utf-8"))
+    return {"verdict": v, **det}
+
+
+def _portes_globales(captures, analyses, modeles) -> dict:
+    """Verdicts de toutes les portes du §4.7 qui dépendent du run."""
+    a80 = corpus_a()
+    div = diversite(a80["slots"])
+    rec = partition_identite(a80["slots"])["recensement"]
+    intra, inter = paires_intra_inter()
+    cl = clusters_de_strate(a80["slots"], P_OWN)
+    der = partage_suffixe_derive(N_UNITES)
+    suff = {m: captures[m]["V-suffixe"] for m in modeles}
+    ok_suff = all(abs(suff[m][t] - der[t]) <= 1e-4
+                  for m in modeles for t in ("para1", "para2", "para3"))
+    diff = _diff_engram()
+    return {
+        "V-diversité": {"verdict": "PASS" if list(div) == list(
+            diversite_attendue(N_UNITES)) else "FAIL",
+            "observe": list(div), "attendu": list(diversite_attendue(N_UNITES))},
+        "V-puissance": {"verdict": "PASS" if cl["K"] >= k_requis() else "FAIL",
+                        "K": cl["K"], "K_requis": k_requis(),
+                        "decision_AUC": enonce_robuste_auc()},
+        "V-paires": {"verdict": "PASS" if (len(intra) == N_INTRA_ATTENDU
+                                           and len(inter) == N_INTER_ATTENDU
+                                           and rec["P-both"] == 0) else "FAIL",
+                     "n_intra": len(intra), "n_inter": len(inter),
+                     "recensement": rec},
+        "V-suffixe": {"verdict": "PASS" if ok_suff else "FAIL",
+                      "observe_par_modele": suff,
+                      "derive": {t: der[t] for t in ("para1", "para2", "para3")}},
+        "V-plat": {m: analyses[m]["V-plat_contraste"] for m in modeles},
+        "V-plat_H": {m: analyses[m]["V-plat_H"] for m in modeles},
+        "V-bord": {m: {"contraste": analyses[m]["V-bord_contraste"],
+                       "H": analyses[m]["V-bord_H"]} for m in modeles},
+        "V-λ₁": {m: analyses[m]["V-lambda1"] for m in modeles},
+        "V-bandes": {"verdict": "PASS", "note": "vérifiée par le banc et les "
+                     "tests CPU (partition exhaustive, bords, précédence D)"},
+        "V-source": {"verdict": "PASS" if all(c["support"] == "PDF" and
+                                              c["source_primaire"]
+                                              for c in CITATIONS) else "FAIL",
+                     "n_citations": len(CITATIONS)},
+        "V-amont": _verdict_v_amont(),
+        "V-hooks": {"verdict": ("PASS" if all(
+            captures[m]["V-hooks"] == "PASS" for m in modeles)
+            and diff.strip() == "" else "FAIL"),
+            "hooks_restants": {m: {v: d["hooks_restants"] for v, d
+                                   in captures[m]["variantes"].items()}
+                               for m in modeles},
+            "git_diff_engram": diff.strip(), "M_instanciee": False},
+        "V-1pass": {"verdict": "PASS" if all(captures[m]["V-1pass"] == "PASS"
+                                             for m in modeles) else "FAIL",
+                    "forwards": {m: captures[m]["forwards"] for m in modeles}},
+        "V-L": {m: {"verdict": captures[m]["V-L"], "L": captures[m]["L"],
+                    "attendu": captures[m]["L_attendu"]} for m in modeles},
+        "V-hash": {m: {"verdict": captures[m]["V-hash"],
+                       "avant": captures[m]["sha256_avant"],
+                       "apres": captures[m]["sha256_apres"]} for m in modeles},
+    }
+
+
+def _ecrire_csv(out: Path, analyses, modeles):
+    lignes = ["modele,metrique,couche,valeur,ic_bas,ic_haut,N"]
+    for m in modeles:
+        a = analyses[m]
+        c = a["couloir"][P_OWN]
+        e = a["couloir"][P_ENT]
+        lignes += [
+            f"{m},AUC_max,{a['l_contrast']},{a['P-A']['max_AUC']:.6f},"
+            f"{a['P-A']['IC']['bas']:.6f},{a['P-A']['IC']['haut']:.6f},{a['n_intra']}",
+            f"{m},delta_R1_P-own,{c['l_star_delta_R1']},{c['delta_R1_observe']:.6f},"
+            f"{c['IC_delta_R1'][0]:.6f},{c['IC_delta_R1'][1]:.6f},{c['K']}",
+            f"{m},R1_36_P-own,{c['l_star_delta_R1']},"
+            f"{c['R1_36_observe_a_l_star']:.6f},"
+            f"{c['IC_R1_36'][0]:.6f},{c['IC_R1_36'][1]:.6f},{c['K']}",
+            f"{m},R1_36_P-ent,{e['l_star_delta_R1']},"
+            f"{e['R1_36_observe_a_l_star']:.6f},"
+            f"{e['IC_R1_36'][0]:.6f},{e['IC_R1_36'][1]:.6f},{e['K']}",
+            f"{m},H_min,{a['l_H']},{a['H'][a['l_H']]:.6f},,,{N_A}",
+            f"{m},lambda1_a_l_H,{a['l_H']},{a['lambda1'][a['l_H']]:.6f},,,{N_A}",
+        ]
+        for k, v in a["planchers"]["AUC"].items():
+            lignes.append(f"{m},plancher_AUC_{k},,{v:.6f},,,")
+    (out / "summary.csv").write_text("\n".join(lignes) + "\n", encoding="utf-8")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--model", default="gpt2", choices=list(MODELES))
     ap.add_argument("--variante", default="a", choices=list(VARIANTES))
     ap.add_argument("--out", default=str(ROOT / "experiments" / "results"
                                          / "layer-profile"))
+    ap.add_argument("--mode", default="une_variante",
+                    choices=("une_variante", "tout"),
+                    help="`tout` = les 12 forwards du §9 + l'analyse complète")
+    ap.add_argument("--b", type=int, default=B_BOOT,
+                    help="B du bootstrap et des permutations (§7 : 10 000)")
     ap.add_argument("--go", action="store_true",
                     help="exigé pour toute mesure : le protocole est en PROPOSE "
                          "tant que le banc n'est pas à E = 0")
@@ -1277,9 +2309,12 @@ def main() -> int:
               "pré-enregistrement (banc à E = 0) n'est pas franchie.")
         return 2
 
+    if args.mode == "tout":
+        rap = run_complet(Path(args.out), b_boot=args.b)
+        return 0 if not rap.get("arret") else 3
+
     import torch
     from transformers import AutoModelForCausalLM, AutoTokenizer
-    from engram.cortex import _find_blocks          # LECTURE SEULE
 
     t0 = time.time()
     dispo = torch.cuda.is_available()
@@ -1294,7 +2329,7 @@ def main() -> int:
     dtype = torch.float16 if device.type == "cuda" else torch.float32
     model = AutoModelForCausalLM.from_pretrained(args.model, dtype=dtype)
     model.to(device).eval().requires_grad_(False)
-    blocks = _find_blocks(model)
+    blocks = _blocs_du_modele(model)
     L = len(blocks)
     verdict_L = "PASS" if L == L_ATTENDU[args.model] else "FAIL"
     print(f"L (config) = {L} ; attendu {L_ATTENDU[args.model]} → V-L {verdict_L}")
