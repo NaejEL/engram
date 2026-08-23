@@ -119,9 +119,11 @@ par construction vérifiable ; et l'instrument I2, appliqué à ce matériau, re
 décisionnel sur la primaire 2.**
 
 **Antipode explicite (D13)** : au moins une porte de génération est **insatisfiable** (le banc le
-montre, à coût CPU, avant tout GPU), **ou** la primaire 2 rend `C-ind` — auquel cas la conclusion
-gravée est *« indécidable ICI, matériel ou `K_eff` insuffisant »*, la suite est **« augmenter la
-résolution »**, et **jamais** « conclure prudemment ».
+montre, à coût CPU, avant tout GPU), **ou** la primaire rend `C-ind` — auquel cas la conclusion
+gravée est *« indécidable ICI, matériel ou `K_eff` insuffisant »* et **jamais** « conclure
+prudemment ». **La SUITE, elle, n'est pas unique** : elle se lit au **§6.G**, en fonction de la
+classe du calibrateur (défaut D7 de l'audit — la suite inconditionnelle « augmenter la résolution »
+écrite ici était **périmée par la scission 0-71** et n'avait pas été amendée).
 
 ### Vocabulaire interdit (§2, étendu)
 
@@ -413,15 +415,33 @@ chacune ⇒ demi-largeur ×1.41 **plus** Bonferroni ×4 ⇒ régime du bin dur.
 **Pré-évaluation obligatoire des TROIS maillons, AVANT la classification ORD (défauts 0-72 et
 0-76)** — chaque maillon est jugé en **quatre états**, jamais en ternaire naïf :
 
-| État | Condition sur l'IC de permutation | Routage |
-| --- | --- | --- |
-| `+` | strictement positif | poursuit vers la classification |
-| `−` | strictement négatif | poursuit vers la classification |
-| **`0-résolu`** | `IC ⊂` couloir de résolution, **bornes exclues** | poursuit vers la classification |
-| **`ind`** | IC plus large que le couloir | **route immédiatement vers `ORD-ind`** |
+**Ordre d'évaluation gravé PAR MAILLON (défaut D2 de l'audit), calqué sur le calibrateur** — la
+première condition satisfaite emporte l'état ; **`ind` est défini par COMPLÉMENTATION et évalué en
+DERNIER** :
 
-**Règle de routage gravée** : *tout maillon dont le zéro n'est pas résolu envoie la classification
-entière en `ORD-ind`.* Elle est la transposition **au niveau du maillon** de la distinction
+| Rang | État | Condition sur l'IC de permutation |
+| --- | --- | --- |
+| 1 | `+` | `IC_inf > 0` |
+| 2 | `−` | `IC_sup < 0` |
+| 3 | **`0-résolu`** | `IC ⊂ [−κ, +κ]` (couloir de résolution) |
+| 4 | **`ind`** | **tout le reste** |
+
+**`κ` = couloir de résolution du test de permutation intra-tige — CONSTANTE À GRAVER PAR `lab-math`
+(§12-Q-D3) avant scellement.** Elle est aujourd'hui **absente du protocole** : c'est le défaut D3 de
+l'audit, et il est **bloquant** — sans `κ`, la frontière `ORD-0` / `ORD-ind`, dont la création était
+tout l'objet du correctif 0-76, repose sur un seuil inexistant, et le cas de banc « `0-résolu`
+distinct de `ind` » (§10) est **inconstructible**.
+
+*Pourquoi cet ordre et pas l'autre* : dans la version précédente, `ind` était défini **positivement**
+(« IC plus large que le couloir ») **et évalué en premier** ⇒ `IC = [0.20, 0.60]`, c'est-à-dire un
+**effet fort**, routait en `ORD-ind`, vidant `ORD-1` et `ORD-4` — **le mode de vacuité 0-47, dans la
+classe qui porte la seule issue positive**. Et `IC = [0.01, 0.05]` dans un couloir `[−0.10, 0.10]`
+était **à la fois `+` et `0-résolu`**, sans ordre pour trancher, alors que les deux verdicts sont
+opposés. Le calibrateur (§4.4) évitait déjà le piège en testant `IC_inf > 0` **avant** le corridor et
+en définissant `N-ind` par complémentation ; la table des maillons faisait l'inverse.
+
+**Règle de routage gravée** : *tout maillon en état `ind` envoie la classification entière en
+`ORD-ind`.* Elle est la transposition **au niveau du maillon** de la distinction
 `N-a`/`N-ind` que le protocole impose partout ailleurs — sans elle, `ORD-2` prononcerait « retour au
 matériau » sur ce qui n'est **qu'un manque de résolution** (défaut 0-76).
 
@@ -431,18 +451,39 @@ pré-évaluation, puisque le `0-résolu` en sort désormais avant : défaut 0-76
 
 | Classe | Condition sur (M1, M2, M3) | # cellules / 27 | Verdict gravé | Suite gravée |
 | --- | --- | --- | --- | --- |
-| **ORD-1** | (+, +, +) | 1 | chaîne complète `S3 > S2 > S1 > S0` | les deux facteurs sont instanciés et ordonnés |
-| **ORD-2** | (0, +, 0) — **issue modale** | 1 | **« le facteur domaine n'a pas été instancié — retour au matériau »** | **JAMAIS** « le token domine, comme prédit » (défaut 0-56) |
+| **ORD-1** | `M2 = +`, **`M3 = +`**, `M1 = +` | 1 | chaîne complète `S3 > S2 > S1 > S0` | les deux facteurs sont instanciés et ordonnés |
+| **ORD-2** | `M2 = +`, **`M3 ≤ 0`** (c'est-à-dire `M3 ∈ {−, 0-résolu}`), tout `M1` — **contient l'issue modale `(0, +, 0)`** | **6** | **« le facteur domaine n'a pas été instancié — retour au matériau »** | **JAMAIS** « le token domine, comme prédit » (défaut 0-56) |
 | **ORD-3** | `M2 = −` (tout M1, M3) | 9 | **le domaine domine la tige** ⇒ géométrie **sémantique**, `C5` insuffisante | retour au banc ; **la mesure ne s'interprète pas** |
 | **ORD-0** *(nouvelle, défaut 0-76)* | `M2 = 0-résolu` (tout M1, M3) | 9 | **l'information de tige N'ATTEINT PAS la capture** — diagnostic **opposé** à ORD-3 : là le domaine écrase la tige, ici la tige n'arrive pas | **même SUITE qu'ORD-3** (arrêt de l'interprétation représentationnelle), **verdict distinct** : la cause est le **locus de capture**, pas la géométrie ⇒ le chantier suivant déplace la capture, il ne change pas le pool. *Et **jamais** « augmenter la résolution » : le zéro est résolu.* |
-| **ORD-4** | `M2 = +`, (M1 = + **ou** M3 = +), hors ORD-1 / ORD-2 | 7 | domaine instancié, chaîne incomplète | rapporter le maillon manquant ; pas d'ordre global |
+| **ORD-4** | `M2 = +`, **`M3 = +`**, `M1 ∈ {−, 0-résolu}` | **2** | domaine instancié, chaîne incomplète | rapporter le maillon manquant ; pas d'ordre global |
 | **ORD-ind** | **tout maillon en état `ind`** (règle de routage ci-dessus) | hors espace résolu | **« ordre indécidable ICI »** | **augmenter la résolution** — *jamais « retour au matériau »* |
 
-*Exhaustivité de l'espace résolu : ORD-1 (1) + ORD-2 (1) + ORD-3 (9) + **ORD-0 (9)** + ORD-4 (7)
-= **27**. ✓ `ORD-ind` absorbe tout ce qui sort de l'espace résolu. **Exclusivité** : les quatre états
-de chaque maillon sont mutuellement exclusifs par construction, et le routage `ind` est évalué en
-premier. **Aucune classe ne partage son verdict avec une autre** — vérification demandée par le PI à
-la gate de scellement, exécutée, et c'est elle qui a produit `ORD-0`.*
+**Structure du bloc `M2 = +` (9 cellules), après correctif D1/D6 de l'audit** — il est découpé par
+l'état de **M3**, qui est le **contrôle de manipulation de `C7`** :
+
+| Sous-bloc | Cellules | Classe |
+| --- | --- | --- |
+| `M3 = +` (domaine instancié) **et** `M1 = +` | 1 | **ORD-1** |
+| `M3 = +` **et** `M1 ∈ {−, 0-résolu}` | 2 | **ORD-4** |
+| **`M3 ≤ 0`** (le contrôle de manipulation dit que le domaine **n'est pas** instancié), tout `M1` | **6** | **ORD-2** |
+
+*Ce découpage ferme **deux** défauts d'un coup.* **D1** : l'ancienne condition d'`ORD-4` portait
+`(M1 = + ou M3 = +)` et ne couvrait donc que **4** cellules, laissant `(−,+,−)`, `(−,+,0)` et
+`(0,+,−)` **orphelines** — sans classe, et non absorbées par `ORD-ind` puisque aucun maillon n'y est
+en état `ind`. **D6** : `ORD-4` gravait « domaine **instancié** » pour `(+,+,−)` et `(+,+,0)`, alors
+que l'antipode de M3 grave que `M3 ≤ 0` ⇒ *« `C7` n'a pas instancié le domaine dans la géométrie ⇒
+M1 perd son objet, plan publié en 1 × 2 »* — **deux textes gravés incompatibles sur la même
+cellule**. En subordonnant le bloc à M3, le diagnostic d'`ORD-2` devient ce qu'il était déjà : la
+lecture correcte de **toutes** les cellules à domaine non instancié, dont `(0, +, 0)` n'était qu'un
+cas particulier.
+
+*Exhaustivité de l'espace résolu : ORD-1 (1) + ORD-4 (2) + ORD-2 (6) + ORD-3 (9) + **ORD-0 (9)**
+= **27**. ✓ — recompté **à partir des conditions écrites**, pas du total annoncé.* `ORD-ind` absorbe
+tout ce qui sort de l'espace résolu (au moins un maillon en état `ind`). **Exclusivité** : les quatre
+états de chaque maillon sont mutuellement exclusifs **par l'ordre d'évaluation gravé ci-dessus**, et
+les cinq classes de l'espace résolu sont disjointes par `M2` puis par `M3`. **Aucune classe ne
+partage son verdict avec une autre** — la seule paire à **suite** commune (`ORD-3` / `ORD-0`) porte
+des **diagnostics opposés** et une frontière de chantier écrite.
 
 **Exactitude de la permutation intra-tige sous `C7` (Math, Q9-iii)** : le test reste **exact**
 (`C(6,3) = 20` partitions par tige) — **c'est sa signification qui change, et c'est voulu**. Avant
@@ -487,7 +528,7 @@ profondeur est la vraie M4 — l'information de tige n'arrive que par l'attentio
 | **`V-plafond`** *(remplace `V-lex`)* | le rapport **publie** `36/37` et `1/6` **en fractions**, avec leur dérivation, **le plancher stratifié par domaine**, **et** la phrase gravée : *« la primaire 1 ne peut, à elle seule, distinguer un adressage représentationnel d'un transcript lexical ; cette distinction n'est pas au périmètre de ce run »*. Porte de **schéma** : présence obligatoire des champs, **absence** de tout terme du vocabulaire interdit (x) et (xiii) | terme interdit détecté, constante absente, **ou plancher poolé** ⇒ **échec du pipeline** |
 | **`V-compo`** | primaire : nulle MC seedée **exécutée et publiée avant** lecture de `D` ; `Σ_q m_q` publié ; clause de famine appliquée ; exclusion `m = 0` conforme à la déclaration | nulle simulée après lecture, ou sélection sur `m` non déclarée ⇒ **run invalide** |
 | **`V-calib`** *(gate 2)* | la primaire 1 est classée en **une et une seule** des 4 classes du §4.4 ; **aucun champ décisionnel** n'existe pour elle dans le schéma de sortie ; les deux descriptifs obligatoires sont présents | présence d'un champ de verdict d'hypothèse, ou classe non couverte ⇒ **échec du pipeline** |
-| **`V-ord`** | classification en **une et une seule** des 5 classes ORD ; un cas synthétique par classe | classe non couverte ou chevauchement ⇒ échec |
+| **`V-ord`** | classification en **une et une seule** des **6** classes ORD (`ORD-1`, `ORD-2`, `ORD-3`, `ORD-0`, `ORD-4`, `ORD-ind`) ; un cas synthétique par classe. **Plus** : les trois maillons sont classés par **l'ordre gravé** du §4.6, `ind` par complémentation | classe non couverte ou chevauchement ⇒ échec |
 | **`V-leak`** | `B0 ≤ 0` (IC de permutation) | `B0 > 0` ⇒ **arrêt**, aucune interprétation de M1/M2/M3 |
 | **`V-dtype` (v2)** | bf16 épinglé (D21) ; `m = 60` états fp32 ; `δ̂ = max\|Δcos\|` ; **deux marges** : (i) **marge de tête** — `0` requête à marge `< 2δ̂` ; (ii) **marge à la coupure `T`** — `0` concurrent à `\|S_i − T\| < 2δ̂` (condition E4) | **> 1 TIGE touchée ⇒ `INCONCLUSIF-précision`** — l'unité est le **cluster**, pas la famille : « famille » laisserait passer **deux familles de la même tige**, c'est-à-dire un cluster entier corrompu, sans déclencher (Math, Q5). **Repli fp32 = chemin nominal**, pas exception |
 | **`V-freq` (v2)** | serpentin sur **rang de fusion de la tige** (gpt2), **borne exacte par énumération** sur les 3 tokenizers ≤ **0.15** ; **étendu** : appariement **au tirage** des bandes de fréquence des **suffixes** entre unités pontées et non pontées **et** entre les deux familles d'une tige ; **vérification supplémentaire au niveau suffixe intra-famille** | **aucun test d'homogénéité nulle part** (0-41) |
@@ -601,7 +642,8 @@ portée que C. Toute conjonction passe par `V-joint`.
 
 **D. Ce qui tue `H_mat`** : `C5` insatisfiable ; **ou `C7` violée** (⇒ M1/M3 retirées, plan publié en
 1 × 2) ; **ou plancher/nulle poolés** (0-67) ; ou `C6` vacuée ; ou **primaire en `C-ind`** avec
-`V-dtype` PASS (⇒ le matériau ne suffit pas ; suite = **augmenter la résolution**).
+`V-dtype` PASS (⇒ le matériau ne suffit pas ; **suite selon le §6.G, jamais « augmenter la
+résolution » par défaut** — défaut D7 de l'audit).
 
 **E. Bin dur** : descriptif à ce `N` ; aucune formulation ne le cite comme évidence. *(D18 : `E`
 vaut sur le banc seul, pas sur le run.)*
@@ -618,11 +660,18 @@ accusé, pas le cortex** ⇒ arrêt, retour au banc.
 **`C-ind` d'office**. La suite dépend de la **cause**, discriminée **sans mesure supplémentaire** par
 le calibrateur — c'est précisément sa fonction :
 
-| Cause | Signature | Suite gravée |
+**Le discriminant est la CLASSE du calibrateur, jamais une dichotomie « bas / haut » de `ΔR1_inv`**
+(défaut D4 de l'audit : cette dichotomie n'avait **ni seuil ni correspondance** avec les quatre
+classes, laissant les cellules conjointes `(N-a, C-ind)` et `(N-ind, C-ind)` **sans aucune suite
+lisible**). Les quatre cellules conjointes sont donc énumérées, et **aucune n'est laissée muette** :
+
+| Classe du calibrateur | Cause | Suite gravée |
 | --- | --- | --- |
-| **famine par PUISSANCE** | `Σm` faible **et** `ΔR1_inv` bas | **« augmenter la résolution »** |
-| **famine par SATURATION** | `Σm` faible **et** `ΔR1_inv` haut | **« réduire la dominance de surface »** (autre locus de capture, autre position, autre instrument). *« Augmenter la résolution » serait **faux** : ajouter des tiges ne créera pas d'intrusions.* |
-| **famine PARTIELLE** (défaut 0-74) | `Σ_q m_q ≥ 60` **mais** `K_eff^support ≤ 8` | **« le support s'est effondré sur une minorité de clusters »** ⇒ la suite se lit sur la **distribution des `m_q`**, publiée : concentration sur peu de tiges ⇒ **le matériau n'est pas homogène**, retour au banc ; étalement avec beaucoup de `m_q = 0` ⇒ **saturation**, même suite que ci-dessus. **Jamais** « augmenter la résolution » par défaut |
+| **`N-b`** | **famine par SATURATION** — l'état encode bien la surface, la cible se classe bien, `m_q` s'effondre | **« réduire la dominance de surface »** (autre locus de capture, autre position, autre instrument). *« Augmenter la résolution » serait **faux** : ajouter des tiges ne créera pas d'intrusions.* |
+| **`N-a`** | **famine par PUISSANCE** — l'écart à la clé nulle est indécelable à résolution suffisante | **« augmenter la résolution »** |
+| **`N-ind`** | **ni la question ni l'instrument ne sont résolus** | **« re-qualifier l'instrument AVANT de re-mesurer »** — *le discriminant lui-même est indécidable, donc aucune suite sur la question n'est prononçable* |
+| **`INVALIDE-INSTRUMENT`** | la chaîne de mesure est en cause | **arrêt** (§6.F-bis) ; aucune lecture de la primaire |
+| **famine PARTIELLE** (défaut 0-74), *quelle que soit la classe* | `Σ_q m_q ≥ 60` **mais** `K_eff^support ≤ 8` | **« le support s'est effondré sur une minorité de clusters »** ⇒ la suite se lit sur la **distribution des `m_q`**, publiée : concentration sur peu de tiges ⇒ **matériau non homogène**, retour au banc ; étalement avec beaucoup de `m_q = 0` ⇒ **saturation**, suite de la ligne `N-b`. **Jamais** « augmenter la résolution » par défaut |
 
 **G-bis. Issue conjointe modale, formulation gravée AVANT le run (défaut 0-70)** : les deux maillons
 sont **en tension par construction** — mieux l'état encode la surface, mieux la cible se classe, plus
@@ -630,6 +679,13 @@ sont **en tension par construction** — mieux l'état encode la surface, mieux 
 conjointement la plus probable**, et elle **ne peut en aucun cas** se lire comme un demi-succès.
 Formulation obligatoire, à recopier telle quelle : *« l'instrument est sain, la question posée est
 restée sans réponse »*.
+
+**Portée STRICTE de cette phrase (défaut D7 de l'audit)** : elle est licenciée **par la seule
+cellule conjointe `N-b × C-ind`**. En `(N-a, C-ind)` et en `(N-ind, C-ind)`, la santé de
+l'instrument **n'est pas établie** — elle n'est pas non plus réfutée, ce qui exigerait
+`INVALIDE-INSTRUMENT` — et la phrase serait donc **fausse**. Ces deux cellules ont leur suite propre
+au §6.G ; **aucune ne récite G-bis**. *Sans cette restriction, un opérateur en `(N-a, C-ind)` n'avait
+que cette phrase à recopier.*
 
 **H. Fuite de couche 0** : `B0 > 0` ⇒ **arrêt**, aucune interprétation d'ordre.
 
@@ -748,8 +804,9 @@ M2, la scission de `C-ind` — sont des ajouts de banc à **coût nul**, tous in
    forme corrigée du §4.6, ou récuses-tu la correction ?** *(Sans signature, `V-leak` sort du
    protocole et M1/M2/M3 perdent leur garde-fou de fuite.)*
 2. **M3** (`S1 > S0`) : « signable sous A2 ». A2 est adoptée en `C7`. **Signes-tu M3 ?**
-3. **Partition ORD** à 5 classes (§4.6, `ORD-2` = « domaine non instancié — retour au matériau ») :
-   répond-elle à ton A1 ? Y manque-t-il une issue que tu juges probable ?
+3. **Partition ORD** à **6** classes (§4.6, `ORD-2` = « domaine non instancié — retour au
+   matériau », désormais **6 cellules** : tout le bloc `M2 = +` à `M3 ≤ 0`) : répond-elle à ton A1 ?
+   Y manque-t-il une issue que tu juges probable ?
 4. **`P-N1` retirée du décisionnel** : Math démontre la non-monotonicité du contraste inter-pools.
    **Le contestes-tu ?** Si oui, nomme un régime où le signe est déterminé.
 5. **`V-surprise`** : les **bandes de NLL** doivent être gravées **avant génération**. Donne-les
