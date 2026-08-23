@@ -76,6 +76,17 @@ le défaut était fatal**, pas seulement ce qu'il était.
 | **0-66** | **La bande `M` redéfinie était VACUEUSEMENT FRANCHISSABLE** — distinct de 0-47, qui la disait *vide*. Une fois `M` reposée sur `ΔR1_inv` seul, elle redevient atteignable ; mais **le plancher à 0 forward est une borne INFÉRIEURE du canal lexical, pas une borne supérieure**. I2 l'a mesuré : l'état encode la surface **mieux** que le comptage de tokens brut (le cosinus est dominé par la forme). Donc sous `C5`, où la cible est l'unique candidat à partage d'entité, **un `ΔR1_inv` même au-dessus du plancher reste attribuable à un bon encodage lexical de l'état, sans un gramme d'identité**. `V-plafond` filtre le cas trivial ; **elle ne tranche pas le canal**. | **Fatal à la seule issue positive de la primaire 1.** Le seul positif que `M` pouvait produire était **ininterprétable** : une bande dont le verdict confond deux états du monde (« identité » et « lexical bien encodé ») n'est pas une bande — c'est le test que le projet s'est donné avec `N-a`/`N-b`, appliqué à `M`. Et son verdict dépouillé l'avouait lui-même : *« le canal n'est pas tranché »* est **la définition d'un descriptif, pas d'une décision**. Miroir exact de la vacuité refusée pour S-7 et `C6` — refusée cette fois alors qu'elle aurait été **en faveur** de l'hypothèse. |
 | **0-67** | **Planchers et nulles poolés sur des viviers sémantiquement typés.** `C7`/A2 **crée délibérément** une corrélation domaine ↔ contenu — c'est son but. Mais cette corrélation est un **canal pour tout ce qui lit le contenu**, à commencer par le plancher lexical à 0 forward. | **Fatal à M1/M3 sous A2 elle-même** : poolés, un sous-vivier sémantiquement typé peut **déplacer le plancher d'un domaine sans toucher l'autre**, et une différence inter-domaines deviendrait lisible **comme effet** là où c'est le **vivier qui parle**. Le remède coûte une ligne de spec : **planchers stratifiés par domaine, nulles de M1/M3 calculées par domaine et jamais poolées, cardinal D24-b publié par sous-vivier**. *Sixième occurrence de la loi de migration (D26) — la difficulté chassée du facteur (pas de porteur) s'est logée dans le porteur (le vivier contraint), et elle a été attrapée **avant l'adoption**.* |
 
+### 0-68 … 0-73 — Relevés au tour de re-signature (Math et Neuro), avant banc
+
+| # | Défaut | Pourquoi il était fatal |
+| --- | --- | --- |
+| **0-68** | **Les deux partitions n'étaient pas EXCLUSIVES** (Math). Calibrateur : `IC = [0.01, 0.09]` satisfait **à la fois** `N-b` (`IC_inf > 0`) et `N-a` (`IC ⊂ [−τ, τ]`) ; `[−0.10, −0.01]` satisfait à la fois `INVALIDE-INSTRUMENT` et `N-a`. Même chevauchement sur les bandes de la primaire (`C+` ∩ `C-0`, `C−` ∩ `C-0`). | **D18 exige exhaustif ET exclusif.** L'exhaustivité avait été vérifiée (27 cellules ORD), le **recouvrement** ne l'avait pas été. Une observation tombant dans deux classes reçoit **deux verdicts gravés contradictoires** — et, en pratique, celui que l'on préfère. Correctif : **ordre d'évaluation gravé** + cas de banc « IC petit et strictement positif ». |
+| **0-69** | **La réserve était structurellement inutilisable pour le décisionnel** (Math). Substituer une famille pontée par une famille de réserve (**toutes à tige simple**) casse trois invariants d'un coup : `m₁` (5 → 2 pour l'entrante **et** pour la partenaire orpheline), la **cellule S2** de la tige, et l'homogénéité des clusters. La règle « substituer les deux familles de la tige » ne sauve rien : **la réserve n'a que des tiges simples**. | **Fatal à l'amendement pré-enregistré à la gate 1** — « la marge déplacée dans le matériau plutôt que dans `K` » reposait sur un objet **incapable de jouer ce rôle**. Correctif : substitution pontée → simple **INTERDITE** ; réparation au niveau **unité** (suffixe du même sous-vivier, re-qualification complète) ; la réserve devient un **stock de suffixes qualifiés par sous-vivier**, pas des familles. |
+| **0-70** | **L'issue conjointe la plus probable n'avait aucune formulation gravée** (Neuro). Sous 0-46, mieux l'état encode la surface, mieux la cible se classe, **donc plus `m_q` est petit**, donc plus la primaire s'affame (0-61). ⇒ **plus le calibrateur sort beau, plus la primaire risque `C-ind`** : les deux maillons sont **en tension par construction**, et « calibrateur `N-b` + primaire `C-ind` » est l'issue conjointement modale. | **Deuxième occurrence du mode 0-56** (l'issue modale sans conséquence gravée), cette fois **au niveau du couple de maillons** et non d'une chaîne. Sans ligne écrite avant, elle se lirait comme un demi-succès. Formulation gravée : *« l'instrument est sain, la question posée est restée sans réponse »*. |
+| **0-71** | **`C-ind` par famine avait une suite unique pour deux causes opposées** (Neuro). Famine **par puissance** (`Σm` faible, `ΔR1_inv` bas) ⇒ « augmenter la résolution » est correct. Famine **par saturation** (`Σm` faible, `ΔR1_inv` haut) ⇒ « augmenter la résolution » est **faux** : ajouter des tiges ne créera pas d'intrusions. | **Une suite gravée fausse est pire qu'une suite absente** : elle envoie le projet dépenser un tour entier dans la mauvaise direction. Le discriminant existe **sans mesure supplémentaire** — c'est le calibrateur, dont c'est exactement la fonction. |
+| **0-72** | **Le maillon M2 confondait un `0` résolu et un `0` par IC large** (Neuro) — la distinction `N-a`/`N-ind` que le protocole impose partout ailleurs, **non appliquée au niveau du maillon**. Conséquence : `(0, 0, 0)` tombait en `ORD-ind`, dont la suite gravée est « augmenter la résolution ». | **Faux dans le cas résolu** : si M2 est nul à résolution suffisante, **l'information de tige n'atteint pas la capture** et aucun `K_eff` ne la fera apparaître. La porte de sanité M2 devait mordre ; `ORD-ind` l'en empêchait. |
+| **0-73** | **La composition en domaines du pool `P2` n'était pas spécifiée** (Math). Sous encodage de domaine pur, la fraction attendue de tige-partagés parmi les gagnants vaut `(2p_s + 3p_d)/(14p_s + 22p_d)`, **bornée dans [0.136, 0.143] contre 5/36 = 0.139 sous la nulle** — biais ≤ 0.004 par gagnant — **mais uniquement si `k = 12` concurrents même-domaine non-tige**. **Et** : une statistique intra-tige à `t−1` produit des cosinus **dégénérés** (états bit-identiques) qui sortent en `1.0` exact ou en NaN selon l'implémentation. | **Deux quasi-accidents.** (i) L'équilibre qui neutralise le canal de `C7` dans la primaire **n'était pas structurel** : il dépendait d'un tirage non contraint ⇒ septième occurrence de D26 **après** mesure au lieu d'avant. (ii) Le cas `1.0` exact **échappe à la clause NaN (B)** : publier le cardinal 14 ne suffisait pas, il faut une **porte** (`V-t1`). |
+
 ---
 
 ## 1. Question
@@ -190,8 +201,15 @@ la primaire 1 est le **calibrateur du système**, la primaire 2 **porte seule la
 **Primaire (ex-primaire 2) — composition des intrusions, pool surface-apparié, nulle
 hypergéométrique exacte.**
 
-Pool `P2` = 36 concurrents **contenant les 5 tige-partagés** (2 co-famille + 3 famille partenaire)
-et 31 non-partagés. Pour chaque requête `q` :
+**Composition du pool `P2`, gravée (défaut 0-73)** : 36 concurrents = **5 tige-partagés** (2
+co-famille + 3 famille partenaire) + **31 non-partagés, dont exactement 12 même-domaine et 19
+autre-domaine** — constant sur toutes les requêtes, seedé, **gelé**. Cette composition n'est pas un
+détail de tirage : elle **apparie les compositions de domaine des deux classes** (2/5 = 0.400 contre
+12/31 = 0.387), ce qui borne le biais du canal `C7` à **≤ 0.004 par gagnant** (Math, dérivé), soit
+≤ 0.07 sur `D̄` à `m = 18` — **un ordre de grandeur sous `ε`**. **La borne dérivée est publiée avec
+le résultat.** Sans cette ligne, l'équilibre serait un **accident du tirage**.
+
+Pour chaque requête `q` :
 
 - `m₁ = 5` (tige-partagés dans le pool, **constant par construction**) ;
 - `m(q)` = nombre de concurrents **battant strictement** la cible (mid-rank sous `C4`) ;
@@ -222,6 +240,17 @@ exclusion est **pré-déclarée**, et **aucune autre sélection sur `m` n'est pe
 nulle ; **une conformité ne licencie jamais « adressage non lexical »**. Phrase à recopier telle
 quelle dans le rapport (§4.9).
 
+**Descriptif obligatoire attaché (Neuro, coût nul)** : publier la courbe **`X_q` en fonction de
+`m_q`**. `D` somme des régimes dont l'effet attendu diffère structurellement — l'excès doit être
+**nul aux deux bords** (`m → 0` : personne ne bat la cible ; `m → 36` : tout le monde la bat) et
+**maximal à `m` intermédiaire**. **Cette forme en cloche est la signature du décrément lure** ; une
+conformité de `D` **sans** cette forme (excès plat, ou concentré à `m` extrême) est **signalée comme
+non conforme au mécanisme invoqué**. Descriptif : aucune décision n'en dépend.
+
+**Ordre d'évaluation des bandes, gravé (défaut 0-68 — exclusivité D18)** :
+**famine → `C+` → `C−` → `C-0` → `C-ind`**. La première condition satisfaite emporte la
+classification ; aucune observation ne peut recevoir deux verdicts.
+
 ### 4.4 Primaire 1 — CALIBRATEUR, non décisionnelle *(décision PI, gate 2)*
 
 `ΔR1_inv = R1(variante correcte de la même unité) − R1(clé nulle appariée)`, rang parmi **37**
@@ -248,13 +277,25 @@ d'invalidation, **chacune avec son cas synthétique au banc, frontière `N-ind` 
 | **`N-b`** | `IC_inf > 0` | l'état porte **au moins** de la surface encodée — *formulation (xiii) obligatoire* |
 | **`N-a`** | `IC ⊂ [−τ, +τ]` | **pas d'écart décelable, à résolution suffisante** |
 | **`N-ind`** | tout le reste | **« indécidable ICI, matériel ou `K_eff` insuffisant »** ⇒ **« augmenter la résolution »** — *jamais un demi-`N-a`* |
-| **`INVALIDE-INSTRUMENT`** | `ΔR1_inv` **sous la clé nulle elle-même** (`IC_sup < 0`) | **c'est l'INSTRUMENT qui est accusé, pas le cortex** : si même le lexical échoue sur `C5`, la chaîne de mesure est en cause ⇒ arrêt, retour au banc |
+| **`INVALIDE-INSTRUMENT`** | `ΔR1_inv` **sous la clé nulle elle-même** (`IC_sup < 0`) | **c'est l'INSTRUMENT qui est accusé, pas le cortex** : si même le lexical échoue sur `C5`, la chaîne de mesure est en cause ⇒ arrêt, retour au banc. **α propre déclaré (Math) : sous encodage exactement nul, `P(IC_sup < 0) ≈ 0.025`** — l'accusation de l'instrument est portée à **α = 0.025**, à écrire, sinon un faux `INVALIDE-INSTRUMENT` sur 40 runs serait lu comme une panne réelle |
+
+**Ordre d'évaluation, gravé (défaut 0-68 — exclusivité D18)** :
+**`INVALIDE-INSTRUMENT` → `N-b` → `N-a` → `N-ind`**. La première condition satisfaite emporte la
+classification. *(Sans cet ordre, `IC = [0.01, 0.09]` tombait à la fois en `N-b` et en `N-a`, et
+`[−0.10, −0.01]` à la fois en `INVALIDE-INSTRUMENT` et en `N-a`.)*
 
 **Seuils gravés** : `τ = 0.15` ; IC = bootstrap de **tiges** à 95 %, `K_eff = 10`, alpha propre 0.05.
 **Dérivation de `τ`** : Math donne, à `K = 20`, demi-largeur ≈ 0.10 (effet ≈ 0, pire cas ρ = 1) ; et
 `K_eff = 10 ⇒ ×1.41` ⇒ **0.14**. Ses deux options (`τ = 0.10`, `τ = 0.12`) sont donc **toutes deux
 inatteignables** — incohérence interne remontée au §12-Q1. Arbitrage : **`τ = 0.15`**, plus petite
 valeur ronde ≥ 0.14 *(recalcul copilote : `0.229/√10 × 2 = 0.145`)*.
+**Confirmation de Math (verrou levé)** : ses valeurs 0.10 et 0.12 étaient données **à `K = 20`**,
+avant que `K_eff = 10` ne soit acquis ; **elles ne transportent pas**, et c'est son propre facteur
+×1.41 qui les périme. Recalcul complet : sd/requête `√(2·(1/37)(36/37)) = 0.229` ; SE à `K_eff = 10`,
+ρ = 1 : `0.229/√10 = 0.0724` ; demi-largeur 95 % : `1.96 × 0.0724 = 0.142`. **`τ = 0.15` confirmé.**
+**Réserve gravée** : à 10 clusters, un **bootstrap percentile sous-couvre légèrement** — la clause
+ci-dessous est **précisément** la protection et reste **non négociable**.
+
 **Clause gravée, non négociable après run** : *si l'IC sous nulle apparente déborde `τ`, le verdict
 est `N-ind`, jamais un `τ` ajusté.*
 **Zone morte déclarée en clair** : à `K_eff = 10`, tout effet vrai entre ≈ 0.15 et ≈ 0.55 sort
@@ -274,10 +315,20 @@ Sur l'IC de `D` normalisé par requête :
 | **`C-0`** | `Σ_q m_q ≥ 60`, `IC ⊂ [−ε, +ε]` | **pas de composition détectable, à résolution suffisante** | le recouvrement de tige ne rend pas un concurrent plus confusable ; **le cadre « lure » est retiré de la question représentationnelle** |
 | **`C-ind`** | tout le reste, **famine incluse** (`Σ_q m_q < 60`) | **« indécidable ICI »** | augmenter la résolution ; **jamais lisible comme absence d'effet de lure** |
 
-**`ε` (D19)** : défini **avant** le run comme la demi-largeur d'IC 95 % **de la nulle MC seedée**,
-calculée sur les `m_q` observés **avant toute lecture de `D`**, et **publiée avant**. Ordre de
-grandeur attendu (Math, scénario `m ≈ 18`) : `ε ≈ 0.66` excès par requête, ~25-30 % d'enrichissement
-relatif. Validation demandée §12-Q2.
+**`ε` (D19) — validé par Math, avec barrière exécutable et plafond gravé.** L'inférence est exacte
+**conditionnellement aux `m_q`** (conditionnement sur une statistique qui ne porte pas l'effet
+testé) : `ε` défini sur les `m_q` observés est la **résolution vraie de la nulle**, pas un
+ajustement. D19 est respectée **si et seulement si** la barrière d'information est **exécutable** :
+
+1. **Formule et seed gravées maintenant** : `ε = q₀.₉₇₅(|D̄_null|)`, MC de l'hypergéométrique **par
+   requête**, agrégée **par tiges**, `B = 10⁴` répliques, seed = `cfg.seed`.
+2. **Barrière mécanique** (porte `V-compo`) : le pipeline calcule `{m_q}`, **scelle `D`** (non
+   calculé, ou calculé et hashé sans lecture), **publie `ε`**, puis descelle. L'ordre est **vérifié
+   par le banc** ; cas échouant = `ε` publié après lecture de `D`.
+3. **Plafond numérique gravé MAINTENANT, indépendant des `m_q`** (Math, dérivé) : `Var(X|m)` est
+   maximale à `m = 18` ⇒ `18²·(5/36)(31/36)/35 = 1.107` ⇒ sd ≤ 1.052 par requête ⇒ demi-largeur
+   pire cas (ρ = 1, `K_eff = 10`) = `1.96 × 1.052/√10` ⇒ **`ε_max = 0.66` excès par requête**.
+   **Toute valeur MC au-dessus est une erreur de pipeline** — porte exécutable.
 
 ### 4.6 Partition exhaustive des ORDRES (D18)
 
@@ -289,7 +340,30 @@ Trois maillons, chacun jugé **+ / − / 0** par son **test de permutation intra
   elle, la permutation intra-tige **est la vérité du générateur**.
 - **M2** = `cos̄(S2) − cos̄(S1)` — **porte de sanité** : si `cos̄(S2) ≤ cos̄(S1)`, l'information de la
   tige **n'atteint pas la capture** ⇒ arrêt de l'interprétation représentationnelle.
-- **M3** = `cos̄(S1) − cos̄(S0)` — effet **domaine sans tige partagée**.
+- **M3** = `cos̄(S1) − cos̄(S0)` — effet **domaine sans tige partagée**. **Requalifié par son
+  signataire en CONTRÔLE DE MANIPULATION de `C7`** : une confirmation dit *« le vivier a été
+  correctement typé »*, **jamais** *« l'état encode le domaine »*. **Attendu dès la couche 0** — c'est
+  ce qui le distingue de M1 ; s'il n'apparaissait qu'en profondeur, ce serait un effet
+  représentationnel et non un effet de vivier, et cela se note. **Antipode** : `M3 ≤ 0` ⇒ les
+  sous-viviers sont **lexicalement disjoints mais pas sémantiquement cohérents** ⇒ `C7` n'a pas
+  instancié le domaine **dans la géométrie** ⇒ **M1 perd son objet**, plan publié en 1 × 2 (même
+  conséquence que `C7` violée).
+
+**Forme décisionnelle de M1 et M3 (Math, Q9-ii) — « stratifié-combiné », jamais « poolé », jamais
+« quatre tests »** : les nulles sont calculées **dans chaque strate de domaine**, et la statistique
+décisionnelle est la **somme** `Σ_domaines (observé − attendu-dans-la-strate)` — exacte comme somme
+de quantités centrées sous leurs nulles propres, et **conservant `K_eff = 10`**. Les déclinaisons
+**par domaine** sont publiées en **descriptif** : quatre M1 décisionnelles vaudraient ~5 tiges
+chacune ⇒ demi-largeur ×1.41 **plus** Bonferroni ×4 ⇒ régime du bin dur.
+
+**Pré-évaluation obligatoire de M2, AVANT la classification ORD (défaut 0-72)** — M2 est jugée en
+**trois états résolus**, pas en ternaire naïf :
+
+| État de M2 | Condition | Conséquence |
+| --- | --- | --- |
+| `+` | IC de permutation strictement positif | on poursuit vers la classification ORD |
+| **`0-résolu`** | IC ⊂ couloir de résolution, **borne exclue** | **arrêt de l'interprétation représentationnelle** — même suite que `M2 = −` (ORD-3). *L'information de tige n'atteint pas la capture ; aucun `K_eff` ne la fera apparaître.* |
+| `ind` | IC plus large que le couloir | **`ORD-ind`** |
 
 | Classe | Condition sur (M1, M2, M3) | # cellules / 27 | Verdict gravé | Suite gravée |
 | --- | --- | --- | --- | --- |
@@ -301,13 +375,39 @@ Trois maillons, chacun jugé **+ / − / 0** par son **test de permutation intra
 
 *Exhaustivité : 1 + 1 + 9 + 9 + 7 = 27. ✓ Un cas synthétique par classe au banc (§10).*
 
+**Exactitude de la permutation intra-tige sous `C7` (Math, Q9-iii)** : le test reste **exact**
+(`C(6,3) = 20` partitions par tige) — **c'est sa signification qui change, et c'est voulu**. Avant
+`C7`, cette nulle était **la vérité du générateur** (défaut 0-53) ; sous `C7`, permuter les suffixes
+entre les deux familles d'une tige **mélange deux sous-viviers**, et la nulle devient l'hypothèse
+substantielle *« l'état ne distingue pas le contenu des sous-viviers »* — exactement ce que M1 doit
+tester. **Exigence induite, à rendre explicite dans `V-freq` v2** : l'appariement des bandes de
+fréquence entre les deux familles d'une tige est un appariement **entre sous-viviers** ; il se vérifie
+**par paire de sous-viviers**, sinon **fréquence et domaine se confondent dans la permutation**.
+
 **Porte de fuite `V-leak` (M4 de Neuro, corrigée — re-signature due, §11-Q1).** Sous `C7`, la forme
 « `cos̄(S2) − cos̄(S1)` **nul** à la couche 0 » est **falsifiée par construction** : à la couche 0 le
 résiduel en `t` est l'embedding du **suffixe** ; S1 partage le sous-vivier de domaine, S2 non ⇒ la
 quantité vaut une **ligne de base `B0` prédite ≤ 0**, pas 0. Forme corrigée, conservant l'intention :
 quantité décisionnelle = **le contraste en profondeur** `[cos̄(S2) − cos̄(S1)](ℓ) − B0` ; prédiction
 `B0 ≤ 0` (IC de permutation) et croissance sur le premier tiers de la profondeur ; **antipode
-`B0 > 0` strictement ⇒ FUITE ⇒ arrêt, pas interprétation**.
+`B0 > 0` strictement ⇒ FUITE ⇒ arrêt, pas interprétation**. **SIGNÉE par lab-neuro sous cette
+forme.** *Précision d'implémentation gravée : « couche 0 » = **sortie des embeddings avant le premier
+bloc** (`hidden_states[0]`), sans ambiguïté d'indexation.*
+
+**`B0′` — détecteur de fuite SANS HYPOTHÈSE (ajout de lab-neuro, coût nul, adopté).** `B0` est un
+détecteur **faible** : sa prédiction `≤ 0` est **déjà garantie par `C7`**, donc une fuite de tige
+modérée ne peut pas la franchir. Le détecteur fort est gratuit :
+
+> **`B0′ = [cos̄(S3) − cos̄(S1)](ℓ = 0)`**, prédit **exactement 0** (IC de permutation contenant 0).
+> **Dérivation** : S3 et S1 sont **tous deux à domaine identique**, donc tirent leurs suffixes du
+> **même sous-vivier** ; ils ne diffèrent que par le partage de la **tige**, qui **n'est pas dans le
+> résiduel en `t` à la couche 0**. Toute valeur non nulle est une **fuite au sens strict** (suffixe
+> non indépendant de la tige : corrélation de bande de fréquence, de longueur de chaîne, ou de
+> sous-vivier).
+> **Antipode** : `B0′ ≠ 0` (IC de permutation excluant 0) ⇒ **FUITE ⇒ arrêt**.
+
+*C'est ce que M4 voulait dire, re-basé sur un contraste **apparié en domaine** ; et sa croissance en
+profondeur est la vraie M4 — l'information de tige n'arrive que par l'attention.*
 
 ### 4.7 Portes
 
@@ -320,15 +420,16 @@ quantité décisionnelle = **le contraste en profondeur** `[cos̄(S2) − cos̄(
 | **`V-calib`** *(gate 2)* | la primaire 1 est classée en **une et une seule** des 4 classes du §4.4 ; **aucun champ décisionnel** n'existe pour elle dans le schéma de sortie ; les deux descriptifs obligatoires sont présents | présence d'un champ de verdict d'hypothèse, ou classe non couverte ⇒ **échec du pipeline** |
 | **`V-ord`** | classification en **une et une seule** des 5 classes ORD ; un cas synthétique par classe | classe non couverte ou chevauchement ⇒ échec |
 | **`V-leak`** | `B0 ≤ 0` (IC de permutation) | `B0 > 0` ⇒ **arrêt**, aucune interprétation de M1/M2/M3 |
-| **`V-dtype` (v2)** | bf16 épinglé (D21) ; `m = 60` états fp32 ; `δ̂ = max\|Δcos\|` ; **deux marges** : (i) **marge de tête** — `0` requête à marge `< 2δ̂` ; (ii) **marge à la coupure `T`** — `0` concurrent à `\|S_i − T\| < 2δ̂` (condition E4) | **> 1 famille touchée ⇒ `INCONCLUSIF-précision`** ; **repli fp32 = chemin nominal**, pas exception |
+| **`V-dtype` (v2)** | bf16 épinglé (D21) ; `m = 60` états fp32 ; `δ̂ = max\|Δcos\|` ; **deux marges** : (i) **marge de tête** — `0` requête à marge `< 2δ̂` ; (ii) **marge à la coupure `T`** — `0` concurrent à `\|S_i − T\| < 2δ̂` (condition E4) | **> 1 TIGE touchée ⇒ `INCONCLUSIF-précision`** — l'unité est le **cluster**, pas la famille : « famille » laisserait passer **deux familles de la même tige**, c'est-à-dire un cluster entier corrompu, sans déclencher (Math, Q5). **Repli fp32 = chemin nominal**, pas exception |
 | **`V-freq` (v2)** | serpentin sur **rang de fusion de la tige** (gpt2), **borne exacte par énumération** sur les 3 tokenizers ≤ **0.15** ; **étendu** : appariement **au tirage** des bandes de fréquence des **suffixes** entre unités pontées et non pontées **et** entre les deux familles d'une tige ; **vérification supplémentaire au niveau suffixe intra-famille** | **aucun test d'homogénéité nulle part** (0-41) |
-| **`V-surprise`** | **NLL du token de capture** et **norme d'état** publiées **par strate** ; M1 rapportée **brute ET stratifiée** par bandes de NLL **gravées avant génération** (§11-Q5) | **toute repondération ou sélection après lecture ⇒ run invalide** |
+| **`V-surprise` (bandes gravées)** | **NLL du token de capture** (scalaire, cortex gelé, teacher-forcing) et **norme d'état** publiées **par strate**. **Unité de bande = la PAIRE**, par la **moyenne des NLL de ses deux membres** *(M1 est une statistique de paire ; stratifier par membre rendrait les paires inter-bandes indéfinies et sortirait ~2/3 du matériau)*. **3 bandes** — dérivé, non préféré : à `K_eff = 10`, quatre bandes laisseraient ~2,5 tiges par bande, **0-52 rejoué à l'étage de la stratification**. **Coupures : tertiles calculés PAR MODÈLE** sur la distribution des NLL moyennes de paire, **avant toute lecture de M1** (la NLL n'est pas comparable en valeur absolue entre les trois modèles). **Superposition secondaire, 2 bandes, coupure absolue à `4.0 nats`** = la constante `thr` du projet, pour **relier ce run à X8.1b / P5 / D11** | **Règle de décision qui rend la porte non vide** : *M1 n'est créditée que si **son signe est stable sur les trois bandes**. Si M1 n'est présente que dans la bande de NLL la plus haute, **elle EST le confondant de surprise (0-55) et M1 est RETIRÉE**, pas « rapportée avec nuance ».* **Toute repondération ou sélection après lecture ⇒ run invalide.** |
+| **`V-t1`** *(défaut 0-73, porte et non note)* | **toute quantité à `t−1` dont l'ensemble de comparaison contient deux unités de MÊME TIGE ⇒ échec du pipeline**. Motif : les états y sont **bit-identiques**, et le cosinus dégénéré sort en `1.0` **exact** ou en NaN selon l'implémentation — **le cas `1.0` échappe à la clause NaN (B)**. Publier le cardinal 14 ne suffisait pas | cas de banc échouant = un rapport synthétique contenant un cos intra-tige à `t−1` |
 | **`V-var-dist`** | **distance lexicale minimale déclarée** entre les deux préfixes d'une cellule : **≥ 50 % des tokens diffèrent**, sur les trois tokenizers | < 50 % ⇒ contraste quasi-identique (0-57) ⇒ arrêt. *Interaction* : préfixes plus proches ⇒ écarts de cosinus plus fins ⇒ **`2δ̂` mord plus** |
 | `V-bindur` | le bin dur est marqué `DESCRIPTIF` et son champ décisionnel est **absent du schéma de sortie** | présence d'un champ décisionnel ⇒ échec |
 | `V-casse` | `C6`, ≥ 90 % | < 90 % ⇒ arrêt |
 | `V-fact-pairs` | **contre-exemple obligatoire** : `fact_pairs` soumis à la table D25 doit **ÉCHOUER** sur `C1`, `C2` et S-1 | s'il passe, c'est la **table** qui est fausse |
-| **`V-joint`** | conjonction des trois modèles jugée par **bootstrap joint** (un rééchantillonnage de clusters par réplique, trois statistiques sur le **même** rééchantillon ; min-p ou IC simultanés, §12-Q7) | **tout produit de p-valeurs par modèle ⇒ run invalide** (0-63) |
-| **`V-subst`** | toute substitution depuis la réserve **recalcule et publie `K_eff` et `m₁` avant le run** ; substituer une famille pontée impose de substituer **les deux familles de sa tige** | substitution partielle d'une tige ⇒ S2 perd sa cellule ⇒ échec |
+| **`V-joint` (règle tranchée par Math)** | **IC simultanés par enveloppe bootstrap jointe (max-t)** — ni min-p (qui réintroduit des p-valeurs par modèle, l'objet même de l'interdit 0-63), ni Bonferroni (qui ignore la dépendance que le bootstrap joint capture précisément). Sur chaque réplique `b` (**un seul** rééchantillonnage de tiges) : `M_b = max_j \|D_j^{(b)} − D̄_j\|/ŝ_j` pour `j ∈ {gpt2, smol, qwen}` ; `c* = q₀.₉₅({M_b})` ; IC simultanés `D̄_j ± c*·ŝ_j` ; **conjonction déclarée ssi 0 est hors des trois IC simultanés** ; `B ≥ 2000`, seedé | cas passant = trois séries corrélées dont l'enveloppe couvre à ~95 % (vérifié par simulation) ; **cas échouant = « p₁·p₂·p₃ < 0.05 » déclaré significatif** |
+| **`V-subst` (réécrite, défaut 0-69)** | **(1) Substitution d'une famille pontée par une famille à tige simple : INTERDITE** — elle casse `m₁` (5 → 2 pour l'entrante **et** la partenaire orpheline), la cellule S2, et l'homogénéité des clusters. **(2)** Un item mort se répare **au niveau UNITÉ** : remplacement du suffixe **depuis le même sous-vivier**, **re-qualification complète** (`C2` : jamais de rustine locale). **(3)** Si une **tige entière** meurt : `K_eff = #tiges survivantes`, **recalculé et publié avant le run** ; run **permis à `K_eff = 9`** (demi-largeurs ×1.05 ; `τ` et `ε_max` **inchangés car dérivés à 10, donc conservateurs à 9**) ; **`K_eff ≤ 8` ⇒ retour au PI**. **(4)** La réserve utile est un **stock de suffixes qualifiés par sous-vivier**, **pas des familles** | toute substitution de famille pontée, ou `K_eff` non republié, ⇒ échec |
 | **`V-perimetre`** *(gate 2)* | les **trois** éléments du §4.9 sont présents dans le rapport : (i) mécanisme de l'invisibilité, (ii) limite nommée, (iii) successeur désigné | un seul manquant ⇒ **échec du pipeline** — la différence entre hors-périmètre et angle mort est **entièrement** dans cette écriture |
 
 ### 4.8 Descriptifs pré-déclarés (aucune décision n'en dépend)
@@ -339,7 +440,17 @@ quantité décisionnelle = **le contraste en profondeur** `[cos̄(S2) − cos̄(
 | **A3** | `cos(topk(G·h))` relu sur les strates | **compression croissante** avec le cosinus brut | **compression uniforme** ⇒ `topk(G·h)` est un **rééchelonnement, pas un séparateur** ⇒ l'attribution bio du +57 % d'E2 de X1 serait une **façade** — à consigner, pas à décider ici |
 | **A4** | capture à **`t−1`**, mécanistique (cardinal D24-b **= 14**) | discriminant du confondant de **copie de token** : la copie doit être **bien plus forte** à la capture sur la tige | profil identique aux deux positions ⇒ pas de signature de copie |
 | **profil** | forme en profondeur de M2 | **copie** = abrupt et localisé ; **effondrement représentationnel** = lisse et monotone (`V-leak`) | — |
-| **`P1 − P2`** | contraste inter-pools | — | **DESCRIPTIF par 0-49** : non monotone, ininterprétable comme dose |
+| **`P1 − P2`** | contraste inter-pools | — | **DESCRIPTIF par 0-49**, et **ASYMÉTRIQUEMENT INFORMATIF** (correction de lecture de lab-neuro, gravée) : la non-monotonicité porte sur la **dose**, pas sur le **signe**. Sous monotonie stochastique du score en σ, `P1 ≥ P2` **partout**, avec égalité aux deux extrémités. Donc une valeur **positive ou nulle est NON INFORMATIVE** (compatible avec l'effet maximal comme avec l'absence d'effet) ; **seule une valeur strictement négative est informative** — elle violerait la monotonie stochastique en σ, indiquant un **mécanisme anti-lexical actif**. *Sans cette ligne, un `P1 − P2 > 0` serait lu comme un demi-appui à l'hypothèse.* |
+
+### 4.8-bis Recadrage à écrire EN TÊTE du rapport *(lab-neuro, adopté)*
+
+> **Le livrable de v4-matériel est le MATÉRIAU QUALIFIÉ ; `P-N2` en est la première sonde.** Un
+> `C-ind` sur un matériau qui passe les 7 conditions, les ~120 cas de banc et `fact_pairs` en
+> contre-exemple **n'est pas un échec du cycle** — c'est **le premier matériau du projet dont on
+> saura ce qu'il garantit**.
+
+*Écrit **avant**, ce recadrage protège du verdict-pour-avoir-un-verdict que le PI vient de refuser en
+retirant la bande `M`.*
 
 ### 4.9 Hors-périmètre déclaré — le canal suffixe *(décision PI, gate 2)*
 
@@ -354,8 +465,15 @@ silencieuse**. Les trois éléments suivants sont **obligatoires** dans le rappo
 2. **Limite nommée.** **Aucune formulation du rapport ne peut exclure que l'effet mesuré transite
    par le canal suffixe.** La limite est **nommée**, pas enterrée.
 3. **Successeur désigné.** L'expérience pré-enregistrée qui couvrira ce canal est désignée comme
-   successeur de v4-matériel ; **§12-Q8 (chiffrage de la variante « suffixe-ponts » par Math) en est
-   la première pierre**, instruite **hors du chemin critique** de ce protocole.
+   successeur de v4-matériel. **Sa première pierre est posée** (Math, §12-Q8, chiffré hors chemin
+   critique) : la cellule « suffixe partagé × domaine différent » est **structurellement interdite
+   sous `C7`** (un suffixe appartiendrait à deux sous-viviers lexicalement disjoints) ⇒ le 2 × 2
+   tige × suffixe n'est réalisable qu'**intra-domaine** ; cette version tient sur le vivier (~10
+   suffixes doublés) et sur `C5` (éligibles 63 ≥ 36), **mais fait tomber `K_eff` à 5** (les arêtes
+   suffixe s'ajoutent aux arêtes tige dans le graphe de dépendance) ⇒ tout passerait sous la
+   frontière descriptive. **Verdict chiffré : le successeur exige SON PROPRE MATÉRIAU** — ~20 tiges /
+   40 familles pour retrouver `K_eff = 10`, même machinerie, volume ×2. **La variante n'est pas
+   greffable sur v4 sans le vider de sa puissance.**
 
 ### 4.10 Prédictions d'instrument reconduites
 
@@ -427,7 +545,21 @@ descriptif obligatoire manquant — **run invalide**. Et si le calibrateur sort 
 **`INVALIDE-INSTRUMENT`** (`ΔR1_inv` sous la clé nulle elle-même), **c'est l'instrument qui est
 accusé, pas le cortex** ⇒ arrêt, retour au banc.
 
-**G. Famine (D19)** : `Σ_q m_q < 60` ⇒ primaire = **`C-ind` d'office**, gravé avant run.
+**G. Famine (D19), avec sa SCISSION gravée (défaut 0-71)** : `Σ_q m_q < 60` ⇒ primaire =
+**`C-ind` d'office**. La suite dépend de la **cause**, discriminée **sans mesure supplémentaire** par
+le calibrateur — c'est précisément sa fonction :
+
+| Cause | Signature | Suite gravée |
+| --- | --- | --- |
+| **famine par PUISSANCE** | `Σm` faible **et** `ΔR1_inv` bas | **« augmenter la résolution »** |
+| **famine par SATURATION** | `Σm` faible **et** `ΔR1_inv` haut | **« réduire la dominance de surface »** (autre locus de capture, autre position, autre instrument). *« Augmenter la résolution » serait **faux** : ajouter des tiges ne créera pas d'intrusions.* |
+
+**G-bis. Issue conjointe modale, formulation gravée AVANT le run (défaut 0-70)** : les deux maillons
+sont **en tension par construction** — mieux l'état encode la surface, mieux la cible se classe, plus
+`m_q` est petit, plus la primaire s'affame. **« Calibrateur `N-b` + primaire `C-ind` » est l'issue
+conjointement la plus probable**, et elle **ne peut en aucun cas** se lire comme un demi-succès.
+Formulation obligatoire, à recopier telle quelle : *« l'instrument est sain, la question posée est
+restée sans réponse »*.
 
 **H. Fuite de couche 0** : `B0 > 0` ⇒ **arrêt**, aucune interprétation d'ordre.
 
@@ -510,10 +642,15 @@ qui a tué **vingt-deux défauts fatals avant tout GPU**.
      **`INVALIDE-INSTRUMENT`** ;
    - **un cas synthétique par bande de la primaire** : `C+`, `C−`, `C-0`, **`C-ind` (famine)** ;
    - **un cas synthétique par classe d'ordre** : `ORD-1`, `ORD-2`, `ORD-3`, `ORD-4`, **`ORD-ind`** ;
-   - cas échouants pour `V-pool`, `V-bindur`, **`V-plafond`** (terme interdit ; **plancher poolé**),
+   - **cas de banc d'EXCLUSIVITÉ (défaut 0-68)** : « IC petit et strictement positif » doit tomber
+     en `N-b` (et en `C+`), **jamais en deux classes** ; « IC petit et strictement négatif » doit
+     tomber en `INVALIDE-INSTRUMENT`, jamais aussi en `N-a` ;
+   - **un cas synthétique pour `M2 = 0-résolu`** (défaut 0-72), distinct de `M2 = ind` ;
+   - cas échouants pour **`V-t1`** (cos intra-tige à `t−1`), **`V-subst`** (substitution d'une famille
+     pontée), `V-pool`, `V-bindur`, **`V-plafond`** (terme interdit ; **plancher poolé**),
      **`V-calib`** (champ décisionnel présent), **`V-perimetre`** (élément manquant),
-     **`V-var-dist`**, **`V-compo`** (nulle simulée après lecture), **`V-joint`** (produit de
-     p-valeurs), **`V-leak`** (`B0 > 0`), **`V-subst`** (substitution partielle d'une tige) ;
+     **`V-var-dist`**, **`V-compo`** (nulle simulée après lecture ; `ε` MC au-dessus de `ε_max`),
+     **`V-joint`** (« p₁·p₂·p₃ < 0.05 » déclaré significatif), **`V-leak`** (`B0 > 0` ; `B0′ ≠ 0`) ;
    - **tous les cardinaux D24-b publiés tronqués au point de capture**, jamais sur séquences
      complètes.
 5. **Tests CPU** : `.venv\Scripts\python -m pytest tests/ -q`, sans téléchargement HF au-delà des
@@ -523,7 +660,11 @@ qui a tué **vingt-deux défauts fatals avant tout GPU**.
 7. **Conservation des états bruts** (permet A3 ; `G` gelée, D8/D9 intactes) et des **NLL scalaires
    par position de capture**.
 
-## 11. Questions pour lab-neuro *(bloquantes pour le pré-enregistrement)*
+## 11. Questions pour lab-neuro — **TOUTES RÉPONDUES, avis FAVORABLE (2026-08-23)**
+
+*lab-neuro signe les quatre engagements demandés (M4 corrigée, M3, forme agrégée de `P-N2`, charge
+unique) et n'oppose **aucun** motif de blocage. Ses trois compléments — `B0′`, la pré-évaluation de
+M2, la scission de `C-ind` — sont des ajouts de banc à **coût nul**, tous intégrés ci-dessus.*
 
 1. **`V-leak` / M4 — re-signature requise.** Sous `C7` (que tu exiges), la forme « nul à la couche 0 »
    est **falsifiée par construction** : le résiduel en `t` à la couche 0 est l'embedding du suffixe,
@@ -544,7 +685,12 @@ qui a tué **vingt-deux défauts fatals avant tout GPU**.
    posée repose désormais **entièrement** sur `P-N2`. **Le maintiens-tu en connaissance de cette
    charge**, ou demandes-tu un second maillon décisionnel ?
 
-## 12. Questions pour lab-math *(Q1 et Q2 bloquantes)*
+## 12. Questions pour lab-math — **VERROUS LEVÉS (2026-08-23)**
+
+*`τ = 0.15` **confirmé** (ses 0.10/0.12 étaient à `K = 20` et ne transportent pas) ; `ε` conditionnel
+**validé** avec barrière mécanique et plafond `ε_max = 0.66`. Il relève au passage **deux défauts**
+(0-68 exclusivité des partitions, 0-69 réserve inutilisable) et **un quasi-accident** (0-73), tous
+intégrés. **Aucune de ses corrections ne demande un nouveau tour d'expertise.***
 
 1. **Contradiction interne sur `τ` — BLOQUANT.** Tu donnes ≈ 0.10 à `K = 20`, puis `×1.41` pour
    `K_eff = 10` ⇒ **0.14**, alors que tes deux options étaient 0.10 et 0.12. J'ai arbitré à
@@ -623,11 +769,26 @@ maillon qui mesure le confondant et un maillon qui mesure l'effet**.
 
 ## 14. Amendements de gate
 
-### 14-1 (PI, gate 1) — **MAINTENU**
-Design **60 unités décisionnelles + 12 de réserve**. Repli 48/`K = 16` non déclenché ; réserve
-**substituable avant le premier token, jamais additive** (D14). **Précisé** : la réserve est
-constituée des **4 familles à tige simple** ; toute substitution passe par `V-subst`. **`K` initial
+### 14-1 (PI, gate 1) — **MAINTENU dans son intention, RÉÉCRIT dans sa forme (défaut 0-69)**
+Design **60 unités décisionnelles + 12 de réserve**. Repli 48/`K = 16` non déclenché. **`K` initial
 = 20 familles, mais l'unité d'inférence est la TIGE : `K_eff = 10`** (0-50).
+
+**Ce qui change.** L'amendement pré-enregistré à la gate 1 — *« la marge déplacée dans le matériau
+plutôt que dans `K` »* — reposait sur des **familles de réserve substituables**. Math démontre que
+cet objet **ne peut pas jouer ce rôle** : la réserve n'a que des **tiges simples**, et toute
+substitution pontée → simple casse `m₁`, la cellule S2 et l'homogénéité des clusters (0-69).
+
+**Forme réécrite, qui sert la même intention :**
+
+- la **réserve utile** est un **stock de suffixes qualifiés par sous-vivier**, pas des familles ;
+- un item mort se répare **au niveau unité** (suffixe du même sous-vivier, **re-qualification
+  complète**, `C2` : jamais de rustine) ;
+- une **tige morte** fait tomber `K_eff` à 9 : run **permis**, `τ` et `ε_max` restant **conservateurs
+  car dérivés à 10** ; **`K_eff ≤ 8` ⇒ retour au PI** ;
+- substitution **avant le premier token, jamais additive** (D14) : inchangé.
+
+*L'intention du PI est intégralement conservée — la marge vit bien dans le matériau ; c'est son
+**grain** qui passe de la famille à l'unité.*
 
 ### 14-2 (gate 1) — **CADUC. RETIRÉ ET REMPLACÉ.**
 
@@ -796,6 +957,16 @@ de l'auteur* (A-7). **Déclassée** : **`P-N1`** (non-monotonicité démontrée)
 | **Bande `M`** (« `M` ssi `ΔR1_inv` dépasse le plancher à 0 forward ») | **PI**, gate 1 | — | **RETIRÉE PAR SON AUTEUR, gate 2** | *« nécessaire mais pas suffisante » ; le plancher est une **borne inférieure** du canal lexical. Vacuité franchissable — refusée **alors qu'elle aurait été en faveur de l'hypothèse**.* Défaut 0-66. |
 | **Déclencheur observable de X5** | lab-neuro | tour 2 | **GRAVÉ, non ouvert** | `N-a` du calibrateur sur matériau qualifié + `V-dtype` PASS, sur ≥ 2 modèles / 3. |
 | **Substitution depuis la réserve** | lab-director | tour 2 | **GRAVÉE** (`V-subst`) | Recalcul et publication de `K_eff` et `m₁` **avant** le run ; substituer une famille pontée impose de substituer **les deux familles de sa tige**. |
+| **`V-leak` / M4, forme corrigée `B0 ≤ 0`** | lab-neuro | **2026-08-23, tour de re-signature** | **SIGNÉE** | Correction acceptée sans réserve : *« c'est ma deuxième prédiction tuée par un porteur mal identifié — cohérent avec 0-53, et c'est moi qui ai réclamé `C7` »*. |
+| **`B0′`** (détecteur de fuite sans hypothèse) | lab-neuro | 2026-08-23 | **SIGNÉE, adoptée** | `B0` est garanti par `C7`, donc **faible** ; `B0′` est apparié en domaine et prédit **exactement 0**. |
+| **M3** (`S1 > S0`), **requalifié contrôle de manipulation de `C7`**, attendu **dès la couche 0** | lab-neuro | 2026-08-23 | **SIGNÉE** | Une confirmation dit « le vivier a été correctement typé », jamais « l'état encode le domaine ». |
+| **`P-N2` sous forme agrégée** (`D`, clusters = tiges, `K_eff = 10`) | lab-neuro | 2026-08-23 | **CONFIRMÉE** | *« mon "par famille" était faux pour la raison même que j'avais invoquée ailleurs : les deux familles d'une tige sont réciproquement requêtes et concurrentes »*. |
+| **Charge décisionnelle unique sur `P-N2`** | lab-neuro | 2026-08-23 | **MAINTENUE ; aucun second maillon demandé** | Un second maillon devrait porter un canal que les trois faits acquis ferment (0-46, 0-49, 0-62). *« Je n'en vois aucun, et j'affirme ne pas pouvoir en dériver un — c'est un résultat, pas une dérobade. »* |
+| **Bandes de NLL** (`V-surprise`) | lab-neuro | 2026-08-23 | **GRAVÉES** | 3 bandes (dérivé : 4 donneraient 2,5 tiges/bande = 0-52 rejoué), tertiles **par modèle** sur la **NLL moyenne de paire**, + superposition absolue à `4.0 nats`. Règle de **retrait de M1** si son signe n'est pas stable sur les trois bandes. |
+| **`τ = 0.15`** | lab-math | 2026-08-23 | **CONFIRMÉ** | Recalcul complet ; réserve gravée sur la sous-couverture du bootstrap percentile à 10 clusters. |
+| **`ε` conditionnel + `ε_max = 0.66`** | lab-math | 2026-08-23 | **VALIDÉ** | D19 respectée **si** la barrière d'information est **exécutable** ; formule, seed, `B = 10⁴` et plafond gravés. |
+| **`V-joint` = enveloppe max-t** | lab-math | 2026-08-23 | **TRANCHÉ** | Ni min-p (réintroduit des p-valeurs par modèle) ni Bonferroni (ignore la dépendance capturée par le bootstrap joint). |
+| **Successeur (canal suffixe) : matériau propre requis** | lab-math | 2026-08-23 | **CHIFFRÉ** | La cellule « suffixe partagé × domaine différent » est **structurellement interdite sous `C7`** ; la version intra-domaine tient sur le vivier et sur `C5` mais fait tomber **`K_eff` à 5** ⇒ tout passe sous la frontière descriptive. **Le successeur exige ~20 tiges / 40 familles** (volume ×2, même machinerie) : la variante **n'est pas greffable** sur v4 sans le vider de sa puissance. |
 | **Canal suffixe hors périmètre** | PI | **gate 2** | **DÉCLARÉ, daté, signé avant mesure** | Porte `V-perimetre`, trois éléments obligatoires (§4.9). Successeur désigné. |
 
 ---
@@ -843,4 +1014,15 @@ amendement (réserve substituable avant le premier token) reste adopté incondit
   (§13-bis). **Vingt-deux défauts acquittés au total ce tour (0-46 … 0-67).**
   `Statut : PROPOSE` — **non pré-enregistrable** tant que Neuro n'a pas répondu à §11-Q1/Q2/Q5/Q6/Q7
   et Math à §12-Q1/Q2/Q9.
+- **2026-08-23** — **Tour de re-signature.** **Neuro : FAVORABLE** — signe `V-leak` corrigée, M3,
+  la forme agrégée de `P-N2` et la **charge décisionnelle unique** ; grave ses bandes de NLL ; ajoute
+  `B0′` (détecteur de fuite sans hypothèse), la **pré-évaluation de M2 en trois états** et la
+  **scission de `C-ind`** ; relève l'**issue conjointe modale** (0-70). **Math : verrous levés** —
+  `τ = 0.15` confirmé, `ε` conditionnel validé avec `ε_max = 0.66` ; relève l'**absence d'exclusivité
+  des partitions** (0-68) et l'**inutilisabilité structurelle de la réserve** (0-69) ; grave `k = 12`
+  dans `P2`, la forme **stratifiée-combinée** de M1/M3, `V-t1`, `V-joint` en **max-t**, et chiffre le
+  successeur (**matériau propre requis**). **Six défauts de plus (0-68 … 0-73)** — total du cycle :
+  **vingt-huit (0-46 … 0-73)**, aucun octet de matériau généré, aucun GPU touché.
+  `Statut : PROPOSE` — **tous les verrous d'expertise sont levés** ; reste la gate de
+  pré-enregistrement du PI, puis le banc.
 - **2026-08-23** : proposé.
