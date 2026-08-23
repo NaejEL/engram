@@ -1662,9 +1662,15 @@ primaire dérivée par Neuro (défaut 0-70) est réelle et devient un fait de m�
 - **Suite** : construction du matériau (`eval/pool_v4.py`, table des garanties D25 en en-tête) et
   **banc D14-S complet — `E = 0`, `fact_pairs` en contre-exemple échouant obligatoire**. **Aucun GPU
   avant PASS intégral.** Puis gel du matériau, puis **une seule** mesure I2 sur les trois modèles.
-- **Décisions candidates pour le PI** (`docs/ARCHITECTURE.md` §3, à graver par lui) : le couple
-  **calibrateur / question** ; le vice **0-81** des couloirs d'équivalence ; et l'acquis 4 ci-dessus
-  sur la relecture des correctifs.
+- **Décisions gravées par le PI le 2026-08-23** (`docs/ARCHITECTURE.md` §3) : **D27** — *quand un
+  confondant résiste à N purifications, cesser de le chasser : scinder l'instrument en un calibrateur
+  qui l'absorbe et une question définie hors de son domaine* (**la solution générale de la loi de
+  migration D26**) ; **D28** — *un couloir d'équivalence réglé sur l'enveloppe nulle de son propre
+  estimateur est inatteignable, **et augmenter la résolution en éloigne*** (piège dont **la sortie
+  intuitive est la mauvaise direction**) ; **D29** — *la correction d'un défaut est une écriture, et
+  elle produit des défauts au même taux*, avec son corollaire exécutable (**au-delà de 10 lignes, le
+  circuit de relecture complet**) et son corollaire de personnel (**le relecteur n'a pas écrit
+  l'objet relu**).
 - *Modèles : director.cadrage inherit, math fable, neuro inherit, verifier inherit. Aucun run, aucune
   interprétation de mesure.*
 
