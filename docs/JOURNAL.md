@@ -1440,6 +1440,100 @@ Modèle d'entrée :
 - *Modèles : director.interpretation fable, math fable, neuro inherit, builder inherit,
   verifier inherit.*
 
+## 2026-08-23 — DÉCISION PI : verdict sur le matériau, fusion I2 / v4 — `fact_pairs` ne peut pas porter une mesure représentationnelle
+
+- **Nature** : décision de chantier, **pas un run**. Aucune mesure, aucun GPU. Prise après
+  les avis **Math (DÉFAVORABLE)** et **Neuro (RÉSERVÉ)** sur I2-v2, eux-mêmes consécutifs au
+  verdict **INCONCLUSIF** d'I2 (NaN §6).
+- **Contexte** : quatre tours de portes successifs sur le même instrument, aucune mesure
+  propre obtenue. Le protocole I2-v2 était en `PROPOSE`, jamais pré-enregistré.
+
+### Le verdict sur le matériau — définitif
+
+**`pool.fact_pairs` ne peut pas porter une mesure de géométrie représentationnelle.** Ce
+n'est pas un défaut de protocole, c'est une **propriété du matériau** : il a été conçu pour
+du **rappel** (E1, X9), où ses symétries combinatoires sont inoffensives ; pour de la
+géométrie, **ces mêmes symétries fuient par tous les canaux**.
+
+Les quatre tours ont découvert **quatre facettes d'une seule vérité**, chacune sourcée :
+
+| # | Facette | Source | Statut |
+| --- | --- | --- | --- |
+| 1 | **Période 20 sur (entity, verb)** : `entity = i mod 20`, `verb = i mod 5`, et **5 divise 20** ⇒ le couple a une période de 20 ⇒ à N = 30 il n'existe que **20 couples distincts, 10 collisions inévitables** ; l'owner devient seul discriminant, et il est **effacé en BPE** dans deux des trois types (`Her`→`her` : 2332→607, aucun partage). | **banc v3**, journal 2026-08-22 | vérifié par exécution |
+| 2 | **Dominance de type** : la cible est, **par construction du jeu de candidats**, le seul candidat d'un type de paraphrase **différent** de la requête, quand **~12 des 36 concurrents partagent son type**. ⇒ `R1` ne peut pas dépasser le hasard ⇒ **la bande M est structurellement inaccessible**, et le couloir envoie « pas d'identité » **et** « identité sous-dominante au type » vers le **même** verdict N — faux pour le second. | **Math**, ce tour | dérivé de la seule construction (D14-R : aucun chiffre du run invalidé) |
+| 3 | **Appariement de longueur insatisfaisable** : l'owner a **trois formes de surface** selon le type (`OWNERS[i]` / minusculisé / `OWNER_OBJ`), de longueurs BPE différentes ; la longueur à apparier dépend de `(unité, type)` alors que le remplissage dépend d'un seul indice modulaire. Contrainte violée pour **16/16 valeurs de k** — pas difficile : **impossible**. Et chaque réparation naïve rouvre le canal intra-unité (appariement par unité ⇒ signature de longueur partagée par les trois lignes ⇒ position absolue du point de capture identique). | **Neuro**, ce tour | **vérifié par exécution : 16/16** |
+| 4 | **Verbe confondu avec une strate** : `P-own` (`16 \| d`) ⇒ `d mod 5 ∈ {1,2,3,4}` ⇒ **aucune paire `P-own` ne partage le verbe** ; `P-ent` (`20 \| d`) ⇒ `5 \| d` ⇒ **toute paire `P-ent` le partage**. Le verbe est **parfaitement confondu** avec une strate et **orthogonal** à l'autre. | **Neuro**, ce tour | **vérifié par exécution** |
+
+**Et la spec qui clôt le débat** (Neuro, spec dure 3, **vérifiée par construction**) : la règle
+cyclique `t′ = (t+1) mod 3` fait que **les 240 paires intra-unité sont TOUTES inter-types**.
+Sur ce pool, **identité** et **invariance à la paraphrase** sont donc **confondues 1:1, à tout
+`N`** : aucune bande N n'y pourra jamais distinguer « pas d'identité » de « identité non
+invariante à la paraphrase sous cosinus ». **Aucune clause ne répare cela ; aucun `N` non
+plus.**
+
+**Décision : aucun cinquième tour de consolidation sur `fact_pairs`.** On ne corrige pas un
+matériau dont les défauts sont structurels — on en change.
+
+### La décision : fusion I2 / v4
+
+**L'économie de la gate est morte.** Elle existait pour épargner des jours de construction de
+matériel contre ~8 minutes de GPU ; **quatre tours de consolidation ont coûté plus cher que
+le matériel lui-même**. La logique de gate, elle, **survit — déplacée, pas abandonnée** :
+
+1. **Construire le matériel de v4 UNE FOIS**, au cahier des charges ci-dessous.
+2. **I2 devient la PREMIÈRE MESURE sur ce matériel** (~8 min de GPU) : son verdict oriente
+   toujours la suite de v4 — mais une **bande N sur matériau sain est une réorientation
+   réelle**, plus un artefact de plan.
+3. **Le banc D14-S se rejoue EN ENTIER sur le nouveau matériel**, jamais sur `fact_pairs`.
+
+**`fact_pairs` reste gelé pour ce qu'il sait faire — E1, X9, le rappel — et il est
+explicitement interdit à tout instrument représentationnel futur.** C'est la leçon la plus
+réutilisable de ce cycle : *un jeu de données conçu pour une tâche de rappel n'est pas
+neutre pour une mesure de géométrie ; ses symétries d'indexation deviennent des canaux.*
+
+### Cahier des charges du matériel v4 — consolidé, entièrement sourcé
+
+| # | Spec | Source |
+| --- | --- | --- |
+| **S-1** | **Paires intra-unité intra-type OBLIGATOIRES** : invariance à la paraphrase et identité **décorrélées par construction**. | Neuro, spec dure 3 |
+| **S-2** | **Concurrents tous du type de la cible** : le type devient une **constante du jeu**, pas un confondant. Hasard `1/37`, `T`, `K`, `ΔR1` **inchangés**. | Math, correctif Q1 option A |
+| **S-3** | **Statistique = rang parmi les candidats de même type**, **jamais** le rang global sur 37 (le rang médian **mélange** les deux effets : ~25 sous dominance et identité nulle, ~13 sous dominance et identité forte, 19 sous échange complet). | Math Q1, Neuro Q4 |
+| **S-4** | **Appariement de longueur garanti PAR CONSTRUCTION du matériel**, pas par clause : longueur **indépendante de `(unité, type)`** dès la génération. *(L'insatisfiabilité 16/16 prouve qu'aucune clause ne peut le réparer.)* | Neuro Q1, facette 3 |
+| **S-5** | **Verbe contrôlé par strate** : l'asymétrie « jamais partagé dans l'une, toujours dans l'autre » est **interdite** dans le nouveau jeu. | Neuro Q2, facette 4 |
+| **S-6** | **Stratification par recouvrement de surface (S0→S3) conservée comme livrable** — la strate quasi-dégénérée devient **construite à dessein**, plus subie. | Directeur, §D du protocole gelé |
+| **S-7** | **Identifiabilité BPE vérifiée à la génération** : la discrimination doit **survivre à l'effacement de casse** *(leçon `Her`/`her` de v3)*. | v3 §16, facette 1 |
+| **S-8** | **Cardinal de séquences distinctes de chaque nulle publié en porte** (D24). | D24 |
+
+### Ce qui est conservé du travail I2
+
+- **Les prédictions `P-A` / `P-B` / `P-C` / `P-D` restent pré-enregistrées** et seront jugées
+  **sur le nouveau matériel** : elles n'ont **jamais été mesurées proprement**, elles ne
+  s'amendent pas.
+- **D21** (dtype du forward épinglé — **bf16 à instruire** : même plage dynamique que fp32,
+  moitié de la VRAM, natif Ampere ; **contrôle ponctuel fp32 sur sous-échantillon**),
+  **D22** (§6 exécutable), **D23** (réductions NaN-strictes), **D24** : toutes s'appliquent
+  au **premier run sur le nouveau matériel**.
+- **L'acquis descriptif d'I2 — « le cosinus mesure la forme de la paraphrase, pas l'identité
+  du fait » — reste consigné comme MOTIVATION du design intra-type.** C'est lui qui justifie
+  **S-1**, et il doit être nommé comme tel dans le protocole. *(Il provient d'un run
+  INCONCLUSIF : il motive, il ne prédit pas — D14-R.)*
+
+### Point signalé au PI, non tranché
+
+**S-1 et S-2 interagissent.** Le correctif de Math a été dérivé **sous le matériau actuel**,
+où la cible est **nécessairement** d'un type différent de la requête. Avec **S-1**, des paires
+intra-unité **intra-type** deviennent disponibles : la requête *peut* alors être du même type
+que la cible, et **S-2 change de sens** — le type cesse d'être une contrainte subie pour
+devenir un **facteur manipulable**. Les deux specs ne se contredisent pas, mais les appliquer
+mécaniquement l'une après l'autre passerait à côté de ce que leur **conjonction** rend
+possible. **Signalé plutôt que tranché**, conformément à la consigne du PI.
+
+- **Suite** : rédaction du protocole **v4-matériel**, format maison, **banc complet avant tout
+  GPU**. Toute contradiction entre un avis d'expert de la consolidation et une spec S-1..S-8
+  est **remontée au PI**, jamais tranchée en cours de rédaction — ces specs viennent des avis
+  Math et Neuro de ce tour et **ne se réinterprètent pas**.
+- *Décision du PI ; pas de modèles de jugement engagés (aucune interprétation de mesure).*
+
 ## 2026-08-20 — v0 : squelette posé
 
 - **Commit** : (initial)

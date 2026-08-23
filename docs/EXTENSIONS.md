@@ -133,7 +133,29 @@ C'est l'état actuel du code. Aucun flag.
   discriminants) n'a été observé qu'en gabarit commun artificiel. Réouverture :
   ce symptôme en usage réaliste.
 
-### I2 — Profilage par couche du cortex (`layer_profile`) — *instrumentation, pas un mécanisme*
+### I2 — Profilage par couche du cortex (`layer_profile`) — *FUSIONNÉ AVEC v4 (décision PI, 2026-08-23)*
+
+> **DÉCISION PI DU 2026-08-23 — lire d'abord.** I2 **ne se mesure plus sur `pool.fact_pairs`**.
+> Quatre tours de portes ont établi que **ce matériau ne peut pas porter une mesure de géométrie
+> représentationnelle** : conçu pour du **rappel** (E1, X9), ses symétries combinatoires y sont
+> inoffensives ; pour de la géométrie, **elles fuient par tous les canaux** — période 20 sur
+> (entity, verb), dominance de type rendant la **bande M structurellement inaccessible**,
+> appariement de longueur **insatisfaisable 16/16**, verbe **parfaitement confondu** avec une
+> strate. Et surtout : **les 240 paires intra-unité sont toutes inter-types**, donc identité et
+> invariance à la paraphrase y sont **confondues 1:1, à tout `N`**.
+>
+> **`pool.fact_pairs` reste gelé pour ce qu'il sait faire — E1, X9, le rappel — et est
+> INTERDIT à tout instrument représentationnel futur.** *Un jeu conçu pour une tâche de rappel
+> n'est pas neutre pour une mesure de géométrie : ses symétries d'indexation deviennent des
+> canaux.*
+>
+> **La gate n'est pas abandonnée, elle est déplacée** : le matériel de v4 se construit **une
+> fois**, au cahier des charges S-1..S-8 (journal 2026-08-23), puis **I2 en est la première
+> mesure** (~8 min de GPU). Une **bande N sur matériau sain est une réorientation réelle**, plus
+> un artefact de plan. Le banc D14-S se rejoue **en entier** sur le nouveau matériel.
+> Protocoles : `experiments/EXP-2026-08-22-layer-profile.md` (**TERMINE — INCONCLUSIF**, NaN §6).
+
+### I2 — description de l'instrument *(conservée ; le matériau change, l'instrument non)*
 
 **Ce que c'est.** Un forward pass instrumenté, hooks sur **toutes** les couches
 simultanément (profiler L couches coûte UN passage, pas L), qui produit deux courbes
