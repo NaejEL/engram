@@ -1,6 +1,6 @@
 # EXP — v4-matériel : construire un matériau qualifié pour un instrument représentationnel
 
-Statut : PROPOSE
+Statut : PRE-ENREGISTRE
 
 *Protocole consolidé (2e tour) par `lab-director` le 2026-08-23, sous les avis Math (RÉSERVÉ, avis
 principal + complément) et Neuro (RÉSERVÉ, avis principal + complément), les positions PI A-1..A-7,
@@ -12,16 +12,22 @@ inter-pools et porte `V-lex`), démolis indépendamment par les deux experts, **
 (décision PI, gate 2). Les retraits sont tracés au §14-2-CADUC, au §14-5 et au Registre des
 engagements ; **rien ne disparaît silencieusement** (position A-7).
 
-**Non pré-enregistrable en l'état.** Deux verrous restent nommés : §11-Q1/Q2/Q5/Q6 (re-signature de
-Neuro sur `V-leak`, M3, bandes de NLL, forme agrégée de `P-N2`) et §12-Q1/Q2 (confirmation de `τ` et
-de `ε` par Math).
+**PRÉ-ENREGISTRÉ le 2026-08-23.** Tous les verrous sont levés : Neuro **FAVORABLE** (M4 corrigée,
+M3, forme agrégée de `P-N2`, charge décisionnelle unique — signées ; bandes de NLL gravées) ; Math
+**verrous levés** (`τ = 0.15`, `ε` canonique, `ε_M`, `V-joint`, `V-subst`, stratification) ; **quatre
+passes d'audit indépendant** closes sur un verdict de convergence.
+
+> **À partir de cette date, les sections « Prédictions » (§4) et « Critères d'abandon » (§6) ne sont
+> plus jamais modifiées, par personne** — ni le PI, ni le copilote, ni les experts, ni un auditeur.
+> Toute lecture ultérieure qui les contredirait est un **résultat**, pas un motif d'amendement.
 
 ---
 
 ## 0. Défauts acquittés
 
-**0-1 … 0-45 : reconduits sans changement**, numérotation inchangée, aucun ré-ouvert. Ce tour en
-ajoute **vingt-deux (0-46 … 0-67)**. Le §0 est le patrimoine du projet : chaque ligne dit **pourquoi
+**0-1 … 0-45 : reconduits sans changement**, numérotation inchangée, aucun ré-ouvert. Le tour de 2ᵉ consolidation en
+ajoutait **vingt-deux (0-46 … 0-67)** ; les tours suivants ont porté le total du cycle à
+**cinquante-six (0-46 … 0-101)** — voir l'Historique. Le §0 est le patrimoine du projet : chaque ligne dit **pourquoi
 le défaut était fatal**, pas seulement ce qu'il était.
 
 ### 0-46 … 0-49 — Le §14-2 (gate 1) était inexécutable
@@ -178,6 +184,17 @@ primaire ; sous effet plausible, `ORD-4` sort à 88-92 %.*
 | **0-99** *(mineur)* | **Qualificatif et titre périmés, introduits par le correctif 0-89.** Le §2 disait que la suite de `C-ind` se lit au §6.G *« en fonction de la classe du calibrateur »* — faux depuis l'ajout de la ligne de résolution, qui déclare elle-même que **la classe ne discrimine rien** ; et le §6.G restait intitulé *« Famine »* alors qu'il porte désormais deux causes **hors famine**, avec **trois endroits** du protocole qui y renvoient pour **toute** suite de `C-ind`. | Un renvoi qui promet un discriminant inexistant envoie l'opérateur chercher une ligne qui n'existe pas — la forme adoucie du trou de 0-80. |
 | **0-100** *(mineur)* | **Double chiffrage de `P(C-ind | nulle)`** : « ~5 % » au §4.5 contre **6.7 %** au §6.G. Re-simulation : **6.8 %** — le « ~5 % » était la valeur analytique à `σ` **connu** et **ignorait la variabilité de `σ̂`** sur 10 clusters. | **Même famille que 0-82** (une quantité définie deux fois), sur une **constante d'interprétation publiée avant le run** : c'est elle qui décide si un `C-ind` observé est « attendu » ou « anormal ». |
 | **0-101** *(mineur)* | **Cardinal du budget de banc non mis à jour** par l'ajout de 0-89 : *« 4 bandes primaire »* alors que le §10 commande désormais **cinq** cas. | **Quatrième occurrence de la famille « cardinal périmé »** (0-76(i), 0-86, 0-94, celle-ci) — **et sur la ligne même que 0-94 venait de corriger**. C'est ce qui établit le mode comme systématique, et non comme accident : *tout ajout d'un cas de banc doit re-vérifier le cardinal qui le chiffre.* |
+
+### 0-102 … 0-103 — **Passe ciblée finale**, bornée aux onze réécritures
+
+*Mandat strictement borné : vérifier les onze lignes réécrites par la 3ᵉ passe, sans rouvrir aucune
+dérivation, aucune simulation d'atteignabilité, aucun recomptage. **Onze réécritures conformes, deux
+défauts mineurs**, aucun mauvais routage.*
+
+| # | Défaut | Pourquoi il fallait le fermer |
+| --- | --- | --- |
+| **0-102** *(mineur)* | **La clause d'unicité restait fausse aux deux tiers.** Le correctif de 0-98 avait restreint la portée par « hors famine », ce qui fermait le démenti par la ligne `N-a` — mais **pas** les deux autres que la parenthèse **continue de nommer elle-même** : `N-ind` (§4.4) et `ORD-ind` (§4.6) portent la même suite et sont tous deux **hors famine**. | **Un correctif qui ferme un tiers du défaut qu'il vise** — mode « sémantique aux deux tiers » (0-91), appliqué cette fois à une correction. La phrase restait **littéralement démentie par les exemples qu'elle citait**. |
+| **0-103** *(mineur)* | **`B0′` manquait dans la table « Nulles par maillon » du §5** — le dernier endroit du corps où la propagation de 0-97 n'avait pas été faite. | La table déclare *« une nulle par maillon, **toutes bloquantes** »* : le maillon couche 0 en a **deux** depuis 0-97, et c'est **`B0′` le seul qui morde** (`B0` est garanti par `C7`). La table qui énumère les nulles bloquantes **omettait la seule qui bloque réellement** — troisième et dernière occurrence du mode 0-97. |
 
 ---
 
@@ -771,7 +788,7 @@ demeure **illégitime**.
 | sélection | pool `C5` gelé | déterministe |
 | **composition (primaire)** | **hypergéométrique `X\|m ~ H(36, 5, m)`** + MC seedé | exacte sous E1–E4 |
 | ordre / strates | **permutation intra-tige par domaine** (`C(6,3) = 20`, MC seedé) | exacte |
-| couche 0 | **`B0`** (`V-leak`) | permutation |
+| couche 0 | **`B0`** *(détecteur faible, garanti par `C7`)* **et `B0′`** *(détecteur fort, le seul qui morde)* — `V-leak` | permutation |
 | cadre | **40 paires `L_e = 2`** | appariée en position |
 | nouveauté | pseudo-mots, **séparée** | non appariée, déclarée telle |
 | précision | `δ̂` fp32 vs bf16, **deux marges** | déterministe |
@@ -836,9 +853,11 @@ lisible**). Les quatre cellules conjointes sont donc énumérées, et **aucune n
 | **`N-a`** | **famine par PUISSANCE** — l'écart à la clé nulle est indécelable à résolution suffisante | **« augmenter la résolution »** |
 | **`N-ind`** | **ni la question ni l'instrument ne sont résolus** | **« re-qualifier l'instrument AVANT de re-mesurer »** — *le discriminant lui-même est indécidable, donc aucune suite sur la question n'est prononçable* |
 | **`INVALIDE-INSTRUMENT`** | la chaîne de mesure est en cause | **arrêt** (§6.F-bis) ; aucune lecture de la primaire |
-| **`C-ind` DE RÉSOLUTION** *(défaut 0-89)* — **hors famine**, la classe du calibrateur ne discrimine rien ici | `Σ_q m_q ≥ 60` **et** `K_eff^support ≥ 9`, IC **ni** au-delà de `±ε` **ni** inclus dans `±2ε` | **« effet vrai dans la zone morte déclarée »** (≈`ε` à ≈`3ε`) ⇒ **« augmenter la résolution »** — `K_eff`, requêtes contributives. *C'est le seul cas **hors famine** où cette suite est correcte — en famine, elle ne l'est qu'en
-`N-a` (défaut 0-98 : la clause d'unicité était démentie par la ligne `N-a` de la même table, par
-`N-ind` au §4.4 et par `ORD-ind` au §4.6). Et elle n'était couverte par aucune ligne : le §6.G était entièrement conditionné à une famine, alors que trois endroits y renvoyaient la suite de `C-ind`. **6.7 % des issues sous la nulle** (simulation de l'audit).* |
+| **`C-ind` DE RÉSOLUTION** *(défaut 0-89)* — **hors famine**, la classe du calibrateur ne discrimine rien ici | `Σ_q m_q ≥ 60` **et** `K_eff^support ≥ 9`, IC **ni** au-delà de `±ε` **ni** inclus dans `±2ε` | **« effet vrai dans la zone morte déclarée »** (≈`ε` à ≈`3ε`) ⇒ **« augmenter la résolution »** — `K_eff`, requêtes contributives. *C'est le seul cas **hors famine** où cette suite est la suite correcte **d'un `C-ind`** — en
+famine, elle ne l'est qu'en `N-a` ; hors de la primaire, `N-ind` (§4.4) et `ORD-ind` (§4.6) portent
+la même suite **pour leur propre partition** (défaut 0-98, dont le correctif initial ne fermait que
+le démenti par `N-a`, laissant subsister les deux qu'il nommait lui-même). Et elle n'était couverte
+par aucune ligne : le §6.G était entièrement conditionné à une famine, alors que trois endroits y renvoyaient la suite de `C-ind`. **6.7 % des issues sous la nulle** (simulation de l'audit).* |
 | **famine PARTIELLE** (défaut 0-74), *quelle que soit la classe* | `Σ_q m_q ≥ 60` **mais** `K_eff^support ≤ 8` | **« le support s'est effondré sur une minorité de clusters »** ⇒ la suite se lit sur la **distribution des `m_q`**, publiée : concentration sur peu de tiges ⇒ **matériau non homogène**, retour au banc ; étalement avec beaucoup de `m_q = 0` ⇒ **saturation**, suite de la ligne `N-b`. **Jamais** « augmenter la résolution » par défaut |
 
 **G-bis. Issue conjointe modale, formulation gravée AVANT le run (défaut 0-70)** : les deux maillons
@@ -1380,4 +1399,14 @@ amendement (réserve substituable avant le premier token) reste adopté incondit
   canoniques, α d'`INVALIDE-INSTRUMENT` reproduit à 1.3 × 10⁻⁴, arithmétique complète du matériau,
   et **`ORD-1`/`ORD-4` non vidées par le durcissement**. **Six défauts de plus (0-96 … 0-101)** —
   **total du cycle : cinquante-six (0-46 … 0-101)**, toujours **aucun octet de matériau, aucun GPU**.
+- **2026-08-23** — **PASSE CIBLÉE FINALE**, bornée aux onze lignes réécrites par la 3ᵉ passe :
+  **deux défauts, mineurs, aucun mauvais routage**. La clause d'unicité de `C-ind` de résolution
+  restait démentie par les deux exemples qu'elle nommait elle-même ; et **`B0′` manquait encore dans
+  la table des nulles par maillon du §5** — dernier endroit du corps où la propagation n'avait pas
+  été faite, dans une table qui déclare « une nulle par maillon, **toutes bloquantes** ». Les onze
+  autres réécritures sont **conformes**. **Total du cycle : cinquante-huit (0-46 … 0-103)**, aucun
+  octet de matériau, aucun GPU.
 - **2026-08-23** : proposé.
+- **2026-08-23** : **PRÉ-ENREGISTRÉ par le PI.** Prédictions et critères d'abandon **gelés
+  définitivement**. Suite : construction du matériau et **banc D14-S complet (`E = 0`,
+  `fact_pairs` en contre-exemple échouant obligatoire)** ; **aucun GPU avant PASS intégral**.

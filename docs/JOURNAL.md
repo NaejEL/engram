@@ -1582,6 +1582,92 @@ d'office** — *« coût des quatre tours »*.
   Math et Neuro de ce tour et **ne se réinterprètent pas**.
 - *Décision du PI ; pas de modèles de jugement engagés (aucune interprétation de mesure).*
 
+## 2026-08-23 — v4-matériel PRÉ-ENREGISTRÉ : 58 défauts fermés, aucun octet de matériau
+
+- **Nature** : pré-enregistrement, **pas un run**. Aucune mesure, aucun GPU, aucun code écrit.
+  Protocole : `experiments/EXP-2026-08-23-v4-materiel.md`, `Statut : PRE-ENREGISTRE`.
+- **Coût du cycle** : sept tours (cadrage, avis croisés, deux consolidations, deux gates PI,
+  re-signature), **quatre passes d'audit indépendant**, et **cinquante-huit défauts acquittés
+  (0-46 … 0-103)** — tous trouvés **avant** qu'un seul octet de matériau n'existe.
+
+### Ce que le protocole est devenu
+
+**Une seule primaire décisionnelle** : la **composition des intrusions**,
+`D = Σ_q (X_q − m_q·5/36)`, de nulle **hypergéométrique exacte** sous `E1–E4`, clusters = **tiges**,
+`K_eff = 10`. C'est la seule quantité de la table qui vive **au-dessus du plancher lexical** : sous
+le lecteur à 0 forward, `m_q = 0` pour toute requête et `D` est **indéfini** — le plancher n'a pas de
+valeur, il est hors du domaine de définition.
+
+**La primaire 1 n'est plus un test de l'hypothèse : c'est le calibrateur du système** (nulle exacte,
+plancher, santé de l'instrument). *Un maillon qui mesure le confondant, un maillon qui mesure
+l'effet* — D17 assumée jusqu'au bout. **La bande `M` a été retirée par son auteur** : le plancher à
+0 forward est une **borne inférieure** du canal lexical, pas une borne supérieure, donc un `M` franchi
+aurait été une **vacuité franchissable** — refusée alors qu'elle aurait joué **en faveur** de
+l'hypothèse.
+
+**Le canal suffixe est hors périmètre, déclaré et daté avant mesure**, en trois éléments obligatoires
+sous porte (`V-perimetre`). Son successeur est chiffré : il **exige son propre matériau** (~20 tiges /
+40 familles), la variante « suffixe-ponts » n'étant pas greffable sur v4 sans faire tomber `K_eff` à 5.
+
+### Les quatre acquis de méthode du cycle
+
+1. **La difficulté ne se supprime pas, elle migre** (D26, gravée par le PI) — et elle s'est vérifiée
+   **sur elle-même** : `C5` purifie le pool, la difficulté passe au contrôle ; `V-lex` attrape la
+   migration, et **`V-lex` est saturée par la même construction** (`ΔR1_lex = 36/37` = le plafond) ;
+   la composition remplace `V-lex`, et **le canal suffixe y devient structurellement invisible**.
+   Quatre crans en un cycle. Neuro en donne la forme extrême : *« la difficulté ne migre pas vers un
+   endroit qu'on regarde, elle migre vers un endroit qu'on ne PEUT PAS regarder »* (option B).
+2. **Un couloir d'équivalence réglé sur l'enveloppe nulle de son propre estimateur est
+   structurellement inatteignable** — et, `c` et `hw` étant tous deux `∝ σ/√K_eff`, **augmenter la
+   résolution en éloigne au lieu d'en rapprocher**. Un protocole dont le monde nul rend
+   « indécidable » n'a pas de mode de succès négatif. Remède uniforme : **marge de significativité
+   1×, couloir d'équivalence 2×**, appliqué aux trois partitions ; la classe d'équivalence redevient
+   modale (~93 %) et **stable en `K_eff`**. *(Défaut 0-81 — candidat à la gravure.)*
+3. **La relecture qui trouve le défaut est celle qui n'a pas écrit l'objet relu.** Le PI a exigé
+   « quelqu'un qui n'a pas écrit la table » ; l'auteur, relisant, avait trouvé trois défauts et cru
+   avoir fait le travail. Le lecteur indépendant en a trouvé **dix de plus, dont quatre critiques**,
+   dans des dispositifs **déjà validés par deux experts**. Extension directe de la leçon D14-ext.
+4. **La correction d'un défaut est une écriture, et elle produit des défauts au même taux que
+   l'écriture initiale.** 19 lignes réécrites → **9 défauts** ; 14 → **6** ; 11 → **2**. Deux des
+   défauts nés de corrections portaient sur une **décision d'arrêt** — dont `B0′`, où **le seul
+   détecteur de fuite capable de mordre était absent de la porte exécutable**. *Conséquence pour la
+   suite : au banc comme au code, toute correction appliquée après un échec de porte se relit comme
+   du neuf, jamais comme un patch.*
+
+**Trajectoire des quatre passes d'audit** : 10 défauts / 4 critiques → 9 / 2 → 6 / **0** → 2 / 0.
+Verdict de convergence du lecteur indépendant, partitions certifiées saines **par énumération et par
+simulation** : 27 cellules exhaustives et exclusives, **14 classes toutes atteignables et aucune
+toujours vraie**, unicité des lignes canoniques, `ORD-1`/`ORD-4` non vidées par le durcissement.
+
+### Les paris, hors protocole, non décisionnels — datés avant mesure
+
+*Demande du PI : « que quelqu'un écrive la prédiction du PI, hors protocole, non décisionnelle, juste
+pour l'histoire […] le chapitre méthode du rapport aura un jour besoin de savoir si, au moment de
+sceller, l'humain du dispositif croyait encore à l'identité représentationnelle. » Aucun des deux ne
+figure au §4 ; aucun n'a de conséquence gravée.*
+
+| | Pari |
+| --- | --- |
+| **PI** | *« `D` indéfini nulle part, **famine évitée de peu**, bande basse de la primaire, et l'issue conjointe modale réalisée sur les trois modèles — le témoin a des yeux, la salle est éclairée, et les visages restent illisibles. »* |
+| **Copilote** | Calibrateur `N-b` net et primaire **`C-ind` par saturation** sur au moins deux modèles — donc **famine réalisée, pas évitée**. Motif : le point de capture est le token du suffixe, unique par unité, et sous `C1` tout le reste de la séquence est byte-identique ; l'état à `t` sera massivement l'embedding du suffixe, la cible se classera bien, `m_q` s'effondrera. |
+
+**Ce qui rend le couple intéressant** : les deux parient sur **la même cellule conjointe**
+(`N-b` + `C-ind`) **par des mécanismes opposés**. Le PI la prédit **hors famine** — `C-ind` par
+insuffisance de résolution, sur un support intact — alors que le §6.G-bis motive cette issue **par**
+la famine. Il parie donc contre le raisonnement du protocole tout en pariant sur son issue. Le
+discriminant est `Σ_q m_q`, publié avant lecture de `D` : s'il est confortable, le PI avait raison sur
+le mécanisme et le protocole a surestimé la saturation ; s'il s'effondre, la tension calibrateur ↔
+primaire dérivée par Neuro (défaut 0-70) est réelle et devient un fait de méthode réutilisable.
+
+- **Suite** : construction du matériau (`eval/pool_v4.py`, table des garanties D25 en en-tête) et
+  **banc D14-S complet — `E = 0`, `fact_pairs` en contre-exemple échouant obligatoire**. **Aucun GPU
+  avant PASS intégral.** Puis gel du matériau, puis **une seule** mesure I2 sur les trois modèles.
+- **Décisions candidates pour le PI** (`docs/ARCHITECTURE.md` §3, à graver par lui) : le couple
+  **calibrateur / question** ; le vice **0-81** des couloirs d'équivalence ; et l'acquis 4 ci-dessus
+  sur la relecture des correctifs.
+- *Modèles : director.cadrage inherit, math fable, neuro inherit, verifier inherit. Aucun run, aucune
+  interprétation de mesure.*
+
 ## 2026-08-20 — v0 : squelette posé
 
 - **Commit** : (initial)
