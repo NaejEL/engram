@@ -100,6 +100,30 @@ un défaut fatal.*
 | **0-75** | **`C−` était une cellule nommée sans suite de chantier.** L'antipode était signé et son verdict écrit (« déplétion »), mais **aucune conséquence sur le chantier** n'était gravée : que devient X1 / le cadre DG si la déplétion est réelle ? | **Fatal le jour où elle se réalise.** `P-N2` est la prédiction dont le **renversement** a la plus grande valeur théorique, et l'histoire du projet est sans ambiguïté : les renversements signés ont été plus informatifs que les confirmations (P1 de X7, loi 2, Q-01b). **Une cellule sans conséquence gravée invite l'interprétation à chaud** — et ce protocole est le dernier endroit où l'écrire à froid. Correctif : quatre conséquences ordonnées (§4.5), dont la séparation explicite entre le **chiffre** de X1 (+57 %, acquis, chemin d'écriture) et son **attribution** (représentationnelle, tombée). |
 | **0-76** | **La partition des ordres était incohérente ET partiellement dégénérée.** (i) `ORD-4` portait encore `M2 ∈ {+, 0}`, condition **périmée** par la pré-évaluation de M2 introduite au tour précédent — le `0-résolu` en sort désormais avant. (ii) `M2 = 0-résolu` renvoyait *« même suite que `M2 = −` »*, donc **partageait le verdict d'ORD-3**, alors que les deux diagnostics sont **opposés** : là le domaine écrase la tige, ici la tige **n'atteint pas la capture**. (iii) Les zéros de **M1 et M3** ne distinguaient pas résolu d'indécis. | **Le test du PI** — *« existe-t-il deux cellules adjacentes dont les verdicts sont textuellement identiques ? Si oui, la partition est plus grossière qu'annoncée — trou de type [4,11] si une frontière entre elles est censée décider quelque chose »* — **a mordu**. La frontière `−` / `0-résolu` décide de la suite du chantier (changer le pool contre déplacer la capture) : elle ne pouvait pas partager un texte. Et (iii) faisait prononcer à `ORD-2` un « retour au matériau » sur ce qui n'était **qu'un manque de résolution** — 0-72 un cran plus bas. Correctif : **quatre états par maillon**, routage `ind` évalué en premier, **classe `ORD-0` créée avec son verdict propre**, espace résolu **restauré à exactement 27 cellules**. |
 
+### 0-77 … 0-86 — **Audit indépendant des partitions** (lab-verifier), avant scellement
+
+*Le PI a exigé que la relecture des partitions soit faite par **« quelqu'un qui n'a pas écrit la
+table »**. `lab-verifier` — qui n'avait vu aucune pièce de ce cycle — a audité les quatre partitions
+**par énumération** et trouvé **dix défauts, dont quatre critiques**, tous dans des dispositifs
+**déjà validés par les deux experts et par la session principale**. Le protocole était à une réponse
+du scellement.*
+
+*Fait de méthode, troisième occurrence dans le projet : **la relecture qui trouve le défaut est celle
+qui n'a besoin d'aucune donnée** — et, nouveau cette fois, **celle qui n'a pas écrit l'objet relu**.*
+
+| # | Défaut | Pourquoi il était fatal |
+| --- | --- | --- |
+| **0-77** *(critique)* | **La partition des ordres n'était pas exhaustive, et son compte était faux.** `ORD-4` portait la clause `(M1 = + ou M3 = +)` : elle couvrait **4 cellules, pas 7**. Trois cellules résolues — `(−,+,−)`, `(−,+,0)`, `(0,+,−)` — n'avaient **aucune classe**, et `ORD-ind` ne les absorbait pas (aucun maillon n'y est en état `ind`). La ligne « 1+1+9+9+7 = 27 ✓ » comptait une condition **qui n'était pas celle écrite**. | **Trou de type [4,11], à l'identique.** Ces cellules sont les **voisines immédiates** d'`ORD-2` et auraient été lues comme elle, ou pire comme `ORD-4`. Et c'était le **frère exact du défaut 0-76(i)**, corrigé une ligne plus haut au tour précédent : une condition résiduelle qui ne suit plus le comptage annoncé. Correctif : bloc `M2 = +` **restructuré par l'état de M3** (le contrôle de manipulation de `C7`) ⇒ ORD-1 (1) + ORD-4 (2) + ORD-2 (6) ; **recompté par exécution**, pas par affirmation. |
+| **0-78** *(critique)* | **La pré-évaluation des maillons n'était ni exclusive ni ordonnée.** `IC = [0.01, 0.05]` dans un couloir `[−0.10, 0.10]` satisfaisait **`+` ET `0-résolu`**, sans ordre pour trancher, alors que les deux verdicts sont **opposés**. Et `ind`, défini **positivement** (« IC plus large que le couloir ») **et évalué en premier**, capturait `IC = [0.20, 0.60]` — **un effet fort**. | **`ORD-1` et `ORD-4` devenaient quasi inatteignables** : le mode de vacuité 0-6/0-8/0-47, **dans la classe qui porte la seule issue positive**. Le calibrateur évitait déjà le piège (test d'existence **avant** le corridor, `N-ind` par complémentation) ; la table des maillons faisait **l'inverse**, écrite par la même main au même tour. Correctif : ordre gravé `+ → − → 0-résolu → ind`, **`ind` par complémentation, évalué en dernier**. |
+| **0-79** *(critique)* | **Le « couloir de résolution » des maillons n'existait pas.** Deux occurrences dans tout le fichier, **toutes deux dans la table qui l'utilise** ; aucune valeur, aucune dérivation, absent des Variables fixées. | La frontière `ORD-0` / `ORD-ind` — **dont la création était tout l'objet du correctif 0-76** — reposait sur **un seuil inexistant**, et le cas de banc « `0-résolu` distinct de `ind` » commandé au §10 était **inconstructible sans inventer le seuil à l'implémentation**, c'est-à-dire **0-52 rejoué**. Correctif (Math) : **`ε_M` dérivé par run, par maillon et par modèle** — aucune constante absolue n'existe, l'échelle du cosinus dépendant du modèle et de la couche ; **en poser une aurait été 0-52 sous une autre forme**. |
+| **0-80** *(critique)* | **Le discriminant de famine n'avait ni seuil ni correspondance avec les classes.** Le §6.G opposait `ΔR1_inv` « **bas** » et « **haut** », deux mots jamais définis, jamais rattachés aux quatre classes du calibrateur. | Les cellules conjointes **`(N-a, C-ind)`** et **`(N-ind, C-ind)`** n'avaient **aucune suite lisible** — et la phrase obligatoire de G-bis (*« l'instrument est **sain** »*) y aurait été **récitée par défaut alors qu'elle est fausse** : `N-a` est précisément l'état où la santé de l'instrument n'est **pas établie** sans être réfutée. C'est le trou [4,11] **au niveau du produit de deux partitions**. Correctif : le discriminant devient la **classe** du calibrateur, les quatre cellules sont énumérées, **aucune n'est muette**, et la portée de G-bis est **restreinte à `N-b × C-ind`**. |
+| **0-81** *(majeur, transversal — le plus réutilisable du lot)* | **Un couloir d'équivalence réglé sur l'enveloppe nulle de l'estimateur lui-même est STRUCTURELLEMENT INATTEIGNABLE.** `IC ⊂ [−c, +c]` exige `\|estimé\| ≤ c − hw` ; si `c` = enveloppe nulle et `hw` = demi-largeur du **même** estimateur, le seuil vaut **≈ 0**. | La classe d'équivalence n'était atteinte que par **sous-estimation bruitée de `σ̂`** — un artefact — **jamais par le design**. Et, `c` et `hw` étant tous deux `∝ σ/√K_eff`, **augmenter `K_eff` faisait tendre `P(C-0)` vers 0, pas vers 1** : la suite gravée « augmenter la résolution » était **inopérante pour atteindre la classe qu'elle visait**. Simulation de l'auditeur, **sous la nulle** : `C+` 4.4 %, `C−` 5.5 %, `C-0` 23-36 %, **`C-ind` modal à 54-67 %** — un protocole dont le monde nul rend « indécidable ». Correctif (Math) : **marge de significativité 1×, couloir d'équivalence 2×**, appliqué aux **trois** partitions ; sous la nulle, la classe d'équivalence redevient modale (~90-95 %) et **stable en `K_eff`**. |
+| **0-82** *(majeur)* | **`ε` était défini DEUX FOIS, incompatiblement** : `q₀.₉₇₅(\|D̄_null\|)` au §4.5 (**2.24σ**) et « demi-largeur d'IC 95 % » au §7 (**1.96σ**). Math reconnaît la première comme **une faute de plume** — le quantile 97.5 % d'une **valeur absolue** donne une enveloppe à 97.5 %, **incohérente avec l'alpha propre 0.05**. | Sous la formule du §4.5, `ε` pire cas valait **0.746 > `ε_max` = 0.66** ⇒ **une valeur MC parfaitement légitime aurait déclenché un faux échec de la porte exécutable `V-compo`**. Et la frontière `C-0`/`C-ind` se déplaçait de **13 points** (P(`C-0`) sous la nulle : 0.359 contre 0.230). Correctif : **ligne canonique unique**, `ε = q₀.₉₅(\|D̄_null\|)`, recopiée à l'identique aux deux endroits. |
+| **0-83** *(majeur)* | **Aucune classe pour « significatif au bootstrap mais sous la résolution de la nulle exacte ».** `IC = [0.02, 0.18]` avec `ε ≈ 0.215` déclenchait **`C+`** ; symétriquement `[−0.18, −0.02]` déclenchait **`C−`**. | **`C−` porte la conséquence la plus lourde du protocole** — le retrait à X1 de son attribution représentationnelle — et se serait déclenchée **sur un effet entièrement sous la résolution de sa propre nulle**. Correctif : `C+ ≡ IC_inf > ε`, `C− ≡ IC_sup < −ε`. **Coût chiffré et déclaré** (Math) : le seuil de détection passe de ~26 % à ~52 % d'enrichissement relatif — **le seul maillon décisionnel se durcit de moitié**, prix assumé d'un verdict lourd. |
+| **0-84** *(majeur)* | **`ORD-4` gravait « domaine INSTANCIÉ »** pour `(+,+,−)` et `(+,+,0)`, alors que l'antipode de M3 grave que `M3 ≤ 0` ⇒ *« `C7` n'a pas instancié le domaine dans la géométrie ⇒ M1 perd son objet, plan publié en 1 × 2 »*. | **Deux textes gravés incompatibles sur la même cellule** — et le rapport aurait retenu celui qui arrangeait. Correctif : le bloc est **subordonné à M3**, et `ORD-2` absorbe **toutes** les cellules à domaine non instancié, dont `(0,+,0)` n'était qu'un cas particulier. |
+| **0-85** *(majeur)* | **Les suites de `C-ind` étaient PÉRIMÉES à deux endroits** — §2 (antipode) et §6.D — qui prescrivaient encore « augmenter la résolution » **inconditionnellement**, alors que la scission 0-71 venait d'établir que cette suite est **fausse en régime de saturation**. | Ce sont **les frères exacts** de la condition périmée d'`ORD-4`, dans la famille que le mandat d'audit demandait explicitement de chercher. **Un protocole amendé quatre fois porte des conditions qui référencent des états disparus** — et rien ne les signale. Correctif : renvoi au §6.G partout. |
+| **0-86** *(mineur, mais porte exécutable)* | **Cardinaux périmés** : la porte `V-ord` exigeait « une et une seule des **5** classes ORD » alors qu'il y en avait **6** depuis la création d'`ORD-0` (le §10 en énumérait bien 6). Même cardinal périmé au §11-Q3. Et : `INVALIDE-INSTRUMENT` se déclenchait sur `IC = [−0.14, −0.01]`, **entièrement dans le corridor de résolution déclaré**, quand son miroir exact recevait un verdict bénin. | Une **porte exécutable** portant un cardinal faux échoue ou passe pour la mauvaise raison. Et l'asymétrie de seuil — une phrase d'un côté, **l'abandon du run** de l'autre — n'était **écrite nulle part**. Correctifs : cardinal à 6 ; `INVALIDE-INSTRUMENT ≡ IC_sup < −τ` (exigence de magnitude) ; **asymétrie assumée et déclarée** : *les seuils sont pondérés par le coût du verdict*. |
+
 ---
 
 ## 1. Question
@@ -290,14 +314,23 @@ d'invalidation, **chacune avec son cas synthétique au banc, frontière `N-ind` 
 | Classe | Condition sur l'IC de `ΔR1_inv` (bootstrap de tiges, 95 %, `K_eff = 10`) | Lecture gravée |
 | --- | --- | --- |
 | **`N-b`** | `IC_inf > 0` | l'état porte **au moins** de la surface encodée — *formulation (xiii) obligatoire* |
-| **`N-a`** | `IC ⊂ [−τ, +τ]` | **pas d'écart décelable, à résolution suffisante** |
+| **`N-a`** | **`IC ⊂ [−2τ, +2τ] = [−0.30, +0.30]`** | **« écart BORNÉ par la résolution : `\|Δ\| < 2τ` établi »** — lecture d'**équivalence**, **jamais** « pas d'écart ». *Sans le facteur 2, `N-a` souffrait du même vice d'atteignabilité : à `τ = 0.15 ≈ hw = 0.142`, l'inclusion aurait exigé `\|Δ̄\| ≤ 0.008`.* |
 | **`N-ind`** | tout le reste | **« indécidable ICI, matériel ou `K_eff` insuffisant »** ⇒ **« augmenter la résolution »** — *jamais un demi-`N-a`* |
-| **`INVALIDE-INSTRUMENT`** | `ΔR1_inv` **sous la clé nulle elle-même** (`IC_sup < 0`) | **c'est l'INSTRUMENT qui est accusé, pas le cortex** : si même le lexical échoue sur `C5`, la chaîne de mesure est en cause ⇒ arrêt, retour au banc. **α propre déclaré (Math) : sous encodage exactement nul, `P(IC_sup < 0) ≈ 0.025`** — l'accusation de l'instrument est portée à **α = 0.025**, à écrire, sinon un faux `INVALIDE-INSTRUMENT` sur 40 runs serait lu comme une panne réelle |
+| **`INVALIDE-INSTRUMENT`** | `ΔR1_inv` **significativement sous la clé nulle elle-même** : **`IC_sup < −τ`** (exigence de **magnitude**, défaut D10 de l'audit) | **c'est l'INSTRUMENT qui est accusé, pas le cortex** : si même le lexical échoue sur `C5`, la chaîne de mesure est en cause ⇒ arrêt, retour au banc. **α propre déclaré (Math) : sous encodage exactement nul, `P(IC_sup < 0) ≈ 0.025`** — l'accusation de l'instrument est portée à **α = 0.025**, à écrire, sinon un faux `INVALIDE-INSTRUMENT` sur 40 runs serait lu comme une panne réelle |
 
 **Ordre d'évaluation, gravé (défaut 0-68 — exclusivité D18)** :
 **`INVALIDE-INSTRUMENT` → `N-b` → `N-a` → `N-ind`**. La première condition satisfaite emporte la
-classification. *(Sans cet ordre, `IC = [0.01, 0.09]` tombait à la fois en `N-b` et en `N-a`, et
-`[−0.10, −0.01]` à la fois en `INVALIDE-INSTRUMENT` et en `N-a`.)*
+classification. *(Sans cet ordre, `IC = [0.01, 0.09]` tombait à la fois en `N-b` et en `N-a`.)*
+
+**Asymétrie des seuils, ASSUMÉE ET DÉCLARÉE (défaut D10 de l'audit)** : `N-b` garde un **seuil
+d'existence** (`IC_inf > 0`) parce que son verdict est **bénin — une phrase** ;
+`INVALIDE-INSTRUMENT` exige une **magnitude** (`IC_sup < −τ`) parce que son verdict est **lourd —
+l'abandon du run**. **Les seuils sont pondérés par le coût du verdict**, et cette pondération est
+écrite plutôt que subie. *Avant correctif, `IC = [−0.14, −0.01]` — entièrement dans le corridor de
+résolution que le protocole déclare lui-même — déclenchait l'abandon du run, tandis que son miroir
+exact `[+0.01, +0.14]` recevait un verdict bénin. Il route désormais en `N-a` (équivalence).*
+**Les probabilités d'atteinte des quatre classes sous la nulle sont estimées par la simulation
+seedée et publiées avant le run.**
 
 **Seuils gravés** : `τ = 0.15` ; IC = bootstrap de **tiges** à 95 %, `K_eff = 10`, alpha propre 0.05.
 **Dérivation de `τ`** : Math donne, à `K = 20`, demi-largeur ≈ 0.10 (effet ≈ 0, pire cas ρ = 1) ; et
@@ -313,9 +346,13 @@ ci-dessous est **précisément** la protection et reste **non négociable**.
 
 **Clause gravée, non négociable après run** : *si l'IC sous nulle apparente déborde `τ`, le verdict
 est `N-ind`, jamais un `τ` ajusté.*
-**Zone morte déclarée en clair** : à `K_eff = 10`, tout effet vrai entre ≈ 0.15 et ≈ 0.55 sort
-majoritairement en `N-ind`. Prix du design, déclaré **avant** le run, n'autorisant **aucune**
-relecture *a posteriori*.
+**Zone morte du calibrateur, déclarée en clair et RECALCULÉE sous le schéma 1×/2×** : `N-b` étant
+un seuil d'**existence**, tout effet vrai positif suffisamment séparé de 0 y tombe ; la zone morte
+résiduelle est **du côté négatif**, entre le bord du couloir d'équivalence (`−2τ`) et le seuil de
+magnitude de l'accusation d'instrument (`−τ` sur `IC_sup`) — les IC qui n'y satisfont ni l'un ni
+l'autre sortent en `N-ind`. **Les bornes exactes ne sont pas posées a priori : elles sont produites
+par les probabilités d'atteinte publiées avant le run** (même simulation seedée). Prix du design,
+déclaré **avant** le run, n'autorisant **aucune** relecture *a posteriori*.
 
 **La bande `M` est RETIRÉE** (défauts 0-47 et 0-66, décision PI gate 2). Traçabilité : §14-5.
 
@@ -325,9 +362,9 @@ Sur l'IC de `D` normalisé par requête :
 
 | Bande | Condition | Verdict gravé | Suite |
 | --- | --- | --- | --- |
-| **`C+`** | `IC_inf > 0` **et** `Σ_q m_q ≥ 60` | **excès d'intrusions tige-partagées** — décrément lure-spécifique mesuré comme composition | canal tige actif ; instruire le canal suffixe (§4.9) |
-| **`C−`** | `IC_sup < 0` **et** `Σ_q m_q ≥ 60` | **déplétion** — la géométrie sépare activement les voisins de surface | **positif surprenant**, et sa **suite de chantier est gravée ci-dessous** — pas seulement « antipode réalisé » |
-| **`C-0`** | `Σ_q m_q ≥ 60`, `IC ⊂ [−ε, +ε]` | **pas de composition détectable, à résolution suffisante** | le recouvrement de tige ne rend pas un concurrent plus confusable ; **le cadre « lure » est retiré de la question représentationnelle** |
+| **`C+`** | **`IC_inf > ε`** **et** `Σ_q m_q ≥ 60` | **excès d'intrusions tige-partagées** — décrément lure-spécifique mesuré comme composition | canal tige actif ; instruire le canal suffixe (§4.9) |
+| **`C−`** | **`IC_sup < −ε`** **et** `Σ_q m_q ≥ 60` | **déplétion** — la géométrie sépare activement les voisins de surface | **positif surprenant**, et sa **suite de chantier est gravée ci-dessous** — pas seulement « antipode réalisé » |
+| **`C-0`** | `Σ_q m_q ≥ 60`, **`IC ⊂ [−2ε, +2ε]`** | **« composition BORNÉE par la résolution : `\|effet\| < 2ε` établi »** — lecture d'**équivalence** (type TOST), **jamais** « pas d'effet » | le recouvrement de tige ne rend pas un concurrent **davantage** confusable au-delà de `2ε` ; **le cadre « lure » est retiré de la question représentationnelle** |
 | **`C-ind`** | tout le reste, **famine globale** (`Σ_q m_q < 60`) **ou famine partielle** (§ ci-dessous) | **« indécidable ICI »** | suite **selon la cause** (§6.G) ; **jamais lisible comme absence d'effet de lure** |
 
 **Famine PARTIELLE — porte de support, gravée (défaut 0-74).** `E3` exclut les requêtes à `m = 0` :
@@ -344,6 +381,22 @@ effectives sur 60***. Trois quantités sont **publiées avant lecture de `D`**, 
 
 *C'est la clause NaN (D23) transposée en arithmétique exacte : une somme qui saute des termes
 **change son propre support**, et un support non publié est un support inventé.*
+
+**Zone morte de la primaire, DÉCLARÉE AVANT RUN (défaut D11 de l'audit ; forme du §4.4)** :
+
+> Tout effet vrai compris entre ≈ `ε` et ≈ `2ε + hw ≈ 3ε` sort **majoritairement en `C-ind`**. Pire
+> cas `m ≈ 18` : entre ≈ **0.65** et ≈ **2.0** excès/requête, soit **~26 % à ~78 %** d'enrichissement
+> relatif ; régime `m_q ∈ [1,10]` : entre ≈ 0.22 et ≈ 0.65. **Sous la nulle vraie, l'issue modale
+> attendue est `C-0` (~90 %) et `C-ind` reste sous ~5 % : un `C-ind` MODAL observé serait lui-même un
+> **signal de régime de famine ou de variance anormale**, à consigner comme tel.** Les probabilités
+> d'atteinte des quatre bandes sous la nulle sont estimées par la simulation MC seedée et
+> **publiées avant le run**.
+
+**Coût du durcissement, chiffré et déclaré (Math)** : le seuil de détection de `C+` passe de
+`hw ≈ 0.65` à `ε + hw ≈ 1.3` excès/requête, soit **de ~26 % à ~52 %** d'enrichissement relatif dans
+le pire cas (régime simulé par l'auditeur, `ε ≈ 0.215` : de ~0.22 à ~0.43). **C'est un durcissement
+réel du SEUL maillon décisionnel du protocole** — tenu pour le prix correct d'un verdict lourd, et
+**déclaré, non absorbé**.
 
 **Suite de chantier de `C−`, gravée À FROID (défaut 0-75).** *Le PI note que `P-N2` est la
 prédiction dont le **renversement** aurait la plus grande valeur théorique, et que l'histoire du
@@ -376,15 +429,25 @@ Conséquences gravées, dans cet ordre :
 testé) : `ε` défini sur les `m_q` observés est la **résolution vraie de la nulle**, pas un
 ajustement. D19 est respectée **si et seulement si** la barrière d'information est **exécutable** :
 
-1. **Formule et seed gravées maintenant** : `ε = q₀.₉₇₅(|D̄_null|)`, MC de l'hypergéométrique **par
-   requête**, agrégée **par tiges**, `B = 10⁴` répliques, seed = `cfg.seed`.
+1. **Formule et seed gravées maintenant — ligne canonique, recopiée À L'IDENTIQUE au §7** :
+   **`ε = q₀.₉₅(|D̄_null|)`**, **enveloppe bilatérale à 95 %** de la nulle MC seedée (sous normalité
+   `= 1.96·σ_null`) ; MC de l'hypergéométrique **par requête**, agrégée **par tiges**, `B = 10⁴`
+   répliques, seed = `cfg.seed`. *(Correctif D5 de l'audit : la notation `q₀.₉₇₅(|D̄_null|)` du tour
+   précédent était une **faute de plume** de `lab-math`, reconnue comme telle — le quantile 97.5 %
+   d'une **valeur absolue** donne une enveloppe à **97.5 %** (2.24σ), **incohérente avec l'alpha
+   propre 0.05** du protocole. Le protocole portait donc **deux définitions incompatibles** de `ε` —
+   §4.5 à 2.24σ, §7 à 1.96σ — dont la seconde est la bonne. Coût mesuré par l'auditeur : la frontière
+   `C-0`/`C-ind` se déplaçait de **13 points**.)*
 2. **Barrière mécanique** (porte `V-compo`) : le pipeline calcule `{m_q}`, **scelle `D`** (non
    calculé, ou calculé et hashé sans lecture), **publie `ε`**, puis descelle. L'ordre est **vérifié
    par le banc** ; cas échouant = `ε` publié après lecture de `D`.
 3. **Plafond numérique gravé MAINTENANT, indépendant des `m_q`** (Math, dérivé) : `Var(X|m)` est
-   maximale à `m = 18` ⇒ `18²·(5/36)(31/36)/35 = 1.107` ⇒ sd ≤ 1.052 par requête ⇒ demi-largeur
-   pire cas (ρ = 1, `K_eff = 10`) = `1.96 × 1.052/√10` ⇒ **`ε_max = 0.66` excès par requête**.
-   **Toute valeur MC au-dessus est une erreur de pipeline** — porte exécutable.
+   maximale à `m = 18` ⇒ `18²·(5/36)(31/36)/35 = 1.107` ⇒ sd ≤ 1.052 par requête ⇒ enveloppe
+   pire cas (ρ = 1, `K_eff = 10`) = `1.96 × 1.052/√10 = 0.652` ⇒ **`ε_max = 0.66` excès par
+   requête**. **Toute valeur MC au-dessus est une erreur de pipeline** — porte exécutable.
+   *(Cohérent avec la ligne canonique ci-dessus ; sous l'ancienne notation fautive, `ε` pire cas
+   valait **0.746 > 0.66** et une valeur MC **parfaitement légitime** aurait déclenché un **faux
+   échec de `V-compo`**.)*
 
 ### 4.6 Partition exhaustive des ORDRES (D18)
 
@@ -415,6 +478,28 @@ chacune ⇒ demi-largeur ×1.41 **plus** Bonferroni ×4 ⇒ régime du bin dur.
 **Pré-évaluation obligatoire des TROIS maillons, AVANT la classification ORD (défauts 0-72 et
 0-76)** — chaque maillon est jugé en **quatre états**, jamais en ternaire naïf :
 
+### Principe transversal — **marge de significativité 1×, couloir d'équivalence 2×** *(Math, dernier tour)*
+
+> **Un couloir d'équivalence réglé sur l'enveloppe nulle de l'estimateur lui-même est
+> structurellement INATTEIGNABLE.** L'inclusion `IC ⊂ [−c, +c]` exige `|estimé| ≤ c − hw` ; si le
+> couloir `c` vaut l'enveloppe nulle et que `hw` est la demi-largeur du même estimateur, le seuil
+> vaut **≈ 0** : la classe n'est atteinte que par **sous-estimation bruitée de `σ̂`** — un artefact —
+> **jamais par le design**. Pire, `c` et `hw` étant tous deux `∝ σ/√K_eff`, **augmenter `K_eff` fait
+> tendre `P(classe d'équivalence)` vers 0, pas vers 1** : la suite « augmenter la résolution »
+> devient **inopérante** pour l'atteindre.
+
+**Remède uniforme, sans nouvelle constante libre, appliqué aux TROIS partitions** :
+
+| Rôle | Seuil | Où |
+| --- | --- | --- |
+| **marge de significativité** | **1×** l'enveloppe nulle | `C+`/`C−` à `±ε` ; maillons `±` à `±ε_M` ; `INVALIDE-INSTRUMENT` à `−τ` |
+| **couloir d'équivalence** | **2×** l'enveloppe nulle | `C-0` à `±2ε` ; maillons `0-résolu` à `±2ε_M` ; `N-a` à `±2τ` |
+
+**Conséquence de lecture, gravée** : une classe d'équivalence ne dit **jamais** « pas d'effet », elle
+dit **« effet borné par 2× la résolution »** (lecture de type TOST). Et sous la nulle vraie, **la
+classe d'équivalence devient l'issue modale (~90-95 %)**, ce qui est le comportement correct d'un
+protocole : *un monde nul doit rendre « rien de détectable », pas « indécidable »*.
+
 **Ordre d'évaluation gravé PAR MAILLON (défaut D2 de l'audit), calqué sur le calibrateur** — la
 première condition satisfaite emporte l'état ; **`ind` est défini par COMPLÉMENTATION et évalué en
 DERNIER** :
@@ -423,14 +508,29 @@ DERNIER** :
 | --- | --- | --- |
 | 1 | `+` | `IC_inf > 0` |
 | 2 | `−` | `IC_sup < 0` |
-| 3 | **`0-résolu`** | `IC ⊂ [−κ, +κ]` (couloir de résolution) |
+| 3 | **`0-résolu`** | `IC ⊂ [−2ε_M, +2ε_M]` (couloir d'**équivalence**) |
 | 4 | **`ind`** | **tout le reste** |
 
-**`κ` = couloir de résolution du test de permutation intra-tige — CONSTANTE À GRAVER PAR `lab-math`
-(§12-Q-D3) avant scellement.** Elle est aujourd'hui **absente du protocole** : c'est le défaut D3 de
-l'audit, et il est **bloquant** — sans `κ`, la frontière `ORD-0` / `ORD-ind`, dont la création était
-tout l'objet du correctif 0-76, repose sur un seuil inexistant, et le cas de banc « `0-résolu`
-distinct de `ind` » (§10) est **inconstructible**.
+*(Rangs 1 et 2 : `IC_inf > ε_M`, resp. `IC_sup < −ε_M` — marge de significativité à **1×**.)*
+
+**`ε_M` — enveloppe nulle du maillon, DÉRIVÉE PAR RUN (défaut D3 de l'audit, résolu par Math).**
+Aucune constante absolue n'existe et **en poser une serait 0-52 sous une autre forme** :
+`cos̄(S_a) − cos̄(S_b)` n'est pas bornée utilement dans [0,1], et son échelle dépend **du modèle et de
+la couche** (la dispersion des cosinus est une propriété de la géométrie des états). Définition
+canonique, à recopier au §7 :
+
+> Pour **chaque maillon `M_j` et chaque modèle** : `ε_M = q₀.₉₅(|Δcos̄_null|)`, **enveloppe
+> bilatérale à 95 %** de la nulle de **permutation intra-tige** MC seedée (`C(6,3) = 20` par tige,
+> **stratifiée par domaine**, combinée, `B = 10⁴`), calculée **sous la même barrière d'information
+> que `ε`** (scellement de la quantité observée, publication de l'enveloppe, puis descellement) et
+> **publiée avant lecture**. **Les probabilités d'atteinte des quatre états sous la nulle sont
+> estimées par la même simulation seedée et publiées avant le run.**
+
+**Atteignabilité, dérivée** : sous la nulle, `P(0-résolu) ≈ P(|Δ| ≤ 2ε_M − hw) ≈ P(|Δ| ≤ ε_M) = 0.95` ;
+sous effet vrai `≥ 2ε_M + hw ≈ 3ε_M`, `P(±-résolu) > 0.5`. Le cas de banc « `0-résolu` distinct de
+`ind` » (§10) devient **constructible avec la machinerie MC elle-même**. *Si un affichage sans
+dimension est voulu, normaliser par `σ_perm` (échelle z) — mais **la décision se prend sur l'échelle
+brute** avec `ε_M` dérivé.*
 
 *Pourquoi cet ordre et pas l'autre* : dans la version précédente, `ind` était défini **positivement**
 (« IC plus large que le couloir ») **et évalué en premier** ⇒ `IC = [0.20, 0.60]`, c'est-à-dire un
@@ -706,8 +806,10 @@ injecte**.
 : bf16** (D21), **repli fp32 déclaré comme chemin nominal**, contrôle sur `m = 60` états ·
 cosinus/Gram fp32, valeurs propres fp64 · **aucune injection, `M` jamais instanciée**, `engram/` non
 modifié · tokenizers : les trois, tous les tests BPE **simultanés** · **`τ = 0.15`, `K_eff = 10`
-(clusters = TIGES), pools de 36, `m₁ = 5`** · **`ε`** = demi-largeur d'IC 95 % de la nulle MC seedée,
-calculée et publiée **avant** lecture de `D` · batch ≤ 240 séquences, **VRAM rapportée en réservé** ·
+(clusters = TIGES), pools de 36, `m₁ = 5`** · **`ε = q₀.₉₅(|D̄_null|)`** (enveloppe bilatérale à 95 % de la
+nulle MC seedée ; sous normalité `= 1.96·σ_null`), `B = 10⁴`, seed `cfg.seed`, calculée et publiée
+**avant** lecture de `D` ; **`ε_max = 0.66`** · **`ε_M = q₀.₉₅(|Δcos̄_null|)`** par maillon et par
+modèle (permutation intra-tige, stratifiée par domaine, `B = 10⁴`) · batch ≤ 240 séquences, **VRAM rapportée en réservé** ·
 **NLL du token de capture conservée en scalaire** (jamais le tenseur de logits : 870 × 151k fp32
 ≈ 2 Gio sur Qwen).
 
@@ -1168,4 +1270,16 @@ amendement (réserve substituable avant le premier token) reste adopté incondit
   `ORD-0` créée**, quatre états par maillon, espace résolu restauré à **27 cellules exactement**.
   **Total du cycle : trente et un défauts (0-46 … 0-76)**, toujours aucun octet de matériau, aucun
   GPU.
+- **2026-08-23** — **AUDIT INDÉPENDANT DES PARTITIONS** (`lab-verifier`, lecteur n'ayant écrit
+  aucune table — exigence du PI). **Dix défauts, quatre critiques**, tous dans des dispositifs déjà
+  validés par les deux experts **et** par la session principale ; le protocole était **à une réponse
+  du scellement**. Six correctifs mécaniques appliqués (partition ORD restructurée par M3 et
+  **recomptée par exécution** : 1 + 2 + 6 + 9 + 9 = 27 ; ordre d'évaluation par maillon, `ind` par
+  complémentation ; discriminant de famine par **classe** ; portée de G-bis restreinte ; suites
+  périmées amendées ; cardinaux corrigés). Cinq dérivés par `lab-math`, qui identifie le **vice
+  transversal 0-81** — *un couloir d'équivalence réglé sur l'enveloppe nulle de son propre estimateur
+  est structurellement inatteignable* — et le répare par le schéma **1× / 2×** sur les trois
+  partitions, en **chiffrant et déclarant** le durcissement du seul maillon décisionnel (~26 % →
+  ~52 % d'enrichissement requis). **Dix défauts de plus (0-77 … 0-86)** — **total du cycle :
+  quarante et un (0-46 … 0-86)**, toujours aucun octet de matériau, aucun GPU.
 - **2026-08-23** : proposé.
