@@ -87,6 +87,19 @@ le défaut était fatal**, pas seulement ce qu'il était.
 | **0-72** | **Le maillon M2 confondait un `0` résolu et un `0` par IC large** (Neuro) — la distinction `N-a`/`N-ind` que le protocole impose partout ailleurs, **non appliquée au niveau du maillon**. Conséquence : `(0, 0, 0)` tombait en `ORD-ind`, dont la suite gravée est « augmenter la résolution ». | **Faux dans le cas résolu** : si M2 est nul à résolution suffisante, **l'information de tige n'atteint pas la capture** et aucun `K_eff` ne la fera apparaître. La porte de sanité M2 devait mordre ; `ORD-ind` l'en empêchait. |
 | **0-73** | **La composition en domaines du pool `P2` n'était pas spécifiée** (Math). Sous encodage de domaine pur, la fraction attendue de tige-partagés parmi les gagnants vaut `(2p_s + 3p_d)/(14p_s + 22p_d)`, **bornée dans [0.136, 0.143] contre 5/36 = 0.139 sous la nulle** — biais ≤ 0.004 par gagnant — **mais uniquement si `k = 12` concurrents même-domaine non-tige**. **Et** : une statistique intra-tige à `t−1` produit des cosinus **dégénérés** (états bit-identiques) qui sortent en `1.0` exact ou en NaN selon l'implémentation. | **Deux quasi-accidents.** (i) L'équilibre qui neutralise le canal de `C7` dans la primaire **n'était pas structurel** : il dépendait d'un tirage non contraint ⇒ septième occurrence de D26 **après** mesure au lieu d'avant. (ii) Le cas `1.0` exact **échappe à la clause NaN (B)** : publier le cardinal 14 ne suffisait pas, il faut une **porte** (`V-t1`). |
 
+### 0-74 … 0-76 — Relevés par le PI à la gate de scellement, avant gel
+
+*Trois vérifications demandées par le PI avant d'autoriser le pré-enregistrement. **Deux ont
+échoué, une a échoué à moitié.** Toutes trois portaient sur des dispositifs déjà validés par les
+deux experts — c'est la quatrième fois du cycle que la relecture d'un dispositif **approuvé** trouve
+un défaut fatal.*
+
+| # | Défaut | Pourquoi il était fatal |
+| --- | --- | --- |
+| **0-74** | **Famine PARTIELLE : le support de `D` rétrécissait silencieusement.** La porte ne testait que `Σ_q m_q ≥ 60`, alors que `E3` **exclut** les requêtes à `m = 0`. Régime dégénéré atteignable : **55 requêtes affamées et 5 obèses** donnent `Σ_q m_q = 90 ≥ 60`, la porte passe, et `D` est calculé sur **5 unités effectives sur 60**. | **C'est la clause NaN (D23) en arithmétique exacte** — formulation du PI : *« une somme Σ qui saute les `q` indéfinis change silencieusement son propre support »*. Un IC calculé sur 5 unités et présenté comme portant sur 60 n'est pas une sous-estimation, c'est **une quantité différente**. Correctif : publication de `n_eff` et de la distribution des `m_q`, et porte **bloquante** sur **`K_eff^support ≤ 8`** — seuil **dérivé** (identique à `V-subst` : `τ` et `ε_max` sont conservateurs à 9, plus à 8). *Une tige sans requête contributive est un cluster qui n'existe pas : la laisser passer réduirait `K_eff` en silence — mode 0-50 par une autre porte.* |
+| **0-75** | **`C−` était une cellule nommée sans suite de chantier.** L'antipode était signé et son verdict écrit (« déplétion »), mais **aucune conséquence sur le chantier** n'était gravée : que devient X1 / le cadre DG si la déplétion est réelle ? | **Fatal le jour où elle se réalise.** `P-N2` est la prédiction dont le **renversement** a la plus grande valeur théorique, et l'histoire du projet est sans ambiguïté : les renversements signés ont été plus informatifs que les confirmations (P1 de X7, loi 2, Q-01b). **Une cellule sans conséquence gravée invite l'interprétation à chaud** — et ce protocole est le dernier endroit où l'écrire à froid. Correctif : quatre conséquences ordonnées (§4.5), dont la séparation explicite entre le **chiffre** de X1 (+57 %, acquis, chemin d'écriture) et son **attribution** (représentationnelle, tombée). |
+| **0-76** | **La partition des ordres était incohérente ET partiellement dégénérée.** (i) `ORD-4` portait encore `M2 ∈ {+, 0}`, condition **périmée** par la pré-évaluation de M2 introduite au tour précédent — le `0-résolu` en sort désormais avant. (ii) `M2 = 0-résolu` renvoyait *« même suite que `M2 = −` »*, donc **partageait le verdict d'ORD-3**, alors que les deux diagnostics sont **opposés** : là le domaine écrase la tige, ici la tige **n'atteint pas la capture**. (iii) Les zéros de **M1 et M3** ne distinguaient pas résolu d'indécis. | **Le test du PI** — *« existe-t-il deux cellules adjacentes dont les verdicts sont textuellement identiques ? Si oui, la partition est plus grossière qu'annoncée — trou de type [4,11] si une frontière entre elles est censée décider quelque chose »* — **a mordu**. La frontière `−` / `0-résolu` décide de la suite du chantier (changer le pool contre déplacer la capture) : elle ne pouvait pas partager un texte. Et (iii) faisait prononcer à `ORD-2` un « retour au matériau » sur ce qui n'était **qu'un manque de résolution** — 0-72 un cran plus bas. Correctif : **quatre états par maillon**, routage `ind` évalué en premier, **classe `ORD-0` créée avec son verdict propre**, espace résolu **restauré à exactement 27 cellules**. |
+
 ---
 
 ## 1. Question
@@ -311,9 +324,50 @@ Sur l'IC de `D` normalisé par requête :
 | Bande | Condition | Verdict gravé | Suite |
 | --- | --- | --- | --- |
 | **`C+`** | `IC_inf > 0` **et** `Σ_q m_q ≥ 60` | **excès d'intrusions tige-partagées** — décrément lure-spécifique mesuré comme composition | canal tige actif ; instruire le canal suffixe (§4.9) |
-| **`C−`** | `IC_sup < 0` **et** `Σ_q m_q ≥ 60` | **déplétion** — la géométrie sépare activement les voisins de surface | **positif surprenant** ; falsification partielle de la motivation représentationnelle de X1 |
+| **`C−`** | `IC_sup < 0` **et** `Σ_q m_q ≥ 60` | **déplétion** — la géométrie sépare activement les voisins de surface | **positif surprenant**, et sa **suite de chantier est gravée ci-dessous** — pas seulement « antipode réalisé » |
 | **`C-0`** | `Σ_q m_q ≥ 60`, `IC ⊂ [−ε, +ε]` | **pas de composition détectable, à résolution suffisante** | le recouvrement de tige ne rend pas un concurrent plus confusable ; **le cadre « lure » est retiré de la question représentationnelle** |
-| **`C-ind`** | tout le reste, **famine incluse** (`Σ_q m_q < 60`) | **« indécidable ICI »** | augmenter la résolution ; **jamais lisible comme absence d'effet de lure** |
+| **`C-ind`** | tout le reste, **famine globale** (`Σ_q m_q < 60`) **ou famine partielle** (§ ci-dessous) | **« indécidable ICI »** | suite **selon la cause** (§6.G) ; **jamais lisible comme absence d'effet de lure** |
+
+**Famine PARTIELLE — porte de support, gravée (défaut 0-74).** `E3` exclut les requêtes à `m = 0` :
+le support de `D` **rétrécit donc silencieusement**, et le seuil global est franchissable par un
+régime dégénéré — *55 requêtes affamées et 5 obèses donnent `Σ_q m_q = 90 ≥ 60` avec **5 unités
+effectives sur 60***. Trois quantités sont **publiées avant lecture de `D`**, et deux sont
+**bloquantes** :
+
+| Quantité | Statut | Règle |
+| --- | --- | --- |
+| `n_eff = #{q : m_q ≥ 1}` | publiée, descriptive | le **support réel** de la somme, jamais implicite |
+| distribution complète des `m_q` | publiée, descriptive | alimente la courbe `X_q` vs `m_q` (§4.3) |
+| **`K_eff^support` = # tiges portant ≥ 1 requête contributive** | **BLOQUANTE** | **`K_eff^support ≤ 8` ⇒ `C-ind` d'office (famine partielle)**. Seuil **dérivé, non choisi** : identique à celui de `V-subst` — `τ` et `ε_max` sont dérivés à `K_eff = 10`, donc conservateurs à 9, et cessent de l'être à 8. Une tige sans requête contributive est **un cluster qui n'existe pas** : la laisser passer réduirait `K_eff` **en silence**, ce qui est le mode 0-50 par une autre porte |
+
+*C'est la clause NaN (D23) transposée en arithmétique exacte : une somme qui saute des termes
+**change son propre support**, et un support non publié est un support inventé.*
+
+**Suite de chantier de `C−`, gravée À FROID (défaut 0-75).** *Le PI note que `P-N2` est la
+prédiction dont le **renversement** aurait la plus grande valeur théorique, et que l'histoire du
+projet est constante — les renversements signés ont toujours été plus informatifs que les
+confirmations (P1 de X7, la loi 2, Q-01b). Une cellule nommée sans conséquence écrite invite
+l'interprétation à chaud le jour où elle se réalise. Voici la conséquence, écrite avant.*
+
+Si `C−` se réalise, **le cortex gelé sépare déjà activement les entrées à fort recouvrement** —
+c'est-à-dire qu'il fait, au niveau représentationnel, ce que la biologie délègue à un étage dédié.
+Conséquences gravées, dans cet ordre :
+
+1. **X1 conserve son statut de mécanisme de CHEMIN D'ÉCRITURE, et perd sa justification
+   représentationnelle.** Le gain mesuré (+57 % sur E2, tableau `EXTENSIONS.md` §4) **reste acquis** :
+   il porte sur l'interférence d'écriture, pas sur la géométrie de `h`. Ce qui tombe est
+   l'**attribution** — « expansion + parcimonie = séparation de patterns » — pas le **chiffre**.
+2. **Le descriptif `A3` devient le test prioritaire du chantier suivant**, et son antipode devient
+   une **question ouverte et non une note** : si la compression de `cos(topk(G·h))` est **uniforme**,
+   `topk(G·h)` est un **rééchelonnement** et non un séparateur, et le +57 % appelle **une autre
+   explication** (parcimonie des écritures, capacité) — à instruire, pas à supposer.
+3. **Le successeur « canal suffixe » est REPRIORISÉ derrière** cette re-dérivation : mesurer un
+   second canal de surface sur un cortex qui sépare déjà activement répondrait à une question dont la
+   prémisse vient de changer.
+4. **Aucune de ces trois conséquences n'autorise une phrase sur la séparation de patterns
+   d'`engram`** : le run mesure `h` brut, `M` n'est jamais instanciée (vocabulaire interdit (ix)).
+   La formulation autorisée est *« le cortex gelé, sur ce matériau, sépare les voisins de surface »* —
+   jamais *« le gyrus denté est inutile »*.
 
 **`ε` (D19) — validé par Math, avec barrière exécutable et plafond gravé.** L'inférence est exacte
 **conditionnellement aux `m_q`** (conditionnement sur une statistique qui ne porte pas l'effet
@@ -356,24 +410,39 @@ de quantités centrées sous leurs nulles propres, et **conservant `K_eff = 10`*
 **par domaine** sont publiées en **descriptif** : quatre M1 décisionnelles vaudraient ~5 tiges
 chacune ⇒ demi-largeur ×1.41 **plus** Bonferroni ×4 ⇒ régime du bin dur.
 
-**Pré-évaluation obligatoire de M2, AVANT la classification ORD (défaut 0-72)** — M2 est jugée en
-**trois états résolus**, pas en ternaire naïf :
+**Pré-évaluation obligatoire des TROIS maillons, AVANT la classification ORD (défauts 0-72 et
+0-76)** — chaque maillon est jugé en **quatre états**, jamais en ternaire naïf :
 
-| État de M2 | Condition | Conséquence |
+| État | Condition sur l'IC de permutation | Routage |
 | --- | --- | --- |
-| `+` | IC de permutation strictement positif | on poursuit vers la classification ORD |
-| **`0-résolu`** | IC ⊂ couloir de résolution, **borne exclue** | **arrêt de l'interprétation représentationnelle** — même suite que `M2 = −` (ORD-3). *L'information de tige n'atteint pas la capture ; aucun `K_eff` ne la fera apparaître.* |
-| `ind` | IC plus large que le couloir | **`ORD-ind`** |
+| `+` | strictement positif | poursuit vers la classification |
+| `−` | strictement négatif | poursuit vers la classification |
+| **`0-résolu`** | `IC ⊂` couloir de résolution, **bornes exclues** | poursuit vers la classification |
+| **`ind`** | IC plus large que le couloir | **route immédiatement vers `ORD-ind`** |
+
+**Règle de routage gravée** : *tout maillon dont le zéro n'est pas résolu envoie la classification
+entière en `ORD-ind`.* Elle est la transposition **au niveau du maillon** de la distinction
+`N-a`/`N-ind` que le protocole impose partout ailleurs — sans elle, `ORD-2` prononcerait « retour au
+matériau » sur ce qui n'est **qu'un manque de résolution** (défaut 0-76).
+
+**L'espace résolu compte donc exactement `3 × 3 × 3 = 27` cellules**, et `ORD-ind` absorbe tout le
+reste. *(Avant correction, `ORD-4` portait encore `M2 ∈ {+, 0}` — condition **périmée** par la
+pré-évaluation, puisque le `0-résolu` en sort désormais avant : défaut 0-76.)*
 
 | Classe | Condition sur (M1, M2, M3) | # cellules / 27 | Verdict gravé | Suite gravée |
 | --- | --- | --- | --- | --- |
 | **ORD-1** | (+, +, +) | 1 | chaîne complète `S3 > S2 > S1 > S0` | les deux facteurs sont instanciés et ordonnés |
 | **ORD-2** | (0, +, 0) — **issue modale** | 1 | **« le facteur domaine n'a pas été instancié — retour au matériau »** | **JAMAIS** « le token domine, comme prédit » (défaut 0-56) |
-| **ORD-3** | M2 = − (tout M1, M3) | 9 | **le domaine domine la tige** ⇒ géométrie sémantique, `C5` insuffisante | retour au banc ; **la mesure ne s'interprète pas** |
-| **ORD-4** | M2 ∈ {+, 0}, (M1 = + **ou** M3 = +), hors ORD-1/ORD-2 | 9 | domaine instancié, chaîne incomplète | rapporter le maillon manquant ; pas d'ordre global |
-| **ORD-ind** | tout le reste | 7 | **« ordre indécidable ICI »** | augmenter la résolution / retour matériau |
+| **ORD-3** | `M2 = −` (tout M1, M3) | 9 | **le domaine domine la tige** ⇒ géométrie **sémantique**, `C5` insuffisante | retour au banc ; **la mesure ne s'interprète pas** |
+| **ORD-0** *(nouvelle, défaut 0-76)* | `M2 = 0-résolu` (tout M1, M3) | 9 | **l'information de tige N'ATTEINT PAS la capture** — diagnostic **opposé** à ORD-3 : là le domaine écrase la tige, ici la tige n'arrive pas | **même SUITE qu'ORD-3** (arrêt de l'interprétation représentationnelle), **verdict distinct** : la cause est le **locus de capture**, pas la géométrie ⇒ le chantier suivant déplace la capture, il ne change pas le pool. *Et **jamais** « augmenter la résolution » : le zéro est résolu.* |
+| **ORD-4** | `M2 = +`, (M1 = + **ou** M3 = +), hors ORD-1 / ORD-2 | 7 | domaine instancié, chaîne incomplète | rapporter le maillon manquant ; pas d'ordre global |
+| **ORD-ind** | **tout maillon en état `ind`** (règle de routage ci-dessus) | hors espace résolu | **« ordre indécidable ICI »** | **augmenter la résolution** — *jamais « retour au matériau »* |
 
-*Exhaustivité : 1 + 1 + 9 + 9 + 7 = 27. ✓ Un cas synthétique par classe au banc (§10).*
+*Exhaustivité de l'espace résolu : ORD-1 (1) + ORD-2 (1) + ORD-3 (9) + **ORD-0 (9)** + ORD-4 (7)
+= **27**. ✓ `ORD-ind` absorbe tout ce qui sort de l'espace résolu. **Exclusivité** : les quatre états
+de chaque maillon sont mutuellement exclusifs par construction, et le routage `ind` est évalué en
+premier. **Aucune classe ne partage son verdict avec une autre** — vérification demandée par le PI à
+la gate de scellement, exécutée, et c'est elle qui a produit `ORD-0`.*
 
 **Exactitude de la permutation intra-tige sous `C7` (Math, Q9-iii)** : le test reste **exact**
 (`C(6,3) = 20` partitions par tige) — **c'est sa signification qui change, et c'est voulu**. Avant
@@ -553,6 +622,7 @@ le calibrateur — c'est précisément sa fonction :
 | --- | --- | --- |
 | **famine par PUISSANCE** | `Σm` faible **et** `ΔR1_inv` bas | **« augmenter la résolution »** |
 | **famine par SATURATION** | `Σm` faible **et** `ΔR1_inv` haut | **« réduire la dominance de surface »** (autre locus de capture, autre position, autre instrument). *« Augmenter la résolution » serait **faux** : ajouter des tiges ne créera pas d'intrusions.* |
+| **famine PARTIELLE** (défaut 0-74) | `Σ_q m_q ≥ 60` **mais** `K_eff^support ≤ 8` | **« le support s'est effondré sur une minorité de clusters »** ⇒ la suite se lit sur la **distribution des `m_q`**, publiée : concentration sur peu de tiges ⇒ **le matériau n'est pas homogène**, retour au banc ; étalement avec beaucoup de `m_q = 0` ⇒ **saturation**, même suite que ci-dessus. **Jamais** « augmenter la résolution » par défaut |
 
 **G-bis. Issue conjointe modale, formulation gravée AVANT le run (défaut 0-70)** : les deux maillons
 sont **en tension par construction** — mieux l'état encode la surface, mieux la cible se classe, plus
@@ -641,11 +711,17 @@ qui a tué **vingt-deux défauts fatals avant tout GPU**.
    - **un cas synthétique par classe du calibrateur** : `N-b`, `N-a`, **`N-ind`**,
      **`INVALIDE-INSTRUMENT`** ;
    - **un cas synthétique par bande de la primaire** : `C+`, `C−`, `C-0`, **`C-ind` (famine)** ;
-   - **un cas synthétique par classe d'ordre** : `ORD-1`, `ORD-2`, `ORD-3`, `ORD-4`, **`ORD-ind`** ;
+   - **un cas synthétique par classe d'ordre** : `ORD-1`, `ORD-2`, `ORD-3`, **`ORD-0`**, `ORD-4`,
+     **`ORD-ind`** ;
    - **cas de banc d'EXCLUSIVITÉ (défaut 0-68)** : « IC petit et strictement positif » doit tomber
      en `N-b` (et en `C+`), **jamais en deux classes** ; « IC petit et strictement négatif » doit
      tomber en `INVALIDE-INSTRUMENT`, jamais aussi en `N-a` ;
-   - **un cas synthétique pour `M2 = 0-résolu`** (défaut 0-72), distinct de `M2 = ind` ;
+   - **un cas synthétique pour `M2 = 0-résolu`** (défaut 0-72), distinct de `M2 = ind`, **tombant en
+     `ORD-0` et non en `ORD-3`** (défaut 0-76) ;
+   - **un cas « famine partielle concentrée »** (défaut 0-74) : `Σ_q m_q ≥ 60` obtenu par une
+     poignée de requêtes obèses, `K_eff^support ≤ 8` ⇒ **doit tomber en `C-ind`**, jamais en `C+`
+     ni en `C-0` ;
+   - **un cas de routage `ind`** : un maillon indécis ⇒ **`ORD-ind`**, jamais `ORD-2` ;
    - cas échouants pour **`V-t1`** (cos intra-tige à `t−1`), **`V-subst`** (substitution d'une famille
      pontée), `V-pool`, `V-bindur`, **`V-plafond`** (terme interdit ; **plancher poolé**),
      **`V-calib`** (champ décisionnel présent), **`V-perimetre`** (élément manquant),
@@ -1025,4 +1101,14 @@ amendement (réserve substituable avant le premier token) reste adopté incondit
   **vingt-huit (0-46 … 0-73)**, aucun octet de matériau généré, aucun GPU touché.
   `Statut : PROPOSE` — **tous les verrous d'expertise sont levés** ; reste la gate de
   pré-enregistrement du PI, puis le banc.
+- **2026-08-23** — **Gate de scellement (PI).** Trois vérifications exigées avant autorisation de
+  pré-enregistrer : **deux échouent, une à moitié**. **0-74** (famine partielle : le support de `D`
+  rétrécissait silencieusement — « la clause NaN en arithmétique exacte ») ; **0-75** (`C−` était une
+  cellule nommée sans suite de chantier — la prédiction dont le renversement vaut le plus était la
+  moins écrite) ; **0-76** (partition des ordres incohérente : `ORD-4` périmée, `0-résolu` partageant
+  le verdict d'ORD-3 malgré un diagnostic opposé, zéros de M1/M3 non résolus). Correctifs intégrés :
+  porte de support `K_eff^support ≤ 8 ⇒ C-ind`, quatre conséquences de chantier pour `C−`, **classe
+  `ORD-0` créée**, quatre états par maillon, espace résolu restauré à **27 cellules exactement**.
+  **Total du cycle : trente et un défauts (0-46 … 0-76)**, toujours aucun octet de matériau, aucun
+  GPU.
 - **2026-08-23** : proposé.
