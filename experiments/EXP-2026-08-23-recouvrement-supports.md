@@ -205,26 +205,58 @@ plage `[0.1471, 0.3368]`), table de masses cumulées reconstruite indépendammen
 (`p=1 → 0.0259`, `p=4 → 0.0932`, `p=5 → 0.1132`, `p=6 → 0.1333`, `p=7 → 0.1533`, `p=8 → 0.1724`,
 **`p=9 → 0.1911`** *(Q-M1 réglée : valeur exacte, non interpolée)*, `p=10 → 0.2095`, `p=11 → 0.2275`) :
 
-| cellule | `cos` (`G` du projet) | `cos²` | `p` minimal | `L = p/64` |
-| --- | --- | --- | --- | --- |
-| Qwen S0 | 0.1471 | 0.0216 | **1** | **0.015625 = `2n` EXACTEMENT** |
-| Qwen S2, gpt2 S0 | 0.164-0.189 | 0.027-0.036 | 2 | 0.03125 |
-| Qwen S1/S3, gpt2 S2 | 0.188-0.218 | 0.035-0.048 | 2-3 | 0.031-0.047 |
-| gpt2 S1, SmolLM2 S2/S0 | 0.248-0.257 | 0.061-0.066 | 3 | 0.0469 |
-| gpt2 S3 | 0.2766 | 0.0765 | 4 | 0.0625 |
-| SmolLM2 S1 | 0.3174 | 0.1007 | 5 | 0.0781 |
-| SmolLM2 S3 | 0.3368 | 0.1134 | **6** | **0.0938** |
+**Table cumulée EXACTE** (`lab-math`, Q-M5, dérivée par série asymptotique de `Φ⁻¹`, vérifiée
+contre les **sept ancres** de `lab-verifier`, écart < 1e−4 sur chacune) — **aucune valeur n'est
+interpolée** :
 
-> **`O ≥ 1 à 6 indices sur 64`, soit 1 à 6 × le corridor `2n`.** *(Recalcul du copilote sur les
-> valeurs `A3` confirmé par `lab-verifier` ; re-paramétrage sur la `G` du projet fait ici,
-> **confirmation due à `lab-math` avant le banc** — Q-M5.)*
+`cum(1) = 0.02590` · `cum(2) = 0.04952` · `cum(3) = 0.07180` · `cum(4) = 0.09314` ·
+**`cum(5) = 0.11376`** · **`cum(6) = 0.13379`** · `cum(7) = 0.15332`.
 
-**Conséquence sur le défaut 0-104, gravée :** *« `C-sep` est vide par arithmétique »* **ne tient plus
-catégoriquement**. La classe `BAS` reste arithmétiquement exclue sur **11/12** cellules
-(`L ≥ 2/64 = 2·(2n)`), mais sur **`Qwen S0` elle est offerte, à la frontière exacte** (`L = 2n`) —
-et **fragilement** : `cos² = 0.0216` contre `cum(p=1) = 0.0259`, écart **de 17 %**, mais la somme des
-64 masses **réalisées** vaut 563.9 contre 569.6 théorique (~1 %, marge déjà nommée par 0-128).
-**`C-sep` est donc RE-OFFERTE sur cette cellule, et le protocole le dit au lieu de la retirer.**
+> **RÈGLE GRAVÉE (Q-M5)** : ***aucune valeur de `cum` n'est jamais interpolée.*** `cum` est
+> **concave** (les `t_j²` décroissent), donc l'interpolation linéaire **sous-estime toujours** — et
+> elle a **déplacé une cellule** dans la première version de cette table. **Table exacte `j = 1..20`
+> publiée d'avance au banc, en fp64, avec la double normalisation 569.6 / 563.9.**
+
+| cellule | `cos` (`G` du projet) | `cos²` | `p` minimal | `L = p/64` | marge à la frontière |
+| --- | --- | --- | --- | --- | --- |
+| **Qwen S0** | 0.1471 | 0.02165 | **1** | **0.015625 = `2n` EXACTEMENT** | 16.4 % — **robuste** |
+| Qwen S2 | 0.1636 | 0.02676 | 2 | 0.03125 | — |
+| Qwen S1 | 0.1883 | 0.03547 | 2 | 0.03125 | — |
+| gpt2 S0 | 0.1886 | 0.03559 | 2 | 0.03125 | — |
+| gpt2 S2 | 0.2070 | 0.04283 | 2 | 0.03125 | — |
+| **Qwen S3** | 0.2184 | 0.04772 | **2** *(corrigé : était « 2-3 »)* | 0.03125 | 3.6 % — **robuste** |
+| gpt2 S1 | 0.2479 | 0.06145 | 3 | 0.046875 | — |
+| SmolLM2 S2 | 0.2566 | 0.06582 | 3 | 0.046875 | — |
+| SmolLM2 S0 | 0.2568 | 0.06593 | 3 | 0.046875 | — |
+| gpt2 S3 | 0.2766 | 0.07650 | 4 | 0.0625 | — |
+| SmolLM2 S1 | 0.3174 | 0.10076 | 5 | 0.078125 | — |
+| **SmolLM2 S3** | 0.3368 | 0.11346 | **5 ou 6** *(corrigé : était « 6 »)* | 0.078 – 0.094 | **0.26 % < marge 1 %** ⇒ **frontière indécidable en théorique ; la version RÉALISÉE tranche** — mode 0-128 rejoué à `p = 5/6` |
+
+> **`O ≥ 1 à 5(-6) indices sur 64`**, soit **1 à 5(-6) × le corridor `2n`**.
+> *(Recalcul du copilote confirmé sur dix cellules par `lab-math` et **corrigé sur deux** : `Qwen S3`
+> et `SmolLM2 S3`, tous deux par une **interpolation interdite** de `cum`.)*
+
+**Conséquence sur le défaut 0-104, gravée — `lab-math` tranche FERMEMENT :** *« `C-sep` est vide par
+arithmétique »* **ne tient plus**. La classe `BAS` reste arithmétiquement exclue sur **11/12**
+cellules (`L ≥ 2/64 = 2·(2n)`), et sur **`Qwen S0` elle est OFFERTE**, à la frontière exacte
+(`L = 2n`). **Cette ré-ouverture est ROBUSTE, pas fragile** : l'écart vaut **16.4 %**
+(`(0.02590 − 0.02165)/0.02590`) contre une marge de normalisation de **~1 %** (563.9 / 569.6) — pour
+refermer, il faudrait `cum(1) < 0.0216`, soit **−16 %**, hors de portée de cette marge.
+**`C-sep` est offerte : à écrire fermement, pas d'entre-deux.**
+
+*Seconde dispersion, nommée par `lab-math` et que personne n'avait relevée* : la masse réalisée de la
+première coordonnée d'une clé **fluctue** (maximum de 8192 gaussiennes ⇒ loi de Gumbel, `SD ≈ 15-20 %`,
+estimé sous M3), donc **le `p_pair` réalisé chevauchera 1 et 2 selon les paires**. **Sans effet sur
+l'offre de la classe** — on ne ferme pas une classe sur une fluctuation.
+
+**Trivialité de la borne, à publier (Q-M5)** : sur **`Qwen S0`, `p = 1` est exactement
+« `cos ≠ 0` ⇒ les supports se touchent » — trivial par paire**. Sur les **cinq cellules à `p = 2`**,
+la borne **égale le `q95` par paire de la nulle** (0-119) : une paire nulle l'atteint **7.6 %** du
+temps — faible par paire, mais **décisionnellement active** (une moyenne ≥ 2 = `2·(2n)` exclut `BAS`)
+et **écrasante en agrégat** (`P(toutes les paires ≥ 2)` sous la nulle ≈ `0.076^P`). ⇒ **triviale sur
+1/12, faible sur 5/12, active sur 11/12.** `V-borne` **garde toute sa valeur de porte de cohérence**
+(identité, 100 % des paires, violation = bug) ; sa valeur **prédictive** à ce régime est **portée par
+`p_sym`, pas par `p_pair`** (§16).
 
 **Version réalisée par paire — la MESURE et la porte** : `p_pair` calculé sur les `φ_i²` **réalisés**.
 `V-borne` exige `|A∩B| ≥ p_pair` sur **100 % des paires** (identité arithmétique — toute violation
@@ -656,6 +688,45 @@ signés de `lab-neuro` (`P-N`, `P-N-ord`, centrage, `auto`, `Core`), les critèr
 sur les `cos` de la `G` du projet (table ci-dessus), et dit si la ré-ouverture de `BAS` sur
 `Qwen S0` est **robuste** ou **à l'intérieur de la marge** de 0-128.
 
+## 16. Borne serrée `p_sym` — adoptée le 2026-08-26 sous D30 alinéa 2
+
+**Ce que `lab-math` a trouvé (Q-M5).** La dérivation gelée passe par `min(m_φ, m_ψ) ≥ cos²`, obtenue
+en majorant `m_ψ ≤ 1` — **cette marche jette un facteur `cos`**. Or les **deux** masses sont bornées
+par `T(p)`, d'où l'identité **serrée**, de même statut et sans hypothèse supplémentaire :
+
+> **`cos ≤ √(T_φ(p) · T_ψ(p)) ≤ T(p)`  ⇒  `p_sym = min{p : cum(p) ≥ cos}`** — et non `≥ cos²`.
+
+À `cos ≈ 0.45` l'écart entre les deux bornes était modeste ; **à `cos ≈ 0.15` il vaut un facteur ~7**.
+Trois valeurs dérivées par `lab-math` : **`Qwen S0 → 7`**, **`gpt2 S3 → 14`**, **`SmolLM2 S3 → 18`**.
+
+**Décision du PI, 2026-08-26 — `p_sym` devient la borne DÉCISIONNELLE**, sous le **second alinéa de
+D30** (critère de **direction**) :
+
+> La borne gelée n'était **pas fausse** — elle était **correcte et lâche**. La remplacer n'est donc
+> pas une correction d'erreur (D30 alinéa 1) mais une **amélioration**, normalement interdite après
+> gel. Elle est licite ici parce qu'elle rend la prédiction **PLUS DURE à satisfaire** :
+> **`O ≥ 7 à 18` au lieu de `O ≥ 1 à 5`**, soit **14 à 36 × la nulle** au lieu de 1 à 5 ×.
+> *Un changement qui rend sa propre hypothèse plus difficile à confirmer n'est pas une bifurcation.*
+
+**Conséquences, gravées :**
+
+1. **`V-borne` porte désormais `p_sym`** : `|A∩B| ≥ p_sym(cos_pair)` sur **100 %** des paires, en
+   version **réalisée par paire** (`T` calculée sur les `φ_i²` observés), la version théorique
+   restant la **prédiction pré-enregistrée** que la réalisée doit encadrer (D26 inchangé).
+2. **Le défaut 0-104 est RE-FERMÉ, cette fois avec la bonne `G`** : `p_sym ≥ 7` sur la cellule au
+   `cos` le plus bas ⇒ **`BAS` est arithmétiquement exclue sur 12/12**, et **`C-sep` n'est plus
+   offerte**. *La fermeture d'origine était vraie par accident — bonne conclusion, mauvaise borne,
+   mauvaise `G`, mauvaise colonne. Elle est maintenant vraie pour ses raisons.*
+3. **`p_pair` (borne lâche) reste publiée** en descriptif, avec l'écart aux deux versions — **double
+   mesure D26**, et trace de ce que le gel portait.
+4. **La trivialité relevée en Q-M5 disparaît** : `p_sym ≥ 7` n'est jamais l'énoncé « les supports se
+   touchent ». La borne **redevient prédictive sur 12/12**.
+
+**DÛ AVANT LE BANC — `Q-M6`, bloquant** : `lab-math` fournit la **table `cum(j)` exacte pour
+`j = 1..20`** (fp64, double normalisation 569.6 / 563.9) et les **douze valeurs de `p_sym`**.
+**La session principale ne les extrapole pas** — c'est précisément la faute que la règle
+anti-interpolation de Q-M5 vient de fermer, et elle a déjà déplacé une cellule une fois.
+
 ## Historique
 
 - **2026-08-23** — Brouillon (mode cadrage). **Treize défauts acquittés (0-104 … 0-116), dont quatre
@@ -696,6 +767,18 @@ sur les `cos` de la `G` du projet (table ci-dessus), et dit si la ré-ouverture 
   seule des quatre différences (le **tirage de `G`**) porte l'échec. **Huit défauts de plus
   (0-135 … 0-142), dont trois critiques**, tous portant sur le **protocole** et sur le **journal de
   v4**, aucun sur ce run.
+- **2026-08-26** — **`Q-M5` (`lab-math`, FAVORABLE)** : table `cum` **exacte** (aucune
+  interpolation), **deux cellules corrigées** — `Qwen S3 → p = 2` (marge 3.6 %, robuste) et
+  `SmolLM2 S3 → frontière 5/6` à **0.26 %**, sous la marge de 1 % (mode 0-128 rejoué à `p = 5/6`,
+  **par l'interpolation de la session principale**). Règle gravée : ***aucune valeur de `cum` n'est
+  jamais interpolée***. `0-104` **tranché fermement** : ré-ouverture de `BAS` sur `Qwen S0`
+  **ROBUSTE** (16.4 % contre ~1 %). Et **borne serrée `p_sym` dérivée** — la marche `m ≤ 1` jetait un
+  facteur `cos`.
+- **2026-08-26** — **DÉCISION PI : `p_sym` adoptée comme borne décisionnelle**, sous le **second
+  alinéa de D30** (critère de **DIRECTION** : un changement post-gel trouvable sans la mesure est
+  licite s'il rend la prédiction **plus dure**, interdit s'il la rend plus facile). Prédiction :
+  **`O ≥ 7 à 18`** au lieu de `1 à 5`. **`C-sep` re-fermée sur 12/12, avec la bonne `G`** — §16.
+  **`Q-M6` dû avant le banc** : table `cum(j)` exacte `j = 1..20` et les douze `p_sym`.
 - **2026-08-26** — **DÉCISION PI : correction de provenance autorisée** sur le discriminant *« une
   erreur trouvable sans la mesure se corrige ; une erreur qui n'apparaît qu'à la lumière des
   résultats, jamais »*. §3, §4.2, §4.7 (`V-G` v2), §4.9-2, §2, §4.6 et le Registre **rectifiés avec

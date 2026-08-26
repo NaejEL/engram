@@ -36,7 +36,7 @@ Ce n'est PAS un produit — c'est une expérience falsifiable sur un laptop RTX 
   grep) — recalculé avec incertitude le 2026-08-21 (COR-02) : IC 95 % [0.56,
   0.99], médiane par secret 0.59 [0.45, 0.75] ; à citer « ~0.6–0.7, N=10 ».
 
-## État du projet (2026-08-22)
+## État du projet (2026-08-26)
 
 - Squelette v1 posé et **validé sur GPU** (torch 2.13+cu126 ; GPT-2, SmolLM2 et
   Qwen2.5-1.5B en cache). Parcours complet dans JOURNAL.md : X0 → X1 (gyrus
@@ -115,14 +115,37 @@ Ce n'est PAS un produit — c'est une expérience falsifiable sur un laptop RTX 
   exhaustive des clauses à seuils ; **E vaut sur le banc seul, pas sur le run**) ·
   **D19** (couloir de faisabilité `C-null`) · **D20** (une clause d'audit exige un
   plancher à produire, jamais un suspect à innocenter).
-- **Chantier courant = v4, « l'adressage apporte-t-il quelque chose ? »** Primaire
-  en **différence** clé correcte − clé nulle appariée (D16), plancher de hasard
-  dérivé **avant** le run et bloquant (D19). Verrou : il faut ~36 **leurres
-  appariés** par unité, et cette exigence tire en **sens opposé** des conditions
-  d'identifiabilité C-1/C-2/C-3 (§16 de v3) qui ont effondré la diversité à 5
-  owners / 6 entités. **Le pool actuel ne peut pas satisfaire les deux** : c'est un
-  travail de **construction de matériel**, pas de réglage, et il précède toute
-  rédaction de portes.
+- **v4-matériel — TERMINÉ le 2026-08-23. Matériau qualifié `RETENU` ; primaire
+  `C-ind` par SATURATION ; `ORD-3` ×3.** Protocole
+  `experiments/EXP-2026-08-23-v4-materiel.md`. Cellule conjointe **`N-b × C-ind`**,
+  l'issue modale gravée d'avance : *« l'instrument est sain, la question posée est
+  restée sans réponse »*. `R1 = 1.0000` sur 180/180 × 3 modèles ⇒ **`Σ m_q = 0`** :
+  un seul fait, deux affichages — `P(m_q = 0 ∀q) ≈ 10⁻⁹⁴` sous échangeabilité,
+  **≈ 1** sous le transcript lexical. `ΔR1_inv = 1 − R1_null` **exactement** :
+  aucun dépassement du plafond `36/37`. **Trois acquis** : `B0′ = 0` (tige et
+  suffixe **physiquement séparables**) ; `A4` (le porteur du domaine **s'évanouit**
+  quand il quitte le préfixe causal) ; et le **théorème d'incompatibilité** —
+  *sur tout matériau où l'entité cible figure verbatim dans le préfixe causal de la
+  requête, `m_q = 0` est un théorème* : composition des intrusions et identité du
+  préfixe sont **incompatibles**, ce qui **ferme une famille entière de protocoles**.
+  **58 défauts fermés (0-46 … 0-103) avant qu'un octet de matériau n'existe**, dont
+  10 + 9 + 6 + 2 par **quatre passes d'audit indépendant**.
+- **Chantier courant = « recouvrement des supports de `topk(G·h) »`**
+  (`experiments/EXP-2026-08-23-recouvrement-supports.md`, `PRE-ENREGISTRE`).
+  Analyse **CPU pure** sur les états conservés de v4 : `M` jamais instanciée, aucun
+  forward, `engram/` non modifié. Primaire = **`Δ* = O_plac − O_type`** (nulle **0
+  par construction**), niveau = `Λ = O_type − 2n` sur **corridor absolu**.
+  **Le run s'est arrêté à la deuxième porte**, en **9,1 s de CPU**, sans une mesure :
+  **`V-G` FAIL** ⇒ **`A3` n'a jamais été calculé avec la `G` du projet** (`numpy`
+  contre `torch`, `corrcoef ≈ 0.011`), et le §3 **nommait la mauvaise colonne**
+  (« 0.41-0.46 » = la **compression**, pas le cosinus ; le vrai vaut **0.147-0.337**).
+  **39 défauts fermés (0-104 … 0-142)**, aucune mesure conduite. Correction de
+  provenance autorisée sous **D30**, traçabilité au **§15**. Borne serrée **`p_sym`**
+  adoptée sous **D30 alinéa 2** (§16) : **`C-sep` re-fermée sur 12/12, avec la bonne
+  `G`**. **`Q-M6` dû avant le banc.**
+- **File d'attente, NON OUVERTE** : `Q-quant` — *robustesse de `φ` à la
+  quantification* (`EXTENSIONS.md`). Un seul bouton, coût XS, GPT-2 seul, banc
+  existant. **Ne s'ouvre pas avant le verdict du cycle en cours.**
 - **Instrument I2 (`layer_profile`) — `PROPOSE`, deux avis RÉSERVÉ non traités.**
   Profilage par couche (score contrastif d'invariance + entropie matricielle), un
   forward instrumenté, aucune injection. Défauts à corriger avant implémentation :
@@ -132,6 +155,41 @@ Ce n'est PAS un produit — c'est une expérience falsifiable sur un laptop RTX 
   n'est **pas apparié**. Protocole : `experiments/EXP-2026-08-22-layer-profile.md`.
 - Runs : SmolLM2 `--model HuggingFaceTB/SmolLM2-360M --layer 16` ; Qwen
   `--model Qwen/Qwen2.5-1.5B --layer 14`.
+
+## Registre des formulations interdites (en vigueur)
+
+*Les vocabulaires interdits vivent éparpillés dans les protocoles ; **ce fichier est leur point de
+rassemblement** — c'est ici qu'un agent qui rédige cherche son registre. Chaque entrée nomme sa
+source ; le protocole d'origine fait foi sur le détail.*
+
+- **Plafond lexical (xiii, v4)** — `ΔR1_inv ≈ 36/37` **ne se lit JAMAIS** *« le modèle retrouve
+  l'unité »*. Formulation obligatoire : ***« compatible avec un encodage de surface ; le canal
+  identité n'est pas adressé par cette primaire »***. *(Un plafond atteint n'est pas un succès.)*
+- **« Sémantique » (xv, réserve `lab-neuro`)** — le mot est **interdit**. Maximum licite :
+  ***« appartenance au sous-vivier déclaré »***. La mesure ne distingue pas le domaine sémantique de
+  l'identité lexicale de l'ensemble dont les tokens sont tirés (défaut 0-67 : `C7` **crée** cette
+  corrélation).
+- **Interdit d'étage (xiv, 0-75)** — **rien sur le chemin d'ÉCRITURE depuis une mesure de LECTURE**.
+  Le **+57 % d'E2 de X1** vit sur l'écriture ; il **reste acquis** et aucune mesure de lecture ne le
+  confirme ni ne l'entame. Seule son **attribution** peut être en jeu.
+- **Interdit d'ordre (0-63)** — les modèles **ne sont pas des réplicats** : forwards déterministes,
+  un seul tirage de matériau. **La borne d'une conjonction est le `min`, jamais le produit** ; **tout
+  produit de p-valeurs par modèle rend le run invalide**. Toute conjonction passe par un
+  **bootstrap joint** sur le **même** rééchantillon de clusters.
+- **« Séparation de patterns » (ix, 0-59)** — interdit d'appliquer la formule **à un run** qui mesure
+  `h` brut sans instancier `M`. Réservée à la **motivation historique de X1**.
+- **Le centrage (xviii, `lab-neuro`)** — **aucune désignation biologique** : ni « inhibition
+  tonique », ni « normalisation divisive », ni « retrait de mode commun par les interneurones ». Le
+  centrage est un **instrument statistique** ; formulation licite : ***« retrait d'une composante
+  affine estimée hors ligne, en leave-one-out, sur les états du même type »***.
+- **Support vide (D23, 0-74)** — une quantité sans domaine de définition se publie ***`SANS OBJET`,
+  jamais `0`***. Un support vide **ne licencie aucune borne**, pas même une équivalence TOST.
+- **Classe d'équivalence (D28)** — elle dit ***« effet borné par 2 × la résolution »***, **jamais**
+  « pas d'effet ».
+- **Indécidable (0-71, 0-85)** — *« augmenter la résolution »* n'est pas une suite par défaut : la
+  **cause doit être nommée** (puissance, support, précision) avant la suite.
+- **Bin dur (A-5)** — interdit **sous toute forme, y compris adverbiale** : « tendance »,
+  « suggère », « va dans le sens de ».
 
 ## Environnement
 

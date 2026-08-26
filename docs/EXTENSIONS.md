@@ -558,6 +558,47 @@ rencontré exactement ces bugs et a shippé des fixes :
 | Substrat matriciel inadapté | Indexation plutôt que stockage | X5 |
 | Oubli catastrophique à la consolidation | Replay SWR recombinant | V2 |
 
+### Q-quant — Robustesse de `φ` à la quantification — *FILE D'ATTENTE, coût XS, NON OUVERTE*
+
+> **Ne s'ouvre pas avant le verdict du cycle « recouvrement des supports ».** Les deux fils en cours
+> (Math `Q-M5`, Builder) ont **priorité absolue**. *Un XS n'a pas droit au raccourci : c'est
+> précisément parce qu'elle est petite que cette ablation est le bon test de la discipline de file.*
+
+**Question.** *Combien d'amplitude le mécanisme peut-il perdre avant que le rappel casse ?*
+
+**Un seul bouton** : `φ ∈ {continue (défaut), ternaire (sign(x)·1[|x|>seuil]), binaire (1[x>seuil])}`,
+appliqué **à la lecture ET à l'écriture** — le régime « spike » **complet**, pas un hybride. Tout le
+reste aux **défauts X8**. Jugé sur le **banc existant** : **E1** (10 secrets), **E1b** (ratio
+paraphrases), **E3**. **GPT-2 seul pour commencer.**
+
+**Provenance de la question, à consigner** : proposition externe d'une règle **STDP / spike**.
+L'analyse PI + copilote **écarte la refonte** pour trois motifs, chacun suffisant :
+
+1. **Optimisation d'un poste qui coûte 0,1 % du budget** — 197 s de GPU sur **tout** le cycle v4.
+2. **Deux variables à la fois** pendant qu'`A3` est ouverte.
+3. **Temporalité fine sans substrat** — la STDP encode la **causalité inter-spikes** ; l'hippocampe
+   de ce projet ne voit que des **états continus au rythme des tokens**.
+
+**Mais la proposition contenait une question falsifiable, et c'est elle qui entre en file** : la
+**robustesse du mécanisme à la quantification**.
+
+**Observation valide de la proposition, à consigner aussi** : les organes existants — **top-k du
+gyrus denté**, **gate quasi-binaire X8.1**, **écriture par surprise** — sont **DÉJÀ
+fonctionnellement événementiels**. La convergence continu/spike sous les mêmes contraintes est
+**un paragraphe du rapport** (*« ces propriétés sont dictées par le problème, pas par le
+substrat »*), **pas un chantier**.
+
+**Écarté sans entrée en file** : SNN + sommeil (proposition B). Distiller vers un SNN **empile deux
+paris non résolus** — l'entraînement SNN n'a pas d'équivalent local au backprop qui **scale** ; et la
+version **LoRA** du sommeil garde son **chemin connu**.
+
+**Circuit** : format maison, **banc D14-S**, prédictions signées, partition exhaustive — **le circuit
+normal**, sans raccourci.
+
+**Paris datés au registre avant mesure** *(copilote, 2026-08-26)* : la **binarisation dure coûte cher
+sur E1** — l'écriture a besoin du **continu de la surprise** ; le **ternaire est presque gratuit**
+(**< 15 % de perte E1**, **E3 inchangé**).
+
 ## 4. Tableau des poids (à remplir au fil des runs)
 
 Référence : config par défaut (`EngramConfig`), seeds fixes, GPT-2 124M.
@@ -590,6 +631,6 @@ retire un mécanisme de la référence, aucune n'est retenue comme nouveau défa
 | V2-D(a) v3 — kNN logits, instrument (2026-08-22) | n.a. (V-base +1.353 reproduite) | P1 **28/30 (F)** · **30/30 (L6)** — **non interprétables** : plancher clé-nulle 12/30 (F) / 23/30 (L6), `knn_k ≥ |store|` | n.a. | non mesurée (arrêt P3[L6], médiane 4/30) | **INCONCLUSIF — instrument sans étape d'adressage** ; acquis : V2 30/30 + P1-exact 30/30 ⇒ **le budget E3 n'est pas le verrou du top-10** ; protocole `experiments/EXP-2026-08-22-knn-borne-logits-v3.md` |
 | I2 `layer_profile` — gate v4 (instrument, 2026-08-23) | — (`M = 0`, hors E1/E2/E3) | — | — | — | **INCONCLUSIF — NaN §6 (forward fp16 non épinglé au §7)** ; descriptif, robuste au bornage adversarial : **bande N ×3**, `max AUC` **sous le plancher lexical à 0 forward** (−0.185 / −0.085 / −0.072), `R1_36 = 0.0000` = **rang médian 19/37, exactement le hasard** ; mécanisme établi : **le plus proche voisin est de même TYPE de paraphrase (1.000 / 0.996 / 1.000, hasard 0.331) et du même FAIT au hasard (0.000 / 0.008 / 0.000)** ⇒ le cosinus mesure la forme, pas l'identité. Suite : I2-v2 — protocole `experiments/EXP-2026-08-22-layer-profile.md` |
 | V2-D(a) kNN-LM nu, run 2 (instrument, 2026-08-22) | — (récupération : N_eff = 3, non consignable) | non mesuré | — | +0.0461 à λ\* (fait-seul) ‡ chiffre exact d'un run invalide | **INVALIDE ×3** — porte V1b insatisfiable en fp64 puis amendée après données (arrêt dur violé) + **pseudo-réplication** (clé et prompts indépendants du secret ⇒ N_eff = 3, pas 10) + acquis de régime faux recopié du run 1 (d²_min = 0.0 → réel 0.00449220464) ⇒ **D14-ext candidate** (satisfiabilité machine des portes ; provenance des chiffres cités). **Observation P6 (N_eff = 3)** : clé couche 6 h = 1.00 vs état final h = 0.33 — l'invariance à la paraphrase vit dans les couches intermédiaires — protocole `experiments/EXP-2026-08-21-knn-borne-logits-v2.md` |
-| **v4-matériel — `pool_v4` + I2 (instrument, 3 modèles, 2026-08-23)** | — (`M = 0`, hors E1/E2/E3) | — | — | — | **matériau qualifié RETENU ; `P-N2` INCONCLUSIF (`N-b × C-ind`, famine par SATURATION : `Σm = 0`, `D` sans objet) ; `ORD-3` ×3 (`p ≤ 1.7e-4`, borne = min)** — *« l'instrument est sain, la question posée est restée sans réponse »*. Calibrateur au plafond : `ΔR1_inv = 1 − R1_null` exactement, formulation (xiii). **Acquis** : `B0′ = 0` (tige/suffixe séparables), `A4` (porteur du domaine identifié, s'évanouit à `t−1`), **théorème d'incompatibilité composition / préfixe verbatim** (dérivation Math due). `A3` antipode en forme forte (plancher commun 0.41-0.46 contre 0.008 attendu) ⇒ attribution représentationnelle de X1 **non soutenue** par la seule mesure qui l'a approchée (étage de **lecture** ; le **+57 % d'E2 reste acquis**). Banc `E = 0` (57 clauses, 167 cas), `fact_pairs` échoue au contre-exemple, 58 défauts fermés avant tout octet de matériau. Suite : recouvrement des supports (CPU) puis locus de capture ; canal suffixe désigné, non ouvert. Protocole `experiments/EXP-2026-08-23-v4-materiel.md` |
+| **v4-matériel — `pool_v4` + I2 (instrument, 3 modèles, 2026-08-23)** | — (`M = 0`, hors E1/E2/E3) | — | — | — | **matériau qualifié RETENU ; `P-N2` INCONCLUSIF (`N-b × C-ind`, famine par SATURATION : `Σm = 0`, `D` sans objet) ; `ORD-3` ×3 (`p ≤ 1.7e-4`, borne = min)** — *« l'instrument est sain, la question posée est restée sans réponse »*. Calibrateur au plafond : `ΔR1_inv = 1 − R1_null` exactement, formulation (xiii). **Acquis** : `B0′ = 0` (tige/suffixe séparables), `A4` (porteur du domaine identifié, s'évanouit à `t−1`), **théorème d'incompatibilité composition / préfixe verbatim** (dérivation Math due). `A3` antipode en forme forte — **⚠ RECTIFIÉ le 2026-08-26 (journal, cycle « recouvrement ») : mesure effectuée avec une `G` DISTINCTE de celle du projet** (`numpy.default_rng(0)` contre le `torch.randn(seed 0)` de `hippocampus.phi`, `corrcoef ≈ 0.011`) ; **le « plancher 0.41-0.46 » est la COMPRESSION, pas le cosinus** — cosinus avec la `G` réelle : **0.147-0.337**. **L'attribution représentationnelle de X1 reste OUVERTE**, jugée par la prédiction rectifiée du cycle « recouvrement », **et non par `A3`** (le **+57 % d'E2 reste acquis**, chemin d'écriture). Banc `E = 0` (57 clauses, 167 cas), `fact_pairs` échoue au contre-exemple, 58 défauts fermés avant tout octet de matériau. Suite : recouvrement des supports (CPU) puis locus de capture ; canal suffixe désigné, non ouvert. Protocole `experiments/EXP-2026-08-23-v4-materiel.md` |
 
 *(les lignes suivantes du tableau principal s'ajoutent quand leur déclencheur est observé)*

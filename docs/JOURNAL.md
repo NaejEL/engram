@@ -1855,6 +1855,76 @@ qui départage, jamais la relecture.*
   recouvrement des supports n'a pas tranché.
 - *Modèles : director.interpretation fable, math fable, neuro inherit, builder inherit, verifier inherit.*
 
+## 2026-08-26 — Notes : motif candidat sur les portes, et file d'attente `Q-quant`
+
+- **Nature** : notes du PI, **pas un verdict de cycle**. Le cycle « recouvrement des supports » est
+  **en cours** (arrêt de provenance à `V-G`, correction autorisée sous D30, `Q-M6` dû avant le banc).
+  Aucune mesure, aucun GPU.
+
+### Motif candidat — les portes-identités échouent en produisant de l'information
+
+*Observé **une fois**. Consigné comme **motif**, pas comme décision : **gravure seulement si le
+patron se répète**.*
+
+`V-G` a échoué **en produisant exactement le chiffre qui lui manquait** : pour établir que la `G`
+d'`A3` n'est pas celle du projet, elle a dû **mesurer les douze cosinus avec la `G` du projet**
+(0.147 à 0.337) — et ce sont eux qui paramètrent désormais la prédiction rectifiée. **L'échec de la
+porte n'a pas seulement invalidé une entrée : il a fourni la bonne.**
+
+**Propriété structurelle candidate** :
+
+> Les portes formulées comme **IDENTITÉS ENTRE OBJETS NOMMÉS** échouent **en produisant de
+> l'information** — *la mesure de l'écart EST la calibration manquante*. Les portes formulées comme
+> **SEUILS** échouent **en produisant du regret** — runs 1 à 3 : données brûlées, verdicts interdits.
+
+*Si le patron se confirme, il oriente la rédaction des portes : préférer « `X` est-il le même objet
+que `Y` ? » à « `X` dépasse-t-il `s` ? » chaque fois que les deux sont disponibles.*
+
+### File d'attente — `Q-quant`, robustesse de `φ` à la quantification (coût XS, NON OUVERTE)
+
+**Ne s'ouvre pas avant le verdict du cycle « recouvrement des supports ».** Fiche complète :
+`docs/EXTENSIONS.md`, section `Q-quant`.
+
+**Question** : *combien d'amplitude le mécanisme peut-il perdre avant que le rappel casse ?* Un seul
+bouton — `φ ∈ {continue, ternaire, binaire}`, appliqué **à la lecture ET à l'écriture** (le régime
+« spike » **complet**, pas un hybride). Tout le reste aux **défauts X8**. Jugé sur le **banc
+existant** : **E1**, **E1b**, **E3**. **GPT-2 seul pour commencer.**
+
+**Provenance** : proposition externe d'une règle **STDP / spike**. L'analyse PI + copilote **écarte la
+refonte** — (1) optimisation d'un poste qui coûte **0,1 % du budget** (197 s de GPU sur tout v4) ;
+(2) **deux variables à la fois** pendant qu'`A3` est ouverte ; (3) **temporalité fine sans
+substrat** : la STDP encode la **causalité inter-spikes**, l'hippocampe de ce projet ne voit que des
+**états continus au rythme des tokens**. **Mais elle contenait une question falsifiable**, et c'est
+elle qui entre en file : **la robustesse à la quantification**.
+
+**Observation valide de la proposition, consignée** : les organes existants — **top-k du gyrus
+denté**, **gate quasi-binaire X8.1**, **écriture par surprise** — sont **DÉJÀ fonctionnellement
+événementiels**. La convergence continu/spike sous les mêmes contraintes est **un paragraphe du
+rapport** — *« ces propriétés sont dictées par le problème, pas par le substrat »* — **pas un
+chantier**.
+
+**Écarté sans entrée en file** : SNN + sommeil (proposition B). Distiller vers un SNN **empile deux
+paris non résolus** — l'entraînement SNN n'a pas d'équivalent local au backprop qui **scale** ; et la
+version **LoRA** du sommeil garde son **chemin connu**.
+
+**Circuit** : format maison, banc D14-S, prédictions signées, partition exhaustive — **le circuit
+normal**. *Un XS n'a pas droit au raccourci : c'est précisément parce qu'elle est petite que cette
+ablation est le bon test de la discipline de file.*
+
+**Paris datés avant mesure** *(copilote, 2026-08-26, hors protocole, aucun poids décisionnel)* :
+
+| Condition | Pari |
+| --- | --- |
+| **binaire** (`1[x > seuil]`) | **coûte cher sur E1** — l'écriture a besoin du **continu de la surprise** |
+| **ternaire** (`sign(x)·1[\|x\| > seuil]`) | **presque gratuit** — **< 15 % de perte E1**, **E3 inchangé** |
+
+- **Décisions gravées ce jour** (`docs/ARCHITECTURE.md` §3) : **D30** — *le gel se lève pour une
+  erreur trouvable SANS la mesure, jamais pour une erreur qui n'apparaît qu'à la lumière des
+  résultats* ; **D30 alinéa 2** — *un changement post-gel trouvable sans la mesure mais qui n'est pas
+  une correction d'erreur est licite s'il rend la prédiction **plus dure** à satisfaire, interdit
+  s'il la rend plus facile*.
+- *Notes du PI ; aucun run, aucun modèle de jugement engagé.*
+
 ## 2026-08-20 — v0 : squelette posé
 
 - **Commit** : (initial)
