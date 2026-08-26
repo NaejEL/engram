@@ -4359,15 +4359,781 @@ def _imprimer(rep: dict) -> None:
     print("-" * 78)
 
 
+# =========================================================================
+#  ======  SUITE dgov — recouvrement des supports de `topk(G·h)` (D14-S)  ==
+#
+#  Protocole : `experiments/EXP-2026-08-23-recouvrement-supports.md`
+#  (PRE-ENREGISTRE ; correction de provenance du 2026-08-26, §15).
+#
+#  CPU seul, aucune mesure, aucun GPU, aucun poids de modèle chargé. Les seuls
+#  fichiers touchés sont les `config.json` en cache (porte `V-norm`, deux
+#  lignes) et les `.npz` d'états déjà sur disque (portes de provenance).
+#
+#  **AUCUNE MESURE AVANT `E = 0`** (§6.E, critère d'abandon).
+#
+#  Contenu exigé au §10 : **12 cellules énumérées**, **10 objets simulés**
+#  (4 classes de `N`, 4 états de `C`, 2 issues de `Core`), et **cas ÉCHOUANTS
+#  OBLIGATOIRES** pour `V-borne`, `V-P8` (7 paires), `V-core-S` (deux unités
+#  d'une même tige), `V-ulp` (états centrés et placebo), `V-seed`, `V-t1`.
+#  **Le cardinal est recompté par ÉNUMÉRATION, jamais par affirmation.**
+# =========================================================================
+
+import support_overlap as so  # noqa: E402
+
+OUT_DIR_DGOV = ROOT / "experiments" / "results" / "recouvrement-supports"
+
+UNDERSPEC_DGOV = dict(so.OPERATIONNALISATIONS)
+
+
+def _dgov_paires_conformes(n=40, seed=0):
+    """Paires synthétiques dont l'identité `|A∩B| ≥ p_pair` tient **par
+    construction** : on tire deux `z` et on lit les quantités réelles."""
+    rng = np.random.default_rng(seed)
+    out = []
+    for _ in range(n):
+        za = rng.standard_normal(so.D_DG)
+        zb = 0.7 * za + 0.7 * rng.standard_normal(so.D_DG)
+        out.append(so.quantites_de_paire(za, zb))
+    return out
+
+
+def _dgov_paire_violante():
+    """Contre-exemple ÉCHOUANT obligatoire de `V-borne` : une paire dont
+    `|A∩B| < p_sym`. **Impossible en arithmétique exacte** — c'est précisément
+    pourquoi toute violation est un **BUG DE MESURE** et jamais un résultat
+    (§6.B). Le banc la fabrique pour vérifier que la porte mord."""
+    return [{"inter": 2, "p_sym": 9, "p_pair": 5, "cos": 0.42}]
+
+
+def _dgov_supports_core(n_unites=10, commun=7, seed=0):
+    """Supports synthétiques partageant `commun` indices sur toutes les unités."""
+    rng = np.random.default_rng(seed)
+    base = np.arange(commun)
+    out = []
+    for _ in range(n_unites):
+        reste = rng.choice(np.arange(commun, so.D_DG), so.K_TOPK - commun,
+                           replace=False)
+        out.append(np.sort(np.concatenate([base, reste])))
+    return out
+
+
+def _dgov_marges(completes=True):
+    m = {c: {"marge_ulp_min": 12.0 + i} for i, c in enumerate(so.CENTRAGES)}
+    if not completes:            # 0-125 : la porte n'existait que pour les bruts
+        for c in ("glob", "type", "auto", "plac"):
+            m.pop(c)
+    return m
+
+
+def _dgov_spec_seed(complete=True):
+    s = {"seed": 0,
+         "generateur": "torch.randn(R, d, generator=manual_seed(seed))",
+         "regle_de_tirage": "normalisation L2 par ligne ; indices 0..R−1",
+         "indices": "0..R−1",
+         "cardinal_par_modele": {m: 20 for m in so.MODELES},
+         "appariement_inter_modeles": "par la NORME, jamais par le vecteur"}
+    if not complete:             # 0-133 : la clause inexécutable
+        s["appariement_inter_modeles"] = "mêmes vecteurs sur les trois modèles"
+        s["cardinal_par_modele"] = {so.MODELES[0]: 20}
+    return s
+
+
+def _dgov_schema_diag(complet=True):
+    cel = {}
+    for m in so.MODELES:
+        for x in so.CENTRAGES:
+            for s in so.STRATES:
+                cel[f"{m}|{x}|{s}"] = {
+                    "f": 0.31, "sigma_pm": 0.52,
+                    "O_cos_conjoint": {"O_moyen": 0.05, "cos_moyen": 0.24,
+                                       "corr_O_cos": 0.4}}
+    if not complet:              # 0-120 : sans `f`, le cycle ne peut pas donner
+        cel[f"{so.MODELES[0]}|aucun|S3"]["f"] = None    # tort à son propre expert
+    return {"modeles": list(so.MODELES), "conditions": list(so.CENTRAGES),
+            "cellules": cel}
+
+
+def _dgov_enumerer_cellules():
+    """**12 cellules décisionnelles**, produites une à une par des IC
+    synthétiques, puis recomptées par ÉNUMÉRATION."""
+    n = float(so.N_HASARD)
+    ics_n = {
+        "HAUT": (( 0.20,  0.30), ( 0.20,  0.30)),
+        "−":    ((-0.30, -0.20), (-0.30, -0.20)),
+        "BAS":  ((-0.30, -0.20), (-0.004, 0.004)),
+        "ind_L": ((-0.30, 0.30), (-0.30,  0.30)),
+    }
+    ics_c = {"c-mec": (-0.004, 0.004), "c-cent": (0.20, 0.30),
+             "ind_Δ": (-0.30, 0.30)}
+    eps_l, eps_e = 0.01, 0.01
+    vues = []
+    for cn, (icl, ico) in ics_n.items():
+        obtenu_n = so.classe_n(icl, ico, eps_l, so.N_HASARD)
+        for cc, icd in ics_c.items():
+            obtenu_c = so.classe_c(icd, eps_e, so.N_HASARD)
+            vues.append((obtenu_n, obtenu_c, cn, cc))
+    attendu = so.cellules_decisionnelles()
+    produites = sorted({(a, b) for a, b, _, _ in vues})
+    conformes = all(a == cn and b == cc for a, b, cn, cc in vues)
+    ok = conformes and produites == sorted(attendu["cellules"]) \
+        and attendu["cardinal"] == 12 and len(produites) == 12
+    return (PASS if ok else FAIL), {
+        "cardinal_enumere": len(produites), "cardinal_attendu": 12,
+        "cellules_produites": [list(x) for x in produites],
+        "cellules_enumerees_par_le_noyau": [list(x)
+                                            for x in attendu["cellules"]],
+        "chaque_cellule_atteinte_par_un_IC": conformes,
+        "n_hasard": str(so.N_HASARD), "corridor_2n": str(so.CORRIDOR),
+        "n_flottant": n,
+        "regle": "cardinal recompté PAR ÉNUMÉRATION, jamais par affirmation"}
+
+
+def _dgov_enumerer_objets():
+    """**10 objets simulés** : 4 classes de `N`, 4 états de `C`, 2 issues de
+    `Core`. Chacun doit être **atteint** par une entrée synthétique."""
+    eps = 0.01
+    atteints = []
+    for icl, ico in (((0.2, 0.3), (0.2, 0.3)), ((-0.3, -0.2), (-0.3, -0.2)),
+                     ((-0.3, -0.2), (-0.004, 0.004)), ((-0.3, 0.3), (-0.3, 0.3))):
+        atteints.append(("N", so.classe_n(icl, ico, eps, so.N_HASARD)))
+    for icd in ((-0.3, -0.2), (-0.004, 0.004), (0.2, 0.3), (-0.3, 0.3)):
+        atteints.append(("C", so.classe_c(icd, eps, so.N_HASARD)))
+    vide = so.core(_dgov_supports_core(10, 0, seed=1), seuil=so.CORE_SEUIL)
+    plein = so.core(_dgov_supports_core(10, 7, seed=2), seuil=so.CORE_SEUIL)
+    atteints.append(("Core", "vide" if vide["taille"] == 0 else "non vide"))
+    atteints.append(("Core", "non vide" if plein["taille"] > 0 else "vide"))
+    attendu = so.objets_du_banc()
+    ok = (sorted(atteints) == sorted(attendu["objets"])
+          and attendu["cardinal"] == 10 and len(set(atteints)) == 10)
+    return (PASS if ok else FAIL), {
+        "objets_atteints": [list(x) for x in atteints],
+        "objets_enumeres_par_le_noyau": [list(x) for x in attendu["objets"]],
+        "cardinal_enumere": len(set(atteints)), "cardinal_attendu": 10,
+        "Core_vide": vide["taille"], "Core_non_vide": plein["taille"],
+        "regle": "cardinal recompté PAR ÉNUMÉRATION, jamais par affirmation"}
+
+
+def _dgov_unite_de_n():
+    """`n` et le corridor dans l'unité de publication de `O` — **fraction
+    `p/64`**, pas l'indice.
+
+    Défaut trouvé **par ce banc**, sur quatre clauses à la fois : `N_HASARD`
+    valait `k²/D = 1/2` (l'unité INDICE) là où `O`, publié en `p/64`, appelle
+    `n = 0.5/64 = 1/128` et `2n = 1/64`. Le corridor était **64 fois trop
+    large** ⇒ `BAS` et `c-mec` vraies presque partout.
+    """
+    o = so.o_fraction(32 * 40, 40)            # 32 indices communs sur 40 paires
+    centre = float(o - so.N_HASARD)
+    ic_o = (centre - 1e-6, centre + 1e-6)
+    juste = so.classe_n((-0.3, -0.2), ic_o, 0.01, so.N_HASARD)
+    ok = (o == so.frac(1, 2) and so.N_HASARD == so.frac(1, 128)
+          and so.CORRIDOR == so.frac(1, 64)
+          and so.N_HASARD_INDICES == so.frac(1, 2) and juste != "BAS")
+    return (PASS if ok else FAIL), {
+        "O_de_32_indices": so.texte_fraction(o),
+        "n_fraction": str(so.N_HASARD), "corridor_2n": str(so.CORRIDOR),
+        "n_indices": str(so.N_HASARD_INDICES),
+        "classe_sous_l_unite_juste": juste,
+        "regle": "O est une fraction p/64 (0-132) : n et 2n le sont aussi"}
+
+
+def _dgov_unite_de_n_fausse():
+    """Contre-exemple ÉCHOUANT : le corridor pris en INDICES classe `BAS` une
+    cellule où les supports partagent **32 indices sur 64**, soit 32 × le
+    corridor."""
+    o = so.o_fraction(32 * 40, 40)
+    centre = float(o - so.N_HASARD)
+    ic_o = (centre - 1e-6, centre + 1e-6)
+    faux = so.classe_n((-0.3, -0.2), ic_o, 0.01, so.N_HASARD_INDICES)
+    return (FAIL if faux == "BAS" else PASS), {
+        "classe_sous_l_unite_fausse": faux,
+        "O_de_32_indices": so.texte_fraction(o),
+        "corridor_faux": str(2 * so.N_HASARD_INDICES),
+        "motif": "32 indices sur 64 déclarés « bornés par 2 × le hasard »"}
+
+
+def _dgov_exclusivite_ordres():
+    """Ordres d'évaluation **GRAVÉS** (D18) : `N` = HAUT → − → BAS → ind_L,
+    `C` = c-anti (court-circuitante) → c-mec → c-cent → ind_Δ ; la
+    complémentation est évaluée **EN DERNIER**."""
+    eps = 0.01
+    # une entrée satisfaisant à la fois `HAUT` et `BAS` doit rendre `HAUT`
+    prio_n = so.classe_n((0.20, 0.30), (-0.004, 0.004), eps, so.N_HASARD)
+    # une entrée satisfaisant à la fois `c-anti` et `c-mec` doit rendre `c-anti`
+    prio_c = so.classe_c((-0.02, -0.011), eps, so.N_HASARD)
+    # `ind` par complémentation : ni l'une ni l'autre
+    ind_n = so.classe_n((-0.3, 0.3), (-0.3, 0.3), eps, so.N_HASARD)
+    ind_c = so.classe_c((-0.3, 0.3), eps, so.N_HASARD)
+    ok = (prio_n == "HAUT" and prio_c == "c-anti"
+          and ind_n == "ind_L" and ind_c == "ind_Δ")
+    return (PASS if ok else FAIL), {
+        "HAUT_prime_sur_BAS": prio_n, "c_anti_court_circuitante": prio_c,
+        "ind_L_par_complementation": ind_n, "ind_delta_par_complementation": ind_c,
+        "ordre_N": list(so.CLASSES_N), "ordre_C": list(so.CLASSES_C)}
+
+
+def build_clauses_dgov(paires_ok, marges_ok, spec_ok, diag_ok):
+    C = []
+
+    def clause(name, pass_desc, fail_desc, cases_pass, cases_fail,
+               structural=None, note=None):
+        C.append({"clause": name, "pass_case": pass_desc, "fail_case": fail_desc,
+                  "cases_pass": cases_pass, "cases_fail": cases_fail,
+                  "structural": structural, "note": note})
+
+    # ------------------------------------------------------- provenance
+    clause("V-cache", "les trois `.npz` de v4 sont lisibles, hash publié",
+           "un modèle absent du cache ⇒ re-forward, jamais un repli silencieux",
+           [("cache v4 complet", PASS, lambda: so.v_cache(so.MODELES))],
+           [("modèle inexistant", FAIL,
+             lambda: so.v_cache(("modele/qui-n-existe-pas",)))],
+           note="échec ⇒ re-forward autorisé (§14-4) : 53,82 s, VRAM ≤ 4,688 "
+                "Gio en RÉSERVÉ (0-142).")
+
+    clause("V-G (v2)",
+           "G du projet instanciée et hashée ; cos fp32/fp64 sous 1e−6 ; "
+           "divergence avec A3 publiée",
+           "divergence fp32/fp64 au-dessus de la tolérance ⇒ arrêt de "
+           "provenance (D14-R)",
+           [("tolérance 1e−6", PASS,
+             lambda: so.v_g((so.MODELES[0],), tol_precision=1e-6))],
+           [("tolérance 0 — aucune divergence tolérée", FAIL,
+             lambda: so.v_g((so.MODELES[0],), tol_precision=0.0))],
+           note="v1 (« reproduire A3 bit-à-bit ») était INEXÉCUTABLE PAR "
+                "CONSTRUCTION : A3 n'a jamais été calculé avec la G du projet "
+                "(0-135). Aucune reproduction d'A3 n'est exigée ni possible.")
+
+    clause("V-iid", "sanité de moments de G (prouvée par provenance, M3)",
+           "une matrice non gaussienne ⇒ FAIL ; PAS de KS",
+           [("G du projet, 512 lignes", PASS,
+             lambda: so.v_iid(np.random.default_rng(0).standard_normal((512, 768))))],
+           [("matrice uniforme [0,1]", FAIL,
+             lambda: so.v_iid(np.random.default_rng(0).random((512, 768))))])
+
+    # --------------------------------------------- portes exigées au §10
+    clause("V-borne",
+           "|A∩B| ≥ p_sym (borne SERRÉE, §16) sur 100 % des paires",
+           "une paire à |A∩B| < p_sym ⇒ BUG DE MESURE, jamais un résultat",
+           [("40 paires réelles synthétiques", so.EN_ATTENTE,
+             lambda: so.v_borne(paires_ok))],
+           [("paire fabriquée inter=2 < p_sym=9", FAIL,
+             lambda: so.v_borne(_dgov_paire_violante()))],
+           structural=lambda: (
+               [] if so.ENCADREMENT_TABLE_SEUIL is None else
+               ["le second membre de V-borne a reçu un seuil : Q-M6 était-elle "
+                "rendue ? sinon c'est 0-52"]),
+           note="§16, D30 alinéa 2 : la borne gelée n'était pas fausse, elle "
+                "était CORRECTE ET LÂCHE — majorer m_ψ ≤ 1 jette un facteur "
+                "cos. Le seuil est ≥ cos, pas ≥ cos². membre (b) "
+                "« la réalisée encadre la théorique » = EN-ATTENTE de Q-M6 ; "
+                "poser un seuil ici serait 0-52, troisième occurrence.")
+
+    clause("p_sym vs p_pair (double mesure D26)",
+           "p_sym ≥ p_pair sur 100 % des paires ; p_pair reste DESCRIPTIF",
+           "p_pair traité comme décisionnel ⇒ la borne lâche décide",
+           [("40 paires réelles synthétiques", PASS,
+             lambda: (PASS if all(p["p_sym"] >= p["p_pair"] for p in paires_ok)
+                      else FAIL,
+                      {"n": len(paires_ok),
+                       "ecart_min_max": [min(p["ecart_psym_moins_ppair"]
+                                             for p in paires_ok),
+                                         max(p["ecart_psym_moins_ppair"]
+                                             for p in paires_ok)],
+                       "p_sym_min_max": [min(p["p_sym"] for p in paires_ok),
+                                         max(p["p_sym"] for p in paires_ok)],
+                       "p_pair_min_max": [min(p["p_pair"] for p in paires_ok),
+                                          max(p["p_pair"] for p in paires_ok)]}))],
+           [("borne lâche décisionnelle ⇒ prédiction plus FACILE", FAIL,
+             lambda: (FAIL, {"motif": "D30 alinéa 2 n'autorise le resserrement "
+                                      "que parce qu'il rend la prédiction plus "
+                                      "DURE (O ≥ 7 à 18 au lieu de 1 à 5) ; "
+                                      "revenir à la lâche inverserait le "
+                                      "critère de direction"}))])
+
+    clause("cum : aucune interpolation (Q-M5)",
+           "cos sous cum(7) ⇒ p_sym rendu ; cos au-dessus ⇒ EN-ATTENTE",
+           "une valeur de cum extrapolée au lieu d'être attendue",
+           [("cos = 0.1471 (Qwen S0) ≤ cum(7)", PASS,
+             lambda: (PASS if so.p_sym_theorique(0.1471)["p_sym"] == 7
+                      else FAIL, so.p_sym_theorique(0.1471))),
+            ("cos = 0.3368 (SmolLM2 S3) > cum(7) ⇒ EN-ATTENTE", PASS,
+             lambda: (PASS if so.p_sym_theorique(0.3368)["statut"]
+                      == so.EN_ATTENTE else FAIL, so.p_sym_theorique(0.3368))),
+            ("table chargée : 7 ancres, concave, contiguë depuis 1", PASS,
+             lambda: (PASS if (so.charger_cum()["concave"]
+                               and so.charger_cum()["contigue_depuis_1"])
+                      else FAIL,
+                      {k: v for k, v in so.charger_cum().items() if k != "cum"}))],
+           [("extrapolation linéaire de cum(8)", FAIL,
+             lambda: (FAIL, {"cum_7": so.CUM_ANCRES[7],
+                             "extrapolation_lineaire": round(
+                                 2 * so.CUM_ANCRES[7] - so.CUM_ANCRES[6], 5),
+                             "motif": "cum est CONCAVE : l'interpolation "
+                                      "linéaire SOUS-ESTIME toujours, et elle "
+                                      "a déjà déplacé une cellule (SmolLM2 S3, "
+                                      "frontière 5/6 à 0.26 %)"}))],
+           note="la table `cum` est une constante CHARGÉE (charger_cum) et non "
+                "des nombres que le code compléterait : elle s'attend, elle ne "
+                "se devine pas.")
+
+    clause("V-P8", "toute cellule a ≥ 8 paires",
+           "une cellule à 7 paires ⇒ exclue, cardinal publié (CAS OBLIGATOIRE)",
+           [("4 cellules à 40, 90, 360, 1260 paires", PASS,
+             lambda: so.v_p8({"gpt2|S3": 360, "gpt2|S2": 540,
+                              "gpt2|S1": 2160, "gpt2|S0": 7560}))],
+           [("une cellule à 7 paires", FAIL,
+             lambda: so.v_p8({"gpt2|S3": 7, "gpt2|S2": 540,
+                              "gpt2|S1": 2160, "gpt2|S0": 7560}))],
+           note="0-119 : q95 par paire = 2 indices = le DOUBLE du corridor ; "
+                "une paire isolée le dépasse 7.6 % du temps sous la nulle.")
+
+    clause("V-t1", "aucune quantité n'est calculée à t−1 ; cardinal intra-tige "
+                   "publié",
+           "une quantité à t−1 dont l'ensemble contient deux unités d'une même "
+           "tige (CAS OBLIGATOIRE)",
+           [("registre t−1 vide, cardinal publié", PASS,
+             lambda: so.v_t1([], {"S3": 360, "S2": 540}))],
+           [("quantité à t−1 avec paires intra-tige", FAIL,
+             lambda: so.v_t1([{"nom": "profil à t−1", "intra_tige": True,
+                               "n_paires_intra_tige": 360}]))],
+           note="0-130 : à t−1, S3 et S2 rendraient 64/64 PAR ARITHMÉTIQUE — "
+                "le chiffre le plus élevé du cycle aurait été un artefact de "
+                "définition.")
+
+    clause("V-core-S", "|S| = 10, une unité par tige, appartenance publiée",
+           "deux unités d'une même tige dans S (CAS OBLIGATOIRE)",
+           [("10 unités, 10 tiges", PASS,
+             lambda: so.v_core_s(list(range(10)),
+                                 {i: f"T{i}" for i in range(10)}))],
+           [("deux unités de la tige T0", FAIL,
+             lambda: so.v_core_s(
+                 list(range(10)),
+                 {i: ("T0" if i == 9 else f"T{i}") for i in range(10)}))],
+           note="0-124 : la signature de Core vaut p < 1e-13 SOUS "
+                "INDÉPENDANCE ; deux états d'une même tige rendent Core > 0 "
+                "ATTENDU.")
+
+    clause("V-ulp", "marge à la coupure publiée pour les CINQ conditions",
+           "les états centrés et placebo sans marge (CAS OBLIGATOIRE)",
+           [("cinq conditions", PASS, lambda: so.v_ulp(_dgov_marges(True)))],
+           [("états bruts seuls (0-125)", FAIL,
+             lambda: so.v_ulp(_dgov_marges(False)))],
+           note="0-125 : les états centrés et placebo sont ceux dont les "
+                "coordonnées sont RAPPROCHÉES DE ZÉRO par soustraction — les "
+                "plus exposés au basculement de rang. La porte manquait "
+                "exactement là où le risque est maximal.")
+
+    clause("V-seed", "seed, générateur, règle de tirage gelés ; cardinal par "
+                     "modèle ; appariement par la NORME",
+           "appariement par le VECTEUR et cardinal partiel (CAS OBLIGATOIRE)",
+           [("spécification complète, seed = 0", PASS,
+             lambda: so.v_seed(_dgov_spec_seed(True)))],
+           [("« mêmes vecteurs sur les trois modèles »", FAIL,
+             lambda: so.v_seed(_dgov_spec_seed(False))),
+            ("champ `seed` absent (distinct de seed = 0)", FAIL,
+             lambda: so.v_seed({k: v for k, v in _dgov_spec_seed(True).items()
+                                if k != "seed"}))],
+           note="0-133 : d vaut 768 / 960 / 1536 — un vecteur de ℝ⁷⁶⁸ n'est "
+                "pas un vecteur de ℝ¹⁵³⁶. Cinquième occurrence de la famille "
+                "« cardinal périmé ».")
+
+    # ----------------------------------------------- portes de publication
+    clause("V-norm", "LayerNorm vs RMSNorm cité par ligne de config des trois "
+                     "modèles",
+           "une normalisation affirmée sans ligne de config",
+           [("trois config.json en cache", PASS,
+             lambda: so.v_norm({m: so.config_de_normalisation(m)
+                                for m in so.MODELES}))],
+           [("normalisation par croyance", FAIL,
+             lambda: so.v_norm({m: {"normalisation": "LayerNorm",
+                                    "ligne_de_config": None}
+                                for m in so.MODELES}))],
+           note="0-123 : sans `auto`, C-mod était une classe SANS CAUSE "
+                "CANDIDATE — une classe qui se consigne et ne s'explique "
+                "jamais.")
+
+    clause("V-diag", "f, σ± et (O, cos) conjoint publiés par strate, condition "
+                     "et modèle",
+           "une cellule sans `f` ⇒ le rapport ne peut pas être écrit (§6.D)",
+           [("schéma complet, 60 cellules", PASS, lambda: so.v_diag(diag_ok))],
+           [("une cellule sans f", FAIL,
+             lambda: so.v_diag(_dgov_schema_diag(False)))],
+           note="0-120 : sans `f`, « les supports coïncident » et « quelques "
+                "coordonnées géantes portent tout le cosinus » rendent le MÊME "
+                "O — et le second est la branche de tort de Neuro (N7).")
+
+    clause("V-perimetre", "les trois éléments du §4.9 présents",
+           "le successeur désigné manquant",
+           [("bloc complet", PASS, lambda: so.v_perimetre(bloc_perimetre_dgov()))],
+           [("sans successeur désigné", FAIL,
+             lambda: so.v_perimetre({k: v for k, v in bloc_perimetre_dgov().items()
+                                     if k != "successeur_designe"}))])
+
+    clause("V-schéma", "aucun terme interdit ; O en fraction exacte ; phrase "
+                       "gravée (xvi) verbatim",
+           "un terme du vocabulaire interdit dans le schéma de sortie",
+           [("schéma conforme", PASS, lambda: so.v_schema(schema_dgov()))],
+           [("« séparation de patterns » dans le schéma", FAIL,
+             lambda: so.v_schema(dict(schema_dgov(),
+                                      commentaire="séparation de patterns")))],
+           note="la phrase gravée (xvi) contient elle-même un terme proscrit "
+                "(« chemin d'écriture ») : elle NOMME la limite et est retirée "
+                "du balayage — sinon la porte échouerait sur la formulation "
+                "que le protocole rend obligatoire.")
+
+    # ---------------------------------------- partitions, cardinaux, ordres
+    clause("Cellules décisionnelles",
+           "12 cellules, chacune atteinte par un IC, recomptées par énumération",
+           "un cardinal AFFIRMÉ au lieu d'être recompté",
+           [("énumération exécutée", PASS, _dgov_enumerer_cellules)],
+           [("cardinal affirmé à 16 (4 × 4, c-anti comptée)", FAIL,
+             lambda: (FAIL if so.cellules_decisionnelles()["cardinal"] != 16
+                      else PASS,
+                      {"cardinal_affirme": 16,
+                       "cardinal_enumere": so.cellules_decisionnelles()["cardinal"],
+                       "motif": "c-anti est court-circuitante : elle ne croise "
+                                "pas N"}))],
+           note="famille 0-76(i) / 0-86 / 0-94 / 0-101 / 0-133 — cinq "
+                "occurrences de « cardinal périmé ».")
+
+    clause("Unité de `n` et du corridor",
+           "n = 1/128 et 2n = 1/64 dans l'unité de publication de O (p/64)",
+           "le corridor pris en INDICES classe BAS 32 indices partagés sur 64",
+           [("échelle p/64", PASS, _dgov_unite_de_n)],
+           [("échelle en indices (n = 1/2, 2n = 1)", FAIL,
+             _dgov_unite_de_n_fausse)],
+           note="défaut trouvé PAR CE BANC, sur quatre clauses à la fois : le "
+                "corridor était 64 × trop large ⇒ BAS et c-mec vraies presque "
+                "partout. Aucune donnée du run n'a été nécessaire pour le voir.")
+
+    clause("Objets du banc",
+           "10 objets, chacun ATTEINT par une entrée synthétique",
+           "un objet inatteignable ⇒ classe vide par construction",
+           [("énumération exécutée", PASS, _dgov_enumerer_objets)],
+           [("cardinal affirmé à 8", FAIL,
+             lambda: (FAIL if so.objets_du_banc()["cardinal"] != 8 else PASS,
+                      {"cardinal_affirme": 8,
+                       "cardinal_enumere": so.objets_du_banc()["cardinal"]}))])
+
+    clause("Ordres gravés (D18)",
+           "HAUT prime sur BAS ; c-anti court-circuitante ; ind par "
+           "complémentation EN DERNIER",
+           "une entrée doublement satisfaite classée par la seconde clause",
+           [("priorités exécutées", PASS, _dgov_exclusivite_ordres)],
+           [("ordre inversé : BAS avant HAUT", FAIL,
+             lambda: (FAIL if so.classe_n((0.20, 0.30), (-0.004, 0.004),
+                                          0.01, so.N_HASARD) != "BAS" else PASS,
+                      {"observe": so.classe_n((0.20, 0.30), (-0.004, 0.004),
+                                              0.01, so.N_HASARD),
+                       "attendu_du_cas_faux": "BAS"}))])
+
+    clause("Deux écritures obligatoires (§4.6)",
+           "ε* ≥ 2n ⇒ recouvrement VIDE déclaré ; ε* < 2n ⇒ région masquée "
+           "publiée",
+           "une région masquée passée sous silence",
+           [("ε* = 0.05 ≥ 2n", PASS,
+             lambda: (PASS if so.ecritures_obligatoires(0.05)["cas"] == 1
+                      else FAIL, so.ecritures_obligatoires(0.05))),
+            ("ε* = 0.002 < 2n, région publiée", PASS,
+             lambda: (PASS if so.ecritures_obligatoires(
+                 0.002, region_masquee=0.11)["region_masquee"] != so.SANS_OBJET
+                 else FAIL, so.ecritures_obligatoires(0.002, region_masquee=0.11)))],
+           [("ε* < 2n sans région publiée", FAIL,
+             lambda: (FAIL if so.ecritures_obligatoires(0.002)["region_masquee"]
+                      == so.SANS_OBJET else PASS,
+                      so.ecritures_obligatoires(0.002)))],
+           note="0-131 : sous l'alternative, un effet entre ε* et 2n est "
+                "SIGNIFICATIF et classé NÉGLIGEABLE — étouffement assumé, "
+                "jamais silencieux.")
+
+    clause("R dérivé (§4.5)",
+           "R = ⌈10·σ̂_dir²/σ̂_Δ²⌉, plafond 300 ; dépassement PUBLIÉ",
+           "un R tronqué en silence au plafond",
+           [("σ_dir = 0.02, σ_Δ = 0.015 ⇒ R sous plafond", PASS,
+             lambda: (PASS if not so.r_derive(0.02, 0.015)["depassement"]
+                      else FAIL, so.r_derive(0.02, 0.015))),
+            ("σ_dir = 0.30, σ_Δ = 0.015 ⇒ dépassement publié", PASS,
+             lambda: (PASS if so.r_derive(0.30, 0.015)["depassement"]
+                      else FAIL, so.r_derive(0.30, 0.015)))],
+           [("σ_Δ = 0 ⇒ SANS OBJET, jamais un R inventé", FAIL,
+             lambda: (FAIL if so.r_derive(0.02, 0.0)["R"] is None else PASS,
+                      so.r_derive(0.02, 0.0)))],
+           note="0-126-iii / 0-52 : R choisi à la main est 0-52 rejoué.")
+
+    # ---------------------------------------------- noyaux de la mesure
+    clause("support_topk", "exactement k indices, ex æquo départagés par indice",
+           "une coupure par SEUIL rend plus de k indices sur ex æquo",
+           [("z gaussien, k = 64", PASS,
+             lambda: (PASS if len(so.support_topk(
+                 np.random.default_rng(0).standard_normal(so.D_DG))) == so.K_TOPK
+                 else FAIL, {"k": so.K_TOPK})),
+            ("z avec 70 ex æquo à la coupure", PASS,
+             lambda: (PASS if len(so.support_topk(
+                 np.concatenate([np.ones(70), np.zeros(so.D_DG - 70)]))) == so.K_TOPK
+                 else FAIL, {"ex_aequo": 70, "k": so.K_TOPK}))],
+           [("coupure par seuil |z| ≥ q sur 70 ex æquo", FAIL,
+             lambda: (FAIL, {"n_indices_rendus_par_le_seuil": 70,
+                             "k_attendu": so.K_TOPK,
+                             "motif": "le seuil `|z| >= q_(k)` du chemin d'A3 "
+                                      "peut dépasser k ; `topk` ne le peut pas"}))],
+           note="0-135, quatrième différence — la seule INERTE : à G égale, "
+                "seuil et topk donnent 0.0 EXACT sur 4/4 (aucun ex æquo dans "
+                "le matériau réel).")
+
+    clause("σ± sur intersection vide",
+           "σ± SANS OBJET quand |A∩B| = 0 — jamais 0",
+           "σ± publié à 0 sur une intersection vide",
+           [("deux supports disjoints", PASS,
+             lambda: (PASS if so.quantites_de_paire(
+                 np.concatenate([np.ones(64) * 9, np.zeros(so.D_DG - 64)]),
+                 np.concatenate([np.zeros(so.D_DG - 64), np.ones(64) * 9])
+             )["sigma_pm"] is None else FAIL, {"regle": "SANS OBJET, jamais 0"}))],
+           [("σ± = 0 sur intersection vide", FAIL,
+             lambda: (FAIL, {"motif": "une quantité sans domaine de définition "
+                                      "se publie SANS OBJET, jamais 0"}))])
+
+    clause("O en fraction exacte",
+           "O agrégé en p/64 exact ; cellule vide ⇒ SANS OBJET",
+           "O publié en flottant tronqué (0-132)",
+           [("128 intersections sur 40 paires", PASS,
+             lambda: (PASS if so.o_fraction(128, 40) == so.frac(128, 2560)
+                      else FAIL, {"O": so.texte_fraction(so.o_fraction(128, 40))})),
+            ("cellule vide", PASS,
+             lambda: (PASS if so.o_fraction(0, 0) is None else FAIL,
+                      {"regle": "SANS OBJET, jamais 0"}))],
+           [("flottant tronqué à 4 décimales", FAIL,
+             lambda: (FAIL, {"valeur_tronquee": round(128 / 2560, 4),
+                             "valeur_exacte": so.texte_fraction(
+                                 so.o_fraction(128, 40)),
+                             "motif": "détruit l'exactitude dont dépendent "
+                                      "V-borne et Core"}))])
+
+    clause("p_pair réalisé",
+           "p_pair = max(p_a, p_b) ; |A∩B| ≥ p_pair sur des paires réelles",
+           "p_pair calculé sur un seul membre (borne plus faible)",
+           [("40 paires synthétiques", PASS,
+             lambda: (PASS if all(p["inter"] >= p["p_pair"] for p in paires_ok)
+                      else FAIL,
+                      {"n": len(paires_ok),
+                       "p_pair_min_max": [min(p["p_pair"] for p in paires_ok),
+                                          max(p["p_pair"] for p in paires_ok)],
+                       "inter_min_max": [min(p["inter"] for p in paires_ok),
+                                         max(p["inter"] for p in paires_ok)]}))],
+           [("max(p_a,p_b) ignoré ⇒ borne desserrée", FAIL,
+             lambda: (FAIL, {"motif": "la dérivation vaut pour CHAQUE membre : "
+                                      "|A∩B| ≥ max(p_a, p_b) est exact"}))])
+
+    clause("Bascule split-half (§14-2)",
+           "n_cell = 60 ⇒ LOO principal ; n_cell = 20 ⇒ split-half principal",
+           "une bascule décidée APRÈS lecture des données",
+           [("n_cell = 60", PASS,
+             lambda: (PASS if so.bascule_split_half(60)["mesure_principale"]
+                      == "LOO" else FAIL, so.bascule_split_half(60))),
+            ("n_cell = 20", PASS,
+             lambda: (PASS if so.bascule_split_half(20)["mesure_principale"]
+                      == "split-half" else FAIL, so.bascule_split_half(20)))],
+           [("bascule à n_cell = 20 refusée", FAIL,
+             lambda: (FAIL if so.bascule_split_half(20)["bascule"] else PASS,
+                      {"motif": "0-117 : le biais résiduel +1/(n_cell−2) ≈ 0.05 "
+                                "est DE LA TAILLE de la quantité décidée — il "
+                                "fabriquerait c-cent"}))])
+
+    clause("Core / Core-G",
+           "Core non vide ⇒ Core-G en fraction ; Core vide ⇒ SANS OBJET",
+           "Core-G publié à 0 sur un Core vide",
+           [("7 indices communs sur 10 unités", PASS,
+             lambda: (PASS if so.core(_dgov_supports_core(10, 7, 2))["taille"] == 7
+                      else FAIL, so.core(_dgov_supports_core(10, 7, 2)))),
+            ("Core vide ⇒ Core-G SANS OBJET", PASS,
+             lambda: (PASS if so.core_g([], np.arange(64))["Core_G"]
+                      == so.SANS_OBJET else FAIL, so.core_g([], np.arange(64))))],
+           [("Core-G = 0 sur Core vide", FAIL,
+             lambda: (FAIL, {"motif": "support vide ≠ zéro : la fraction n'a "
+                                      "pas de domaine de définition"}))])
+
+    clause("Bootstrap de tiges / ε*",
+           "IC bootstrap de TIGES (K_eff = 10) ; ε* par permutation intra-tige",
+           "un bootstrap d'UNITÉS (K_eff = 60) au lieu de tiges",
+           [("40 paires, 10 tiges", PASS,
+             lambda: (PASS if so.bootstrap_tiges(
+                 *_dgov_serie_synthetique())["K_eff"] == 10 else FAIL,
+                 {"K_eff": so.bootstrap_tiges(*_dgov_serie_synthetique())["K_eff"]})),
+            ("ε* gelé avant lecture", PASS,
+             lambda: (PASS if so.eps_etoile(
+                 *_dgov_serie_synthetique(), b=500)["gele_avant_lecture"]
+                 else FAIL, {k: v for k, v in so.eps_etoile(
+                     *_dgov_serie_synthetique(), b=500).items()
+                     if k in ("epsilon_etoile", "sigma_delta", "K_eff")}))],
+           [("K_eff = 60 (unités, pas tiges)", FAIL,
+             lambda: (FAIL, {"K_eff_faux": 60, "K_eff_grave": so.K_EFF,
+                             "motif": "l'unité d'échange est la TIGE (0-50)"}))],
+           note="opérationnalisation déclarée : poids m[t_a]·m[t_b] hors tige, "
+                "m[t_a] intra-tige ; permutation constante DANS une tige.")
+
+    return C
+
+
+def _dgov_serie_synthetique(seed=0):
+    rng = np.random.default_rng(seed)
+    tiges = [f"T{i}" for i in range(10)]
+    tdp, val = [], []
+    for a in range(10):
+        for b in range(a, 10):
+            for _ in range(2):
+                tdp.append((tiges[a], tiges[b]))
+                val.append(float(rng.normal(0.01, 0.02)))
+    return val, tdp, tiges
+
+
+def bloc_perimetre_dgov() -> dict:
+    """§4.9 — les **trois** éléments obligatoires, écrits AVANT mesure."""
+    return {
+        "mecanisme": "aucun effet aval n'est mesuré : M n'est jamais "
+                     "instanciée, aucune lecture n'est injectée, aucune NLL "
+                     "n'est modifiée ; les quantités sont géométriques, sur le "
+                     "cortex gelé",
+        "limite_nommee": "le point de contact keysim — read_gate=keysim se "
+                         "calcule sur cos(φ(h), clés), la quantité même dont "
+                         "ce cycle mesure le plancher ; un plancher de "
+                         "0.147-0.337 avec une étendue inter-strates de "
+                         "0.064-0.091 signifie que le gate opère sur une "
+                         "variable à fort offset et dynamique modérée. Ce "
+                         "n'est PAS un verdict sur le gate : c'est une "
+                         "désignation de chantier",
+        "successeur_designe": "Q-06 — calibration de gate_keysim_mid PAR "
+                              "MODÈLE, ouverte depuis 2026-08-21 ; ce cycle ne "
+                              "l'ouvre pas et n'anticipe pas son résultat",
+    }
+
+
+def schema_dgov() -> dict:
+    """Schéma de sortie, passé aux portes de schéma."""
+    return {"unite_de_O": "fraction exacte p/64",
+            "phrase_gravee_xvi": so.PHRASE_XVI,
+            "portee": "pour cette G, seed 0 (D9) ; Core est G-spécifique",
+            "locus": "t", "t_moins_1": "REFUSÉ (0-130)",
+            "hors_perimetre": bloc_perimetre_dgov()}
+
+
+def run_dgov(out_dir: Path = OUT_DIR_DGOV) -> dict:
+    """Banc de satisfiabilité `dgov`. CPU seul, aucune mesure, aucun GPU."""
+    t0 = time.time()
+    paires_ok = _dgov_paires_conformes(40, seed=0)
+    clauses = build_clauses_dgov(paires_ok, _dgov_marges(True),
+                                 _dgov_spec_seed(True), _dgov_schema_diag(True))
+    rows, E = _evaluer(clauses)
+    n_cov = sum(1 for r in rows if r["expected"]["pass_case"]
+                and r["expected"]["fail_case"])
+    cel = so.cellules_decisionnelles()
+    obj = so.objets_du_banc()
+    report = {
+        "protocole": "experiments/EXP-2026-08-23-recouvrement-supports.md",
+        "statut_protocole": "PRE-ENREGISTRE (correction de provenance §15, "
+                            "2026-08-26)",
+        "banc": "D14-S — satisfiabilité dgov, CPU seul, aucune mesure, aucun GPU",
+        "E": int(E),
+        "n_clauses": len(rows),
+        "couverture": {"clauses_avec_les_deux_contre_exemples": n_cov,
+                       "total": len(rows),
+                       "pct": round(100.0 * n_cov / len(rows), 2)},
+        "n_cas": sum(len(r["cas"]["pass_case"]) + len(r["cas"]["fail_case"])
+                     for r in rows),
+        "cellules_decisionnelles": {"cardinal": cel["cardinal"],
+                                    "cellules": [list(x) for x in cel["cellules"]]},
+        "objets_simules": {"cardinal": obj["cardinal"],
+                           "objets": [list(x) for x in obj["objets"]]},
+        "cas_echouants_obligatoires": ["V-borne", "V-P8 (7 paires)",
+                                       "V-core-S (deux unités d'une tige)",
+                                       "V-ulp (états centrés et placebo)",
+                                       "V-seed", "V-t1"],
+        "constantes": {"n": str(so.N_HASARD), "2n": str(so.CORRIDOR),
+                       "k": so.K_TOPK, "D": so.D_DG, "K_eff": so.K_EFF,
+                       "P_min_par_cellule": so.P_MIN_PAR_CELLULE,
+                       "B_boot": so.B_BOOT, "B_perm": so.B_PERM,
+                       "R_plafond": so.R_PLAFOND},
+        "borne_decisionnelle": "p_sym (serrée, §16, D30 alinéa 2) ; p_pair "
+                               "(lâche) publiée en DESCRIPTIF",
+        "table_cum": {k: v for k, v in so.charger_cum().items() if k != "cum"},
+        "Q-M6": {"statut": "NON RENDUE",
+                 "du": "table cum(j) exacte pour j = 1..20 (fp64, double "
+                       "normalisation 569.6 / 563.9) et les douze p_sym",
+                 "effet": "le second membre de V-borne (« la réalisée encadre "
+                          "la théorique ») reste EN-ATTENTE ; aucun seuil n'est "
+                          "posé et aucune valeur de cum n'est extrapolée "
+                          "(règles Q-M5 et anti-0-52) ; la MESURE ne peut pas "
+                          "s'ouvrir"},
+        "clauses_sous_specifiees": UNDERSPEC_DGOV,
+        "duree_s": round(time.time() - t0, 2),
+        "clauses": rows,
+    }
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / "gate_bench_dgov.json").write_text(
+        json.dumps(report, ensure_ascii=False, indent=1, default=str),
+        encoding="utf-8")
+    return report
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--no-hf", action="store_true",
                     help="repli mot-à-mot au lieu du tokenizer GPT-2")
-    ap.add_argument("--suite", default="v3", choices=("v3", "i2", "v4", "all"),
+    ap.add_argument("--suite", default="v3",
+                    choices=("v3", "i2", "v4", "dgov", "all"),
                     help="v3 = V2-D(a) v3 (défaut, inchangé) ; i2 = layer_profile ; "
-                         "v4 = matériau v4 (EXP-2026-08-23-v4-materiel)")
+                         "v4 = matériau v4 (EXP-2026-08-23-v4-materiel) ; "
+                         "dgov = recouvrement des supports "
+                         "(EXP-2026-08-23-recouvrement-supports)")
     ap.add_argument("--out", default=None)
     args = ap.parse_args()
+
+    if args.suite in ("dgov", "all"):
+        out_d = (Path(args.out) if (args.out and args.suite == "dgov")
+                 else OUT_DIR_DGOV)
+        print("=" * 78)
+        print("BANC DE SATISFIABILITÉ (D14-S) — "
+              "EXP-2026-08-23-recouvrement-supports")
+        print("AUCUNE MESURE, AUCUN GPU, AUCUN POIDS DE MODÈLE. CPU seul.")
+        print("AUCUNE MESURE AVANT E = 0 (§6.E, critère d'abandon).")
+        print("=" * 78)
+        rep_d = run_dgov(out_dir=out_d)
+        for r in rep_d["clauses"]:
+            mark = "ok " if not r["compte_dans_E"] else "E !"
+            print(f"[{mark}] {r['clause']}")
+            for side in ("pass_case", "fail_case"):
+                for c in r["cas"][side]:
+                    flag = "  " if c["ok"] else "!!"
+                    print(f"      {flag} {side:9} {c['cas'][:60]:<60} "
+                          f"→ {c['observé']!r}")
+            for raison in r["raisons_E"]:
+                print(f"      >>> {raison}")
+        print("-" * 78)
+        print(f"clauses : {rep_d['n_clauses']}  |  cas exécutés : "
+              f"{rep_d['n_cas']}  |  couverture : {rep_d['couverture']['pct']} %")
+        print(f"cellules décisionnelles (énumérées) : "
+              f"{rep_d['cellules_decisionnelles']['cardinal']}")
+        print(f"objets simulés (énumérés)           : "
+              f"{rep_d['objets_simules']['cardinal']}")
+        print(f"cas échouants obligatoires          : "
+              f"{rep_d['cas_echouants_obligatoires']}")
+        print(f"constantes : {rep_d['constantes']}")
+        print(f"borne décisionnelle : {rep_d['borne_decisionnelle']}")
+        print(f"table cum : {rep_d['table_cum']}")
+        print(f"Q-M6 : {rep_d['Q-M6']['statut']} — {rep_d['Q-M6']['effet']}")
+        for k, v in rep_d["clauses_sous_specifiees"].items():
+            print(f"sous-spécifiée : {k} — {v}")
+        print("-" * 78)
+        print(f"E(dgov) = {rep_d['E']}  |  durée {rep_d['duree_s']} s")
+        if rep_d["E"] == 0:
+            print("E = 0 — gate de satisfiabilité dgov VERTE.")
+        else:
+            bad = [r["clause"] for r in rep_d["clauses"] if r["compte_dans_E"]]
+            print(f"E ≥ 1 — AUCUNE MESURE. Clauses en cause : {bad}")
+            print("Le banc ne corrige AUCUNE clause : amender est une décision "
+                  "de pré-enregistrement, pas d'implémentation.")
+        print(f"rapport : {out_d / 'gate_bench_dgov.json'}")
+        if args.suite == "dgov":
+            return 0
+        print("=" * 78)
 
     if args.suite in ("v4", "all"):
         out_v4 = Path(args.out) if (args.out and args.suite == "v4") else OUT_DIR_V4

@@ -59,8 +59,16 @@ qui a réécrit un troisième chemin de calcul.*
 | **0-141** *(mineur)* | **Option CLI `--layer` déclarée mais inerte** (`COUCHE_REF` prime inconditionnellement). | Sans effet ici (étage de mesure fermé), mais c'est un **paramètre en dur déguisé en option** — à corriger **avant** l'ouverture de l'étage de mesure. |
 | **0-142** *(mineur)* | **§3, ligne « coût GPU »** : « VRAM Qwen 4,688 Gio » sans qualifier **alloué / réservé**, là où le journal distingue 4.188 alloués et 4.688 réservés. | Imprécision de provenance, sans effet décisionnel — mais **le §7 grave « VRAM rapportée en réservé »**, et une table de provenance qui ne qualifie pas son propre chiffre affaiblit la clause. |
 
-**Total du cycle : trente-neuf défauts (0-104 … 0-142), dont dix critiques. Aucune mesure conduite,
-aucun GPU touché — 9,1 s de CPU.**
+### 0-143 … 0-145 — Relevés à la reprise : un défaut de protocole, deux trouvailles du banc
+
+| # | Défaut | Pourquoi il était fatal |
+| --- | --- | --- |
+| **0-143** *(critique — défaut de PROTOCOLE)* | **La clause `V-t1` était AUTO-CONTRADICTOIRE avec le §7 et le §4.2.** Elle gravait *« exclusion de toute paire intra-tige »* ; or **`S3` et `S2` sont DÉFINIES par le partage de tige**. Prise à la lettre à `t`, elle **vide deux des quatre strates** — celles que le §7 mesure et que la table `L(c)` du §4.2 chiffre cellule par cellule. Et **son motif d'origine (0-134) était doublement faux** : (a) l'argument « états corrélés, bit-identiques » vaut à **`t−1`**, pas à `t` — à `t` deux unités d'une même tige **diffèrent par le suffixe, qui EST le token de capture** ; (b) l'argument « brise l'indépendance sur laquelle repose l'IC bootstrap de tiges » est **à l'envers** : le bootstrap **par tige** est précisément ce qui **absorbe** la corrélation intra-tige — c'est tout l'objet de 0-50. | **Une porte dont la lecture littérale rend le protocole inexécutable** — et qui a été gravée avec un motif inversé. Relevée par `lab-builder` **sans être tranchée par lui**, ce qui était la bonne conduite : il a implémenté la lecture qui laisse §7 et §4.2 exécutables, l'a **déclarée dans le code et dans le rapport de banc**, et a demandé l'arbitrage. Correctif : **portée en trois membres** — `t−1` interdit, `Core(S)` à une unité par tige, **et les paires intra-tige conservées à `t`**, cardinal publié. *Corrigée sous **D30 alinéa 1** : contradiction visible **sur le papier**, aucune donnée du run nécessaire.* |
+| **0-144** *(majeur — trouvaille du BANC, code)* | **Le corridor était 64 × trop large.** `N_HASARD` valait `k²/D = 1/2` — l'unité **indice** — là où `O` est publié en **fraction `p/64`** (0-132), donc `n = 0.5/64 = 1/128` et `2n = 1/64 = 0.015625`. *(Le protocole était correct et cohérent : §4.1 et §7 donnent bien `2n = 1 indice = 0.015625` en fraction. C'est l'implémentation qui a pris une unité pour l'autre.)* | **`BAS` et `c-mec` sortaient vraies presque partout, et `ind_L`/`ind_Δ` étaient INATTEIGNABLES.** C'est-à-dire : la classe d'équivalence devenait **triviale** et la classe d'indécision **vide** — le mode de vacuité 0-47/0-66, mais **dans les deux sens à la fois**. **Détecté uniquement parce que le banc ÉNUMÈRE le cardinal** : 3 cellules atteintes au lieu de 12, 7 objets au lieu de 10. *Aucune relecture n'aurait vu qu'un facteur 64 se cachait entre deux unités toutes deux légitimes ; le comptage, lui, l'a vu en 2 s.* |
+| **0-145** *(mineur — trouvaille du BANC, code)* | **`V-seed` faisait un test de VÉRITÉ au lieu d'un test de PRÉSENCE** : elle rejetait `seed = 0` comme « absent ». | **La porte refusait la valeur même du protocole** (`cfg.seed = 0`, D9). Un `seed` légitime aurait rendu le placebo « non reproductible » et **retiré `Δ*` et `ε*`** — c'est-à-dire **la primaire décisionnelle du cycle** — pour un `0` pris pour un `None`. Famille des portes qui échouent pour la mauvaise raison (0-118, 0-82). |
+
+**Total du cycle : quarante-deux défauts (0-104 … 0-145), dont douze critiques. Aucune mesure
+conduite, aucun GPU touché — 5,9 s de CPU au total.**
 
 ---
 
@@ -368,7 +376,7 @@ par affirmation** (famille 0-76(i)/0-86/0-94/0-101/0-133).
 | **`V-iid`** | **Prouvée par provenance** (M3). Résiduel : **sanité de moments** de `G`. **Pas de KS.** | secondes |
 | **`V-borne`** | `\|A∩B\| ≥ p_pair` sur **100 %** des paires ; **et** la version réalisée **encadre** la table théorique du §4.2. Violation = **bug**, jamais résultat. | secondes |
 | **`V-P8`** | `Λ` et le corridor calculés **uniquement** sur des moyennes de **≥ 8 paires** ; toute cellule à `< 8` paires **exclue, cardinal publié**. | banc |
-| **`V-t1`** | **Exclusion de toute paire intra-tige** ; **cardinal exclu publié** par strate et par modèle. **`t−1` refusé pour ce cycle.** | banc |
+| **`V-t1` (PORTÉE CORRIGÉE le 2026-08-26 — défaut 0-143)** | **(i)** **Aucune quantité à `t−1`** dont l'ensemble de comparaison contient **deux unités de même tige** — à `t−1` ces états sont **bit-identiques** (0-64/0-130) et leur recouvrement vaudrait **`64/64` par arithmétique**. **`t−1` reste refusé pour ce cycle.** **(ii)** **`Core(S)` : une seule unité par tige** (`V-core-S`, M9) — la nulle binomiale suppose l'indépendance sur les `N` états de `S`. **(iii)** **À `t`, les paires intra-tige ne sont PAS exclues** : `S3` et `S2` sont **définies** par le partage de tige, et à `t` ces états **ne sont pas identiques** (ils diffèrent par le suffixe, qui est le token de capture). **Cardinal intra-tige publié** par strate et par modèle. | banc |
 | **`V-core-S`** | `\|S\| = 10`, **une unité par tige**, appartenance publiée. | banc |
 | **`V-ulp`** | Marge à la coupure `k = 64` publiée pour les **cinq** conditions — **y compris centrées et placebo** (0-125). fp64 = **chemin nominal**. | banc |
 | **`V-norm`** | Lecture de la config des **trois** modèles : LayerNorm vs RMSNorm, **citée par ligne de config**, jamais par croyance. | 2 lignes |
@@ -722,10 +730,100 @@ D30** (critère de **direction**) :
 4. **La trivialité relevée en Q-M5 disparaît** : `p_sym ≥ 7` n'est jamais l'énoncé « les supports se
    touchent ». La borne **redevient prédictive sur 12/12**.
 
-**DÛ AVANT LE BANC — `Q-M6`, bloquant** : `lab-math` fournit la **table `cum(j)` exacte pour
-`j = 1..20`** (fp64, double normalisation 569.6 / 563.9) et les **douze valeurs de `p_sym`**.
-**La session principale ne les extrapole pas** — c'est précisément la faute que la règle
-anti-interpolation de Q-M5 vient de fermer, et elle a déjà déplacé une cellule une fois.
+### 16.1 `Q-M6` — table et douze `p_sym`, livrées le 2026-08-26 (`lab-math`, FAVORABLE)
+
+**Provenance (D14-R)** : dérivée **à la main** par Newton sur `Q(z) = φ(z)·R(z)`, ratio de Mills en
+fraction continue (profondeur 10-14), **ancrée sur six quantiles exacts** re-vérifiés (`Q` recalculée
+à < 10⁻⁴ relatif), **aucune valeur interpolée**. Incertitude numérique **≤ ±1.5·10⁻⁴** absolu sur
+`cum` ; les **sept recoupements** avec la table de `lab-verifier` coïncident **tous à la 4ᵉ décimale**.
+
+> **CLAUSE D'IMPLÉMENTATION GRAVÉE** : **le banc grave la version `fp64` (`scipy.special.ndtri`) ;
+> la table ci-dessous est le CONTRÔLE, pas la gravure** (tolérance `±1.5e−4`). Et la colonne
+> **`Z = 563.9` est un HYBRIDE DÉCLARÉ** — profil d'ordre **théorique** × masse totale **réalisée** ;
+> **la vraie table réalisée est PAR CLÉ**, calculée au banc.
+
+| `j` | `t_j²` | `cum` (`Z = 569.6`) | `cum` (`Z = 563.9`) |
+| --- | --- | --- | --- |
+| 1 | 14.7604 | 0.025914 | 0.026176 |
+| 2 | 13.4566 | 0.049538 | 0.050039 |
+| 3 | 12.6971 | 0.071829 | 0.072555 |
+| 4 | 12.1599 | 0.093178 | 0.094120 |
+| 5 | 11.7441 | 0.113795 | 0.114946 |
+| 6 | 11.4051 | 0.133819 | 0.135172 |
+| 7 | 11.1189 | 0.153340 | 0.154890 |
+| 8 | 10.8715 | 0.172426 | 0.174168 |
+| 9 | 10.6535 | 0.191130 | 0.193061 |
+| 10 | 10.4587 | 0.209491 | 0.211608 |
+| 11 | 10.2828 | 0.227543 | 0.229843 |
+| 12 | 10.1223 | 0.245314 | 0.247794 |
+| 13 | 9.9749 | 0.262826 | 0.265483 |
+| 14 | 9.8385 | 0.280099 | 0.282930 |
+| 15 | 9.7116 | 0.297149 | 0.300152 |
+| 16 | 9.5930 | 0.313990 | 0.317164 |
+| 17 | 9.4818 | 0.330638 | 0.333979 |
+| 18 | 9.3769 | 0.347099 | 0.350607 |
+| 19 | 9.2779 | 0.363387 | 0.367060 |
+| 20 | 9.1840 | 0.379511 | 0.383347 |
+
+**Les douze `p_sym` = `min{p : cum(p) ≥ cos}`.** *Critère de robustesse : `p_sym` identique sous les
+deux normalisations ⇒ robuste ; la marge citée est la distance relative à la frontière la plus proche.*
+
+| cellule | `cos` | **`p_sym`** | `L = p/64` | marge | verdict |
+| --- | --- | --- | --- | --- | --- |
+| Qwen S0 | 0.147121 | **7** | 0.1094 | 4.1 % | **ROBUSTE** |
+| Qwen S2 | 0.163589 | **8** | 0.1250 | 5.1 % | **ROBUSTE** |
+| Qwen S1 | 0.188322 | **9** | 0.1406 | 1.5 % | robuste, **limite** |
+| gpt2 S0 | 0.188646 | **9** | 0.1406 | 1.3 % | robuste, **limite** |
+| gpt2 S2 | 0.206957 | **10** | 0.1563 | 1.2 % | robuste, **limite** |
+| Qwen S3 | 0.218442 | **11** | 0.1719 | 4.0 % | **ROBUSTE** |
+| **gpt2 S1** | 0.247890 | **12-13** | 0.188-0.203 | **0.04 %** | **FRONTIÈRE FRANCHE — indécidable en théorique, la RÉALISÉE tranche** |
+| SmolLM2 S2 | 0.256561 | **13** | 0.2031 | 2.4 % | **ROBUSTE** |
+| SmolLM2 S0 | 0.256770 | **13** | 0.2031 | 2.3 % | **ROBUSTE** |
+| gpt2 S3 | 0.276588 | **14** | 0.2188 | 1.25 % | robuste, **limite** |
+| **SmolLM2 S1** | 0.317424 | **16-17** | 0.250-0.266 | **0.08 %** | **FRONTIÈRE FRANCHE — la RÉALISÉE tranche** |
+| SmolLM2 S3 | 0.336841 | **18** | 0.2813 | 1.9 % théorique, **0.9 % réalisée** | quasi-frontière 17/18 ; `p = 18` sous **les deux** tables, mais marge réalisée < 1 % ⇒ **la réalisée tranche** |
+
+> ### **PRÉDICTION FINALE : `O ≥ 7 à 18 indices sur 64`** — soit **14 à 36 × la nulle** (`n = 0.5`).
+>
+> Huit cellules **robustes**, deux **frontières franches** (`gpt2 S1`, `SmolLM2 S1`, marges 0.04 % et
+> 0.08 % — **sous le plancher numérique de ±0.07 %**, donc décidables par **aucune** table
+> théorique), deux **limites** (1.2-1.5 %, stables sous les deux normalisations).
+>
+> **Propriété gravée, et elle est décisive pour la lecture** : **chaque frontière basculerait vers le
+> `p` INFÉRIEUR**, donc dans le sens **CONSERVATEUR** pour l'hypothèse. ***Aucune ne peut rendre la
+> prédiction plus facile qu'annoncé.*** *C'est ce qui autorise à écrire « `O ≥ 7 à 18 »` sans
+> réserve : l'incertitude résiduelle ne joue que contre nous.*
+
+### 16.2 `p_sym` est une IDENTITÉ — confirmé (`Q-M6` (c))
+
+Par paire :
+`|cos| = |Σ_{A∩B} φ_iψ_i| ≤ Σ_{A∩B}|φ_i||ψ_i| ≤ √(Σ_{A∩B}φ_i²)·√(Σ_{A∩B}ψ_i²) ≤ √(T_φ(|A∩B|)·T_ψ(|A∩B|))`
+— **Cauchy-Schwarz**, puis *« la masse d'un sous-ensemble de cardinal `p` est majorée par celle des
+`p` plus grandes coordonnées **réalisées** »*. **Deux pas exacts, zéro hypothèse** ; le membre droit
+est **croissant en `p`**, donc `p_sym^pair` est bien défini.
+
+> **Toute violation de `|A∩B| ≥ p_sym(cos_pair)` en version réalisée est un BUG DE MESURE, jamais un
+> résultat.** `V-borne` peut donc la porter.
+
+**Précision d'implémentation, gravée** : la version réalisée se calcule avec **`|cos_pair|`** et la
+**MOYENNE GÉOMÉTRIQUE** des masses top-`p` des **deux clés de la paire** — **pas** avec la table
+moyenne.
+
+### 16.3 Statut à la livraison de `Q-M6` (2026-08-26)
+
+**`Q-M6` est LIVRÉE et intégrée** (§16.1). La table de contrôle est écrite en
+`experiments/results/recouvrement-supports/cum_table_QM6.json`, **avec ses contrôles de sanité
+exécutés avant publication** : décroissance des `t_j²`, croissance et **concavité** de `cum`, et les
+**sept ancres de `lab-verifier` retrouvées à `≤ 1.5·10⁻⁴`**. **Le banc DOIT la recalculer en `fp64`
+(`scipy.special.ndtri`) et comparer à cette tolérance** — elle est le **contrôle**, jamais la gravure.
+
+**`V-borne` est DÉBLOQUÉE.** Son membre (a) — l'identité par paire — était déjà **PASS** (0 violation
+sur 40 paires synthétiques). Son membre (b) — *« la réalisée encadre la théorique »* — dispose
+désormais de sa table.
+
+*Chiffre du banc à conserver* : sur les 40 paires synthétiques, **`p_sym ∈ [7, 18]` contre
+`p_pair ∈ [1, 6]`**, écart **min 6 / max 12 / moyen 8,5**, et **`p_sym ≥ p_pair` sur 100 %** — la
+borne serrée domine la lâche partout, comme l'identité l'exige.
 
 ## Historique
 
@@ -767,6 +865,23 @@ anti-interpolation de Q-M5 vient de fermer, et elle a déjà déplacé une cellu
   seule des quatre différences (le **tirage de `G`**) porte l'échec. **Huit défauts de plus
   (0-135 … 0-142), dont trois critiques**, tous portant sur le **protocole** et sur le **journal de
   v4**, aucun sur ce run.
+- **2026-08-26** — **REPRISE : banc `E = 0`, arrêt à `V-borne` (Q-M6 non encore rendue).**
+  **`V-G` v2 PASS sur 3/3** (hashes de `G` publiés ; écart fp64−fp32 `≤ 3.8e−09` contre une tolérance
+  de `1e−06` ; **`corrcoef(G projet, G d'A3)` = −0.0008 / +0.0009 / −0.0012** — deux tirages
+  **indépendants**, le diagnostic 0-135 est confirmé numériquement). **`V-norm` PASS**, cité **par
+  ligne de config** : gpt2 **LayerNorm** (`centre = True`), SmolLM2 et Qwen **RMSNorm**
+  (`centre = False`) — **la base de la prédiction `auto`/`C-mod` de `lab-neuro` est vérifiée, pas
+  crue**. **0-141 fermé.** Banc `dgov` : **`E = 0`**, 28 clauses, 66 cas, couverture 100 %, **2,4 s** ;
+  `E(v4) = 0` et 228 tests restent verts. **Le banc a trouvé DEUX défauts dans le code du Builder
+  avant toute mesure** (première passe `E = 5`) : **0-144** (corridor **64 × trop large**, détecté par
+  le **comptage du cardinal** : 3 cellules au lieu de 12) et **0-145** (`V-seed` rejetant `seed = 0`).
+  **`V-borne` rendue `EN-ATTENTE`** — le Builder **refuse de poser un seuil** en l'absence de `Q-M6` :
+  *« ce serait 0-52, troisième occurrence du cycle »*. **Aucune mesure lancée**, étage de mesure écrit
+  mais **structurellement fermé**. Tension **relevée et non tranchée** par lui : la portée de `V-t1`
+  (⇒ **0-143**).
+- **2026-08-26** — **`Q-M6` livrée** (table `j = 1..20`, douze `p_sym`, identité confirmée) et
+  **0-143 tranché** : `V-t1` reçoit une **portée en trois membres**, les paires intra-tige **restent**
+  à `t`. **`V-borne` débloquée.**
 - **2026-08-26** — **`Q-M5` (`lab-math`, FAVORABLE)** : table `cum` **exacte** (aucune
   interpolation), **deux cellules corrigées** — `Qwen S3 → p = 2` (marge 3.6 %, robuste) et
   `SmolLM2 S3 → frontière 5/6` à **0.26 %**, sous la marge de 1 % (mode 0-128 rejoué à `p = 5/6`,
