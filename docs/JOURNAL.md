@@ -1925,6 +1925,66 @@ ablation est le bon test de la discipline de file.*
   s'il la rend plus facile*.
 - *Notes du PI ; aucun run, aucun modèle de jugement engagé.*
 
+## 2026-08-26 — Recouvrement des supports : `H_sup` REJETÉE (`C-strat`), maillon centrage NON ATTRIBUÉ
+
+- **Commit** : `0ed37c7` (code de mesure), consignation à suivre.
+- **Config** : aucune modification du modèle. **Analyse CPU pure** sur les états v4 déjà en cache
+  (hashes `V-cache`), `G` seed 0, dg 8192/64. **`M` jamais instanciée, aucun forward, 0 GPU sur
+  tout le cycle** ; `engram/` non modifié.
+- **Run** : `eval/support_overlap.py` × 5 conditions du §8 × 3 modèles × 4 strates. **Trois tours
+  de mesure, tous `APPROVED`** — ré-exécution bit-à-bit, ré-implémentation indépendante par un
+  troisième chemin (`O` exact, `cos` à 5.6e−16), table `cum` recoupée par un quatrième
+  (`statistics.NormalDist`, écart **0.0**). Banc `dgov` : **47 clauses, 119 cas, couverture 100 %,
+  `E = 0`**. Budget total **< 30 min CPU**. Défauts fermés **0-104 … 0-156**.
+- **Résultat** — classes `N` **identiques sur 3/3** : S3 `HAUT`, S2 `BAS`, S1 `ind_L`, S0 `BAS`
+  ⇒ **`C-strat` RÉALISÉ**. `O ≥ p_sym` sur 12/12 (**identité**, poids probant **nul**). Excès
+  `O − p_sym` : `aucun` **+2.437 ± 0.337** → `type` **+0.509 ± 0.378** (**facteur 4.8**), `glob`
+  +0.563 ± 0.403, `plac` +2.904 ± 0.715. `ε* ≥ 2n` 12/12 ⇒ recouvrement `c-mec`/`c-cent` **VIDE**,
+  ordre **`SANS OBJET`**. **`Δ_rem` (échelle citable) 8 à 19 indices** ; `Δ_add` quasi constant par
+  modèle (artefact du placebo, identité `Δ_rem + Δ_add = Δ*` à **0.00 ULP** sur 12/12). `f`
+  enrichie de **1.066 à 1.102** seulement ⇒ **`N7` fermée**. `Core` 2/3/0 ; `Core-G` 1/1, 1/1,
+  **`SANS OBJET`** (D23). `auto ≈ aucun` à **≤ 0.123 indice partout** — le mode commun **n'est pas
+  la direction `1`** (0.010-0.023 contre `‖μ_global‖/‖h‖` = 0.73-0.85). `σ±` sur les S0 sous
+  `type` : **0.392 / 0.403 / 0.410**, 12 à 15 σ **sous** 0.5 — **`NON EXPLIQUÉ`** ; corrélat
+  `sign(cos_type)`, équivalence **démontrée**, cause **non**.
+- **Conclusion** : **REJETE**. `H_sup` falsifiée sur **deux** de ses trois clauses — le niveau
+  (0.63-2.26 indices contre `≳ 10/64` prédits) et l'**indépendance de strate**. **La lecture forte
+  d'`A3` tombe une seconde fois**, pour une raison **indépendante** de 0-135. **`¬c-mec` et
+  `¬c-anti` sont ATTRIBUÉS sous toute règle licite** (D33) — l'explication triviale « le placebo
+  apparié reproduit la chute » est morte. **L'attribution entre `c-cent` et `ind_Δ` est SUSPENDUE**
+  (0-155, D31 : règle de signe non gelée — **défaut de protocole**, jamais variance ni budget).
+  L'explication **LayerNorm/RMSNorm** de `C-mod` est **morte dans ses termes gravés**, et `auto`
+  était **le seul retrait calculable en ligne** : la distance entre « le centrage mord » et « quelque
+  chose peut descendre dans `engram/` » **augmente**. **Le +57 % d'E2 de X1 reste acquis et intact**
+  (0-75) ; **son attribution reste ouverte et ne s'instruira pas par des mesures de support à ce
+  locus** — `G` et `μ_global` n'ont jamais vu le matériau, toute lecture représentationnelle y est
+  **fausse par provenance**.
+- **Le fait le plus réutilisable** : *ce qui est vrai sous **toute** complétion licite d'un texte
+  gelé sous-spécifié est **décidable** sous le gel ; ce qui **sélectionne** une complétion ne l'est
+  pas.* La frontière n'est pas « avec ou sans données » — elle est **entre le quantificateur
+  universel et le choix**. Gravé en **D33**, avec **D31** (la nulle gèle sa statistique complète)
+  et **D32** (la nulle opératoire n'est plus `k²/D`).
+- **Registre des paris — les quatre parieurs ont perdu.** PI : `O_brut ≥ 0.5` **faux** (max `O/64`
+  = 0.316, max `f` = 0.340), seconde moitié réalisée sur S2/S0 seulement. `lab-neuro` : `P-N`,
+  centrage, `auto`/`C-mod`, `Core` — **quatre perdus**. `lab-director` : *« j'ai parié le mécanisme
+  trivial et il est exclu par le seul corollaire décisionnel du cycle »*. Copilote : perdu, **motif
+  déjà invalidé avant mesure**. **Troisième cycle consécutif dont l'issue réalisée n'était la
+  prédiction de personne — au dossier méthode, pas au passif de quiconque.**
+- **Conduite du labo, à consigner** : le Builder a **refusé de trancher quatre fois** (portée de
+  `V-t1`, lecture d'« encadrer », `p_sym` de cellule, `E = 0` contre clause qui doit échouer) en
+  implémentant la lecture qui laisse le protocole exécutable, en la déclarant, et en demandant
+  l'arbitrage — **conduite validée quatre fois**. Les portes ont trouvé **six défauts avant ou
+  pendant la mesure**, dont un **corridor 64 × trop large** détecté par le **seul comptage du
+  cardinal**, et une borne **PLUS FORTE QUE VRAIE** (30 516 violations sur 669 060) — **mode
+  inverse du faux PASS**. **Quatre chiffres de narration « sans conséquence » se sont révélés faux
+  quand quelqu'un les a vérifiés**, dont trois de la session principale.
+- **Suite gravée (priorité 1, ratifiée PI)** : **Étape A, CPU pure**, mêmes hashes, `< 10 min` —
+  **`P-Base`** (`|A∩B∩top64(G·μ_global)|/|A∩B| ≥ 0.50` sur les 4 strates et 3/3 ; antipode
+  **`C-Base-mort`** `< 0.25` sur ≥ 2/3) et **`P-σ`** (géométrie du simplexe des centroïdes ;
+  antipode `C-σ-mort`). `P-Base` **produit le plancher que D20 exige pour D32**. **V2-D(b)** s'ouvre
+  après son verdict. `Q-N3` (re-spécifier `Δ*`) en **priorité 2**, plafonnée par (xx). **`Q-quant`
+  éligible, priorité 3.** **`I3` conditionné à `P11`** (suite corrigée sous D30 alinéa 1, §15-bis).
+
 ## 2026-08-20 — v0 : squelette posé
 
 - **Commit** : (initial)

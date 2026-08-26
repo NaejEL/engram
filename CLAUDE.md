@@ -130,22 +130,43 @@ Ce n'est PAS un produit — c'est une expérience falsifiable sur un laptop RTX 
   préfixe sont **incompatibles**, ce qui **ferme une famille entière de protocoles**.
   **58 défauts fermés (0-46 … 0-103) avant qu'un octet de matériau n'existe**, dont
   10 + 9 + 6 + 2 par **quatre passes d'audit indépendant**.
-- **Chantier courant = « recouvrement des supports de `topk(G·h) »`**
-  (`experiments/EXP-2026-08-23-recouvrement-supports.md`, `PRE-ENREGISTRE`).
+- **Cycle « recouvrement des supports de `topk(G·h)` » — TERMINÉ le 2026-08-26.
+  Verdict `REJETE` ; maillon centrage `NON ATTRIBUÉ` (0-155).**
+  (`experiments/EXP-2026-08-23-recouvrement-supports.md`.)
   Analyse **CPU pure** sur les états conservés de v4 : `M` jamais instanciée, aucun
   forward, `engram/` non modifié. Primaire = **`Δ* = O_plac − O_type`** (nulle **0
   par construction**), niveau = `Λ = O_type − 2n` sur **corridor absolu**.
-  **Le run s'est arrêté à la deuxième porte**, en **9,1 s de CPU**, sans une mesure :
+  *Historique de l'arrêt initial, conservé —* **le run s'est d'abord arrêté à la deuxième porte**,
+  en **9,1 s de CPU**, sans une mesure :
   **`V-G` FAIL** ⇒ **`A3` n'a jamais été calculé avec la `G` du projet** (`numpy`
   contre `torch`, `corrcoef ≈ 0.011`), et le §3 **nommait la mauvaise colonne**
   (« 0.41-0.46 » = la **compression**, pas le cosinus ; le vrai vaut **0.147-0.337**).
   **39 défauts fermés (0-104 … 0-142)**, aucune mesure conduite. Correction de
   provenance autorisée sous **D30**, traçabilité au **§15**. Borne serrée **`p_sym`**
   adoptée sous **D30 alinéa 2** (§16) : **`C-sep` re-fermée sur 12/12, avec la bonne
-  `G`**. **`Q-M6` dû avant le banc.**
-- **File d'attente, NON OUVERTE** : `Q-quant` — *robustesse de `φ` à la
-  quantification* (`EXTENSIONS.md`). Un seul bouton, coût XS, GPT-2 seul, banc
-  existant. **Ne s'ouvre pas avant le verdict du cycle en cours.**
+  `G`**. **`Q-M6` livrée**, puis **trois tours de mesure, tous `APPROVED`** (ré-exécution bit-à-bit,
+  ré-implémentation indépendante par un troisième chemin, table `cum` recoupée par un quatrième ;
+  banc `dgov` **47 clauses / 119 cas / `E = 0`** ; **< 30 min CPU, 0 GPU** ; défauts **0-104 …
+  0-156**). **Résultat** : classes `N` identiques 3/3 (S3 `HAUT`, S2 `BAS`, S1 `ind_L`, S0 `BAS`)
+  ⇒ **`C-strat` réalisé, la lecture forte d'`A3` tombe une SECONDE fois**, indépendamment de 0-135.
+  `O ≥ p_sym` 12/12 est une **identité au poids probant nul** ; l'excès libre passe de
+  **+2.44 ± 0.34** indice à **+0.51 ± 0.38** sous retrait par type (**facteur 4.8**). `Core-G`
+  = 1/1, 1/1, **`SANS OBJET`** ; les **12 indices les plus partagés sont dans `top64(G·μ_global)`
+  sur 3/3**. `auto ≈ aucun` **partout** ⇒ **l'explication LayerNorm/RMSNorm de `C-mod` est morte**
+  et le seul retrait calculable **en ligne** ne mord pas. `N7` **fermée** (`f` enrichie de 6-10 %
+  seulement). **`¬c-mec` et `¬c-anti` attribués sous toute règle licite (D33)** ; l'attribution
+  `c-cent`/`ind_Δ` **suspendue** par **défaut de protocole** (D31). **`σ±` à 12-15 σ sous le hasard
+  sur les S0 : `NON EXPLIQUÉ`.** Le **+57 % d'E2 de X1 reste acquis et intact** (0-75) ; son
+  **attribution** ne s'instruira **pas** par des mesures de support à ce locus. **Suite priorité 1 :
+  Étape A CPU pure (`P-Base` + `P-σ`).**
+- **File d'attente (ordre ratifié le 2026-08-26)** : **priorité 1 — Étape A**, CPU pure, mêmes
+  hashes, `< 10 min` : **`P-Base`** (`|A∩B∩top64(G·μ_global)|/|A∩B| ≥ 0.50`, 4 strates × 3 modèles ;
+  antipode **`C-Base-mort`** `< 0.25` sur ≥ 2/3) et **`P-σ`** (antipode `C-σ-mort`). `P-Base`
+  **produit le plancher que D20 exige pour D32**. **Priorité 2 — `Q-N3`** : re-spécifier la primaire
+  `Δ*` (permutation exacte, ou placebo à **directions indépendantes par état**) sous
+  pré-enregistrement neuf ; rendement **plafonné par (xx)**. **Priorité 3 — `Q-quant`**, clause
+  d'attente **levée**, éligible. **`V2-D(b)`** (`M_out` sur les logits) s'ouvre **après le verdict
+  d'Étape A**. **`I3` reste conditionné à `P11`** — la purge écrite des deux réserves d'`I2`.
 - **Instrument I2 (`layer_profile`) — `PROPOSE`, deux avis RÉSERVÉ non traités.**
   Profilage par couche (score contrastif d'invariance + entropie matricielle), un
   forward instrumenté, aucune injection. Défauts à corriger avant implémentation :

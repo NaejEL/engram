@@ -1,6 +1,6 @@
 # EXP — recouvrement des supports de `topk(G·h)`
 
-Statut : PRE-ENREGISTRE
+Statut : TERMINE — REJETE (H_sup) / maillon centrage NON ATTRIBUÉ (0-155)
 
 *Consolidé par `lab-director` le 2026-08-23, sous avis **Math FAVORABLE** (verrous levés, M1…M9) et
 **Neuro FAVORABLE sous une condition bloquante** (N1…N8). Amendé à la gate PI du 2026-08-23 (§14).*
@@ -695,6 +695,39 @@ signés de `lab-neuro` (`P-N`, `P-N-ord`, centrage, `auto`, `Core`), les critèr
 **Reste dû avant la reprise au banc** : **Q-M5** — `lab-math` confirme le re-paramétrage de `L(c)`
 sur les `cos` de la `G` du projet (table ci-dessus), et dit si la ré-ouverture de `BAS` sur
 `Qwen S0` est **robuste** ou **à l'intérieur de la marge** de 0-128.
+
+## 15-bis. Correction de la SUITE gravée — 2026-08-26, sous D30 alinéa 1
+
+**Contradiction interne, relevée par `lab-neuro` à l'interprétation, visible SUR LE PAPIER** :
+trois clauses de ce protocole ne sont **pas conjointement satisfiables**.
+
+| clause | texte | statut |
+| --- | --- | --- |
+| **(xx)** | *« `c-cent` licencie un énoncé, un locus, un matériau »* | **gravure signée et ratifiée** |
+| **§10 (N8)** | *« `c-cent` ne licencie pas `I3` »* | **gravure signée et ratifiée** |
+| ligne de suite | *« `c-cent` ⇒ `I3` devient le chantier prioritaire, avec son propre pré-enregistrement »* | **ligne de routage, JAMAIS signée** |
+
+**Arbitrage (`lab-director`, ratifié PI le 2026-08-26)** : **les deux gravures priment.**
+
+| | ancienne valeur | nouvelle valeur |
+| --- | --- | --- |
+| suite de `c-cent` | *« `I3` devient le chantier prioritaire »* | ***« `c-cent` ne licencie aucun chantier ; `I3` reste conditionné à `P11` — la purge écrite des deux réserves d'`I2`. »*** |
+
+- **Motif** : contradiction interne entre deux gravures signées et une ligne de routage non signée.
+- **Auteur du relevé** : `lab-neuro`, à la lecture, **sans aucune donnée du run**.
+- **Régime** : **D30 alinéa 1** — le critère exécutable *« une donnée du run est-elle nécessaire
+  pour voir l'erreur ? »* rend **non**. La correction est donc licite sous traçabilité complète.
+- **Autorisation du PI inscrite dans le protocole**, conformément à D30 : **accordée le 2026-08-26**
+  (gate de consignation, option *« Corriger, tracer au §15-bis »*).
+- **Effet sur ce run : NUL.** `c-cent` **n'est pas attribuée** (0-155) — la ligne corrigée
+  **n'a jamais été exécutée**. La correction se fait **pour l'archive**, hors de toute donnée.
+
+### 15-bis.1 — Défauts ouverts à l'interprétation
+
+| # | Défaut |
+| --- | --- |
+| **0-155** *(critique — PROTOCOLE)* | **La règle de signe de la nulle de permutation de `ε*` n'était pas gelée.** Le §4.5 gèle le schéma d'échange (permutation intra-tige, `B = 10⁴`, `K_eff = 10`) mais **pas la statistique complète**. Deux règles licites rendent des partitions **opposées** ; aucune n'a de primauté par dérivation. **La primaire décisionnelle du cycle est perdue par sous-spécification** — ni variance, ni budget, ni support : **défaut de protocole**, cause nommée au sens de 0-71. Gravé en **D31**. |
+| **0-156** *(mineur — D13)* | **La prédiction signée de centrage n'énumérait pas la cellule réalisée** `O_glob ≈ O_type ≪ O_brut ≈ O_plac`. Le run est passé **par un trou de la grille**. Sans dommage ici — l'issue concernée est descriptive — mais D13 exige l'énumération de l'antipode, et une grille à trous n'est pas une partition. |
 
 ## 16. Borne serrée `p_sym` — adoptée le 2026-08-26 sous D30 alinéa 2
 

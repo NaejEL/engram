@@ -560,9 +560,14 @@ rencontré exactement ces bugs et a shippé des fixes :
 
 ### Q-quant — Robustesse de `φ` à la quantification — *FILE D'ATTENTE, coût XS, NON OUVERTE*
 
-> **Ne s'ouvre pas avant le verdict du cycle « recouvrement des supports ».** Les deux fils en cours
-> (Math `Q-M5`, Builder) ont **priorité absolue**. *Un XS n'a pas droit au raccourci : c'est
-> précisément parce qu'elle est petite que cette ablation est le bon test de la discipline de file.*
+> **Clause d'attente LEVÉE le 2026-08-26** — le cycle « recouvrement des supports » a rendu son
+> verdict (`REJETE`, journal du jour). **`Q-quant` est donc ÉLIGIBLE, en priorité 3.** Elle passe
+> derrière **Étape A** (priorité 1 : `P-Base` + `P-σ`, CPU pure, qui ferme un `NON EXPLIQUÉ` et
+> **produit le plancher que D20 exige pour D32**) et derrière **`Q-N3`** (priorité 2). Motif de
+> l'ordre : à coût comparable, `Q-quant` **ne ferme aucun `NON EXPLIQUÉ` et ne produit aucun
+> plancher dû**, et elle consomme du GPU là où Étape A n'en consomme pas.
+> *Un XS n'a pas droit au raccourci : c'est précisément parce qu'elle est petite que cette ablation
+> est le bon test de la discipline de file.*
 
 **Question.** *Combien d'amplitude le mécanisme peut-il perdre avant que le rappel casse ?*
 
