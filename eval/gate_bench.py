@@ -4405,6 +4405,205 @@ def _dgov_paire_violante():
     return [{"inter": 2, "p_sym": 9, "p_pair": 5, "cos": 0.42}]
 
 
+_CUM_CACHE = {}
+
+
+def _dgov_cum():
+    """Table `cum` gravée en fp64, mise en cache pour le banc."""
+    if "d" not in _CUM_CACHE:
+        _CUM_CACHE["d"] = so.charger_cum()
+    return _CUM_CACHE["d"]
+
+
+def _dgov_cum_decale():
+    """Contre-exemple ÉCHOUANT : une table de contrôle décalée de 1e−3, soit
+    ~7 × la tolérance gravée. Le banc doit la refuser, pas s'y ajuster."""
+    import tempfile
+    d = _dgov_cum()
+    faux = {"_source": "contrôle fabriqué pour le banc",
+            "cum_theorique_Z569_6": [d["cum"][j] + 1e-3
+                                     for j in range(1, so.CUM_J_MAX + 1)]}
+    with tempfile.TemporaryDirectory() as tmp:
+        p = Path(tmp) / "faux.json"
+        p.write_text(json.dumps(faux), encoding="utf-8")
+        r = so.charger_cum(p)
+    return (FAIL if not r["controle"]["conforme"] else PASS), {
+        "ecart_max": r["controle"]["ecart_max_gravure_moins_controle"],
+        "tolerance": so.CUM_TOLERANCE,
+        "regle": "un écart au-dessus de la tolérance est un DÉFAUT À PUBLIER, "
+                 "pas un ajustement"}
+
+
+def _dgov_douze_psym():
+    """Les douze `p_sym` de §16.1 recalculés depuis la gravure fp64."""
+    d = _dgov_cum()
+    cos = {("Qwen/Qwen2.5-1.5B", "S0"): 0.1471,
+           ("Qwen/Qwen2.5-1.5B", "S2"): 0.1636,
+           ("Qwen/Qwen2.5-1.5B", "S1"): 0.1883,
+           ("gpt2", "S0"): 0.1886, ("gpt2", "S2"): 0.2070,
+           ("Qwen/Qwen2.5-1.5B", "S3"): 0.2184, ("gpt2", "S1"): 0.2479,
+           ("HuggingFaceTB/SmolLM2-360M", "S2"): 0.2566,
+           ("HuggingFaceTB/SmolLM2-360M", "S0"): 0.2568,
+           ("gpt2", "S3"): 0.2766,
+           ("HuggingFaceTB/SmolLM2-360M", "S1"): 0.3174,
+           ("HuggingFaceTB/SmolLM2-360M", "S3"): 0.3368}
+    lignes, hors = {}, []
+    for cle, c in cos.items():
+        r = so.p_sym_theorique(c, d)
+        lo, hi = so.P_SYM_ATTENDUS[cle]
+        ok = r["statut"] == PASS and lo <= r["p_sym"] <= hi
+        lignes[f"{cle[0]}|{cle[1]}"] = {"cos": c, "p_sym_grave": r["p_sym"],
+                                        "attendu": [lo, hi], "conforme": ok}
+        if not ok:
+            hors.append(f"{cle[0]}|{cle[1]}")
+    return (PASS if not hors else FAIL), {
+        "par_cellule": lignes, "hors": hors,
+        "prediction": "O ≥ 7 à 18 indices sur 64, soit 14 à 36 × la nulle"}
+
+
+def _dgov_encadrement(conforme=True):
+    """Encadrement synthétique : distribution de `p_sym` réalisé par cellule."""
+    e = {cle: {"min": lo - 3, "q1": lo - 1, "median": lo, "q3": hi + 1,
+               "max": hi + 3}
+         for cle, (lo, hi) in so.P_SYM_ATTENDUS.items()}
+    if not conforme:                   # IQR entièrement au-dessous du théorique
+        e[("gpt2", "S3")] = {"min": 1, "q1": 1, "median": 2, "q3": 3, "max": 4}
+    return e
+
+
+def _dgov_psym_intersection_vide():
+    """Intersection VIDE : `p_sym` doit valoir **0**, pas 1.
+
+    Défaut trouvé **par la porte `V-borne` sur les données réelles** : un
+    plancher à `p = 1` rend la borne PLUS FORTE QUE VRAIE et fabrique une
+    violation sur chaque paire à `|A∩B| = 0` — 30 516 sur 669 060 au premier
+    passage, concentrées dans `glob` et `type`, les conditions où le cosinus
+    s'effondre vers 0.
+    """
+    za = np.concatenate([np.ones(so.K_TOPK) * 9.0, np.zeros(so.D_DG - so.K_TOPK)])
+    zb = np.concatenate([np.zeros(so.D_DG - so.K_TOPK), np.ones(so.K_TOPK) * 9.0])
+    s = so.quantites_de_paire(za, zb, so.K_TOPK)
+    q = so.quantites_batch(za[None, :], zb[None, :], so.K_TOPK)
+    ok = (s["inter"] == 0 and s["p_sym"] == 0 and int(q["p_sym"][0]) == 0
+          and s["p_pair"] == 0 and so.p_sym_theorique(0.0)["p_sym"] == 0)
+    return (PASS if ok else FAIL), {
+        "inter": s["inter"], "p_sym_scalaire": s["p_sym"],
+        "p_sym_batche": int(q["p_sym"][0]), "p_pair": s["p_pair"],
+        "p_sym_theorique_a_cos_0": so.p_sym_theorique(0.0)["p_sym"],
+        "regle": "|A∩B| ≥ p_sym doit rester satisfiable à q = 0 : g(0) = 0 "
+                 "appartient à la recherche"}
+
+
+def _dgov_psym_plancher_a_un():
+    """Contre-exemple ÉCHOUANT : le plancher `p_sym ≥ 1` viole l'identité sur
+    toute paire à intersection vide."""
+    return FAIL, {"q": 0, "p_sym_avec_plancher": 1,
+                  "violation": "0 < 1",
+                  "n_violations_au_premier_passage": 30516,
+                  "n_paires_verifiees": 669060,
+                  "motif": "une borne plus forte que vraie fabrique des "
+                           "violations et ferait déclarer BUG un run sain"}
+
+
+def _dgov_psym_cos_negatif():
+    """`p_sym` doit traiter `cos < 0` par sa **valeur absolue** : la borne
+    porte sur `|cos|`, un cosinus négatif n'est pas une borne plus faible."""
+    rng = np.random.default_rng(3)
+    a = rng.standard_normal(so.K_TOPK)
+    b = -a * 0.8 + 0.2 * rng.standard_normal(so.K_TOPK)
+    a /= np.linalg.norm(a)
+    b /= np.linalg.norm(b)
+    c = float(np.dot(a, b))
+    p_neg = so.p_sym_realise(a, b, c)
+    p_abs = so.p_sym_realise(a, b, abs(c))
+    return (PASS if (c < 0 and p_neg == p_abs) else FAIL), {
+        "cos": c, "p_sym_avec_cos_signe": p_neg,
+        "p_sym_avec_valeur_absolue": p_abs}
+
+
+def _dgov_batch_equiv(n=32, seed=7):
+    """Les noyaux **batchés** (ceux que la mesure exécute) doivent coïncider
+    avec les noyaux **lus** (ceux que le banc exerce partout ailleurs)."""
+    rng = np.random.default_rng(seed)
+    Za = rng.standard_normal((n, so.D_DG))
+    Zb = 0.6 * Za + 0.8 * rng.standard_normal((n, so.D_DG))
+    q = so.quantites_batch(Za, Zb, so.K_TOPK)
+    ecarts = {"inter": 0, "cos": 0.0, "f": 0.0, "p_sym": 0, "p_pair": 0,
+              "support": 0, "sigma": 0}
+    for i in range(n):
+        s = so.quantites_de_paire(Za[i], Zb[i], so.K_TOPK)
+        ecarts["inter"] = max(ecarts["inter"], abs(s["inter"] - int(q["inter"][i])))
+        ecarts["cos"] = max(ecarts["cos"], abs(s["cos"] - float(q["cos"][i])))
+        ecarts["f"] = max(ecarts["f"], abs(s["f"] - float(q["f"][i])))
+        ecarts["p_sym"] = max(ecarts["p_sym"], abs(s["p_sym"] - int(q["p_sym"][i])))
+        ecarts["p_pair"] = max(ecarts["p_pair"],
+                               abs(s["p_pair"] - int(q["p_pair"][i])))
+        ecarts["support"] += int(not np.array_equal(
+            so.support_topk(Za[i], so.K_TOPK),
+            so._topk_batch(Za[i:i + 1], so.K_TOPK)[0]))
+        if s["sigma_pm"] is not None:
+            ecarts["sigma"] = max(ecarts["sigma"], abs(
+                float(s["sigma_pm"]) - int(q["accord"][i]) / int(q["inter"][i])))
+    ok = (ecarts["inter"] == 0 and ecarts["p_sym"] == 0 and ecarts["p_pair"] == 0
+          and ecarts["support"] == 0 and ecarts["cos"] < 1e-12
+          and ecarts["f"] < 1e-12 and ecarts["sigma"] < 1e-12)
+    return (PASS if ok else FAIL), {"n_paires": n, "ecarts_max": ecarts}
+
+
+def _dgov_poids_equiv(seed=5):
+    """`_poids_vect` (mesure) ≡ `poids_bootstrap` (règle déclarée, banc)."""
+    rng = np.random.default_rng(seed)
+    tiges = [f"T{i}" for i in range(10)]
+    tdp = [(tiges[int(rng.integers(0, 10))], tiges[int(rng.integers(0, 10))])
+           for _ in range(200)]
+    tdp += [(t, t) for t in tiges]
+    mult_arr = rng.integers(0, 4, 10)
+    mult = {t: int(mult_arr[i]) for i, t in enumerate(tiges)}
+    ta, tb = so._indices_de_tige(tdp, tiges)
+    w1 = so.poids_bootstrap(tdp, mult)
+    w2 = so._poids_vect(ta, tb, mult_arr)
+    return (PASS if np.array_equal(w1, w2) else FAIL), {
+        "n_paires": len(tdp), "ecart_max": float(np.abs(w1 - w2).max()),
+        "n_paires_intra_tige": int((ta == tb).sum())}
+
+
+def _dgov_egalite_exacte():
+    """Paire à `|A∩B| = 1` dont l'indice commun porte la plus grande magnitude
+    des DEUX clés : la borne y est atteinte **avec égalité**, `|cos| = g(1)`.
+    Sans tolérance, fp64 la fait basculer et fabrique une violation."""
+    D, k = so.D_DG, so.K_TOPK
+    rng = np.random.default_rng(11)
+    za = np.zeros(D)
+    zb = np.zeros(D)
+    za[0] = 10.0
+    zb[0] = 7.0                                   # indice commun, magnitude max
+    za[1:k] = rng.uniform(0.5, 1.5, k - 1)
+    zb[k:2 * k - 1] = rng.uniform(0.5, 1.5, k - 1)
+    s = so.quantites_de_paire(za, zb, k)
+    q = so.quantites_batch(za[None, :], zb[None, :], k)
+    ok = (s["inter"] == 1 and s["inter"] >= s["p_sym"]
+          and int(q["inter"][0]) >= int(q["p_sym"][0]))
+    return (PASS if ok else FAIL), {
+        "inter": s["inter"], "p_sym_scalaire": s["p_sym"],
+        "p_sym_batche": int(q["p_sym"][0]),
+        "p_sym_sans_tolerance": int(q["p_sym_strict"][0]),
+        "decidee_par_la_tolerance": bool(q["decidee_par_la_tolerance"][0]),
+        "cos": float(s["cos"]), "tolerance_ULP": so.TOL_ULP_BORNE}
+
+
+def _dgov_tolerance_trop_large():
+    """Contre-exemple ÉCHOUANT : un écart de `1e−6` — environ `10⁹` ULP à
+    cette échelle — ne doit PAS être absorbé. La tolérance vaut 8 ULP."""
+    c = 0.03
+    ulp = float(np.spacing(c))
+    return FAIL, {"ecart_teste": 1e-6, "ulp_a_cette_echelle": ulp,
+                  "ecart_en_ulp": 1e-6 / ulp,
+                  "tolerance_ULP": so.TOL_ULP_BORNE,
+                  "absorbe": 1e-6 <= so.TOL_ULP_BORNE * ulp,
+                  "motif": "une tolérance qui absorberait un écart réel serait "
+                           "un masque, pas une correction de comparaison"}
+
+
 def _dgov_supports_core(n_unites=10, commun=7, seed=0):
     """Supports synthétiques partageant `commun` indices sur toutes les unités."""
     rng = np.random.default_rng(seed)
@@ -4572,6 +4771,386 @@ def _dgov_exclusivite_ordres():
         "ordre_N": list(so.CLASSES_N), "ordre_C": list(so.CLASSES_C)}
 
 
+def _dgov_tiges_inter(n_rep=4):
+    """Jeu de paires INTER-tige équilibré sur `K_eff = 10` tiges."""
+    tiges = [f"T{i}" for i in range(10)]
+    tdp = [(tiges[a], tiges[b]) for a in range(10) for b in range(a + 1, 10)
+           for _ in range(n_rep)]
+    return tiges, tdp
+
+
+def _dgov_deux_regles_eps():
+    """Les DEUX règles d'affectation du signe sont calculables et publiées
+    côte à côte, avec leur statut ; **aucune n'est promue**."""
+    tiges, tdp = _dgov_tiges_inter()
+    rng = np.random.default_rng(0)
+    d = rng.normal(0.30, 0.04, len(tdp))
+    r = {reg: so.eps_etoile(d, tdp, tiges, b=1000, seed=0, regle=reg)
+         for reg in so.EPS_REGLES}
+    ok = (len(so.EPS_REGLES) == 2
+          and all(r[x]["epsilon_etoile"] is not None for x in so.EPS_REGLES)
+          and r["min"]["statut_de_la_regle"].startswith("IMPLÉMENTÉE")
+          and r["produit"]["statut_de_la_regle"].startswith("ALTERNATIVE"))
+    return (PASS if ok else FAIL), {
+        "cardinal_des_regles_enumere": len(so.EPS_REGLES),
+        "par_regle": {x: {"epsilon_etoile": r[x]["epsilon_etoile"],
+                          "statut": r[x]["statut_de_la_regle"],
+                          "fraction_signe_non_retournable":
+                              r[x]["fraction_de_paires_a_signe_non_retournable"]}
+                      for x in so.EPS_REGLES},
+        "regle": "les deux sont publiées ; AUCUNE n'est promue — arbitrage PI"}
+
+
+def _dgov_regle_inconnue():
+    """Contre-exemple ÉCHOUANT : une troisième règle inventée à l'exécution."""
+    tiges, tdp = _dgov_tiges_inter(1)
+    try:
+        so.eps_etoile(np.ones(len(tdp)), tdp, tiges, b=10, seed=0,
+                      regle="mediane")
+    except ValueError as e:
+        return FAIL, {"exception": str(e),
+                      "motif": "poser une règle non déclarée à l'exécution "
+                               "serait 0-52 ; le noyau la refuse"}
+    return PASS, {"motif": "une règle non déclarée a été acceptée"}
+
+
+def _dgov_plancher_structurel():
+    """Le **plancher structurel** — puissance maximale disponible du test,
+    indépendante de la donnée — est calculé, jamais supposé nul."""
+    tiges, tdp = _dgov_tiges_inter()
+    pmin = so.plancher_epsilon(tdp, tiges, b=1000, seed=0, regle="min")
+    pprod = so.plancher_epsilon(tdp, tiges, b=1000, seed=0, regle="produit")
+    intra = [(t, t) for t in tiges for _ in range(36)]
+    pdeg = so.plancher_epsilon(intra, tiges, b=1000, seed=0, regle="produit")
+    ok = (0.0 < pmin["plancher_relatif"] <= 1.0
+          and 0.0 < pprod["plancher_relatif"] <= 1.0
+          and abs(pdeg["plancher_relatif"] - 1.0) < 1e-12
+          and pdeg["fraction_signe_non_retournable"] == 1.0)
+    return (PASS if ok else FAIL), {
+        "plancher_relatif_min": pmin["plancher_relatif"],
+        "plancher_relatif_produit": pprod["plancher_relatif"],
+        "plancher_structure_degeneree_100pct_intra_regle_produit":
+            pdeg["plancher_relatif"],
+        "fraction_signe_non_retournable_degeneree":
+            pdeg["fraction_signe_non_retournable"],
+        "definition": pmin["definition"],
+        "regle": "sur une structure où AUCUN signe ne peut se retourner, le "
+                 "plancher vaut EXACTEMENT 1 : la nulle de permutation est "
+                 "l'observation elle-même"}
+
+
+def _dgov_plancher_suppose_nul():
+    """Contre-exemple ÉCHOUANT : un plancher supposé nul rend `c-cent`
+    atteignable partout et masque la dégénérescence du test."""
+    tiges = [f"T{i}" for i in range(10)]
+    intra = [(t, t) for t in tiges for _ in range(36)]
+    d = np.full(len(intra), 0.30)
+    ic = so.bootstrap_tiges(d, intra, tiges, b=500, seed=0)
+    faux = so.classe_c(ic["IC"], 0.0, so.N_HASARD)
+    return (FAIL if faux == "c-cent" else PASS), {
+        "classe_avec_epsilon_suppose_nul": faux,
+        "motif": "sans plancher publié, un couloir réglé sur l'enveloppe nulle "
+                 "de son propre estimateur (D28) ne se voit pas"}
+
+
+def _dgov_puissance_partition_C():
+    """**Clause de puissance / vacuité de la partition `C`** (tour de
+    correction, B1-3).
+
+    Quatre jeux synthétiques, chacun avec une réponse connue **par
+    construction** :
+
+    * `Δ*` **constant et non nul**, sur une structure où le signe PEUT se
+      retourner ⇒ la classe **informative** `c-cent` doit rester
+      **atteignable** (test de puissance maximale) ;
+    * `Δ* = 0` par construction ⇒ **`c-cent` ne sort pas** ;
+    * `Δ*` centré et bruité large ⇒ **`ind_Δ` atteignable** ;
+    * structure **dégénérée** (plancher = 1) ⇒ le **DÉTECTEUR** doit annoncer
+      `classe informative INATTEIGNABLE` — c'est lui qu'on teste ici, et le
+      cas échouant obligatoire l'exerce en verdict.
+
+    **Ambiguïtés DÉCLARÉES, non tranchées par le Builder :**
+
+    1. la demande écrit « vérifier que `ind_Δ` reste atteignable » à `Δ*`
+       **constant**, alors qu'à effet constant la classe attendue est `c-cent`
+       (`ind_Δ` est la complémentation, atteinte par défaut). La clause vérifie
+       **les deux lectures** et échoue si l'une tombe ;
+    2. la demande écrit *« si `ind_Δ` est inatteignable même à `Δ*` constant,
+       la clause doit le faire échouer et le compteur le publier »*, mais le
+       même tour exige **`E = 0` sur `dgov` avant toute mesure**. Prises à la
+       lettre ensemble, les deux rendent le protocole **inexécutable**. Lecture
+       implémentée — celle qui le laisse exécutable : la clause teste le
+       **détecteur** (il doit annoncer l'inatteignabilité, cas échouant
+       obligatoire à l'appui) et **le compteur publie**, cellule par cellule,
+       `classe_informative_inatteignable`. Arbitrage dû.
+    """
+    tiges = [f"T{i}" for i in range(10)]
+    # structure où le signe PEUT se retourner sous la règle `min` : intra-tige.
+    # (Sous `min`, une structure 100 % INTER-tige a un plancher de 1.0 — la
+    # nulle de permutation y est l'observation elle-même. C'est mesuré, pas
+    # supposé, et c'est le quatrième jeu.)
+    tdp = [(t, t) for t in tiges for _ in range(36)]
+    c = 0.30
+    dc = np.full(len(tdp), c)
+    eps_c = so.eps_etoile(dc, tdp, tiges, b=1000, seed=0)
+    ic_c = so.bootstrap_tiges(dc, tdp, tiges, b=1000, seed=0)
+    cl_c = so.classe_c(ic_c["IC"], eps_c["epsilon_etoile"], so.N_HASARD)
+    z = np.zeros(len(tdp))
+    eps_0 = so.eps_etoile(z, tdp, tiges, b=1000, seed=0)
+    ic_0 = so.bootstrap_tiges(z, tdp, tiges, b=1000, seed=0)
+    cl_0 = so.classe_c(ic_0["IC"], eps_0["epsilon_etoile"], so.N_HASARD)
+    br = np.random.default_rng(1).normal(0.0, 0.30, len(tdp))
+    eps_b = so.eps_etoile(br, tdp, tiges, b=1000, seed=0)
+    ic_b = so.bootstrap_tiges(br, tdp, tiges, b=1000, seed=0)
+    cl_b = so.classe_c(ic_b["IC"], eps_b["epsilon_etoile"], so.N_HASARD)
+    # 4e jeu — DÉTECTEUR : structure dégénérée pour la règle `min` (inter-tige)
+    _, inter = _dgov_tiges_inter()
+    pl_deg = so.plancher_epsilon(inter, tiges, b=1000, seed=0, regle="min")
+    ic_deg = so.bootstrap_tiges(np.full(len(inter), c), inter, tiges,
+                                b=1000, seed=0)
+    detecte = not (float(ic_deg["IC"][0])
+                   > pl_deg["plancher_relatif"] * c)
+    pl_ok = so.plancher_epsilon(tdp, tiges, b=1000, seed=0, regle="min")
+    ok = (cl_c == "c-cent" and cl_0 != "c-cent" and cl_b == "ind_Δ"
+          and detecte and pl_deg["plancher_relatif"] >= 1.0
+          and pl_ok["plancher_relatif"] < 1.0)
+    return (PASS if ok else FAIL), {
+        "detecteur_d_inatteignabilite": {
+            "structure": "100 % INTER-tige sous la règle `min`",
+            "plancher_relatif": pl_deg["plancher_relatif"],
+            "IC_inf_a_effet_constant": ic_deg["IC"][0],
+            "classe_informative_inatteignable": bool(detecte),
+            "structure_saine": "100 % INTRA-tige sous la règle `min`",
+            "plancher_relatif_sain": pl_ok["plancher_relatif"]},
+        "effet_constant_non_nul": {"Delta": c, "epsilon_etoile":
+                                   eps_c["epsilon_etoile"],
+                                   "IC": ic_c["IC"], "classe": cl_c,
+                                   "attendu": "c-cent (classe informative)"},
+        "effet_nul_par_construction": {"epsilon_etoile": eps_0["epsilon_etoile"],
+                                       "IC": ic_0["IC"], "classe": cl_0,
+                                       "attendu": "PAS c-cent"},
+        "bruit_centre_large": {"epsilon_etoile": eps_b["epsilon_etoile"],
+                               "IC": ic_b["IC"], "classe": cl_b,
+                               "attendu": "ind_Δ"},
+        "ambiguite_declaree": "la demande écrit « ind_Δ atteignable » à effet "
+                              "CONSTANT ; à effet constant la classe attendue "
+                              "est c-cent. LES DEUX lectures sont vérifiées. "
+                              "Arbitrage dû."}
+
+
+def _dgov_puissance_degeneree():
+    """Contre-exemple ÉCHOUANT **obligatoire** : sur une structure où aucun
+    signe ne peut se retourner (100 % intra-tige, règle `produit`), la classe
+    informative `c-cent` est **inatteignable même à `Δ*` constant** — mode de
+    vacuité 0-47 / 0-66. La clause doit le faire ÉCHOUER et le compteur le
+    publier."""
+    tiges = [f"T{i}" for i in range(10)]
+    intra = [(t, t) for t in tiges for _ in range(36)]
+    d = np.full(len(intra), 0.30)
+    eps = so.eps_etoile(d, intra, tiges, b=1000, seed=0, regle="produit")
+    ic = so.bootstrap_tiges(d, intra, tiges, b=1000, seed=0)
+    cl = so.classe_c(ic["IC"], eps["epsilon_etoile"], so.N_HASARD)
+    return (FAIL if cl != "c-cent" else PASS), {
+        "fraction_signe_non_retournable":
+            eps["fraction_de_paires_a_signe_non_retournable"],
+        "epsilon_etoile": eps["epsilon_etoile"], "Delta": 0.30,
+        "IC": ic["IC"], "classe_obtenue": cl,
+        "motif": "ε* ≥ Δ* par construction du test : la classe informative de "
+                 "la partition C est VIDE sur cette structure, quel que soit "
+                 "l'effet. Vacuité 0-47 / 0-66, publiée et non masquée."}
+
+
+def _dgov_couverture(complete=True):
+    pub = {}
+    for m in so.MODELES:
+        for s in so.STRATES:
+            pub[f"{m}|{s}"] = {"eps": {r: 0.3 for r in so.EPS_REGLES},
+                               "mesures": {"LOO": 0.35, "split-half": 0.34}}
+    if not complete:
+        pub[f"{so.MODELES[0]}|S3"]["eps"].pop("produit")
+        pub[f"{so.MODELES[1]}|S0"]["mesures"].pop("split-half")
+    return so.couverture_publiee(pub)
+
+
+def _dgov_split_half_sans_fuite():
+    """La partition split-half ne fuit **jamais** : pour toute paire retenue,
+    `μ` est estimée sur un ensemble qui ne contient **ni `a` ni `b`**."""
+    n = 60
+    moit = so.moities_de_cellule(n)
+    retenues, cheval, fuites = 0, 0, 0
+    for a in range(n):
+        for b in range(a + 1, n):
+            idx = so.indices_estimation_split_half(moit, a, b)
+            if idx is None:
+                cheval += 1
+                continue
+            retenues += 1
+            if a in idx or b in idx:
+                fuites += 1
+    ok = (fuites == 0 and retenues > 0 and cheval > 0
+          and retenues + cheval == n * (n - 1) // 2
+          and int((moit == 0).sum()) == int((moit == 1).sum()) == n // 2)
+    return (PASS if ok else FAIL), {
+        "n_unites": n, "paires_totales": n * (n - 1) // 2,
+        "paires_retenues": retenues, "paires_a_cheval_exclues": cheval,
+        "fuites": fuites, "tailles_des_moities": [int((moit == 0).sum()),
+                                                  int((moit == 1).sum())],
+        "regle": "μ estimée sur la moitié 1−h : elle ne contient ni a ni b"}
+
+
+def _dgov_split_half_fuite():
+    """Contre-exemple ÉCHOUANT : estimer `μ` sur la moitié qui CONTIENT la
+    paire — le split-half devient une fuite pure."""
+    moit = so.moities_de_cellule(60)
+    a, b = 0, 2                     # même moitié
+    meme = np.flatnonzero(moit == int(moit[a]))
+    return (FAIL if (a in meme and b in meme) else PASS), {
+        "a_dans_l_ensemble_d_estimation": bool(a in meme),
+        "b_dans_l_ensemble_d_estimation": bool(b in meme),
+        "motif": "une estimation sur la moitié qui contient la paire n'est ni "
+                 "un split-half ni un LOO : c'est une fuite"}
+
+
+def _dgov_core_distribution():
+    """`Core` publie sa **distribution adjacente** des comptes : un `|Core| = 0`
+    ne se lit jamais en zéro plat (un indice à 8/10 annule déjà la nulle)."""
+    r = so.core(_dgov_supports_core(10, 0, seed=4), seuil=so.CORE_SEUIL)
+    d = r.get("distribution_adjacente") or {}
+    ok = (r["taille"] == 0 and len(d) == 10 and ">=1" in d and ">=9" in d
+          and "compte_max_sur_S" in r and d[">=1"] >= d[">=9"])
+    return (PASS if ok else FAIL), {
+        "taille_Core": r["taille"], "distribution_adjacente": d,
+        "compte_max_sur_S": r.get("compte_max_sur_S"),
+        "seuil": r["seuil"],
+        "regle": "le seuil ≥ 9 est PRÉ-ENREGISTRÉ et ne bouge pas ; seule la "
+                 "publication s'enrichit"}
+
+
+def _dgov_core_zero_plat():
+    """Contre-exemple ÉCHOUANT : `|Core| = 0` publié sans sa distribution."""
+    return FAIL, {"Core": 0, "distribution_adjacente": None,
+                  "motif": "un indice à 8/10 annule déjà la nulle Bin(10, "
+                           "1/128) ; publier « 0 » sans la distribution le "
+                           "masque"}
+
+
+def _dgov_cardinal_unite():
+    """Le cardinal intra-tige se publie **avec son unité**, et dans les DEUX
+    unités : par cellule de capture, et dans l'unité de `P`."""
+    par_cellule, n_cellules = 150, 6
+    total = par_cellule * n_cellules
+    ok = (total == 900 and 60 * n_cellules == 360 and 90 * n_cellules == 540)
+    return (PASS if ok else FAIL), {
+        "cardinal_par_cellule_de_capture": par_cellule,
+        "n_cellules_de_capture": n_cellules,
+        "cardinal_total_unite_de_P": total,
+        "par_strate_unite_de_P": {"S3": 60 * n_cellules, "S2": 90 * n_cellules,
+                                  "S1": 0, "S0": 0},
+        "regle": "P est agrégé sur les 6 cellules : un cardinal PAR CELLULE "
+                 "n'est pas dans l'unité de P"}
+
+
+def _dgov_cardinal_sans_unite():
+    """Contre-exemple ÉCHOUANT : un cardinal publié sans son unité."""
+    return FAIL, {"cardinal_publie": 150, "unite": None,
+                  "motif": "150 par cellule ou 150 au total ? Sans unité "
+                           "nommée, le lecteur ne peut pas le savoir — et "
+                           "150/900 n'est pas 100 % des paires S3 et S2"}
+
+
+def _dgov_anomalie_non_expliquee():
+    """L'anomalie `σ± ≪ 0.5` se consigne **NON EXPLIQUÉE**, en quantité
+    diagnostique, **sans mécanisme proposé**."""
+    cel = {"gpt2|type|S0": {"accord_numerateur": 1994, "accord_denominateur": 5083,
+                            "sigma_pm": "1994/5083",
+                            "sigma_pm_par_intersection": {"|A∩B|=1": 0.387}},
+           "gpt2|aucun|S3": {"accord_numerateur": 5993, "accord_denominateur": 5993,
+                             "sigma_pm": "1/1"}}
+    b = so.bloc_anomalie_non_expliquee(cel)
+    txt = json.dumps(b, ensure_ascii=False).lower()
+    interdits = ["parce que", "s'explique par", "cause probable", "sans doute"]
+    ok = (b["statut"] == "NON EXPLIQUÉ" and b["n_cellules_signalees"] == 1
+          and "non décisionnelle" in b["nature"]
+          and not any(t in txt for t in interdits))
+    return (PASS if ok else FAIL), {
+        "statut": b["statut"], "nature": b["nature"],
+        "n_cellules_signalees": b["n_cellules_signalees"],
+        "cellules": b["cellules"], "termes_de_mecanisme_detectes":
+            [t for t in interdits if t in txt]}
+
+
+def _dgov_anomalie_expliquee():
+    """Contre-exemple ÉCHOUANT : nommer un mécanisme au lieu de nommer
+    l'inconnu."""
+    return FAIL, {"redaction_refusee": "σ± < 0.5 s'explique par la dépendance "
+                                       "LOO entre les deux membres de la paire",
+                  "motif": "la dépendance LOO est POSITIVE (Cov = σ²/58) et ne "
+                           "peut pas produire cet écart ; nommer un mécanisme "
+                           "faux est pire que nommer l'inconnu"}
+
+
+def _dgov_cellules_diag(complet=True, conditions=None, sans_colonne=None,
+                        sans_objet=False):
+    """Les **60 cellules** de `V-diag` (3 modèles × 5 conditions du §8 ×
+    4 strates), portant **toutes** les colonnes exigées, `p_sym` de cellule
+    compris. Tour additif — L1/L2."""
+    conds = tuple(conditions or so.CENTRAGES)
+    cel = {}
+    for m in so.MODELES:
+        for x in conds:
+            for s in so.STRATES:
+                c = {"P": 360, "O_en_indices": 16.647222, "cos_moyen": 0.276588,
+                     "f": 0.279088, "sigma_pm": "1/1",
+                     "sigma_pm_flottant": 1.0, "mediane_indices": "16/1",
+                     "IQR_indices": ["15/1", "18/1"],
+                     "O_cos_conjoint": {"O_moyen": 0.260113,
+                                        "cos_moyen": 0.276588,
+                                        "corr_O_cos": 0.41},
+                     "p_sym_median": 14}
+                c["p_sym_cellule"] = so.p_sym_cellule(c)
+                cel[f"{m}|{x}|{s}"] = c
+    if not complet:
+        # une cellule dont l'excès `O − p_sym` n'est pas publié : la table de
+        # `V-diag` ne peut pas être écrite (0-120, étendu au tour additif)
+        cel[f"{so.MODELES[0]}|aucun|S3"]["p_sym_cellule"][
+            "exces_O_moins_p_sym_realise_median"] = None
+    if sans_colonne:
+        cel[f"{so.MODELES[0]}|aucun|S3"][sans_colonne] = None
+    if sans_objet:
+        # `SANS OBJET` est une valeur PUBLIÉE, pas un manque (D23)
+        cel[f"{so.MODELES[0]}|aucun|S3"]["sigma_pm"] = so.SANS_OBJET
+    return cel
+
+
+def _dgov_decomposition(perturbation=0.0, n_rep=4, seed=3):
+    """`Δ* = Δ_rem + Δ_add` sur des accumulateurs par paire synthétiques.
+    `perturbation` casse l'identité — cas échouant MORDANT."""
+    tiges, tdp = _dgov_tiges_inter(n_rep)
+    rng = np.random.default_rng(seed)
+    a = rng.normal(0.260, 0.03, len(tdp))
+    t = a - rng.normal(0.225, 0.02, len(tdp))
+    p = a + rng.normal(0.150, 0.01, len(tdp))
+    d = so.decomposition_delta(a, t, p, tdp, tiges, b=200, seed=0)
+    if perturbation:
+        # on casse l'identité en déplaçant `Δ*` SEUL, sans toucher aux crans
+        d["Delta_etoile_estime"] = float(d["Delta_etoile_estime"]) + perturbation
+    v, det = so.identite_decomposition(
+        d["Delta_rem_estime"], d["Delta_add_estime"], d["Delta_etoile_estime"],
+        echelle=max(abs(float(d["Delta_rem_estime"])),
+                    abs(float(d["Delta_add_estime"])),
+                    abs(float(d["Delta_etoile_estime"])), 1e-300))
+    ok = (v == PASS and d["identite_par_paire"]["verdict"] == PASS)
+    return (PASS if ok else FAIL), {
+        "identite_sur_les_estimes": det,
+        "identite_par_paire": d["identite_par_paire"],
+        "Delta_rem_indices": d["Delta_rem_en_indices"],
+        "Delta_add_indices": d["Delta_add_en_indices"],
+        "Delta_etoile_indices": d["Delta_etoile_en_indices"],
+        "IC_rem": d["IC_Delta_rem"], "IC_add": d["IC_Delta_add"],
+        "IC_Delta_etoile": d["IC_Delta_etoile"],
+        "statut": d["statut"], "perturbation_injectee": perturbation}
+
+
 def build_clauses_dgov(paires_ok, marges_ok, spec_ok, diag_ok):
     C = []
 
@@ -4614,14 +5193,15 @@ def build_clauses_dgov(paires_ok, marges_ok, spec_ok, diag_ok):
     clause("V-borne",
            "|A∩B| ≥ p_sym (borne SERRÉE, §16) sur 100 % des paires",
            "une paire à |A∩B| < p_sym ⇒ BUG DE MESURE, jamais un résultat",
-           [("40 paires réelles synthétiques", so.EN_ATTENTE,
-             lambda: so.v_borne(paires_ok))],
+           [("40 paires + encadrement conforme aux douze p_sym", PASS,
+             lambda: so.v_borne(paires_ok, _dgov_encadrement(True))),
+            ("40 paires, réalisée non encore mesurée", so.EN_ATTENTE,
+             lambda: so.v_borne(paires_ok, None))],
            [("paire fabriquée inter=2 < p_sym=9", FAIL,
-             lambda: so.v_borne(_dgov_paire_violante()))],
-           structural=lambda: (
-               [] if so.ENCADREMENT_TABLE_SEUIL is None else
-               ["le second membre de V-borne a reçu un seuil : Q-M6 était-elle "
-                "rendue ? sinon c'est 0-52"]),
+             lambda: so.v_borne(_dgov_paire_violante(),
+                                _dgov_encadrement(True))),
+            ("une cellule hors encadrement théorique", FAIL,
+             lambda: so.v_borne(paires_ok, _dgov_encadrement(False)))],
            note="§16, D30 alinéa 2 : la borne gelée n'était pas fausse, elle "
                 "était CORRECTE ET LÂCHE — majorer m_ψ ≤ 1 jette un facteur "
                 "cos. Le seuil est ≥ cos, pas ≥ cos². membre (b) "
@@ -4650,31 +5230,134 @@ def build_clauses_dgov(paires_ok, marges_ok, spec_ok, diag_ok):
                                       "revenir à la lâche inverserait le "
                                       "critère de direction"}))])
 
-    clause("cum : aucune interpolation (Q-M5)",
-           "cos sous cum(7) ⇒ p_sym rendu ; cos au-dessus ⇒ EN-ATTENTE",
-           "une valeur de cum extrapolée au lieu d'être attendue",
-           [("cos = 0.1471 (Qwen S0) ≤ cum(7)", PASS,
-             lambda: (PASS if so.p_sym_theorique(0.1471)["p_sym"] == 7
-                      else FAIL, so.p_sym_theorique(0.1471))),
-            ("cos = 0.3368 (SmolLM2 S3) > cum(7) ⇒ EN-ATTENTE", PASS,
-             lambda: (PASS if so.p_sym_theorique(0.3368)["statut"]
-                      == so.EN_ATTENTE else FAIL, so.p_sym_theorique(0.3368))),
-            ("table chargée : 7 ancres, concave, contiguë depuis 1", PASS,
-             lambda: (PASS if (so.charger_cum()["concave"]
-                               and so.charger_cum()["contigue_depuis_1"])
-                      else FAIL,
-                      {k: v for k, v in so.charger_cum().items() if k != "cum"}))],
+    clause("cum : gravure fp64 vs table de contrôle (§16.1)",
+           "recalcul fp64 conforme au contrôle de lab-math à ±1.5e−4",
+           "un contrôle décalé au-delà de la tolérance ⇒ défaut à publier",
+           [("écart gravure − contrôle ≤ 1.5e−4", PASS,
+             lambda: (PASS if _dgov_cum()["controle"]["conforme"] else FAIL,
+                      {k: v for k, v in _dgov_cum()["controle"].items()
+                       if k != "ecarts"})),
+            ("croissante, concave, contiguë depuis 1, j_max = 20", PASS,
+             lambda: (PASS if (_dgov_cum()["concave"]
+                               and _dgov_cum()["croissante"]
+                               and _dgov_cum()["contigue_depuis_1"]
+                               and _dgov_cum()["j_max"] == 20) else FAIL,
+                      {k: v for k, v in _dgov_cum().items()
+                       if k not in ("cum", "controle")})),
+            ("inverse vérifié par aller-retour math.erfc", PASS,
+             lambda: (PASS if _dgov_cum()["verification_de_l_inverse"][
+                 "residu_max_|Phi(ndtri(p))-p|"] < 1e-12 else FAIL,
+                 _dgov_cum()["verification_de_l_inverse"]))],
+           [("contrôle décalé de 1e−3", FAIL, _dgov_cum_decale)],
+           note="scipy n'est PAS une dépendance du projet (requirements.txt : "
+                "torch, transformers, pytest) : Φ⁻¹ est implémentée en fp64 "
+                "(AS 241, Wichura 1988) et vérifiée par un aller-retour à "
+                "travers math.erfc, qui ne partage aucune ligne avec elle. "
+                "Substitution DÉCLARÉE à scipy.special.ndtri.")
+
+    clause("Les douze p_sym (§16.1)",
+           "la gravure fp64 reproduit les douze p_sym pré-enregistrés",
+           "une valeur de cum extrapolée au lieu d'être calculée",
+           [("douze cellules, frontières franches comprises", PASS,
+             _dgov_douze_psym)],
            [("extrapolation linéaire de cum(8)", FAIL,
              lambda: (FAIL, {"cum_7": so.CUM_ANCRES[7],
                              "extrapolation_lineaire": round(
                                  2 * so.CUM_ANCRES[7] - so.CUM_ANCRES[6], 5),
+                             "cum_8_grave": round(_dgov_cum()["cum"][8], 6),
                              "motif": "cum est CONCAVE : l'interpolation "
                                       "linéaire SOUS-ESTIME toujours, et elle "
-                                      "a déjà déplacé une cellule (SmolLM2 S3, "
-                                      "frontière 5/6 à 0.26 %)"}))],
-           note="la table `cum` est une constante CHARGÉE (charger_cum) et non "
-                "des nombres que le code compléterait : elle s'attend, elle ne "
-                "se devine pas.")
+                                      "a déjà déplacé une cellule"}))],
+           note="les deux frontières franches (gpt2 S1 à 0.04 %, SmolLM2 S1 à "
+                "0.08 %) sont sous le plancher numérique : elles s'écrivent "
+                "12-13 et 16-17, et basculeraient vers le p INFÉRIEUR — sens "
+                "CONSERVATEUR, jamais plus facile qu'annoncé.")
+
+    clause("p_sym réalisé : |cos| et moyenne géométrique",
+           "|cos_pair| et moyenne géométrique des masses top-p des DEUX clés",
+           "la table MOYENNE des deux clés au lieu de la géométrique",
+           [("40 paires, borne exacte vérifiée", PASS,
+             lambda: (PASS if all(p["inter"] >= p["p_sym"] for p in paires_ok)
+                      else FAIL,
+                      {"n": len(paires_ok),
+                       "regle": "|cos| et moyenne géométrique PAR CLÉ",
+                       "n_violations": 0})),
+            ("cos négatif traité par sa valeur absolue", PASS,
+             _dgov_psym_cos_negatif)],
+           [("table moyenne au lieu de géométrique", FAIL,
+             lambda: (FAIL, {"motif": "la dérivation borne CHAQUE masse "
+                                      "séparément ; la moyenne arithmétique "
+                                      "des deux tables n'est pas √(T_φ·T_ψ) et "
+                                      "n'est pas une borne"}))])
+
+    clause("p_sym à intersection vide",
+           "|A∩B| = 0 ⇒ p_sym = 0 (scalaire, batché et théorique)",
+           "un plancher p_sym ≥ 1 fabrique une violation sur chaque paire vide",
+           [("supports disjoints, cos = 0", PASS, _dgov_psym_intersection_vide)],
+           [("plancher à 1 sur intersection vide", FAIL,
+             _dgov_psym_plancher_a_un)],
+           note="défaut trouvé PAR LA PORTE V-borne SUR LES DONNÉES RÉELLES : "
+                "30 516 violations sur 669 060 paires, concentrées dans `glob` "
+                "et `type`. Une borne plus forte que vraie aurait fait "
+                "déclarer BUG un run sain — mode inverse du faux PASS.")
+
+    clause("V-borne : tolérance ULP à l'égalité exacte",
+           "|cos| = g(1) exactement ⇒ p_sym = 1, et le compteur de paires "
+           "décidées par la tolérance est publié",
+           "un écart réel (1e−6, soit ~10⁹ ULP) absorbé par la tolérance",
+           [("égalité exacte, |A∩B| = 1 sur la plus grande magnitude", PASS,
+             _dgov_egalite_exacte),
+            ("compteur de paires décidées par la tolérance exposé", PASS,
+             lambda: (PASS if "decidee_par_la_tolerance" in so.quantites_batch(
+                 np.random.default_rng(1).standard_normal((4, so.D_DG)),
+                 np.random.default_rng(2).standard_normal((4, so.D_DG)),
+                 so.K_TOPK) else FAIL,
+                 {"tolerance_ULP": so.TOL_ULP_BORNE,
+                  "regle": "sans compteur publié, une tolérance est un masque"}))],
+           [("écart de 1e−6 absorbé", FAIL, _dgov_tolerance_trop_large)],
+           note="mesuré : 2 paires sur 669 060 tombaient du mauvais côté au "
+                "dernier bit (0.0 et −1.0 ULP), sur des paires à |A∩B| = 1 où "
+                "la borne est atteinte AVEC ÉGALITÉ. La tolérance ne desserre "
+                "pas la borne : elle rend la comparaison fidèle à "
+                "l'arithmétique réelle que la borne suppose.")
+
+    clause("Encadrement : les TROIS lectures publiées",
+           "l'IQR réalisé rencontre l'intervalle théorique (lecture B) ; A et C "
+           "publiées à côté, avec leurs compteurs",
+           "un IQR réalisé entièrement au-dessous du théorique",
+           [("douze cellules synthétiques conformes", PASS,
+             lambda: so._encadrement_theorique(_dgov_encadrement(True))),
+            ("les trois lectures publiées par cellule et comptées", PASS,
+             lambda: (PASS if (all(
+                 "lecture_A_mediane_dans_theorique" in v
+                 and "lecture_B_IQR_realise_rencontre_theorique" in v
+                 and "lecture_C_contenance_stricte_q1_lo_hi_q3" in v
+                 for v in so._encadrement_theorique(
+                     _dgov_encadrement(True))[1]["par_cellule"].values())
+                 and len(so._encadrement_theorique(
+                     _dgov_encadrement(True))[1]["trois_lectures"]) == 4)
+                 else FAIL,
+                 so._encadrement_theorique(
+                     _dgov_encadrement(True))[1]["trois_lectures"]))],
+           [("IQR réalisé [1,3] contre théorique [14,14]", FAIL,
+             lambda: so._encadrement_theorique(_dgov_encadrement(False)))],
+           note="ambiguïté TRANCHÉE au tour de correction : « X encadre Y » = "
+                "Y contenu dans X, ce qui désigne la lecture B (rôles "
+                "syntaxiques respectés) ; la lecture C est la contenance "
+                "STRICTE, version la plus forte de B. Les TROIS sont publiées "
+                "côte à côte ; leur divergence est SANS EFFET sur le verdict.")
+
+    clause("Noyaux batchés ≡ noyaux scalaires",
+           "quantites_batch et support_topk batché coïncident avec les lus",
+           "une version rapide qui diverge de la version lue",
+           [("32 paires aléatoires", PASS, _dgov_batch_equiv),
+            ("poids vectorisés ≡ poids_bootstrap", PASS, _dgov_poids_equiv)],
+           [("divergence d'un indice sur le support", FAIL,
+             lambda: (FAIL, {"motif": "une optimisation qui change le résultat "
+                                      "est un défaut, pas une optimisation"}))],
+           note="la mesure passe par les noyaux batchés ; le banc n'exerce que "
+                "les noyaux lus. Sans cette clause, tout le banc porterait sur "
+                "un code que la mesure n'exécute pas.")
 
     clause("V-P8", "toute cellule a ≥ 8 paires",
            "une cellule à 7 paires ⇒ exclue, cardinal publié (CAS OBLIGATOIRE)",
@@ -4691,14 +5374,45 @@ def build_clauses_dgov(paires_ok, marges_ok, spec_ok, diag_ok):
                    "publié",
            "une quantité à t−1 dont l'ensemble contient deux unités d'une même "
            "tige (CAS OBLIGATOIRE)",
-           [("registre t−1 vide, cardinal publié", PASS,
-             lambda: so.v_t1([], {"S3": 360, "S2": 540}))],
-           [("quantité à t−1 avec paires intra-tige", FAIL,
+           [("registre t−1 vide, Core 1/tige, cardinal publié", PASS,
+             lambda: so.v_t1([], {"S3": 360, "S2": 540, "S1": 0, "S0": 0},
+                             core_S=list(range(10)),
+                             tige_de={i: f"T{i}" for i in range(10)}))],
+           [("quantité à t−1 avec paires intra-tige (membre i)", FAIL,
              lambda: so.v_t1([{"nom": "profil à t−1", "intra_tige": True,
-                               "n_paires_intra_tige": 360}]))],
-           note="0-130 : à t−1, S3 et S2 rendraient 64/64 PAR ARITHMÉTIQUE — "
-                "le chiffre le plus élevé du cycle aurait été un artefact de "
-                "définition.")
+                               "n_paires_intra_tige": 360}],
+                             {"S3": 360}, list(range(10)),
+                             {i: f"T{i}" for i in range(10)})),
+            ("Core avec deux unités d'une même tige (membre ii)", FAIL,
+             lambda: so.v_t1([], {"S3": 360}, list(range(10)),
+                             {i: ("T0" if i == 9 else f"T{i}")
+                              for i in range(10)})),
+            ("cardinal intra-tige non publié (membre iii)", FAIL,
+             lambda: so.v_t1([], None, list(range(10)),
+                             {i: f"T{i}" for i in range(10)}))],
+           note="0-143 (critique) : la clause d'origine VIDAIT S3 et S2, qui "
+                "sont DÉFINIES par le partage de tige. Son motif était "
+                "doublement faux — les états bit-identiques valent à t−1, pas "
+                "à t (à t le suffixe EST le token de capture) ; et le "
+                "bootstrap PAR TIGE ABSORBE la corrélation intra-tige au lieu "
+                "d'en souffrir (0-50).")
+
+    clause("V-t1 — S3 et S2 mesurées à `t`",
+           "les paires intra-tige ne sont PAS exclues à t ; cardinal publié",
+           "exclure les paires intra-tige vide S3 et S2 (0-143)",
+           [("cardinal intra-tige > 0 et strates non vides", PASS,
+             lambda: (PASS if so.v_t1([], {"S3": 360, "S2": 540},
+                                      list(range(10)),
+                                      {i: f"T{i}" for i in range(10)})[0] == PASS
+                      else FAIL,
+                      {"S3_et_S2_definies_par_le_partage_de_tige": True,
+                       "portee": "à t, les paires intra-tige ne sont PAS "
+                                 "exclues"}))],
+           [("exclusion à t ⇒ S3 et S2 vides", FAIL,
+             lambda: (FAIL, {"S3_apres_exclusion": 0, "S2_apres_exclusion": 0,
+                             "motif": "auto-contradictoire avec le §7 et le "
+                                      "§4.2, qui mesurent et chiffrent les "
+                                      "quatre strates"}))])
 
     clause("V-core-S", "|S| = 10, une unité par tige, appartenance publiée",
            "deux unités d'une même tige dans S (CAS OBLIGATOIRE)",
@@ -4762,6 +5476,68 @@ def build_clauses_dgov(paires_ok, marges_ok, spec_ok, diag_ok):
                 "coordonnées géantes portent tout le cosinus » rendent le MÊME "
                 "O — et le second est la branche de tort de Neuro (N7).")
 
+    # ------------------------- tour additif L1/L2/L3 (clauses NEUVES)
+    clause("V-diag-colonnes",
+           "les 60 cellules (3 × 5 × 4) portent TOUTES les colonnes de "
+           "V-diag — cardinal ÉNUMÉRÉ, jamais supposé",
+           "une cellule sans excès `O − p_sym`, ou une condition manquante "
+           "au cardinal (CAS OBLIGATOIRES)",
+           [("60 cellules complètes", PASS,
+             lambda: so.v_diag_colonnes(_dgov_cellules_diag(True))),
+            ("SANS OBJET publié sur σ± — valeur, pas manque (D23)", PASS,
+             lambda: so.v_diag_colonnes(
+                 _dgov_cellules_diag(True, sans_objet=True)))],
+           [("une cellule sans excès O − p_sym", FAIL,
+             lambda: so.v_diag_colonnes(_dgov_cellules_diag(False))),
+            ("48 cellules au lieu de 60 (condition `plac` absente)", FAIL,
+             lambda: so.v_diag_colonnes(_dgov_cellules_diag(
+                 True, conditions=[c for c in so.CENTRAGES if c != "plac"]))),
+            ("une cellule sans `f`", FAIL,
+             lambda: so.v_diag_colonnes(
+                 _dgov_cellules_diag(True, sans_colonne="f")))],
+           note="V-diag (l. 383) exige f, σ± et le couple (O, cos) conjoint "
+                "par strate, par condition et par modèle. La quantité "
+                "EXISTAIT ; elle n'était pas TABULÉE — le compte rendu ne "
+                "portait `cos` que sous `aucun`. Cette clause compte les "
+                "cellules × colonnes au lieu de les supposer (0-144).")
+
+    clause("V-psym-conditions",
+           "p_sym de cellule défini sur les CINQ conditions du §8 — cardinal "
+           "COMPTÉ par condition",
+           "quatre conditions au lieu de cinq, ou une cellule sans p_sym "
+           "(CAS OBLIGATOIRES)",
+           [("5 conditions × 12 cellules", PASS,
+             lambda: so.v_psym_conditions(_dgov_cellules_diag(True)))],
+           [("condition `type` absente ⇒ 4/5", FAIL,
+             lambda: so.v_psym_conditions(_dgov_cellules_diag(
+                 True, conditions=[c for c in so.CENTRAGES if c != "type"]))),
+            ("une cellule sans p_sym de cellule", FAIL,
+             lambda: so.v_psym_conditions(
+                 _dgov_cellules_diag(True, sans_colonne="p_sym_cellule")))],
+           note="La demande écrit « p_sym défini sur les 5 conditions, "
+                "cardinal compté, jamais supposé ». Le cardinal par "
+                "condition est publié.")
+
+    clause("V-identite-decomposition",
+           "Δ_rem + Δ_add = Δ* à la tolérance ULP DÉJÀ EN VIGUEUR "
+           "(TOL_ULP_BORNE), par paire ET sur les estimés",
+           "un Δ* déplacé de 1e−9 ⇒ FAIL (CAS OBLIGATOIRE)",
+           [("360 paires synthétiques, bootstrap de tiges", PASS,
+             lambda: _dgov_decomposition(0.0)),
+            ("identité sur trois scalaires publiés", PASS,
+             lambda: so.identite_decomposition(
+                 0.2601128472222222 - 0.0353, 0.4105 - 0.2601128472222222,
+                 0.4105 - 0.0353))],
+           [("Δ* déplacé de 1e−9 sans toucher aux crans", FAIL,
+             lambda: _dgov_decomposition(1e-9)),
+            ("Δ* déplacé de 1e−6", FAIL,
+             lambda: so.identite_decomposition(0.2248, 0.1504,
+                                               0.3752 + 1e-6))],
+           note="Δ_rem = O_aucun − O_type (cran RETIRÉ), Δ_add = O_plac − "
+                "O_aucun (cran AJOUTÉ). DESCRIPTIFS : ils ne modifient aucune "
+                "classe, aucun seuil, aucune borne. Δ* reste la primaire "
+                "gelée ; cette clause ne vérifie qu'une IDENTITÉ.")
+
     clause("V-perimetre", "les trois éléments du §4.9 présents",
            "le successeur désigné manquant",
            [("bloc complet", PASS, lambda: so.v_perimetre(bloc_perimetre_dgov()))],
@@ -4805,6 +5581,32 @@ def build_clauses_dgov(paires_ok, marges_ok, spec_ok, diag_ok):
            note="défaut trouvé PAR CE BANC, sur quatre clauses à la fois : le "
                 "corridor était 64 × trop large ⇒ BAS et c-mec vraies presque "
                 "partout. Aucune donnée du run n'a été nécessaire pour le voir.")
+
+    clause("ε_Λ dérivé de l'enveloppe nulle (§4.3)",
+           "ε_Λ = 1.96 × 0.01097/√P, décroissant en P ; corridor 2n ABSOLU",
+           "ε_Λ posé à 0, ou réglé sur l'enveloppe de son propre estimateur",
+           [("P = 8, 360, 7560", PASS,
+             lambda: (PASS if (so.epsilon_lambda(8) > so.epsilon_lambda(360)
+                               > so.epsilon_lambda(7560) > 0
+                               and abs(so.epsilon_lambda(8) - 0.0076) < 1e-3)
+                      else FAIL,
+                      {"eps_P8": so.epsilon_lambda(8),
+                       "eps_P360": so.epsilon_lambda(360),
+                       "eps_P7560": so.epsilon_lambda(7560),
+                       "sd_nulle_par_paire": so.SD_NULLE_PAR_PAIRE,
+                       "corridor_2n": str(so.CORRIDOR)})),
+            ("le corridor reste 2n, indépendant de P", PASS,
+             lambda: (PASS if so.CORRIDOR == so.frac(1, 64) else FAIL,
+                      {"corridor": str(so.CORRIDOR),
+                       "regle": "couloir d'équivalence ABSOLU (0-81 / D28)"}))],
+           [("ε_Λ = 0 ⇒ HAUT dès que IC_inf(Λ) > 0", FAIL,
+             lambda: (FAIL if so.classe_n((1e-9, 0.3), (0.2, 0.3), 0.0,
+                                          so.N_HASARD) == "HAUT" else PASS,
+                      {"motif": "sans marge 1×, une significativité de "
+                                "10⁻⁹ suffirait à prononcer HAUT",
+                       "eps_lambda_correct_P360": so.epsilon_lambda(360)}))],
+           note="§4.3 pré-enregistre l'enveloppe ; ε_Λ n'a jamais été laissé au "
+                "choix de l'implémentation.")
 
     clause("Objets du banc",
            "10 objets, chacun ATTEINT par une entrée synthétique",
@@ -4951,6 +5753,115 @@ def build_clauses_dgov(paires_ok, marges_ok, spec_ok, diag_ok):
              lambda: (FAIL, {"motif": "support vide ≠ zéro : la fraction n'a "
                                       "pas de domaine de définition"}))])
 
+    # ------- tour de correction : sensibilité `ε*`, plancher, split-half
+    clause("ε* : les DEUX règles de signe, publiées côte à côte",
+           "règles `min` (implémentée) et `produit` (alternative) calculées et "
+           "publiées avec leur statut ; AUCUNE promue",
+           "une troisième règle inventée à l'exécution, ou une règle promue",
+           [("deux règles sur un jeu inter-tige", PASS, _dgov_deux_regles_eps)],
+           [("règle non déclarée `mediane`", FAIL, _dgov_regle_inconnue)],
+           note="le §4.5 ne dit pas ce que devient une paire à DEUX tiges "
+                "(S1, S0). L'affectation à min(t_a, t_b) N'EST PAS "
+                "pré-enregistrée : c'est une opérationnalisation déclarée. La "
+                "règle `produit` est aussi naturelle et donne d'autres ε*. Les "
+                "deux sont publiées ; l'arbitrage est PI. Publication de "
+                "SENSIBILITÉ — ne dépend d'aucun résultat, ne peut que durcir "
+                "la lecture (D30 alinéa 2).")
+
+    clause("Plancher structurel de ε* (puissance maximale du test)",
+           "plancher calculé par simulation à effet CONSTANT ; vaut EXACTEMENT "
+           "1 quand aucun signe ne peut se retourner",
+           "un plancher supposé nul ⇒ c-cent atteignable partout",
+           [("K_eff = 10, règles min et produit, structure dégénérée", PASS,
+             _dgov_plancher_structurel)],
+           [("ε* supposé nul sur une structure dégénérée", FAIL,
+             _dgov_plancher_suppose_nul)],
+           note="D28 : le couloir d'équivalence est ABSOLU (2n) et ne se règle "
+                "jamais sur l'enveloppe nulle de son propre estimateur. Le "
+                "plancher dit la puissance MAXIMALE disponible du test, "
+                "indépendamment de la donnée ; il se publie par cellule et par "
+                "règle.")
+
+    clause("Puissance / vacuité de la partition C",
+           "Δ* constant non nul ⇒ c-cent atteignable ; Δ* = 0 ⇒ c-cent ne sort "
+           "pas ; bruit centré large ⇒ ind_Δ atteignable",
+           "structure où AUCUN signe ne se retourne ⇒ classe informative "
+           "INATTEIGNABLE même à Δ* constant (CAS OBLIGATOIRE)",
+           [("trois jeux à réponse connue par construction", PASS,
+             _dgov_puissance_partition_C)],
+           [("100 % intra-tige sous la règle `produit`", FAIL,
+             _dgov_puissance_degeneree)],
+           note="mode de vacuité 0-47 / 0-66 : une classe vide PAR "
+                "CONSTRUCTION du test se publie, elle ne se découvre pas après "
+                "coup. Ambiguïté DÉCLARÉE : la demande écrit « ind_Δ "
+                "atteignable » à effet constant, où la classe attendue est "
+                "c-cent ; les DEUX lectures sont vérifiées. Arbitrage dû.")
+
+    clause("Couverture énumérée : deux règles ε* × deux mesures",
+           "sur chaque cellule, les deux règles ε* ET les deux mesures "
+           "(LOO, split-half) sont présentes ; cardinal COMPTÉ",
+           "une règle ou une mesure manquante sur une cellule",
+           [("36 = 3 modèles × 4 strates × 3 conditions ; 12 cellules "
+             "décisionnelles", PASS, lambda: _dgov_couverture(True))],
+           [("règle `produit` et mesure split-half retirées", FAIL,
+             lambda: _dgov_couverture(False))],
+           note="ambiguïté DÉCLARÉE : « 12 cellules × 3 modèles » et « 36 "
+                "cellules » ne désignent pas le même objet. Les DEUX cardinaux "
+                "sont comptés et publiés avec leur unité nommée. Arbitrage dû. "
+                "Famille « cardinal périmé », sixième occurrence évitée par "
+                "comptage.")
+
+    clause("Split-half : partition sans fuite (§5-7, D26)",
+           "μ estimée sur la moitié qui ne contient NI a NI b ; paires à cheval "
+           "exclues, cardinal publié",
+           "μ estimée sur la moitié qui CONTIENT la paire (CAS OBLIGATOIRE)",
+           [("60 unités, 1770 paires énumérées", PASS,
+             _dgov_split_half_sans_fuite)],
+           [("estimation sur la moitié contenant a et b", FAIL,
+             _dgov_split_half_fuite)],
+           note="le §5-7 grave « double mesure (D26) : LOO ET split-half, "
+                "publiés côte à côte » et le §4.8 le liste. Le premier tour "
+                "n'avait implémenté QUE la bascule (§14-2) : annoncé et "
+                "absent. Le LOO reste PRINCIPAL (n_cell = 60 ≥ 30) ; le "
+                "split-half est le CONTRÔLE, avec un LOO refait sur le même "
+                "sous-ensemble pour que l'écart ne se confonde pas avec un "
+                "changement de jeu de paires.")
+
+    clause("Core : distribution adjacente des comptes",
+           "|Core| et la distribution ≥1..≥10 et le max publiés",
+           "|Core| = 0 publié en zéro plat, sans sa distribution",
+           [("Core vide, distribution complète", PASS, _dgov_core_distribution)],
+           [("zéro plat", FAIL, _dgov_core_zero_plat)],
+           note="le seuil ≥ 9/10 est PRÉ-ENREGISTRÉ et NE BOUGE PAS ; seule la "
+                "publication s'enrichit. Un indice à 8/10 annule déjà la nulle "
+                "Bin(10, 1/128) — publier « 0 » sans la distribution le masque.")
+
+    clause("Cardinal intra-tige : unité NOMMÉE",
+           "publié dans les deux unités — par cellule de capture ET dans "
+           "l'unité de P (× 6 cellules)",
+           "un cardinal publié sans son unité",
+           [("150 par cellule = 900 dans l'unité de P", PASS,
+             _dgov_cardinal_unite)],
+           [("« 150 » sans unité", FAIL, _dgov_cardinal_sans_unite)],
+           note="150 par cellule de capture, mais P est agrégé sur 6 cellules : "
+                "900 au total, S3 360 et S2 540 — soit 100 % des paires S3 et "
+                "S2. Les deux nombres sont vrais, dans deux unités.")
+
+    clause("Anomalie σ± ≪ 0.5 : consignée NON EXPLIQUÉE",
+           "statut NON EXPLIQUÉ, nature diagnostique non décisionnelle, aucun "
+           "mécanisme proposé",
+           "un mécanisme nommé à la place de l'inconnu",
+           [("bloc d'anomalie sur une cellule à ~15 σ", PASS,
+             _dgov_anomalie_non_expliquee)],
+           [("« s'explique par la dépendance LOO »", FAIL,
+             _dgov_anomalie_expliquee)],
+           note="σ± = 0.392288 (gpt2|type|S0, 1994/5083) et 0.4945 "
+                "(SmolLM2|type|S2) : ~15 σ sous la nulle 0.5, UNIFORME en "
+                "|A∩B|, et la dépendance LOO est POSITIVE donc ne peut pas le "
+                "produire. Quantité V-diag, non décisionnelle. Nommer "
+                "l'inconnu EST le livrable (D23 / 0-71 : la cause doit être "
+                "nommée avant toute suite, et elle ne l'est pas).")
+
     clause("Bootstrap de tiges / ε*",
            "IC bootstrap de TIGES (K_eff = 10) ; ε* par permutation intra-tige",
            "un bootstrap d'UNITÉS (K_eff = 60) au lieu de tiges",
@@ -5054,14 +5965,11 @@ def run_dgov(out_dir: Path = OUT_DIR_DGOV) -> dict:
         "borne_decisionnelle": "p_sym (serrée, §16, D30 alinéa 2) ; p_pair "
                                "(lâche) publiée en DESCRIPTIF",
         "table_cum": {k: v for k, v in so.charger_cum().items() if k != "cum"},
-        "Q-M6": {"statut": "NON RENDUE",
+        "Q-M6": {"statut": _dgov_cum().get("Q-M6", "NON RENDUE"),
                  "du": "table cum(j) exacte pour j = 1..20 (fp64, double "
                        "normalisation 569.6 / 563.9) et les douze p_sym",
-                 "effet": "le second membre de V-borne (« la réalisée encadre "
-                          "la théorique ») reste EN-ATTENTE ; aucun seuil n'est "
-                          "posé et aucune valeur de cum n'est extrapolée "
-                          "(règles Q-M5 et anti-0-52) ; la MESURE ne peut pas "
-                          "s'ouvrir"},
+                 "gravure": "recalcul fp64 au banc ; la table livrée est le "
+                            "CONTRÔLE, comparé à ±1.5e−4"},
         "clauses_sous_specifiees": UNDERSPEC_DGOV,
         "duree_s": round(time.time() - t0, 2),
         "clauses": rows,
@@ -5118,7 +6026,7 @@ def main():
         print(f"constantes : {rep_d['constantes']}")
         print(f"borne décisionnelle : {rep_d['borne_decisionnelle']}")
         print(f"table cum : {rep_d['table_cum']}")
-        print(f"Q-M6 : {rep_d['Q-M6']['statut']} — {rep_d['Q-M6']['effet']}")
+        print(f"Q-M6 : {rep_d['Q-M6']['statut']} — {rep_d['Q-M6']['gravure']}")
         for k, v in rep_d["clauses_sous_specifiees"].items():
             print(f"sous-spécifiée : {k} — {v}")
         print("-" * 78)
