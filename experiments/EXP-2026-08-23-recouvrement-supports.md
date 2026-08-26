@@ -1,0 +1,596 @@
+# EXP — recouvrement des supports de `topk(G·h)`
+
+Statut : PRE-ENREGISTRE
+
+*Consolidé par `lab-director` le 2026-08-23, sous avis **Math FAVORABLE** (verrous levés, M1…M9) et
+**Neuro FAVORABLE sous une condition bloquante** (N1…N8). Amendé à la gate PI du 2026-08-23 (§14).*
+
+> **Déclaration en tête, exigée par M8, à recopier dans le rapport** : ce protocole exige
+> `IC_inf > ε*` (et non `> 0`) sur son unique quantité décisionnelle de centrage. **Cela double le
+> seuil de détection**, de ~1.96·se à **~3.9·se** — homologue exact du durcissement 0-83
+> (« ~26 % → ~52 % ») du cycle v4. **C'est le prix d'un verdict lourd, il est déclaré avant la
+> mesure et il ne sera pas renégocié après.**
+
+---
+
+## 0. Défauts acquittés
+
+**0-1 … 0-103** : reconduits sans changement (patrimoine du projet, cycles antérieurs et v4).
+**0-104 … 0-116** : les treize du brouillon de ce cycle, dont quatre critiques, reconduits inchangés.
+
+### 0-117 … 0-134 — Relevés au tour de consolidation
+
+| # | Défaut | Pourquoi il était fatal |
+| --- | --- | --- |
+| **0-117** *(critique)* | **Le leave-one-out ne suffit pas à débiaiser le cosinus centré** (Math M4). Le centrage naïf porte un biais **négatif** ~ −2/n ; le LOO-paire le retire, mais **les deux états d'une paire partagent l'erreur d'estimation** `ε = μ̂ − μ`, `E‖ε‖² ≈ tr(Σ)/(n−2)` ⇒ **biais positif résiduel ~ +1/(n_cell − 2)**, soit **≈ 0.05 à `n_cell ≈ 20`**. | **Du même ordre que le corridor traduit en cosinus** — c'est-à-dire de la taille de la quantité décidée. Un biais de la taille de l'effet n'est pas une correction de second ordre : **il fabrique `c-cent`**. Le brouillon posait « LOO » là où il fallait un majorant publié et une seconde mesure. Correctif : `n_cell` et `1/(n_cell−2)` publiés ; **split-half en double mesure (D26)** ; **`min n_cell < 30` ⇒ le split-half devient la mesure principale** (ratifié §14-2). |
+| **0-118** *(critique)* | **`V-G` bit-à-bit était impossible par construction.** `A3` a été calculé dans le pipeline **fp32** (`hippocampus.phi`) ; la mesure de ce cycle est en **fp64**. La porte exigeait la reproduction bit-à-bit de `A3` **par la nouvelle mesure**. | **La porte allait échouer pour une raison parfaitement légitime** — mode **0-82** exact, à l'étage du dtype. Un échec non diagnostique consomme un tour et discrédite l'instrument sain. Correctif : `V-G` reproduit `A3` **en fp32, sur le chemin d'origine** (bit-à-bit) ; la mesure est ensuite en fp64 ; **deux nombres, écart publié** (D26). |
+| **0-119** *(critique)* | **Le corridor `2n` était invalide à l'échelle où le brouillon l'appliquait.** `\|A∩B\| ~ Hypergéom(8192,64,64)` : `P(0)=0.604`, `P(1)=0.303`, `P(2)=0.076` ⇒ **`q95` par paire = 2 indices, soit le DOUBLE du corridor**. Le corridor ne domine le `q95` que sur des **moyennes de ≥ 8 paires**. | **Une paire isolée dépasse le corridor 7.6 % du temps sous la nulle.** Le brouillon autorisait la lecture de `Λ` par paire : **une paire au-dessus du corridor aurait été lue comme un recouvrement**, à un taux de faux positif deux ordres au-dessus de l'α déclaré. Correctif : porte **`V-P8`**, bloquante. |
+| **0-120** *(critique)* | **Ni `f(s)` (énergie de l'intersection), ni `σ±(s)` (accord de signe), ni le couple `(O, cos)` conjoint n'étaient publiés** (condition bloquante Neuro). | **Le cycle ne pouvait pas donner tort à son propre expert.** Sans `f`, l'état *« les supports coïncident »* et l'état *« quelques coordonnées géantes portent tout le cosinus »* rendent **le même `O`, interprété de la même façon** — et le second est précisément la branche de tort de Neuro (N7). **Un dispositif dont aucune donnée ne peut réfuter l'expert qui le signe n'est pas un dispositif.** Correctif : porte **`V-diag`**, bloquante pour le rapport. |
+| **0-121** *(majeur)* | **Façade non repérée : « le noyau commun est le code de fond du gyrus denté »** (Neuro). **Propriété manquante** : dans le DG, la fraction stable est une propriété **du réseau qui a appris ces environnements** ; ici `Core` serait une propriété de **`G` composée avec l'anisotropie du flux résiduel** — **deux objets dont aucun n'a vu le matériau**. | **Même mode que 0-59 et que la façade Hasselmo** : l'étage mesuré n'est pas l'étage dont on parle. **Plus dangereuse que 0-59** : `Core` est la quantité du cycle dont **la nulle est la plus écrasante** (`p < 10⁻¹³`) — un chiffre statistiquement inattaquable aurait porté une interprétation entièrement fausse. Correctif : **`Core-G`** (une ligne d'arithmétique) + vocabulaire interdit (xix). |
+| **0-122** *(critique)* | **L'ordinal soumis à signature était l'ordre du DESIGN (`S3>S2>S1>S0`), déjà démenti par le brut de v4** (`M1 +`, `M2 −`, `M3 +` sur 3/3 ⇒ `S3>S1>S2>S0`, domaine dominant la tige d'un facteur 2 à 10, régime **additif**). | **Faute de provenance (D14-R) doublée d'une faute de D13** : demander à un expert de signer une prédiction **que le projet a déjà mesurée fausse**, dont l'antipode aurait été « confirmé » par une mesure antérieure au run. Correctif : ordinal du design **retiré** ; remplacé par `P-N` (niveau, décisionnelle) et `P-N-ord` (ordre du **cosinus brut**, descriptive). |
+| **0-123** *(majeur)* | **La condition `auto` manquait** (Neuro N1-bis). `LayerNorm` **centre** ; `RMSNorm` **ne centre pas** (Zhang & Sennrich 2019). | **`G` est appliquée à un vecteur que le cortex lui-même n'utilise jamais sous cette forme, et pas de la même manière selon le modèle** — et le brouillon n'avait aucun moyen de le voir. Conséquence : **`C-mod` était une classe sans cause candidate**, c'est-à-dire une classe qui se consigne et ne s'explique jamais. `auto` est en outre **le seul centrage du cycle dont l'opération soit disponible en ligne**. Correctif : cinquième niveau + porte **`V-norm`**. |
+| **0-124** *(majeur)* | **`Core` était trivial sans la contrainte « une unité par tige »** (Math M9). Deux états intra-tige sont **corrélés** et brisent la nulle binomiale. | La signature de `Core` vaut `p < 10⁻¹³` **sous indépendance**. Avec deux états d'une même tige dans `S`, `Core > 0` devient **attendu** — et le chiffre le plus spectaculaire du cycle aurait été un artefact d'échantillonnage. Correctif : porte **`V-core-S`**. |
+| **0-125** *(majeur)* | **La porte ULP n'était écrite que pour les états bruts** (Math). | Les états **centrés** et **placebo** sont précisément ceux dont les coordonnées sont **rapprochées de zéro par soustraction** ⇒ **les plus exposés** au basculement de rang à la coupure `topk`. La porte manquait **exactement là où le risque est maximal**. Frère de **0-51**. Correctif : `V-ulp` sur les **cinq** conditions. |
+| **0-126** *(majeur)* | **Le budget reposait sur deux calculs faux, et `R` était choisi à la main.** (i) Le MC conditionnel de `V-iid` **n'a pas d'objet** (`G` bâtie par `torch.randn` seedée ⇒ lignes iid gaussiennes **par définition**, résultat **exact**). (ii) Le dépassement « placebo » supposait un **recalcul complet de `G·h` par direction** ; l'identité `G·(h−c·r) = z − c·(G·r)` le réduit à **un matvec + une soustraction rang-1 + un topk**, avec `Z` en cache (**51,9 Mo/modèle**). (iii) `R` était posé, non dérivé. | **Un protocole qui demande un budget pour re-prouver une propriété de provenance dépense pour ne rien apprendre** — et un budget surévalué d'un ordre est un motif de refus injustifié à la gate. `R` choisi à la main est **0-52 rejoué**. Correctifs : les deux postes **supprimés**, §9 re-chiffré ; **`R = ⌈10·σ̂_dir²/σ̂_Δ²⌉`** ; échec de `V-G` = **arrêt de provenance**, jamais repli. |
+| **0-127** *(majeur)* | **Le centrage était désigné par des termes biologiques** (Neuro N1). Trois candidats écartés par **propriété manquante nommée** : inhibition tonique (déplace un **seuil**, sans direction) ; normalisation divisive (Carandini & Heeger : **multiplicative**, **en ligne**) ; retrait de mode commun par interneurones (poids **appris** ⇒ viole D8/D9). | **La propriété qu'aucun circuit ne possède** : `μ_type` est estimé **en leave-one-out sur un corpus dont une partie n'existe pas au moment du calcul — un neurone n'a pas d'ensemble de validation**. Sans cette entrée, `c-cent` réalisée aurait été lue *« le cerveau fait ça »* et aurait ouvert un chantier de mécanisme sur un **post-traitement statistique** (Mu & Viswanath 2018). **Quatrième façade tuée par la même méthode**, après Hasselmo, 0-59 et 0-55. Correctif : entrée **(xviii)**. |
+| **0-128** *(majeur)* | **`L(c)` n'existait qu'en version THÉORIQUE**, dépendant d'une hypothèse d'ordre-statistique, et `L(0.46)` tombait **à cheval sur la frontière `p = 10/11`** compte tenu d'une marge de ~1 % sur la masse totale. | **Une borne décisionnelle dont la valeur dépend d'un arrondi à 1 % n'est pas une borne**, et une porte assise sur une hypothèse distributionnelle a une nulle de plus à défendre. Correctif (Math) : **`V-borne` devient la version RÉALISÉE par paire** — `p_pair ≥ min{p : Σ des p plus grands φ_i² réalisés ≥ cos²_pair}` — **zéro hypothèse**, identité arithmétique, toute violation = **bug** ; **la table théorique devient la prédiction pré-enregistrée que la réalisée doit encadrer** (D14-R + D26). |
+| **0-129** *(majeur)* | **La tension entre `P-N` (niveau `O_type ≳ 10/64`) et la prédiction de centrage (effondrement sous `type`) n'était écrite nulle part** — pas plus que le fait que **le pari du PI** (`O_type` **sous `2n`**) en est l'un des deux termes. | **Deux engagements signés du même expert n'étaient conjointement satisfiables que sous une condition (effondrement PARTIEL) que personne n'avait écrite** ; et l'issue qui les départage est **exactement le pari du PI**. Sans cellule gravée, `O_type` sous le corridor aurait été lu soit « le centrage a marché », soit « pas de recouvrement » — **au choix du lecteur**. Mode **0-56/0-70**. Correctif : cellule **`(BAS × c-cent)`** nommée, lecture écrite d'avance, **ratifiée par le PI avant mesure** (§14-1). |
+| **0-130** *(majeur)* | **La capture à `t−1` était encore proposée** (Neuro N4). Deux raisons indépendantes, chacune suffisante : (i) `A4` a établi que le porteur du domaine **s'évanouit** à `t−1` ; (ii) **`V-t1` l'interdit structurellement** — `S3` et `S2` sont **définies** par le partage de tige, et leur recouvrement à `t−1` vaudrait **`64/64` par arithmétique** (états bit-identiques, 0-64). | Deux des quatre strates auraient rendu **la valeur maximale par construction**, et le chiffre le plus élevé du cycle aurait été un **artefact de définition**. **Mode 0-34/0-64 à la position ajoutée.** Correctif : `t−1` **refusé, non reporté** ; réouverture = ensemble strictement inter-tige (cardinal 14) et protocole propre. |
+| **0-131** *(mineur, porte de lecture)* | **La détection étouffée par le corridor n'était ni bornée ni déclarée** (Math M6). | Sous l'alternative, un effet entre `ε*` et `2n` est **significatif et classé négligeable** — une **détection étouffée**, produite **en silence**. Correctifs obligatoires : (i) **si `ε* ≥ 2n`, le recouvrement des conditions est vide et l'ordre sans objet — le déclarer** ; (ii) sinon, **publier** `P(IC ⊂ corridor ∧ IC_inf > ε*)` sous l'alternative. *Étouffement assumé, jamais silencieux.* |
+| **0-132** *(mineur, portes exécutables)* | **Seed et générateur des `R` directions non gelés ni publiés** ; `O` publié en **flottants tronqués** au lieu de **fractions exactes `p/64`**. | Le seed non gelé rend le placebo **non reproductible** (D24 violée) ; `O` en flottant tronqué **détruit l'exactitude arithmétique** dont dépendent `V-borne` (identité par paire) et `Core` (comptage entier). **Deux portes exécutables assises sur une représentation qui ne les supporte pas.** |
+| **0-133** *(mineur — relevé du copilote sur une clause de Math)* | **« Les mêmes `R` directions pour les 4 strates et les 3 modèles » est arithmétiquement inexécutable** : `d` vaut **768** (GPT-2), **960** (SmolLM2), **1536** (Qwen) — **un vecteur de ℝ⁷⁶⁸ n'est pas un vecteur de ℝ¹⁵³⁶**. | La clause aurait produit un **faux PASS** de la porte de cardinal, ou un échec d'implémentation à chaud. **Famille « cardinal périmé », cinquième occurrence** (0-76(i), 0-86, 0-94, 0-101, celle-ci). Correctif : *« même seed, même générateur, même règle de tirage et mêmes indices ; l'appariement inter-modèles se fait par la **norme**, jamais par le **vecteur** »*, cardinal publié **par modèle**. |
+| **0-134** *(mineur)* | **Les paires intra-tige n'étaient pas exclues explicitement**, et le cardinal exclu n'était pas publié. | Deux états d'une même tige sont **corrélés** : leur présence gonfle `O` **sans mécanisme** et brise l'indépendance sur laquelle repose l'IC bootstrap de tiges. Sans publication du cardinal exclu, la contamination est **invérifiable après coup**. Correctif : `V-t1` étendue. |
+
+**Total du cycle : trente-et-un défauts (0-104 … 0-134), dont sept critiques. Aucun octet mesuré,
+aucun GPU touché.**
+
+---
+
+## 1. Question
+
+Les supports de `topk(G·h)` — les **ensembles d'indices** retenus par la projection gyrus denté, à
+`k = 64` sur `D = 8192` — se recouvrent-ils entre états du cortex **au-delà du tirage indépendant**
+(`n = k²/D = 0.5 indice`) ; et ce recouvrement survit-il au retrait d'une composante affine estimée
+hors ligne, **au-delà de ce qu'un placebo apparié en norme reproduit mécaniquement** ?
+
+## 2. Hypothèse
+
+`H_sup` : **sur les états du matériau qualifié v4, capturés à `t`, les supports de `topk(G·h)`
+partagent en moyenne un nombre d'indices très supérieur au tirage indépendant (`≳ 10 sur 64` contre
+`0.5`), ce recouvrement est quasi indépendant de la strate, et il est porté par une composante
+affine commune que le retrait de `μ_type` supprime au-delà de ce qu'un placebo apparié en norme
+reproduit.**
+
+**Antipodes explicites (D13), énumérés :**
+
+- **`¬P-N` (`C-strat`)** : sur ≥ 2 modèles/3, l'IC de `Λ(s) = O_type(s) − 2n` contient 0 sur ≥ 1
+  strate, **ou** l'étendue inter-strates dépasse la résolution intra-strate ⇒ `topk(G·h)` porte
+  **une structure de strate que le cosinus avait comprimée** ⇒ **la lecture forte d'`A3` tombe**.
+- **`c-mec`** : `O_plac` chute autant que `O_type` ⇒ **le centrage n'a rien démontré** — *et il faut
+  le dire dans ces mots exacts, sans habillage*.
+- **Branche « l'estimateur, pas l'objet » (N7)** : `O_brut ≈ 4-6/64` **avec** `f ≈ 0.45` ⇒ les
+  supports **sont** largement séparés, le cosinus de 0.41-0.46 est porté par **une poignée de
+  coordonnées géantes**, **la lecture forte d'`A3` est fausse**, et le coupable est l'anisotropie de
+  **l'entrée**, pas `G`.
+- **`c-anti`** : `IC_sup(Δ*) < −ε*` — **se consigne et ne s'interprète pas**, mais **oblige** trois
+  descripteurs (§4.6).
+
+**Ce que ce cycle ne touche pas — phrase de Neuro (N5), à recopier dans le rapport :**
+
+> « Ce cycle ne touche ni la loi 2 ni **D11**. D11 porte sur le **dommage d'une lecture injectée**,
+> évalué par position en fonction de l'incertitude du cortex. Ici aucune lecture n'est injectée, `M`
+> n'est jamais instanciée, aucune NLL n'est modifiée : **la quantité sur laquelle D11 se prononce
+> n'existe pas dans ce run**. Toute phrase reliant le recouvrement des supports au gating de lecture
+> est le **glissement d'étage 0-59**, d'un cran plus haut. »
+
+### Vocabulaire interdit (§2, étendu)
+
+**Reconduits** : (i)-(viii) d'I2 ; (ix)-(xiii) de v4 ; le **bin dur** sous toute forme, y compris
+adverbiale ; **(xiv)** toute mention de l'étage d'**ÉCRITURE** ; **(xv)** le mot **« sémantique »** ;
+**(xvii)** **aucun énoncé d'effet aval** (E1, E2, E3, gate, capacité) tiré d'une quantité de ce cycle.
+
+**Ce tour :**
+
+- **(xvi) — phrase gravée, celle de `lab-neuro`, à recopier telle quelle** *(celle du Directeur est
+  retirée)* :
+  > « Sur les états de **\<modèle\>**, capturés à **\<locus\>**, dans la cellule **\<type\>**, les
+  > supports de `topk(G·h)` partagent en moyenne **X indices sur 64** (médiane **X̃**, IQR
+  > **[·,·]**), contre **0.5 indice** sous tirage indépendant (`k²/D`), et l'intersection porte
+  > **f = ·** de l'énergie avec un accord de signe de **σ± = ·**. Cette phrase porte sur l'étage de
+  > **LECTURE** de `φ`, sur ce locus et ce matériau seulement ; elle ne porte **ni** sur le chemin
+  > d'écriture de `M` (jamais instanciée ici, +57 % d'E2 acquis et intact), **ni** sur un quelconque
+  > effet aval (E1, E2, E3 non mesurés). »
+
+  *Contraintes portées : **compte d'indices** et non fraction ; **médiane et IQR** publiées (une
+  moyenne mélange un mode « noyau » et un mode nul) ; `f` et `σ±` **dans la phrase même** ; **modèle
+  et cellule nommés, jamais poolés** (0-63, 0-67).*
+
+- **(xviii) — le centrage** *(entrée rédigée par `lab-neuro`, verbatim)* :
+  > Toute désignation biologique du centrage est interdite : « inhibition tonique », « normalisation
+  > divisive », « retrait de mode commun par les interneurones », « le centrage est ce que fait le
+  > gyrus denté ». Le centrage est un **instrument statistique** ; formulation licite maximale :
+  > *« retrait d'une composante affine estimée hors ligne, en leave-one-out, sur les états du même
+  > type »*. Il n'a **aucun analogue en ligne** et n'est proposable comme mécanisme dans aucun cycle
+  > futur sous cet habillage.
+
+- **(xix)** — *« le noyau commun est le code de fond du gyrus denté »*, sous toute forme (0-121).
+  Formulation licite : *« ensemble d'indices retenus par `topk(G·h)` sur ≥ 9 des 10 unités de `S`,
+  pour cette `G` (seed 0) »*.
+- **(xx)** — *« le centrage répare `φ` »*, *« remède validé »*, et toute formulation où `c-cent`
+  licencie `I3` (N8). **`c-cent` licencie un locus, un matériau.**
+
+## 3. Ce que le projet sait déjà — provenance (D14-R)
+
+| Fait | Chiffre | Source, date | Étiquette |
+| --- | --- | --- | --- |
+| `A3` : cosinus de `φ(h)` entre états, par strate | **plancher ≈ 0.41-0.46**, étendue inter-strates **0.01-0.03** | descriptif `A3`, run v4, journal 2026-08-23 | **à re-lire depuis `experiments/results/` avant gravure**, jamais de mémoire (D14-R). Fonde `L(c)`. |
+| Géométrie mesurée **ordonnée `S3 > S1 > S2 > S0`**, domaine dominant la tige d'un facteur **2 à 10**, régime **additif** | `M1 +`, `M2 −`, `M3 +` sur 3/3 | v4, 2026-08-23 | vérifié — **tue l'ordinal du design** (0-122), fonde `P-N-ord` |
+| `X7` : lecture **sans composante directionnelle** (`cos ≈ 0`), aplatissement = coût **fixe** (+0.141 nats) | — | X7, journal | vérifié — la direction quasi constante de la lecture est un **invariant du modèle** (Q-01) |
+| `Q-01` : le ciblage des positions incertaines est **générique** (bruit de norme appariée, `R ≈ 0.8`) ; **D11** | corr **+0.394** | X8.1b / P5 / Q-01, 2026-08-21 | vérifié — **modèle de raisonnement du placebo de ce cycle** |
+| `X1` : DG **+57 % sur E2** | +57 % | ablations v1.1 | **chiffre acquis, chemin d'ÉCRITURE** — ce cycle porte sur la **lecture** et **ne le touche pas** |
+| `G` est bâtie par `torch.randn(8192, d, generator=seed(cfg.seed))`, **sans `1/√d`** | — | `engram/hippocampus.py`, lecture de code | **provenance** — fonde `V-iid` (M3) ; l'absence d'échelle est **sans effet** (`topk` et la normalisation sont invariants par échelle globale) |
+| Coût GPU de l'instrument v4 | **53,82 s** / 12 forwards / 240 séquences ; VRAM Qwen **4,688 Gio** (fp16) | I2, 2026-08-23 | re-mesuré — **seul poste GPU possible ici, conditionnel** (`V-cache`) |
+| Les états bruts de v4 ont été **relus indépendamment** par `lab-verifier`, qui a recalculé **toutes** les quantités publiées sans écart | 193 Mio, `raw/etats-*.npz` | v4, 2026-08-23 | vérifié par exécution — **les fichiers existaient et étaient lisibles** ; **leur hash n'a jamais été pré-enregistré** (limite nommée, `V-cache`) |
+| Deux fois de suite, la porte qui trouve le défaut est celle **qui n'a besoin d'aucune donnée** | `V-slot`, `V-ident` | cycle D14-ext, 2026-08-22 | vérifié — **quatrième occurrence ce tour** : `V-t1` tue `t−1` (0-130) et `V-borne` réalisée tue la frontière `p=10/11` (0-128), **sans un octet** |
+
+## 4. Prédictions
+
+*Toutes décidables **sans GPU** sous `V-cache` PASS, en arithmétique sur des ensembles d'indices.
+Une prédiction fausse est un **résultat**, obtenu pour moins d'une demi-heure de CPU.*
+
+### 4.1 Quantités
+
+| Symbole | Définition | Unité de publication |
+| --- | --- | --- |
+| `n` | recouvrement sous tirage indépendant `= k²/D = 4096/8192` | **0.5 indice** (fraction `0.5/64`) |
+| `O(s, x, m)` | `\|A ∩ B\|` moyen sur les paires de la strate `s`, condition `x`, modèle `m` | **fractions exactes `p/64` agrégées** (0-132) |
+| `Λ(s)` | `O_type(s) − 2n` | idem, **moyennes de ≥ 8 paires seulement** (0-119) |
+| `Δ*` | `O_plac − O_type`, **apparié par paire** | idem — **primaire (D16)** |
+| `f(s)` | `Σ_{i∈A∩B} a_i² / Σ_{i∈A} a_i²`, moyennée sur les deux membres | fraction |
+| `σ±(s)` | `#{i∈A∩B : sign(a_i)=sign(b_i)} / \|A∩B\|` — **nulle = 0.5** | fraction |
+| `Core(S)` | indices retenus sur **≥ 9 des 10 unités de `S`** (une par tige, `V-core-S`) | **compte entier** |
+| `Core-G` | `\|Core(S) ∩ top64(G·μ_global)\| / \|Core(S)\|` | fraction |
+| `p_pair` | `min{p : Σ des p plus grands φ_i² réalisés ≥ cos²_pair}` | compte entier |
+
+### 4.2 `L(c)` — la borne, en deux versions (D26)
+
+**Dérivation (Math M1)** : `cos = Σ_{A∩B} φ_iψ_i ≤ Σ|φ_i||ψ_i| ≤ √(m_φ·m_ψ)` ; comme `m ≤ 1`,
+`min(m_φ, m_ψ) ≥ cos²` ; et la masse portée par `|A∩B|` coordonnées est au plus celle des `|A∩B|`
+plus grandes ⇒ **`|A∩B| ≥ p_pair`**, exactement, par paire, **sans hypothèse distributionnelle**.
+Les produits négatifs ne peuvent que **desserrer** la borne : le sens est **conservateur**.
+
+**Version théorique — la PRÉDICTION pré-enregistrée** (`t_j ≈ Φ⁻¹(1 − j/16384)`, deux queues ;
+masse totale `64 × E[Z² | |Z| > 2.66] = 64 × 8.90 = 570`) :
+
+| `cos` | `cos²` | masse cumulée franchie | `p` minimal | `L(c) = p/64` |
+| --- | --- | --- | --- | --- |
+| 0.40 | 0.160 | p=7 → 0.154 | **8** | **0.125** |
+| 0.41 | 0.168 | p=7 → 0.154 | **8** | **0.125** |
+| 0.43 | 0.185 | p=8 → 0.173 | **9** | 0.141 |
+| 0.45 | 0.2025 | p=9 → 0.192 *(interpolé — **à recalculer au banc**, Q-M1)* | **10** | 0.156 |
+| 0.46 | 0.2116 | **frontière p=10 (0.210) / p=11 (0.228)** | **10 ou 11** | 0.156 – 0.172 |
+| 0.47 | 0.2209 | p=10 → 0.210 | **11** | **0.172** |
+
+⇒ **prédiction : `O ≥ 8 à 11 indices sur 64`, soit 16 à 22 × le hasard**, sur les strates dont `A3`
+donne `cos ∈ [0.41, 0.46]`.
+
+**Version réalisée par paire — la MESURE et la porte** : `p_pair` calculé sur les `φ_i²` **réalisés**.
+`V-borne` exige `|A∩B| ≥ p_pair` sur **100 % des paires** (identité arithmétique — toute violation
+est un **bug de mesure**, jamais un résultat), et exige que la **version réalisée encadre la table
+théorique** ; l'écart est **publié** (D26). **La frontière `p = 10/11` disparaît de la décision.**
+
+### 4.3 Nulles (D17 — une par maillon, toutes bloquantes)
+
+| Maillon | Nulle | Type | Chiffres |
+| --- | --- | --- | --- |
+| **Niveau `O`** | `\|A∩B\| ~ Hypergéom(8192, 64, 64)` | **exacte** | `E = 0.5`, `sd = 0.702` ; `P(0)=0.604`, `P(1)=0.303`, `P(2)=0.076` ; **q95/paire = 2 indices** ; `sd(O)/paire = 0.01097` |
+| **Centrage `Δ*`** | permutation intra-tige des étiquettes `{plac, type}` | **par permutation** | `ε*` (§4.5) |
+| **`Core`** | `Bin(10, 0.0078)` par indice | **exacte** | `P(≥9) ≈ 1.1e-18` ; espérance ≈ **9e-15 indice** ⇒ **un seul indice = signature**, `p < 10⁻¹³`, **aucun IC** |
+| **`G`** | provenance : `torch.randn`, lignes iid | **par construction (M3)** | `z_i` iid `N(0, ‖h‖²)` conditionnellement à `h`, **exact** ; échec de `V-G` ⇒ **arrêt de provenance**, jamais repli |
+
+**Enveloppe de la moyenne de `O` sous la nulle** : `0.0078 ± 1.96 × 0.01097/√P`.
+**P = 8 → [0.0002, 0.0154]** (borne haute **juste** sous `2n = 0.015625`) ; **P = 40 → [0.0044,
+0.0112]** ; **P = 80 → [0.0054, 0.0102]**. ⇒ **`Λ` et le corridor ne s'évaluent que sur des moyennes
+de ≥ 8 paires** (`V-P8`).
+
+### 4.4 Engagements signés
+
+| # | Énoncé | Statut | Antipode gravé |
+| --- | --- | --- | --- |
+| **`P-N`** *(lab-neuro, **NIVEAU**, **DÉCISIONNELLE**)* | `Λ(s) > 0` sur **les 4 strates et les 3 modèles** ; niveau `O_type ≳ 10 indices sur 64`. Recouvrement **haut et quasi indépendant de la strate**. | **SIGNÉE** | **`C-strat`** ⇒ `topk(G·h)` porte une structure de strate **que le cosinus avait comprimée** ⇒ **la lecture forte d'`A3` tombe**. |
+| **`P-N-ord`** *(lab-neuro, **DESCRIPTIVE**)* | Si un ordre existe : `O(S3) ≥ O(S1) > O(S2) ≥ O(S0)` — **le domaine d'abord** (ordre du **cosinus brut**). | **DESCRIPTIVE** | L'ordre du **design** ⇒ le support porterait un facteur que le cosinus de valeurs signées masque ⇒ **sursis partiel pour l'attribution représentationnelle de X1**, **à instruire ailleurs, jamais à conclure ici**. |
+| **Centrage** *(lab-neuro, signée, ordinale)* | **`O_brut ≈ O_glob > O_type`** **et `O_plac ≈ O_brut`**. | **SIGNÉE** | **`c-mec`** : *« le centrage n'a rien démontré »*, **dans ces mots exacts, sans habillage**. |
+| **`auto` / `C-mod`** *(lab-neuro, signée)* | Divergence attendue **GPT-2 (LayerNorm, centre) vs SmolLM2/Qwen (RMSNorm, ne centre pas)** — **après vérification en config** (`V-norm`). | **SIGNÉE** | `auto` identique sur les trois ⇒ la coordonnée moyenne **n'est pas le porteur**, **l'explication LN/RMS de `C-mod` est morte**. |
+| **`Core` / `Core-G`** *(lab-neuro, signée)* | `Core(S) ≠ ∅` (`p < 10⁻¹³`) ; `Core-G` **élevé** ⇒ **le noyau commun EST la projection de l'état moyen** ⇒ **aucune lecture représentationnelle licite**. | **SIGNÉE** | `Core-G` bas avec `Core ≠ ∅` ⇒ le noyau n'est pas réductible à `G·μ_global` — **descriptif**. |
+
+**Mécanisme candidat nommé AVANT le run** (c'est ce qui rend `Δ*` interprétable) : un flux résiduel
+porte quelques coordonnées **10 à 100 × la médiane** (*rogue dimensions* — Timkey & van Schijndel
+2021 ; Kovaleva et al. 2021 ***(à vérifier)*** ; Dettmers et al. 2022 ; anisotropie : Ethayarajh
+2019). Si `h[j*]` est géante et quasi constante, `(G·h)_i ≈ G[i,j*]·h[j*] + reste` et **le top-64 de
+`G·h` est en grande partie le top-64 de la colonne `G[:,j*]`, identique pour tous les états** ⇒
+prédit un **noyau commun quasi total**, une **insensibilité aux strates**, et un **effondrement sous
+centrage que le placebo ne reproduit pas**.
+
+### 4.5 `ε*` — ligne canonique unique (M7), recopiée à l'identique au §7
+
+> **`ε*` = q₀.₉₅ de `|Δ*|` recalculée sur `B = 10⁴` rééchantillons bootstrap de tiges
+> (`K_eff = 10`) sous permutation intra-tige des étiquettes {plac, type}, le placebo étant la moyenne
+> des `R` directions gelées ; une valeur par modèle et par strate, calculée et gelée AVANT lecture
+> des `Δ*` observés.**
+
+**`R` est dérivé, pas choisi** : le MC des directions ajoute `σ_dir²/R` à la variance par paire de
+`O_plac` ; exiger que cette contribution soit **≤ 10 %** de la variance appariée donne
+**`R = ⌈10·σ̂_dir²/σ̂_Δ²⌉`**, `σ̂_dir` estimée sur un **pilote de `R₀ = 20` directions** sur un
+modèle. **Pilote, formule et plafond (`R ≤ 300`) pré-enregistrés** ; si la formule dépasse le
+plafond, **le dépassement est publié et le PI tranche — il n'est pas absorbé**.
+
+**Puissance, déclarée (M8)** : détection à 1× exige `Δ* > ε* + q95·se ≈ 3.9·σ_Δ/√P`. Avec
+`σ_Δ ≈ 0.015` (**à mesurer et publier, jamais absorbé**) et `P = 80` :
+**`Δ*_min ≈ 0.0066 ≈ 0.42 × (2n) ≈ 84 % de la moyenne nulle `n``**.
+
+### 4.6 Partitions — exhaustives, exclusives, ordre gravé (D18)
+
+**Principe transversal reconduit (0-81 / D28)** : **marge de significativité 1×, couloir
+d'équivalence 2×**, et **le couloir est ABSOLU (`2n`), jamais réglé sur l'enveloppe nulle de son
+propre estimateur**.
+
+**Partition `N` — NIVEAU** (par modèle **et** par strate ; **jamais poolée** ; moyennes de **≥ 8
+paires** uniquement) — ordre gravé :
+
+| Ordre | Classe | Condition | Verdict gravé | `P` sous la nulle |
+| --- | --- | --- | --- | --- |
+| 1 | **`HAUT`** | `IC_inf(Λ) > ε_Λ` | Recouvrement au-delà du corridor : `P-N` soutenue **sur cette strate et ce modèle** | ≈ 0 |
+| 2 | **`−`** | `IC_sup(O) < 0` relativement à `n` | **Répulsion des supports** — sous le hasard. **INVALIDE-NULLE** : le modèle hypergéométrique est faux, arrêt d'interprétation, diagnostic obligatoire | ≈ 0 |
+| 3 | **`BAS`** | `IC(O) ⊂ [0, 2n]` (**corridor absolu**) | **« recouvrement borné par 2 × le hasard »** — **jamais** « pas de recouvrement » (0-91) ; `Λ` peut sortir à `P` plus grand | `Φ(0.711√P − z_boot)` : **P=25 → 0.94** ; **P=80 → >0.9999** |
+| 4 | **`ind_L`** | complémentation, **en dernier** | **sous la résolution** — la **résolution par strate est publiée** pour qu'un plat se lise *« sous la résolution »* et non *« plat »* (D28) | reste |
+
+**Partition `C` — CENTRAGE** (par modèle ; `Δ* = O_plac − O_type`) — ordre gravé, **négligeabilité
+physique d'abord** (M6, sens conservateur **contre** l'hypothèse portée ; divergence assumée avec
+0-78, cf. Arbitrage X-4) :
+
+| Ordre | Classe | Condition | Verdict gravé | `P` sous la nulle |
+| --- | --- | --- | --- | --- |
+| 0 | **`c-anti`** | `IC_sup(Δ*) < −ε*` | **CONSIGNÉE, court-circuitante, NON INTERPRÉTÉE** — mais **non muette** : oblige (i) `‖h − μ_type‖/‖h‖`, (ii) `\|Core_brut ∩ Core_type\|/64` (le noyau change-t-il d'**identité** ou d'**intensité** ?), (iii) `cos(μ_type, μ_global)`. **Aucune cause nommée avant ces trois chiffres ; aucune suite de chantier déclenchée par `c-anti` seule.** | ≈ 0.02 |
+| 1 | **`c-mec`** | `IC(Δ*) ⊂ [−2n, +2n]` | **« le centrage n'a rien démontré »** — dans ces mots exacts, sans habillage. La chute sous `type` est **entièrement reproduite** par un placebo apparié en norme ⇒ **mécanique** | **0.90 – 0.95** (P ≥ 50) |
+| 2 | **`c-cent`** | `IC_inf(Δ*) > ε*` | *« à ce locus, sur ce matériau, le mode commun est linéairement retirable »* — **un locus, un matériau**. **Ne licencie NI `I3` NI aucune modification de `engram/`** (xx) | **≤ 0.05** |
+| 3 | **`ind_Δ`** | complémentation, **en dernier** | sous la résolution ; publier `σ_Δ` et `P` | **0.03 – 0.06** |
+
+**Espace de verdict : 12 cellules décisionnelles = 4 (`N`) × 3 (`C` décisionnelles)**, `c-anti`
+évaluée en premier et court-circuitante. Le banc simule **10 objets** : les 4 classes de `N`, les 4
+états de `C`, et les 2 issues de `Core`. **Le cardinal est recompté par ÉNUMÉRATION au banc, jamais
+par affirmation** (famille 0-76(i)/0-86/0-94/0-101/0-133).
+
+**Deux écritures obligatoires (M6)** :
+1. **Si `ε* ≥ 2n`**, le recouvrement des conditions `c-mec` et `c-cent` est **vide**, l'ordre est
+   **sans objet** — **le déclarer en toutes lettres**.
+2. **Sinon**, publier en annotation la **région masquée** `P(IC ⊂ corridor ∧ IC_inf > ε*)` sous
+   l'alternative : **détection étouffée assumée, jamais silencieuse**.
+
+**Cellules dont la lecture est gravée d'avance :**
+
+| Cellule | Lecture gravée |
+| --- | --- |
+| **`HAUT × c-mec`** | Recouvrement massif **réel**, **cause non établie** : le centrage ne l'a pas départagée d'un décalage de magnitudes. `P-N` soutenue, mécanisme **ouvert**. |
+| **`HAUT × c-cent`** | Recouvrement massif **et** composante affine commune retirable **au-delà du placebo**. **Deux des trois conditions de `X1-rect`** ; la troisième (`σ± > 0.5` significatif) et `Core-G` décident du déclencheur — **qui reste une note**. |
+| **`BAS × c-cent`** *(0-129 — la cellule qui départage le PI et Neuro ; **ratifiée par le PI avant mesure**, §14-1)* | Le recouvrement **après centrage par type** est borné par `2n`, et le centrage a mordu au-delà du placebo. ⇒ **`P-N` est réfutée** (son niveau `≳ 10/64` n'est pas atteint sur `O_type`) **et la prédiction de centrage de Neuro est confirmée** ; **c'est exactement le pari du PI**. Les deux engagements de Neuro n'étaient conjointement satisfiables que sous un effondrement **partiel** : ici il est **total**. **À écrire ainsi, sans arbitrer en faveur de l'un des deux paris après coup.** |
+| **`BAS × c-mec` avec `f ≈ 0.45` et `O_brut ≈ 4-6/64`** | **Branche de tort de Neuro (N7)** : les supports **sont** largement séparés, le cosinus est porté par **une poignée de coordonnées géantes**, **la lecture forte d'`A3` est fausse**, coupable = anisotropie de **l'entrée**, pas `G`. **À écrire dans ces termes.** |
+| **`ind_L × ind_Δ`** | *« indécidable ICI, `P` ou `σ_Δ` insuffisants »* — **jamais** « pas d'effet ». La suite se lit sur `σ_Δ` et `P` publiés, pas sur la classe. |
+
+### 4.7 Portes (toutes exécutables, toutes bloquantes)
+
+| Porte | Contenu | Coût |
+| --- | --- | --- |
+| **`V-G`** | Reproduire `A3` **en fp32, sur le chemin d'origine (`hippocampus.phi`), bit-à-bit** ; puis mesurer en fp64 ; **publier les deux nombres et l'écart** (D26). Échec ⇒ **arrêt de provenance (D14-R)**, jamais repli. | secondes |
+| **`V-iid`** | **Prouvée par provenance** (M3). Résiduel : **sanité de moments** de `G`. **Pas de KS.** | secondes |
+| **`V-borne`** | `\|A∩B\| ≥ p_pair` sur **100 %** des paires ; **et** la version réalisée **encadre** la table théorique du §4.2. Violation = **bug**, jamais résultat. | secondes |
+| **`V-P8`** | `Λ` et le corridor calculés **uniquement** sur des moyennes de **≥ 8 paires** ; toute cellule à `< 8` paires **exclue, cardinal publié**. | banc |
+| **`V-t1`** | **Exclusion de toute paire intra-tige** ; **cardinal exclu publié** par strate et par modèle. **`t−1` refusé pour ce cycle.** | banc |
+| **`V-core-S`** | `\|S\| = 10`, **une unité par tige**, appartenance publiée. | banc |
+| **`V-ulp`** | Marge à la coupure `k = 64` publiée pour les **cinq** conditions — **y compris centrées et placebo** (0-125). fp64 = **chemin nominal**. | banc |
+| **`V-norm`** | Lecture de la config des **trois** modèles : LayerNorm vs RMSNorm, **citée par ligne de config**, jamais par croyance. | 2 lignes |
+| **`V-diag`** *(condition bloquante `lab-neuro`)* | `f(s)`, `σ±(s)` et le couple **`(O, cos)` conjoint** publiés **par strate, par condition, par modèle**. **Sans les trois, le rapport ne peut pas être écrit.** | banc |
+| **`V-cache`** | Les états `h` bruts de v4 sont sur disque, **hash calculé et publié**. **Échec ⇒ re-forward autorisé** (§14-4) : 53,82 s, VRAM ≤ 4,688 Gio — **seul poste GPU, conditionnel, chiffré**. | secondes |
+| **`V-perimetre`** | §4.9, trois éléments obligatoires. | rédaction |
+| **`V-seed`** | Seed, générateur et règle de tirage des `R` directions **gelés et publiés** ; cardinal **par modèle** (les directions **ne sont pas transportables**, 0-133). | banc |
+
+### 4.8 Descriptifs pré-déclarés (aucune décision n'en dépend)
+
+| Quantité | Statut |
+| --- | --- |
+| `f(s)`, `σ±(s)` | **OBLIGATOIRES** (`V-diag`) mais **DIAGNOSTIQUES, jamais correctifs** : ils ne modifient aucune borne, aucun seuil, aucune classe. Ils disent **à quel point la borne de Math est serrée** (Arbitrage X-1). |
+| `O_glob − O_type` | diagnostic d'**anisotropie non capturée par `μ_type`** |
+| distance lexicale par strate | publiée **à côté de `O`** — confondant nommé |
+| `n_cell` par cellule, majorant `1/(n_cell−2)` | **obligatoire** (M4) |
+| split-half | **double mesure (D26)** ; **devient la mesure principale si `min n_cell < 30`** (ratifié §14-2), le LOO passant en contrôle |
+| `σ_Δ`, `σ_dir`, `R` réalisé | **publiés, jamais absorbés** (M8) |
+| médiane et IQR de `O` | **dans la phrase gravée (xvi)** |
+| portée | **« pour cette `G` », seed 0 (D9)** ; `Core` est **G-spécifique** |
+
+### 4.9 Hors-périmètre déclaré — porte `V-perimetre`
+
+1. **Mécanisme.** Aucun effet aval n'est mesuré : `M` n'est jamais instanciée, aucune lecture n'est
+   injectée, aucune NLL n'est modifiée. Les quantités de ce cycle sont **géométriques**, sur le
+   cortex gelé.
+2. **Limite nommée — le point de contact `keysim`.** `read_gate=keysim` se calcule sur
+   `cos(φ(h), clés)` — **la quantité même dont ce cycle mesure le plancher**. Un plancher de
+   **0.41-0.46** avec une étendue inter-strates de **0.01-0.03** signifie que **le gate opère sur une
+   variable à fort offset et faible dynamique**. **Ce n'est pas un verdict sur le gate** (aucun effet
+   aval, (xvii)) : c'est une **désignation de chantier**.
+3. **Successeur désigné.** **Q-06** — calibration de `gate_keysim_mid` **par modèle** (ouverte depuis
+   2026-08-21 : E1b 0.68 → 0.38 sous gate, « coût de sélectivité »). Ce cycle **ne l'ouvre pas** et
+   **n'anticipe pas son résultat**.
+
+### 4.10 Prédictions d'instrument reconduites
+
+`P-A`, `P-B`, `P-C`, `P-D` d'I2 **restent pré-enregistrées telles quelles**. **Rappel gravé** :
+l'inférence « `P-A` falsifiée ⇒ `P6` falsifiée » demeure **illégitime**. **Les deux réserves d'`I2`
+(ratio → AUC ; `NEUTRAL_TEXT` non apparié) ne sont PAS caduques** — l'une est **aggravée** par le
+centrage (§10).
+
+## 5. Contrôles et baselines
+
+1. **Configuration courante** : `EngramConfig()` par défaut (layer=6, λ=2.0, cap=0.5, η=0.2,
+   decay=1e-3, thr=4.0, dg=8192/64, read_gate=keysim, seed=0) — **citée comme référence** ; ce
+   protocole **n'instancie ni ne lit `M`** (D8 intacte, aucun backprop, `G` gelée D9).
+2. **`M` reset / D7** : **sans objet**. Contrôle homologue = **`G` gelée, seed 0, identique aux cinq
+   conditions** : seule l'entrée `h` change.
+3. **Contrôle qui élimine l'explication triviale — le PLACEBO** : `h − c·r`, `r` gelée aléatoire,
+   `‖c·r‖ = ‖μ_type‖`. Propriété d'appariement (M3-ter) : `E‖G·x‖² = D‖x‖²` pour **toute**
+   direction ⇒ l'appariement en norme dans `ℝ^d` vaut aussi dans `ℝ^8192` **en espérance** ⇒ le
+   **décalage mécanique de magnitudes (0-106) est reproduit**, et **seule la composante
+   directionnelle corrélée à `z`** distingue `type` de `plac`. C'est exactement ce que `Δ*` isole.
+4. **Flag à off, même code** : la condition **`aucun`** passe par **le même chemin de calcul** que
+   les quatre autres — différence **uniquement dans l'entrée**.
+5. **Ordre des conditions** : les cinq sont calculées **sur les mêmes paires, dans le même ordre, à
+   partir du même cache `Z`** ⇒ aucun effet d'ordre possible.
+6. **Unité d'échange** : `K_eff = 10` **tiges** (0-50) ; IC 95 % **bootstrap de tiges**, `B = 10⁴` ;
+   **paires intra-tige exclues** (`V-t1`) ; **≥ 8 paires par tige** (`V-P8`).
+7. **Double mesure (D26)** : LOO **et** split-half, publiés côte à côte ; **fp32 (chemin d'origine)
+   et fp64**, publiés côte à côte.
+
+## 6. Critères d'abandon — portes exécutables (D22)
+
+**Ce qui INVALIDE le run** (aucun verdict n'est écrit) :
+- **A.** `V-G` échoue en fp32 sur le chemin d'origine ⇒ **arrêt de provenance (D14-R)**.
+- **B.** `V-borne` violée sur ≥ 1 paire ⇒ **bug de mesure**, jamais un résultat.
+- **C.** NaN, ou `|A∩B|` hors de `[0, 64]`, ou `O` publié en flottant tronqué (0-132).
+- **D.** `V-diag` incomplète ⇒ **le rapport ne peut pas être écrit**.
+- **E.** `V-core-S` violée ⇒ `Core` **retiré du rapport**.
+- **F.** `V-P8` violée sur une cellule ⇒ cellule **exclue**, cardinal publié ; si **> 2 strates**
+  touchées sur un modèle ⇒ modèle **exclu**.
+- **G.** `V-norm` non exécutée ⇒ **`auto` retiré de l'interprétation** (chiffres descriptifs).
+- **H.** `V-seed` violée ⇒ `Δ*` et `ε*` **retirés**.
+- **I.** Un chiffre de `A3` cité de mémoire au lieu d'être relu depuis `experiments/results/`
+  (D14-R).
+
+**Ce qui TUE `H_sup`** : `C-strat` réalisée ⇒ **la lecture forte d'`A3` tombe** · `c-mec` réalisée ⇒
+*« le centrage n'a rien démontré »*, dans ces mots exacts · branche N7 ⇒ **la lecture forte d'`A3`
+est fausse**, coupable = anisotropie de l'**entrée**.
+
+**Ce qui NE tue rien et se consigne** : `c-anti` (avec ses trois descripteurs obligatoires) ;
+`ind_L`/`ind_Δ` (*« indécidable ICI »*, avec `σ_Δ`, `P` et la résolution par strate publiés).
+
+**Sans objet ici** (aucune injection, aucune NLL) : « 0 write », « E3 > 0.05 ». **Nommés comme sans
+objet, jamais omis.**
+
+## 7. Variables fixées
+
+- **Modèles / couches** : GPT-2 (`--layer 6`), `HuggingFaceTB/SmolLM2-360M` (`--layer 16`),
+  `Qwen/Qwen2.5-1.5B` (`--layer 14`). **`d` = 768 / 960 / 1536** — les directions **ne sont pas
+  transportables** (0-133).
+- **`G`** : gelée, `seed = 0`, `dg_dim = 8192`, `dg_topk = 64`, `torch.randn(8192, d)` — **portée du
+  résultat : « pour cette `G` » (D9)**.
+- **Matériau** : états `h` **du matériau qualifié v4**, capturés à **`t`** (`t−1` **refusé**),
+  **792 états par modèle**, **cache vérifié par `V-cache`**.
+- **Strates** : `S0` (rien partagé), `S1` (domaine), `S2` (tige, ponts), `S3` (tige + domaine).
+  **Jamais poolées** (0-63, 0-67).
+- **Inférence** : `K_eff = 10` **tiges** ; **`P ≥ 80` paires par modèle, `≥ 8` par tige** ; IC 95 %
+  **bootstrap de tiges**, `B = 10⁴` ; **σ publié par strate**.
+- **`ε*`** : **ligne canonique unique, recopiée à l'identique du §4.5** — *q₀.₉₅ de `|Δ*|` sur
+  `B = 10⁴` rééchantillons bootstrap de tiges (`K_eff = 10`) sous permutation intra-tige des
+  étiquettes {plac, type}, le placebo étant la moyenne des `R` directions gelées ; une valeur par
+  modèle et par strate, calculée et gelée AVANT lecture des `Δ*` observés.*
+- **`R`** : **dérivé**, `R = ⌈10·σ̂_dir²/σ̂_Δ²⌉`, pilote `R₀ = 20`, **plafond `R ≤ 300` publié**.
+- **Corridor** : `n = 0.5 indice`, **`2n = 1 indice = 0.015625`**, **absolu**.
+- **Précision** : `A3` reproduit en **fp32** (chemin d'origine, bit-à-bit) ; mesure en **fp64** ;
+  **`Z` en cache, 51,9 Mo/modèle**. `M` reste fp32 dans le projet — **sans objet ici**.
+- **Rien d'autre ne bouge** : aucun hyperparamètre d'`EngramConfig` modifié, aucun fichier de
+  `engram/` touché.
+
+## 8. Variable manipulée
+
+**Une seule : la condition de centrage appliquée à `h` avant `G`**, à **cinq niveaux** :
+
+| Niveau | Opération | Statut |
+| --- | --- | --- |
+| **`aucun`** | `h` | référence |
+| **`glob`** | `h − μ_global` (LOO) | contrôle de mode commun global |
+| **`type`** | `h − μ_type` (**LOO par paire** ; `n_cell` et `1/(n_cell−2)` publiés ; **split-half en double mesure**, **principal si `min n_cell < 30`**) | condition d'intérêt |
+| **`auto`** | `h − mean_coord(h)·1` | **seul centrage calculable EN LIGNE**, sur le seul état courant : **aucun corpus, aucun LOO, aucune fuite** ; **discriminant de `C-mod`** via `V-norm` |
+| **`plac`** | `h − c·r`, `r` gelée, `‖c·r‖ = ‖μ_type‖`, moyenne sur `R` directions | **contrôle du décalage mécanique de magnitudes** |
+
+**Ce que `auto` change à `C-mod`** : sans `auto`, une divergence inter-modèles est une **classe
+consignée sans explication**. Avec `auto`, elle a une **cause candidate nommée avant le run et
+vérifiable dans le code des modèles** — LayerNorm **centre**, RMSNorm **ne centre pas** ⇒ **`G` est
+appliquée à un vecteur que le cortex lui-même n'utilise jamais sous cette forme, et pas de la même
+manière selon le modèle**. **Antipode** : comportement identique sur les trois ⇒ **l'explication
+LN/RMS de `C-mod` est morte**.
+
+## 9. Budget
+
+| Poste | Coût | GPU |
+| --- | --- | --- |
+| MC conditionnel de `V-iid` | **0 — SUPPRIMÉ** (prouvé par provenance, M3) | 0 |
+| Placebo (`R ≤ 300` directions) | **~5-10 min CPU/modèle** (identité `G·(h−c·r) = z − c·(G·r)` + cache `Z`) | 0 |
+| Cache `Z` fp64 | **51,9 Mo/modèle**, ~156 Mo total (RAM, pas VRAM) | 0 |
+| Recouvrements (5 conditions × 4 strates × ≥ 80 paires × 3 modèles) | **< 2 min CPU** | 0 |
+| Bootstrap `ε*` (`B = 10⁴`, 10 tiges) | **< 1 min CPU** | 0 |
+| `Core`, `Core-G`, `f`, `σ±`, `p_pair` | **< 1 min CPU** | 0 |
+| Banc D14-S (12 cellules énumérées, 10 objets simulés, cas échouants obligatoires) | **~3-5 min CPU** | 0 |
+| **Total mesure** | **< 30 min CPU, ~160 Mo RAM, 0 VRAM** sous `V-cache` PASS | **0** |
+| **Temps agent** | **~10-14 h** (banc, portes, cellules, simulations) — **accepté à la gate** (§14-4) | — |
+| **GPU conditionnel** | `V-cache` échec ⇒ **re-forward autorisé** : **53,82 s, VRAM ≤ 4,688 Gio** | **≤ 1 min** |
+
+Un run, cinq conditions, trois modèles. **`R` au plafond** : si `⌈10·σ̂_dir²/σ̂_Δ²⌉ > 300`, le
+dépassement est **publié et remonté au PI**, jamais tronqué en silence.
+
+## 10. Livrables attendus
+
+- **Aucun flag `EngramConfig`, aucune modification de `engram/`.** Ce cycle est un **instrument de
+  mesure** sur des états en cache ; **`c-cent` réalisée ne licencie aucune ligne de code** — elle
+  licencie **un énoncé, sur un locus et un matériau**.
+- **Script d'éval** : nouveau, `eval/support_overlap.py` (nom indicatif), options
+  `--model --layer --center {aucun,glob,type,auto,plac} --strate --R --seed`, sortie en **fractions
+  exactes `p/64`**, hors `engram/`, **SPDX AGPL-3.0-or-later**.
+- **Banc D14-S obligatoire, AVANT toute mesure** : 12 cellules énumérées ; 10 objets simulés ; cas
+  **échouants obligatoires** pour `V-borne`, `V-P8` (7 paires), `V-core-S` (deux unités d'une tige),
+  `V-ulp` (états centrés), `V-seed`, `V-t1` ; **cardinal recompté par exécution**. **`E = 0` exigé.**
+- **Tests CPU** : `.venv\Scripts\python -m pytest tests/ -q`.
+- **Entrée de journal**, format maison. **Ligne du tableau `docs/EXTENSIONS.md` §4 — ou déclaration
+  explicite qu'aucune ligne n'est due**, ce cycle ne mesurant ni E1, ni E2, ni E3.
+- **Conditionnement gravé sur `I3`** (N8) : *« `c-cent` ne licencie pas `I3`. `c-cent` licencie
+  l'énoncé "à ce locus, sur ce matériau, le mode commun est linéairement retirable" — un locus, un
+  matériau. `I3` est une affirmation **par couche** que ce cycle ne touche pas, et son ouverture est
+  conditionnée à la purge écrite des deux réserves d'`I2` : **(a)** le score en **ratio** mesure
+  l'anisotropie autant que l'invariance ⇒ **AUC obligatoire** — réserve **non caduque et AGGRAVÉE**
+  par le centrage (supposer la réussite du centrage **à l'intérieur de l'instrument qui la teste est
+  circulaire**, et le ratio confondrait alors l'invariance avec le **profil en profondeur de
+  l'efficacité du centrage**) ; **(b)** `NEUTRAL_TEXT` **non apparié** — **non caduque, orthogonale,
+  possiblement aggravée** : un `μ̂` estimé sur le matériau puis appliqué au contrôle est un centrage
+  **hors distribution**, et le défaut d'appariement devient **une variable manipulée de plus**. »*
+- **Contrainte de build (D29)** : **tout correctif de plus de 10 lignes repasse le circuit de
+  relecture COMPLET** ; en deçà, la relecture ciblée reste **obligatoire, jamais nulle**.
+
+## 11. Questions pour `lab-neuro` — TOUTES RÉPONDUES, avis FAVORABLE, condition INTÉGRÉE
+
+N1 à N8 traitées à l'Arbitrage. La **condition bloquante** (`f`, `σ±`, `(O, cos)` conjoint) est
+intégrée en porte `V-diag`.
+
+**Reste dû, avant le banc** : signature explicite de la cellule **`(BAS × c-cent)`** telle que
+rédigée au §4.6 — c'est la cellule qui **réfute `P-N`** tout en **confirmant sa prédiction de
+centrage**, et le PI l'a **ratifiée avant mesure** (§14-1).
+
+## 12. Questions pour `lab-math` — VERROUS LEVÉS
+
+M1 à M9 traitées à l'Arbitrage. **Restent dues, avant le banc** :
+- **Q-M1** : confirmation de la **masse cumulée à `p = 9`** (interpolée à 0.192) — **à recalculer**,
+  pas à interpoler.
+- **Q-M2** : réserve M5 — **≥ 8 paires par tige** pour la quasi-normalité : **confirmer par
+  simulation** que l'IC bootstrap percentile ne gonfle pas `ind_L` sous ce plancher.
+- **Q-M3** : validation de la reformulation de la clause « mêmes directions » (0-133).
+- **Q-M4** : `P(classe)` des **10 objets** sous la nulle, par simulation, à comparer aux valeurs
+  analytiques annoncées.
+
+## 13. Questions pour le PI — **TRANCHÉES à la gate du 2026-08-23** (voir §14)
+
+**P1** `ε*` canonique et `R` dérivé → **adoptés** · **P2** charge sur `Δ*` seul → **adoptée** ·
+**P3+P12** budget et GPU conditionnel → **acceptés** (§14-4) · **P4** portée « pour cette `G` » →
+**adoptée** · **P5** `Core` sans IC → **adoptée** · **P6** `X1-rect` note non franchie → **confirmée**
+· **P7** candidate D30 → **proposée** (§14-5) · **P8** condition `auto` → **ADOPTÉE** (§14-3) ·
+**P9** refus de `t−1` → **ratifié** · **P10** split-half principal si `min n_cell < 30` → **RATIFIÉ**
+(§14-2) · **P11** purge des deux réserves d'`I2` avant `I3` → **gravée** · **P13** lecture de la
+cellule `(BAS × c-cent)` → **RATIFIÉE telle quelle** (§14-1).
+
+## 14. Amendements de la gate PI — 2026-08-23
+
+1. **Cellule `(BAS × c-cent)` : lecture gravée ratifiée telle quelle, avant mesure.** Le PI confirme
+   que cette cellule est la réalisation de son pari, qu'elle **réfute `P-N`** tout en **confirmant la
+   prédiction de centrage de Neuro**, et que sa lecture du §4.6 lui convient — **de sorte que
+   personne n'arbitrera après coup en faveur de l'un des deux paris**.
+2. **Bascule split-half RATIFIÉE, automatique et pré-enregistrée** : si `min n_cell < 30`, le
+   split-half **devient la mesure principale** et le LOO passe en contrôle, **sans nouvelle gate**.
+   Motif : le biais résiduel du LOO (`+1/(n_cell−2) ≈ 0.05` de cosinus à `n_cell ≈ 20`) est **de la
+   taille de la quantité décidée** — il fabriquerait `c-cent`. **La bascule étant pré-enregistrée,
+   ce n'est pas un choix après lecture.**
+3. **Condition `auto` ADOPTÉE** — cinquième niveau de la variable manipulée. Motif : coût marginal
+   quasi nul ; **seul centrage calculable en ligne** ; **seul discriminant de `C-mod` avec une cause
+   vérifiable dans le code des modèles** (`V-norm`, deux lignes de config).
+4. **Budget accepté, re-forward autorisé.** ~10-14 h d'agent ; `< 30 min` CPU ; **0 GPU sous
+   `V-cache` PASS**. Si les `.npz` sont absents ou sans hash vérifiable, le **re-forward est
+   autorisé** (53,82 s, VRAM ≤ 4,688 Gio) — **cela contredit le « 0 GPU » du cadrage, et c'est
+   assumé et écrit**.
+5. **Candidate D30 proposée au PI** *(à graver par lui, hors labo)* : *« une borne géométrique se
+   publie en deux versions — une **théorique pré-enregistrée** qui **prédit**, et une **réalisée par
+   paire** qui **décide** ; c'est la réalisée qui porte la porte, la théorique qui porte
+   l'engagement. »*
+
+---
+
+## Registre des engagements
+
+| Engagement | Auteur | Signature | Statut | Motif |
+| --- | --- | --- | --- | --- |
+| **`P-N`** (niveau, `Λ(s) > 0` sur 4 strates × 3 modèles, `O_type ≳ 10/64`) | lab-neuro | 2026-08-23 | **SIGNÉE — DÉCISIONNELLE** | Antipode `C-strat` ⇒ la lecture forte d'`A3` tombe. |
+| **`P-N-ord`** (ordre du **cosinus brut**) | lab-neuro | 2026-08-23 | **SIGNÉE — DESCRIPTIVE** | Antipode = ordre du **design** ⇒ sursis partiel pour l'attribution représentationnelle de X1, **à instruire ailleurs**. |
+| **Ordinal du design `S3>S2>S1>S0`** | lab-director (brouillon) | — | **RETIRÉ, non reporté** | **Déjà démenti** par le brut de v4 (0-122). |
+| **Prédiction de centrage** (`O_brut ≈ O_glob > O_type`, `O_plac ≈ O_brut`) | lab-neuro | 2026-08-23 | **SIGNÉE** | Antipode `c-mec`, formulation gravée mot pour mot. |
+| **`auto` / `C-mod`** | lab-neuro | 2026-08-23 | **SIGNÉE**, sous `V-norm` | Cause **vérifiable dans le code des modèles**, pas une croyance. |
+| **`Core` / `Core-G`** | lab-neuro | 2026-08-23 | **SIGNÉE** | `Core-G` élevé ⇒ **aucune lecture représentationnelle licite**. |
+| **`C-anti`** | lab-neuro | 2026-08-23 | **GRAVÉE — consignée, non interprétée, NON MUETTE** | Trois descripteurs obligatoires ; **aucune cause nommée avant** ; **aucune suite de chantier**. |
+| **`t−1`** | lab-neuro | 2026-08-23 | **REFUSÉ, NON REPORTÉ** ; ratifié par le PI | A4 + `V-t1` (`64/64` par arithmétique). |
+| **Condition bloquante `f` / `σ±` / `(O, cos)`** | lab-neuro | 2026-08-23 | **INTÉGRÉE — porte `V-diag`** | Sans elle, le cycle **ne peut pas donner tort à son expert** (0-120). **Diagnostique, jamais correctif.** |
+| **Phrase gravée (xvi)** | lab-neuro | 2026-08-23 | **PRIME sur celle du Directeur, verbatim** | Quatre contraintes chargées. |
+| **Vocabulaire interdit (xviii)** | lab-neuro | 2026-08-23 | **GRAVÉE, verbatim** | Trois candidats bio écartés par propriété manquante nommée. |
+| **`X1-rect`** | lab-neuro | 2026-08-23 | **GRAVÉ, NON FRANCHI** | **Même observé, ne licencie aucune modification de `engram/`.** |
+| **`L(c)` version réalisée par paire** | lab-math | 2026-08-23 | **VERROU LEVÉ** | Zéro hypothèse ; la théorique **prédit**, la réalisée **décide**. |
+| **`ε*` canonique + `R` dérivé** | lab-math | 2026-08-23 | **VERROU LEVÉ** | Recopiée à l'identique §4.5 / §7 (anti-0-82). |
+| **`V-iid` par provenance ; MC supprimé** | lab-math | 2026-08-23 | **GRAVÉ** | Échec de `V-G` = **arrêt de provenance**. |
+| **`≥ 8 paires` pour `Λ` et le corridor** | lab-math | 2026-08-23 | **GRAVÉ — `V-P8`** | `q95` par paire = **2 × le corridor**. |
+| **Split-half principal si `min n_cell < 30`** | lab-math | 2026-08-23 | **RATIFIÉ par le PI** (§14-2) | Bascule **automatique et pré-enregistrée**. |
+| **« Mêmes directions sur les 3 modèles »** | lab-math | 2026-08-23 | **REFORMULÉ (0-133)** | Arithmétiquement inexécutable ; appariement **par la norme**. |
+| **Pari du PI** — `O_brut ≥ 0.5` (≥ 32/64) et **`O_type` sous `2n`** | **PI** | **2026-08-23, HORS PROTOCOLE, aucun poids décisionnel** | **CONSIGNÉ** | **Mutuellement exclusif avec `P-N` sur `O_type`** ; réalisation = cellule **`(BAS × c-cent)`** (0-129), **lecture ratifiée avant mesure**. |
+| **Pari de `lab-director`** — `O_brut ∈ [12, 25]/64` ; `O_type ∈ [4, 10]/64` ; **`c-mec`** ; `Core ≠ ∅` avec **`Core-G > 0.8`** | lab-director | **2026-08-23, HORS PROTOCOLE** | **CONSIGNÉ** | Posé **avant** la mesure pour que son interprétation soit auditable. |
+| **Pari du copilote** — `O_brut ∈ [25, 45]/64` (bien au-dessus de `L ≈ 8-11` : la constance du plancher 0.41-0.46 **sur trois architectures** sent le mode commun) ; `O_type` **chute fortement mais reste au-dessus de `2n`** ⇒ cellule **`HAUT × c-cent`** ; **`Core-G > 0.7`** | **copilote** | **2026-08-23, HORS PROTOCOLE, aucun poids décisionnel** | **CONSIGNÉ** | Conséquences : **le pari du PI tombe**, **`P-N` survit**, **la prédiction de centrage de Neuro est confirmée**, **le `c-mec` du Directeur tombe**. Il **ne modifie aucun seuil, aucune classe, aucune porte**. |
+| **D29 — contrainte de build** | PI | reconduite | **GRAVÉE** | **Tout correctif de plus de 10 lignes repasse le circuit complet.** |
+
+---
+
+## Ce qui reste indécidable, et le restera après ce run
+
+*Écrit avant la mesure, pour qu'aucune de ces phrases ne soit tentée après.*
+
+1. **L'effet aval.** Aucune injection, aucune NLL, aucun E1/E2/E3. `O` ne dit **rien** sur le rappel,
+   sur le gate, sur la capacité, ni sur le 0/10 top-10.
+2. **Le chemin d'écriture de `M`.** Le +57 % d'E2 de X1 est **acquis et intact** ; ce cycle porte sur
+   la **lecture** de `φ`. **Seule son attribution représentationnelle est en jeu, et seulement par
+   `P-N-ord`, qui est descriptive.**
+3. **La généralité à une autre `G`.** Portée **« pour cette `G` », seed 0** (D9). `Core` est
+   **G-spécifique**.
+4. **La cause d'un `c-mec`.** Il dit que le placebo reproduit la chute ; il **ne dit pas** pourquoi
+   la chute existe.
+5. **La cause d'un `c-anti`.** Trois mécanismes candidats nommés par Neuro, **qu'il déclare ne pas
+   savoir ordonner avant le run** ; **aucune cause ne sera nommée après** sans les trois descripteurs.
+6. **`I3` et le profil par couche.** Ce cycle mesure **un locus**. Il **ne licencie pas `I3`**.
+7. **`gate_keysim_mid` (Q-06).** Point de contact **nommé** au §4.9 ; **non instruit** ici.
+8. **Le canal suffixe** (0-62, v4). Hors périmètre, successeur désigné, **matériau propre requis**.
+
+---
+
+## Historique
+
+- **2026-08-23** — Brouillon (mode cadrage). **Treize défauts acquittés (0-104 … 0-116), dont quatre
+  critiques.**
+- **2026-08-23** — **Avis `lab-math` : FAVORABLE, verrous levés** (M1 `L(c)` confirmée + correctif
+  « version réalisée par paire » ; M2 nulle hypergéométrique et plancher de 8 paires ; M3 `V-iid` par
+  provenance et **deux budgets morts** ; M4 LOO insuffisant ; M5 corridor absolu vérifié par calcul ;
+  M6 partition et deux écritures ; M7 ligne canonique de `ε*` et `R` dérivé ; M8 puissance déclarée ;
+  M9 `Core`).
+- **2026-08-23** — **Avis `lab-neuro` : FAVORABLE sous une condition bloquante** (`f`, `σ±`,
+  `(O, cos)` conjoint). Retire l'ordinal du design, refuse `t−1`, ajoute `auto`, `Core-G`, l'entrée
+  (xviii), la phrase gravée (xvi), `C-anti` non muette, sa branche de tort, et la purge des deux
+  réserves d'`I2`.
+- **2026-08-23** — **Consolidation.** Condition bloquante **intégrée** ; **dix-huit défauts de plus
+  (0-117 … 0-134), dont sept critiques** ; **quatre contradictions tranchées** (dont deux clauses
+  d'expert **inexécutables**, relevées par le copilote) ; ordinal du design **retiré**, `t−1`
+  **refusé**, `auto` **ajouté**, les **deux budgets morts** retirés et §9 re-chiffré.
+  **Total du cycle : trente-et-un défauts (0-104 … 0-134), aucun octet mesuré, aucun GPU touché.**
+- **2026-08-23** — **Gate PI** : cellule `(BAS × c-cent)` **ratifiée telle quelle avant mesure** ;
+  bascule split-half **ratifiée** ; condition `auto` **adoptée** ; budget et **re-forward
+  conditionnel acceptés**. Pari du copilote **consigné**. Candidate **D30** proposée.
+- **2026-08-23** : proposé.
+- **2026-08-26** : **PRÉ-ENREGISTRÉ par le PI.** Prédictions (§4) et critères d'abandon (§6)
+  **gelés définitivement** — ni le PI, ni le copilote, ni les experts, ni un auditeur ne les
+  modifient désormais ; toute lecture ultérieure qui les contredirait est un **résultat**, pas un
+  motif d'amendement. Suite : `eval/support_overlap.py` puis **banc D14-S complet (`E = 0`, cas
+  échouants obligatoires pour `V-borne`, `V-P8`, `V-core-S`, `V-ulp`, `V-seed`, `V-t1`)** ;
+  **aucune mesure avant PASS intégral du banc**.
