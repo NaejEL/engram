@@ -1662,6 +1662,61 @@ primaire dérivée par Neuro (défaut 0-70) est réelle et devient un fait de m�
 - **Suite** : construction du matériau (`eval/pool_v4.py`, table des garanties D25 en en-tête) et
   **banc D14-S complet — `E = 0`, `fact_pairs` en contre-exemple échouant obligatoire**. **Aucun GPU
   avant PASS intégral.** Puis gel du matériau, puis **une seule** mesure I2 sur les trois modèles.
+### RECTIFICATION du 2026-08-26 — `A3` : deux erreurs, relevées par les portes de provenance du cycle suivant
+
+*Ajoutée sans modifier le texte d'origine ci-dessus, conformément à A-7 (rien ne disparaît
+silencieusement). Établie par `lab-builder` aux portes `V-G` et §6.I du protocole
+`experiments/EXP-2026-08-23-recouvrement-supports.md`, en **9,1 s de CPU**, **avant toute mesure**,
+et **reproduite indépendamment par `lab-verifier`** via un troisième chemin de calcul.*
+
+**(1) `A3` n'a pas été calculé avec la `G` du projet.** `eval/materiel_v4.py::descriptif_A3` tire
+`G` par `numpy.random.default_rng(0).standard_normal` ; `engram/hippocampus.py::phi` — la projection
+que `φ_dg` utilise réellement — la tire par `torch.randn(generator=manual_seed(0))`. **Sous le même
+seed, ce sont deux matrices différentes** : `corrcoef ≈ 0.011`,
+`max|G_np·√d − G_torch| = 7.23`. Isolement causal vérifié : substituer **la seule** `G` torch
+reproduit les douze écarts à l'identique ; l'échelle `1/√d` est inerte (`~1e−10`), le dtype `float64`
+— dû à une repromotion NEP 50 — inerte aussi (`~1e−9`), et la coupure par seuil au lieu de `topk`
+donne **`0.0` exact sur 4/4** cellules à `G` égale.
+
+> **Portée corrigée de `A3`.** Sa conclusion — *compression forte, ordre des strates détruit sur
+> 2 modèles sur 3, plancher commun* — **survit comme énoncé sur les projections top-k aléatoires
+> gelées en général**. Elle **n'est PAS une mesure de `φ_dg`**, et l'entrée ci-dessus la présente
+> comme telle (« `G` gelée seedée par `cfg.seed`, D8/D9 intactes »). **La ligne du tableau
+> `EXTENSIONS.md` §4 hérite de la même limite.**
+
+**(2) Le « plancher commun ≈ 0.41-0.46 » n'est pas un cosinus, c'est une compression.** Relecture des
+bruts (`experiments/results/v4-materiel/mesure-*.json`, champ `metrics.descriptif_A3`) :
+
+| grandeur | valeurs | plage globale |
+| --- | --- | --- |
+| **`cos_dg`** (cosinus après `topk(G·h)`) | gpt2 0.2838/0.2146/0.2573/0.1927 · SmolLM2 0.3401/0.2825/0.3262/0.2758 · Qwen 0.2301/0.1758/0.2033/0.1590 | **[0.1590, 0.3401]** |
+| **`compression`** (`cos_brut − cos_dg`) | 0.4596-0.4659 · 0.4485-0.4606 · 0.4076-0.4334 | **[0.4076, 0.4659]** = « 0.41-0.46 » |
+| **étendue inter-strates de `cos_dg`** | 0.0912 · 0.0643 · 0.0711 | **[0.064, 0.091]** |
+| **`descriptif_A3_amplitude`** (amplitude de la **compression**) | 0.00625 · 0.01208 · 0.02584 | = « 0.01-0.03 » |
+
+La phrase *« plancher commun ≈ 0.41-0.46 là où l'indépendance à `k = 64` / `D = 8192` prédit
+0.008 »* compare donc **une compression à une nulle de cosinus/recouvrement** (`0.008 = 64/8192`).
+L'amplitude, elle, était **correctement nommée**. C'est cette juxtaposition qui a rendu la conflation
+lisible comme un fait, et **elle a contaminé un protocole entier** : le §3 du cycle suivant a
+recopié « 0.41-0.46 » sous l'étiquette « cosinus de `φ(h)` », et toute la borne `L(c)` en dérivait.
+
+**Ce que la rectification ne change pas** : le verdict de v4 (matériau qualifié RETENU ; `P-N2`
+INCONCLUSIF par saturation ; `ORD-3` ×3), aucune quantité décisionnelle, aucune porte. `A3` était
+**descriptif**, et le protocole gravait déjà que **« aucune décision n'en dépend »** et que la
+grandeur décisive — le **recouvrement des supports** — **n'était pas mesurée**. La phrase
+*« l'attribution représentationnelle de X1 est désormais non soutenue par la seule mesure qui l'a
+approchée »* doit se lire, à partir d'aujourd'hui : ***« …par la seule mesure qui l'a approchée, et
+cette mesure ne portait pas sur la projection du projet »***.
+
+**Fait de méthode.** Les deux portes ont mordu sur exactement ce qu'elles visaient : `V-G` avait été
+écrite parce que la `G` recalculée n'était pas **prouvée** identique (défaut 0-116) — elle ne l'est
+pas ; la clause §6.I avait été écrite parce qu'un chiffre recopié d'une analyse antérieure est
+proscrit (D14-R) — il l'avait été, et mal. **Aucune des deux n'a eu besoin d'un octet de mesure**, et
+le motif écrit de la première (défaut 0-118 : « `A3` a été calculé en fp32 dans `hippocampus.phi` »)
+était **faux deux fois**. *Une porte peut être juste et son motif écrit être faux ; c'est l'exécution
+qui départage, jamais la relecture.*
+
+
 - **Décisions gravées par le PI le 2026-08-23** (`docs/ARCHITECTURE.md` §3) : **D27** — *quand un
   confondant résiste à N purifications, cesser de le chasser : scinder l'instrument en un calibrateur
   qui l'absorbe et une question définie hors de son domaine* (**la solution générale de la loi de

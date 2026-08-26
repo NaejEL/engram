@@ -41,8 +41,26 @@ Statut : PRE-ENREGISTRE
 | **0-133** *(mineur — relevé du copilote sur une clause de Math)* | **« Les mêmes `R` directions pour les 4 strates et les 3 modèles » est arithmétiquement inexécutable** : `d` vaut **768** (GPT-2), **960** (SmolLM2), **1536** (Qwen) — **un vecteur de ℝ⁷⁶⁸ n'est pas un vecteur de ℝ¹⁵³⁶**. | La clause aurait produit un **faux PASS** de la porte de cardinal, ou un échec d'implémentation à chaud. **Famille « cardinal périmé », cinquième occurrence** (0-76(i), 0-86, 0-94, 0-101, celle-ci). Correctif : *« même seed, même générateur, même règle de tirage et mêmes indices ; l'appariement inter-modèles se fait par la **norme**, jamais par le **vecteur** »*, cardinal publié **par modèle**. |
 | **0-134** *(mineur)* | **Les paires intra-tige n'étaient pas exclues explicitement**, et le cardinal exclu n'était pas publié. | Deux états d'une même tige sont **corrélés** : leur présence gonfle `O` **sans mécanisme** et brise l'indépendance sur laquelle repose l'IC bootstrap de tiges. Sans publication du cardinal exclu, la contamination est **invérifiable après coup**. Correctif : `V-t1` étendue. |
 
-**Total du cycle : trente-et-un défauts (0-104 … 0-134), dont sept critiques. Aucun octet mesuré,
-aucun GPU touché.**
+### 0-135 … 0-142 — **Relevés par le RUN lui-même**, aux deux premières portes, en 9,1 s de CPU
+
+*Ces défauts n'ont pas été trouvés par relecture : ils ont été trouvés **par l'exécution des portes
+de provenance**, avant toute mesure. `V-G` et la clause §6.I ont mordu chacune sur ce qu'elles
+avaient été écrites pour attraper. Tous ont été **reproduits indépendamment par `lab-verifier`**,
+qui a réécrit un troisième chemin de calcul.*
+
+| # | Défaut | Pourquoi il était fatal |
+| --- | --- | --- |
+| **0-135** *(critique)* | **`A3` n'a JAMAIS été calculé avec la `G` du projet.** `eval/materiel_v4.py::descriptif_A3` tire `G` par `numpy.random.default_rng(0).standard_normal`, `engram/hippocampus.py::phi` par `torch.randn(generator=manual_seed(0))`. **Deux matrices différentes** : `corrcoef ≈ 0.011`, `max\|G_np·√d − G_torch\| = 7.23`. Isolement causal vérifié : substituer **la seule** `G` torch reproduit les douze écarts à l'identique ; l'échelle `1/√d` laisse `~1e−10`, le dtype `~1e−9`, la coupure seuil-vs-`topk` **`0.0` exact sur 4/4**. | **Le descriptif `A3` publié au journal du 2026-08-23 décrit une projection que `φ_dg` n'utilise pas.** Sa conclusion peut survivre comme énoncé sur **les projections top-k aléatoires en général** — elle **n'est pas** une mesure de `φ_dg`, et le journal la présente comme telle. Tout ce qui en dérivait dans ce protocole (`L(c)`, le retrait de `C-sep`, la migration de la décision vers le centrage) était **fondé sur une autre matrice que celle du projet**. |
+| **0-136** *(critique)* | **Le §3, ligne 1, nommait la mauvaise colonne.** « `A3` : **cosinus de `φ(h)`** — plancher ≈ 0.41-0.46, étendue 0.01-0.03 ». Relecture des bruts : **0.41-0.46 est la colonne `compression`** (`cos_brut − cos_dg`, 0.4076-0.4659) et **0.01-0.03 est `descriptif_A3_amplitude`** (0.0063/0.0121/0.0258). Le vrai `cos_dg` vaut **0.159-0.340**, d'étendue **0.064-0.091** — soit **~6 × l'étendue annoncée**. | **C'était la SEULE ligne décisionnelle du §3** — celle qui « fonde `L(c)` » — et **la seule fausse sur neuf**. Le §3 est la table de provenance **D14-R** : son objet même est d'empêcher qu'un chiffre soit repris sans être relu. **Il a été repris sans être relu, dans la table écrite pour l'interdire.** |
+| **0-137** *(critique)* | **La prédiction pré-enregistrée du §4.2 en dérivait**, et **l'ensemble qui la conditionne est VIDE** : « sur les strates dont `A3` donne `cos ∈ [0.41, 0.46]` » — **aucune des douze cellules n'y tombe**. | La prédiction gelée annonçait `O ≥ 8 à 11 / 64`, soit 16 à 22 × le hasard ; la valeur correcte est **`O ≥ 1 à 6 / 64`**, soit 1 à 6 × le corridor. **Facteur d'erreur de 8× à 1.3×.** Et une prédiction conditionnée à un ensemble vide n'est **ni vraie ni fausse** : elle est **sans objet** — la forme la plus silencieuse de la vacuité (famille 0-47/0-66), dans une section **gelée**. |
+| **0-138** *(majeur)* | **Le défaut 0-118 était faux DEUX FOIS.** Il gravait : *« `A3` a été calculé dans le pipeline **fp32** (`hippocampus.phi`) »*. (i) **Mauvais module** — c'est `descriptif_A3`. (ii) **Mauvais dtype** — sous **NEP 50** (numpy 2.5.2), `rng.standard_normal(...).astype(np.float32) / np.sqrt(d)` divise un tableau float32 par un scalaire `np.float64` et **repromeut en float64** ; `Z` est donc calculé en **fp64**. | **Une porte gravée sur un motif faux.** `V-G` a néanmoins **fonctionné** — elle a détecté la vraie divergence — mais **pour une raison que son texte ne nommait pas**. Fait de méthode à retenir : *une porte peut être juste et son motif écrit être faux ; c'est l'exécution qui départage, jamais la relecture.* |
+| **0-139** *(majeur)* | **Le chiffre mal nommé s'était propagé à quatre autres endroits** : §4.9-2 (le gate `keysim` — **les deux termes faux**, offset réel 0.147-0.337 et dynamique réelle 0.064-0.091) ; §2 branche de tort N7 ; §4.6 cellule `BAS × c-mec` (seuils `f ≈ 0.45`, `O_brut ≈ 4-6/64` calibrés dessus) ; **et le pari du copilote au Registre**, dont le motif invoquait « la constance du plancher 0.41-0.46 sur trois architectures ». | **Un chiffre faux dans une table de provenance ne reste pas dans la table** : il devient un seuil, une branche d'antipode, un motif de pari. Quatre propagations à partir d'une seule ligne. **Le copilote a posé un pari daté sur une colonne qu'il n'avait pas vérifiée** — et c'est lui qui avait exigé la clause §6.I qui l'a démasqué. |
+| **0-140** *(mineur)* | **La hiérarchie causale n'était pas écrite** : le compte rendu présentait les quatre différences de code comme si elles concouraient à l'échec. | **Une seule (le tirage de `G`) porte l'écart** ; les trois autres sont inertes à `10⁻⁹` près. Sans hiérarchie écrite, le correctif aurait pu porter sur la mauvaise différence — par exemple « épingler le dtype », qui n'aurait **rien** changé. |
+| **0-141** *(mineur)* | **Option CLI `--layer` déclarée mais inerte** (`COUCHE_REF` prime inconditionnellement). | Sans effet ici (étage de mesure fermé), mais c'est un **paramètre en dur déguisé en option** — à corriger **avant** l'ouverture de l'étage de mesure. |
+| **0-142** *(mineur)* | **§3, ligne « coût GPU »** : « VRAM Qwen 4,688 Gio » sans qualifier **alloué / réservé**, là où le journal distingue 4.188 alloués et 4.688 réservés. | Imprécision de provenance, sans effet décisionnel — mais **le §7 grave « VRAM rapportée en réservé »**, et une table de provenance qui ne qualifie pas son propre chiffre affaiblit la clause. |
+
+**Total du cycle : trente-neuf défauts (0-104 … 0-142), dont dix critiques. Aucune mesure conduite,
+aucun GPU touché — 9,1 s de CPU.**
 
 ---
 
@@ -68,10 +86,12 @@ reproduit.**
   **une structure de strate que le cosinus avait comprimée** ⇒ **la lecture forte d'`A3` tombe**.
 - **`c-mec`** : `O_plac` chute autant que `O_type` ⇒ **le centrage n'a rien démontré** — *et il faut
   le dire dans ces mots exacts, sans habillage*.
-- **Branche « l'estimateur, pas l'objet » (N7)** : `O_brut ≈ 4-6/64` **avec** `f ≈ 0.45` ⇒ les
-  supports **sont** largement séparés, le cosinus de 0.41-0.46 est porté par **une poignée de
-  coordonnées géantes**, **la lecture forte d'`A3` est fausse**, et le coupable est l'anisotropie de
-  **l'entrée**, pas `G`.
+- **Branche « l'estimateur, pas l'objet » (N7)**, *chiffres rectifiés le 2026-08-26 (§15)* :
+  `O_brut` proche de son plancher `L` **avec** `f` élevée ⇒ les supports **sont** largement séparés,
+  le cosinus (**0.147 à 0.337 avec la `G` du projet**, et non 0.41-0.46 qui était la *compression*)
+  est porté par **une poignée de coordonnées géantes**, **la lecture forte d'`A3` est fausse**, et le
+  coupable est l'anisotropie de **l'entrée**, pas `G`. *La forme de la branche est inchangée ; seules
+  les valeurs numériques qui l'illustraient l'étaient à tort.*
 - **`c-anti`** : `IC_sup(Δ*) < −ε*` — **se consigne et ne s'interprète pas**, mais **oblige** trois
   descripteurs (§4.6).
 
@@ -123,7 +143,8 @@ adverbiale ; **(xiv)** toute mention de l'étage d'**ÉCRITURE** ; **(xv)** le m
 
 | Fait | Chiffre | Source, date | Étiquette |
 | --- | --- | --- | --- |
-| `A3` : cosinus de `φ(h)` entre états, par strate | **plancher ≈ 0.41-0.46**, étendue inter-strates **0.01-0.03** | descriptif `A3`, run v4, journal 2026-08-23 | **à re-lire depuis `experiments/results/` avant gravure**, jamais de mémoire (D14-R). Fonde `L(c)`. |
+| ~~`A3` : cosinus de `φ(h)` entre états, par strate~~ **RECTIFIÉE le 2026-08-26 — voir §15** | ~~plancher ≈ 0.41-0.46, étendue 0.01-0.03~~ ⇒ **ces chiffres sont la colonne `compression` (`cos_brut − cos_dg`) et l'amplitude de compression, PAS le cosinus.** Le `cos_dg` d'`A3` vaut **0.159 à 0.340**, étendue **0.064 à 0.091** | descriptif `A3`, run v4, journal 2026-08-23 | **FAUSSE — défaut 0-136.** Et le descriptif lui-même **n'a pas été calculé avec la `G` du projet** (défaut 0-135) : il ne peut donc **plus** fonder `L(c)`. |
+| **`cos` de `φ(h)` par strate, mesuré AVEC LA `G` DU PROJET** (`hippocampus.phi`, `torch.randn(8192, d, generator=seed(0))`) | gpt2 **0.2766 / 0.2070 / 0.2479 / 0.1886** (S3/S2/S1/S0) · SmolLM2 **0.3368 / 0.2566 / 0.3174 / 0.2568** · Qwen **0.2184 / 0.1636 / 0.1883 / 0.1471** — **plage globale [0.1471, 0.3368]** | **`V-G` de ce cycle**, 2026-08-26, `experiments/results/recouvrement-supports/V-G.json` | **mesuré ici, par le run lui-même** ; reproduit indépendamment par `lab-verifier` via un troisième chemin. **C'est cette ligne qui fonde `L(c)` désormais** (§4.2). |
 | Géométrie mesurée **ordonnée `S3 > S1 > S2 > S0`**, domaine dominant la tige d'un facteur **2 à 10**, régime **additif** | `M1 +`, `M2 −`, `M3 +` sur 3/3 | v4, 2026-08-23 | vérifié — **tue l'ordinal du design** (0-122), fonde `P-N-ord` |
 | `X7` : lecture **sans composante directionnelle** (`cos ≈ 0`), aplatissement = coût **fixe** (+0.141 nats) | — | X7, journal | vérifié — la direction quasi constante de la lecture est un **invariant du modèle** (Q-01) |
 | `Q-01` : le ciblage des positions incertaines est **générique** (bruit de norme appariée, `R ≈ 0.8`) ; **D11** | corr **+0.394** | X8.1b / P5 / Q-01, 2026-08-21 | vérifié — **modèle de raisonnement du placebo de ce cycle** |
@@ -171,8 +192,39 @@ masse totale `64 × E[Z² | |Z| > 2.66] = 64 × 8.90 = 570`) :
 | 0.46 | 0.2116 | **frontière p=10 (0.210) / p=11 (0.228)** | **10 ou 11** | 0.156 – 0.172 |
 | 0.47 | 0.2209 | p=10 → 0.210 | **11** | **0.172** |
 
-⇒ **prédiction : `O ≥ 8 à 11 indices sur 64`, soit 16 à 22 × le hasard**, sur les strates dont `A3`
-donne `cos ∈ [0.41, 0.46]`.
+~~⇒ prédiction : `O ≥ 8 à 11 indices sur 64`, soit 16 à 22 × le hasard, sur les strates dont `A3`
+donne `cos ∈ [0.41, 0.46]`.~~
+
+> **RECTIFIÉE le 2026-08-26 (§15) — défaut 0-137.** L'ancienne prédiction était paramétrée par un
+> chiffre qui **nomme une autre colonne** (0-136) et provenait d'un descriptif calculé avec **une
+> autre matrice `G`** (0-135). De plus **l'ensemble `cos ∈ [0.41, 0.46]` est VIDE** : aucune des
+> douze cellules n'y tombe.
+
+**⇒ PRÉDICTION RECTIFIÉE, paramétrée sur les `cos` mesurés avec la `G` DU PROJET** (§3, ligne 2 ;
+plage `[0.1471, 0.3368]`), table de masses cumulées reconstruite indépendamment par `lab-verifier`
+(`p=1 → 0.0259`, `p=4 → 0.0932`, `p=5 → 0.1132`, `p=6 → 0.1333`, `p=7 → 0.1533`, `p=8 → 0.1724`,
+**`p=9 → 0.1911`** *(Q-M1 réglée : valeur exacte, non interpolée)*, `p=10 → 0.2095`, `p=11 → 0.2275`) :
+
+| cellule | `cos` (`G` du projet) | `cos²` | `p` minimal | `L = p/64` |
+| --- | --- | --- | --- | --- |
+| Qwen S0 | 0.1471 | 0.0216 | **1** | **0.015625 = `2n` EXACTEMENT** |
+| Qwen S2, gpt2 S0 | 0.164-0.189 | 0.027-0.036 | 2 | 0.03125 |
+| Qwen S1/S3, gpt2 S2 | 0.188-0.218 | 0.035-0.048 | 2-3 | 0.031-0.047 |
+| gpt2 S1, SmolLM2 S2/S0 | 0.248-0.257 | 0.061-0.066 | 3 | 0.0469 |
+| gpt2 S3 | 0.2766 | 0.0765 | 4 | 0.0625 |
+| SmolLM2 S1 | 0.3174 | 0.1007 | 5 | 0.0781 |
+| SmolLM2 S3 | 0.3368 | 0.1134 | **6** | **0.0938** |
+
+> **`O ≥ 1 à 6 indices sur 64`, soit 1 à 6 × le corridor `2n`.** *(Recalcul du copilote sur les
+> valeurs `A3` confirmé par `lab-verifier` ; re-paramétrage sur la `G` du projet fait ici,
+> **confirmation due à `lab-math` avant le banc** — Q-M5.)*
+
+**Conséquence sur le défaut 0-104, gravée :** *« `C-sep` est vide par arithmétique »* **ne tient plus
+catégoriquement**. La classe `BAS` reste arithmétiquement exclue sur **11/12** cellules
+(`L ≥ 2/64 = 2·(2n)`), mais sur **`Qwen S0` elle est offerte, à la frontière exacte** (`L = 2n`) —
+et **fragilement** : `cos² = 0.0216` contre `cum(p=1) = 0.0259`, écart **de 17 %**, mais la somme des
+64 masses **réalisées** vaut 563.9 contre 569.6 théorique (~1 %, marge déjà nommée par 0-128).
+**`C-sep` est donc RE-OFFERTE sur cette cellule, et le protocole le dit au lieu de la retirer.**
 
 **Version réalisée par paire — la MESURE et la porte** : `p_pair` calculé sur les `φ_i²` **réalisés**.
 `V-borne` exige `|A∩B| ≥ p_pair` sur **100 % des paires** (identité arithmétique — toute violation
@@ -273,14 +325,14 @@ par affirmation** (famille 0-76(i)/0-86/0-94/0-101/0-133).
 | **`HAUT × c-mec`** | Recouvrement massif **réel**, **cause non établie** : le centrage ne l'a pas départagée d'un décalage de magnitudes. `P-N` soutenue, mécanisme **ouvert**. |
 | **`HAUT × c-cent`** | Recouvrement massif **et** composante affine commune retirable **au-delà du placebo**. **Deux des trois conditions de `X1-rect`** ; la troisième (`σ± > 0.5` significatif) et `Core-G` décident du déclencheur — **qui reste une note**. |
 | **`BAS × c-cent`** *(0-129 — la cellule qui départage le PI et Neuro ; **ratifiée par le PI avant mesure**, §14-1)* | Le recouvrement **après centrage par type** est borné par `2n`, et le centrage a mordu au-delà du placebo. ⇒ **`P-N` est réfutée** (son niveau `≳ 10/64` n'est pas atteint sur `O_type`) **et la prédiction de centrage de Neuro est confirmée** ; **c'est exactement le pari du PI**. Les deux engagements de Neuro n'étaient conjointement satisfiables que sous un effondrement **partiel** : ici il est **total**. **À écrire ainsi, sans arbitrer en faveur de l'un des deux paris après coup.** |
-| **`BAS × c-mec` avec `f ≈ 0.45` et `O_brut ≈ 4-6/64`** | **Branche de tort de Neuro (N7)** : les supports **sont** largement séparés, le cosinus est porté par **une poignée de coordonnées géantes**, **la lecture forte d'`A3` est fausse**, coupable = anisotropie de **l'entrée**, pas `G`. **À écrire dans ces termes.** |
+| **`BAS × c-mec` avec `f` élevée et `O_brut` proche de `L`** *(seuils rectifiés §15 : l'ancien « `f ≈ 0.45`, `O_brut ≈ 4-6/64` » était calibré sur le chiffre mal nommé)* | **Branche de tort de Neuro (N7)** : les supports **sont** largement séparés, le cosinus est porté par **une poignée de coordonnées géantes**, **la lecture forte d'`A3` est fausse**, coupable = anisotropie de **l'entrée**, pas `G`. **À écrire dans ces termes.** |
 | **`ind_L × ind_Δ`** | *« indécidable ICI, `P` ou `σ_Δ` insuffisants »* — **jamais** « pas d'effet ». La suite se lit sur `σ_Δ` et `P` publiés, pas sur la classe. |
 
 ### 4.7 Portes (toutes exécutables, toutes bloquantes)
 
 | Porte | Contenu | Coût |
 | --- | --- | --- |
-| **`V-G`** | Reproduire `A3` **en fp32, sur le chemin d'origine (`hippocampus.phi`), bit-à-bit** ; puis mesurer en fp64 ; **publier les deux nombres et l'écart** (D26). Échec ⇒ **arrêt de provenance (D14-R)**, jamais repli. | secondes |
+| **`V-G` (v2 — RE-SPÉCIFIÉE le 2026-08-26, §15)** | *La v1 exigeait la reproduction bit-à-bit d'`A3` par `hippocampus.phi`. **Elle a échoué, et elle avait raison** : `A3` n'a jamais été calculé avec la `G` du projet (0-135). La v1 est donc **inexécutable par construction** — mode 0-118, mais pour la vraie raison.* **v2** : (a) `G` **du projet** instanciée via `hippocampus.phi` (`torch.randn(8192, d, generator=seed(cfg.seed))`), **hash publié par modèle** ; (b) `cos` de `φ(h)` par strate **mesuré et publié** avec cette `G`, en fp32 **et** fp64, **écart publié** (D26) ; (c) **publication obligatoire de la divergence avec `A3`** — les douze écarts, le `corrcoef ≈ 0.011` entre les deux matrices, et la mention que **`A3` porte sur une autre projection**. **Aucune reproduction d'`A3` n'est exigée ni possible.** Échec (hash absent, `G` non instanciable, ou divergence fp32/fp64 > 1e−6) ⇒ **arrêt de provenance (D14-R)**. | secondes |
 | **`V-iid`** | **Prouvée par provenance** (M3). Résiduel : **sanité de moments** de `G`. **Pas de KS.** | secondes |
 | **`V-borne`** | `\|A∩B\| ≥ p_pair` sur **100 %** des paires ; **et** la version réalisée **encadre** la table théorique du §4.2. Violation = **bug**, jamais résultat. | secondes |
 | **`V-P8`** | `Λ` et le corridor calculés **uniquement** sur des moyennes de **≥ 8 paires** ; toute cellule à `< 8` paires **exclue, cardinal publié**. | banc |
@@ -313,8 +365,11 @@ par affirmation** (famille 0-76(i)/0-86/0-94/0-101/0-133).
    cortex gelé.
 2. **Limite nommée — le point de contact `keysim`.** `read_gate=keysim` se calcule sur
    `cos(φ(h), clés)` — **la quantité même dont ce cycle mesure le plancher**. Un plancher de
-   **0.41-0.46** avec une étendue inter-strates de **0.01-0.03** signifie que **le gate opère sur une
-   variable à fort offset et faible dynamique**. **Ce n'est pas un verdict sur le gate** (aucun effet
+   **0.147-0.337** (`G` du projet ; *rectifié §15 — l'ancien « 0.41-0.46 » était la **compression**,
+   pas le cosinus*) avec une étendue inter-strates de **0.064-0.091** (*et non 0.01-0.03, soit
+   ~6 × plus*) signifie que **le gate opère sur une variable à offset marqué et à dynamique
+   modérée** — *la formulation « faible dynamique » était elle aussi tirée du chiffre faux et est
+   retirée*. **Ce n'est pas un verdict sur le gate** (aucun effet
    aval, (xvii)) : c'est une **désignation de chantier**.
 3. **Successeur désigné.** **Q-06** — calibration de `gate_keysim_mid` **par modèle** (ouverte depuis
    2026-08-21 : E1b 0.68 → 0.38 sous gate, « coût de sélectivité »). Ce cycle **ne l'ouvre pas** et
@@ -540,7 +595,7 @@ cellule `(BAS × c-cent)` → **RATIFIÉE telle quelle** (§14-1).
 | **« Mêmes directions sur les 3 modèles »** | lab-math | 2026-08-23 | **REFORMULÉ (0-133)** | Arithmétiquement inexécutable ; appariement **par la norme**. |
 | **Pari du PI** — `O_brut ≥ 0.5` (≥ 32/64) et **`O_type` sous `2n`** | **PI** | **2026-08-23, HORS PROTOCOLE, aucun poids décisionnel** | **CONSIGNÉ** | **Mutuellement exclusif avec `P-N` sur `O_type`** ; réalisation = cellule **`(BAS × c-cent)`** (0-129), **lecture ratifiée avant mesure**. |
 | **Pari de `lab-director`** — `O_brut ∈ [12, 25]/64` ; `O_type ∈ [4, 10]/64` ; **`c-mec`** ; `Core ≠ ∅` avec **`Core-G > 0.8`** | lab-director | **2026-08-23, HORS PROTOCOLE** | **CONSIGNÉ** | Posé **avant** la mesure pour que son interprétation soit auditable. |
-| **Pari du copilote** — `O_brut ∈ [25, 45]/64` (bien au-dessus de `L ≈ 8-11` : la constance du plancher 0.41-0.46 **sur trois architectures** sent le mode commun) ; `O_type` **chute fortement mais reste au-dessus de `2n`** ⇒ cellule **`HAUT × c-cent`** ; **`Core-G > 0.7`** | **copilote** | **2026-08-23, HORS PROTOCOLE, aucun poids décisionnel** | **CONSIGNÉ** | Conséquences : **le pari du PI tombe**, **`P-N` survit**, **la prédiction de centrage de Neuro est confirmée**, **le `c-mec` du Directeur tombe**. Il **ne modifie aucun seuil, aucune classe, aucune porte**. |
+| **Pari du copilote** — `O_brut ∈ [25, 45]/64` ; `O_type` **chute fortement mais reste au-dessus de `2n`** ⇒ cellule **`HAUT × c-cent`** ; **`Core-G > 0.7`** | **copilote** | **2026-08-23, HORS PROTOCOLE, aucun poids décisionnel** | **CONSIGNÉ — MOTIF INVALIDÉ, PARI MAINTENU** | **Le motif invoqué était faux** : *« la constance du plancher 0.41-0.46 sur trois architectures sent le mode commun »* reposait sur la colonne **compression**, que le copilote n'avait pas vérifiée (0-136). **Le pari lui-même n'est pas modifié** — il a été posé, il est daté, il tient ou il tombe ; mais **son fondement est retiré**, et cela se lit avec lui. *La constance réelle est celle de la compression (0.408-0.466 sur trois architectures), qui reste un fait — mais elle ne dit pas ce que le motif lui faisait dire.* | Conséquences : **le pari du PI tombe**, **`P-N` survit**, **la prédiction de centrage de Neuro est confirmée**, **le `c-mec` du Directeur tombe**. Il **ne modifie aucun seuil, aucune classe, aucune porte**. |
 | **D29 — contrainte de build** | PI | reconduite | **GRAVÉE** | **Tout correctif de plus de 10 lignes repasse le circuit complet.** |
 
 ---
@@ -565,6 +620,41 @@ cellule `(BAS × c-cent)` → **RATIFIÉE telle quelle** (§14-1).
 8. **Le canal suffixe** (0-62, v4). Hors périmètre, successeur désigné, **matériau propre requis**.
 
 ---
+
+## 15. Correction de provenance du 2026-08-26 — traçabilité complète
+
+**Autorisation.** Les §4 et §6 étaient **gelés depuis le 2026-08-26**, et le protocole grave que
+*« ni le PI, ni le copilote, ni les experts, ni un auditeur ne les modifient »*. **Le PI a levé le
+gel pour cette correction seule**, sur le discriminant suivant, qu'il propose de graver en décision
+d'architecture :
+
+> **Une erreur trouvable SANS la mesure se corrige sans rompre le gel ; une erreur qui n'apparaît
+> qu'à la lumière des résultats, jamais.** Le gel protège contre l'**ajustement post-hoc aux
+> données** — il n'a jamais été écrit pour protéger une **erreur d'arithmétique ou de lecture**
+> identifiable avant toute mesure. Le critère est **exécutable** : *une donnée du run est-elle
+> nécessaire pour voir l'erreur ?* Ici **non** — elle a été trouvée en **9,1 s de CPU**, par les
+> portes de provenance, **avant** toute mesure et sans une seule donnée de l'expérience.
+
+**Ce qui est corrigé, avec ancienne valeur, nouvelle valeur, motif et auteur :**
+
+| Section | Ancienne valeur | Nouvelle valeur | Motif | Relevé par |
+| --- | --- | --- | --- | --- |
+| **§3, ligne 1** | « cosinus de `φ(h)` : plancher **0.41-0.46**, étendue **0.01-0.03** » | **rectifiée et barrée** ; ligne neuve : `cos` mesuré **avec la `G` du projet**, plage **[0.1471, 0.3368]** | 0-136 : les chiffres nommaient la colonne **`compression`** et l'**amplitude de compression** ; 0-135 : `A3` n'a pas utilisé la `G` du projet | `lab-builder` (§6.I), confirmé par `lab-verifier` |
+| **§4.2, prédiction** | `O ≥ 8 à 11 / 64`, **16 à 22 × le hasard**, sur `cos ∈ [0.41, 0.46]` | **`O ≥ 1 à 6 / 64`**, **1 à 6 × le corridor**, sur `cos ∈ [0.1471, 0.3368]` mesuré **ici** | 0-137 : dérivée du chiffre mal nommé ; l'ensemble conditionnant était **vide** | `lab-verifier` (recalcul), copilote (première alerte) |
+| **§4.2, défaut 0-104** | « `C-sep` est **vide par arithmétique**, la classe n'est pas offerte » | **ne tient plus catégoriquement** : `BAS` exclue sur **11/12** cellules, **RE-OFFERTE sur `Qwen S0`** à la frontière exacte (`L = 2n`), et **fragilement** | idem | `lab-verifier` |
+| **§4.7, `V-G`** | « reproduire `A3` en fp32 sur `hippocampus.phi`, bit-à-bit » | **v2** : instancier la `G` du projet, publier son hash et les `cos`, **publier la divergence avec `A3`** ; **aucune reproduction d'`A3` exigée** | 0-135 + 0-138 : la v1 était **inexécutable par construction** | `lab-builder`, confirmé par `lab-verifier` |
+| **§4.9-2** | « plancher **0.41-0.46**, étendue **0.01-0.03** ⇒ **faible dynamique** » | « **0.147-0.337**, étendue **0.064-0.091** ⇒ **dynamique modérée** » ; « faible dynamique » **retiré** | 0-139 : les **deux** termes étaient faux | `lab-verifier` |
+| **§2 (N7), §4.6 (cellule)** | seuils illustratifs `f ≈ 0.45`, `O_brut ≈ 4-6/64` | **forme conservée, valeurs retirées** | 0-139 : calibrées sur le chiffre faux | `lab-verifier` |
+| **Registre, pari du copilote** | motif : « la constance du plancher **0.41-0.46** sur trois architectures » | **pari MAINTENU, motif INVALIDÉ et retiré** | 0-139 : motif fondé sur une colonne non vérifiée | copilote (auto-relevé) |
+
+**Ce qui n'est PAS corrigé et reste gelé** : la structure des partitions, l'ordre d'évaluation, le
+schéma 1×/2×, la ligne canonique de `ε*`, `R` dérivé, les portes autres que `V-G`, les engagements
+signés de `lab-neuro` (`P-N`, `P-N-ord`, centrage, `auto`, `Core`), les critères d'abandon du §6, et
+**les paris eux-mêmes**. *Aucune de ces sections ne dépendait du chiffre mal nommé.*
+
+**Reste dû avant la reprise au banc** : **Q-M5** — `lab-math` confirme le re-paramétrage de `L(c)`
+sur les `cos` de la `G` du projet (table ci-dessus), et dit si la ré-ouverture de `BAS` sur
+`Qwen S0` est **robuste** ou **à l'intérieur de la marge** de 0-128.
 
 ## Historique
 
@@ -594,3 +684,19 @@ cellule `(BAS × c-cent)` → **RATIFIÉE telle quelle** (§14-1).
   motif d'amendement. Suite : `eval/support_overlap.py` puis **banc D14-S complet (`E = 0`, cas
   échouants obligatoires pour `V-borne`, `V-P8`, `V-core-S`, `V-ulp`, `V-seed`, `V-t1`)** ;
   **aucune mesure avant PASS intégral du banc**.
+- **2026-08-26** — **BUILD & RUN : arrêt à la deuxième porte.** `V-cache` **PASS** (hashes gravés,
+  première gravure ; 0 GPU, re-forward non déclenché). **`V-G` FAIL** : reproduction bit-à-bit par
+  `hippocampus.phi` **fausse sur 12/12**, écarts `3.3e−03` à `2.6e−02` ; le chemin **réellement
+  exécuté en v4** (`descriptif_A3`) reproduit **`0.000e+00` sur 12/12**. **§6.A appliqué : arrêt de
+  provenance (D14-R)**, banc non écrit, aucune mesure, aucune constante dérivée. **9,1 s de CPU.**
+  Second relevé par la clause **§6.I** : deux chiffres du §3 nomment la mauvaise colonne.
+- **2026-08-26** — **VERIFY : `APPROVED`** (`tests_passed`, `protocol_followed`, `rerun_consistent`).
+  L'arrêt est **fondé, correctement appliqué et structurellement matérialisé**. Les deux constats
+  sont **reproduits par un troisième chemin** écrit par le vérifieur. **Isolement causal** : une
+  seule des quatre différences (le **tirage de `G`**) porte l'échec. **Huit défauts de plus
+  (0-135 … 0-142), dont trois critiques**, tous portant sur le **protocole** et sur le **journal de
+  v4**, aucun sur ce run.
+- **2026-08-26** — **DÉCISION PI : correction de provenance autorisée** sur le discriminant *« une
+  erreur trouvable sans la mesure se corrige ; une erreur qui n'apparaît qu'à la lumière des
+  résultats, jamais »*. §3, §4.2, §4.7 (`V-G` v2), §4.9-2, §2, §4.6 et le Registre **rectifiés avec
+  traçabilité complète (§15)**. **Le cycle reprend au banc**, sous réserve de **Q-M5**.
