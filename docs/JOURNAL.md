@@ -1925,6 +1925,36 @@ ablation est le bon test de la discipline de file.*
   s'il la rend plus facile*.
 - *Notes du PI ; aucun run, aucun modèle de jugement engagé.*
 
+## 2026-08-27 — RECTIFICATION (0-170) de l'entrée du 2026-08-26 : l'ampleur de `σ±`
+
+- **Nature** : correction de provenance sous **D30 alinéa 1**, autorisée par le PI le 2026-08-27
+  (gate de cadrage d'Étape A). **Aucune donnée du run n'a été nécessaire pour voir l'erreur** —
+  elle se dérive du seul schéma d'échantillonnage. Aucune mesure, 0 GPU.
+- **Relevé par** : `lab-neuro`, au cadrage d'Étape A ; **confirmé** par `lab-math` la même journée.
+
+| | ancienne valeur | nouvelle valeur |
+| --- | --- | --- |
+| ampleur de l'écart de `σ±` à 0.5 sur les S0 sous `type` | *« 12 à 15 σ sous 0.5 »* (`−15.36 / −13.78 / −12.63`) | ***`N` effectif NON ÉTABLI — l'ampleur en σ est RETIRÉE.*** Le fait subsiste : `σ± = 0.392 / 0.403 / 0.410`, **sous** 0.5, sur 3/3, **`NON EXPLIQUÉ`**. |
+
+- **Motif** : l'écart-type employé était **binomial**, donc il suppose les essais **indépendants**.
+  Ils ne le sont pas : les paires d'une même cellule **partagent des états et partagent `μ̂`**, et
+  `lab-math` a établi que **la dépendance induite par le LOO est POSITIVE**. Le `N` effectif est donc
+  **strictement inférieur** aux 5083 essais comptés, et il **n'a jamais été estimé**. La correction ne
+  peut aller que dans **un seul sens : réduire la significativité**.
+- **Portée exacte de la rectification** : *seule l'ampleur* est retirée. Les valeurs de `σ±`, leur
+  uniformité en `|A∩B|` (0.387 / 0.396 / 0.393 / 0.411 / 0.467 pour 1…5), leur **non-concentration**
+  (top-15 = 513/5083) et le corrélat `sign(cos_type)` **restent acquis et inchangés**.
+- **Conséquence gravée** : **aucune phrase qualifiant l'ampleur de `σ±`** — ni « massif », ni un
+  chiffre en σ — n'est publiable avant le PASS de la porte **`V-grappe`** (bootstrap par grappe,
+  cardinal effectif et méthode de quantile publiés, D24). Entrée interdite **(xxviii)** du cycle
+  Étape A. **Et si l'écart ne survit pas à `V-grappe`, la classe `Σ-mort` s'applique : *il n'y a pas
+  d'anomalie à expliquer*, et `Q-M1` tombe pour une raison qui n'est pas la sienne.**
+- **Famille du défaut** : **D24** (une nulle qui perd sa variabilité ne borne plus rien) et **0-139**
+  (une ligne fausse se propage — quatre propagations observées sur le cycle v4). *Un écart en σ dont
+  le `N` effectif est inconnu n'est pas un écart en σ.*
+- **Décision gravée ce jour** (`docs/ARCHITECTURE.md` §3) : **D34** — *une clause d'audit exige un
+  **couple**, jamais un nombre*.
+
 ## 2026-08-26 — Recouvrement des supports : `H_sup` REJETÉE (`C-strat`), maillon centrage NON ATTRIBUÉ
 
 - **Commit** : `0ed37c7` (code de mesure), consignation à suivre.
@@ -1945,7 +1975,7 @@ ablation est le bon test de la discipline de file.*
   enrichie de **1.066 à 1.102** seulement ⇒ **`N7` fermée**. `Core` 2/3/0 ; `Core-G` 1/1, 1/1,
   **`SANS OBJET`** (D23). `auto ≈ aucun` à **≤ 0.123 indice partout** — le mode commun **n'est pas
   la direction `1`** (0.010-0.023 contre `‖μ_global‖/‖h‖` = 0.73-0.85). `σ±` sur les S0 sous
-  `type` : **0.392 / 0.403 / 0.410**, 12 à 15 σ **sous** 0.5 — **`NON EXPLIQUÉ`** ; corrélat
+  `type` : **0.392 / 0.403 / 0.410**, **sous** 0.5 — **`NON EXPLIQUÉ`** ; *(l'ampleur en σ publiée à l'origine est **RECTIFIÉE le 2026-08-27**, défaut 0-170 : voir la note en tête d'entrée)* ; corrélat
   `sign(cos_type)`, équivalence **démontrée**, cause **non**.
 - **Conclusion** : **REJETE**. `H_sup` falsifiée sur **deux** de ses trois clauses — le niveau
   (0.63-2.26 indices contre `≳ 10/64` prédits) et l'**indépendance de strate**. **La lecture forte

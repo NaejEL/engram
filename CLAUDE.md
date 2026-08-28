@@ -155,8 +155,10 @@ Ce n'est PAS un produit — c'est une expérience falsifiable sur un laptop RTX 
   sur 3/3**. `auto ≈ aucun` **partout** ⇒ **l'explication LayerNorm/RMSNorm de `C-mod` est morte**
   et le seul retrait calculable **en ligne** ne mord pas. `N7` **fermée** (`f` enrichie de 6-10 %
   seulement). **`¬c-mec` et `¬c-anti` attribués sous toute règle licite (D33)** ; l'attribution
-  `c-cent`/`ind_Δ` **suspendue** par **défaut de protocole** (D31). **`σ±` à 12-15 σ sous le hasard
-  sur les S0 : `NON EXPLIQUÉ`.** Le **+57 % d'E2 de X1 reste acquis et intact** (0-75) ; son
+  `c-cent`/`ind_Δ` **suspendue** par **défaut de protocole** (D31). **`σ±` sous le hasard sur les S0 :
+  `NON EXPLIQUÉ`** — *l'ampleur en σ publiée à l'origine est **rectifiée** le 2026-08-27 (0-170,
+  D30 al. 1) : la nulle binomiale supposait des essais indépendants, le `N` effectif n'est pas
+  établi. Aucune phrase qualifiant l'ampleur avant la porte `V-grappe`.* Le **+57 % d'E2 de X1 reste acquis et intact** (0-75) ; son
   **attribution** ne s'instruira **pas** par des mesures de support à ce locus. **Suite priorité 1 :
   Étape A CPU pure (`P-Base` + `P-σ`).**
 - **File d'attente (ordre ratifié le 2026-08-26)** : **priorité 1 — Étape A**, CPU pure, mêmes
