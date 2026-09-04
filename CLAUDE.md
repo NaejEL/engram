@@ -255,6 +255,49 @@ source ; le protocole d'origine fait foi sur le détail.*
 - **Le double comptage (xxix)** — une **seule** cause candidate expliquant **deux** quantités **ne
   produit pas deux confirmations indépendantes**.
 
+*Les neuf entrées suivantes sont **gravées le 2026-09-04** (cycle de rédaction, décision PI). Elles
+s'appliquent au **rapport** autant qu'aux protocoles, et chacune est une **clause exécutable** du banc
+de cohérence documentaire.*
+
+- **« Prouve » (xxx)** — un rapport **ne prouve pas, il cite**. *« Nos résultats prouvent que… »* est
+  interdit hors énoncé mathématique **explicitement démontré ET sourcé**. Licite : ***« mesuré à ⟨valeur⟩,
+  source ⟨artefact⟩ »***.
+- **Convergence industrielle (xxxi)** — une corroboration externe **ne se lit jamais** *« l'industrie
+  confirme notre résultat »*. **Deux bornes obligatoires dans le même paragraphe** : (a) **l'endroit du
+  réseau** où vit le dispositif externe, comparé au nôtre ; (b) **la portée exacte** de ce qu'elle
+  établit — *ce que nos instruments mesurent est établi par eux seuls*. **Confondre les deux échangerait
+  une mesure contre un argument d'autorité.** **(xxxi) ne dispense d'aucune provenance (D38).**
+- **Récit rétrospectif (xxxii)** — interdit d'écrire *« nous avons découvert »* pour un fait produit par
+  **l'échec d'une porte**. Licite : ***« la porte ⟨nom⟩ a échoué EN PRODUISANT ⟨le chiffre qui lui
+  manquait⟩ »***.
+- **Bilan de défauts (xxxiii)** — *« N défauts »* **n'est jamais une performance** ni une garantie de
+  qualité. Licite : ***« N défauts numérotés, dont k fermés avant qu'un octet de matériau n'existe »***,
+  chacun avec sa source. **Un compte de défauts est une donnée de méthode, pas un score.**
+- **Démarcation (xxxiv)** — **aucune prédication mentale, NÉGATIONS COMPRISES** : *« M ne souffre pas »*
+  est une prédication mentale **négative** et tombe au même titre que l'affirmation. Liste interdite :
+  *souffrir, ressentir, éprouver, vouloir, chercher à, préférer, conscience, subjectif, expérience
+  vécue, se souvenir, oublier (mental), traumatisme, douleur, bien-être, intérêt, attention (mental),
+  sommeil, rêve, **hippocampe, neurone, cellule, synapse, engramme***. Seul licite : l'**énumération des
+  propriétés de design**, et l'énoncé de démarcation — *les propriétés qui rendraient la question
+  sérieuse sont exactement celles que ce design refuse*. **Le nom du projet et le glossaire attirent la
+  prose : on y renvoie, on n'en réemploie pas les termes.**
+- **« Échec » (xxxv)** — un cycle `REJETE` ou une hypothèse falsifiée **ne s'écrit pas « échec »** :
+  ***« falsifiée par ⟨le tueur nommé⟩ »***. Un run invalidé ne s'écrit pas « raté » :
+  ***« invalidé par ⟨la clause⟩, autopsie ⟨§⟩ »***.
+- **Le lecteur cible (xxxvi)** — on **ne demande pas d'aide en prose vague**. Chaque anomalie publiée
+  porte **la formulation gelée** — *« non expliqué à ce jour ; hypothèses du labo épuisées ; données
+  publiées pour examen externe »* — **suivie de l'artefact exact à ouvrir, vérifié ouvrable et hashé**.
+  ***Une invitation sans adresse de données est un défaut ; une adresse non ouvrable aussi.***
+- **Taux de banc (xxxvii)** — **aucun taux de détection d'un banc**, sous aucune formulation, **y compris
+  adverbiale** (« l'essentiel », « la plupart »). Motif : les mutants sont **choisis par l'auteur**, un
+  taux serait une propriété **du générateur de mutants**, pas de la classe de défauts. Licite :
+  **couverture par classe**, avec le nombre de clauses exercées.
+- **Obsolescence (xxxviii)** — un chiffre **antérieur** à un verdict qui en a changé **l'objet, le
+  périmètre ou l'instrument** **ne se republie JAMAIS au présent**. Licite : ***« ⟨valeur⟩, dérivée le
+  ⟨date⟩ sous ⟨instrument⟩, instrument remplacé le ⟨date⟩ par ⟨nom⟩ ; mention historique »***. *Cas
+  générateur : un déficit calculé **avant** mesure, relayé comme s'il avait survécu à la mesure — c'est
+  la forme la plus discrète de la générosité rétrospective.*
+
 ## Environnement
 
 - Windows 11, laptop RTX 3060 6 Go, Python 3.12.
