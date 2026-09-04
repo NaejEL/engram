@@ -1,6 +1,6 @@
 # EXP — plancher de `top64(G·μ_global)` et clôture de `σ±` (Étape A, priorité 1)
 
-Statut : PRE-ENREGISTRE
+Statut : TERMINE — REJETE (`H-R`) / dette D20 acquittée / `σ±` clos sur gpt2 seul
 
 *Cadré par `lab-director` le 2026-08-27, sous avis **`lab-neuro` RÉSERVÉ** (7 corrections) et
 **`lab-math` RÉSERVÉ** (9 corrections). **Vingt-cinq défauts fermés (0-157 … 0-181), dont huit
@@ -776,6 +776,143 @@ pour la fiche `P-cadre`.
 
 ---
 
+## 14. Déclarations d'opérationnalisation et rectifications de provenance — 2026-08-28
+
+*Écrites **AVANT le banc** et avant toute mesure. **Aucune ne touche le §4 ni le §6**, gelés le
+2026-08-28. Elles fixent ce que le texte gelé laissait à deux lectures, et corrigent une provenance.*
+
+### 14.1 — Rectification de provenance : le motif chiffré de 0-171
+
+| | ancienne valeur | nouvelle valeur |
+| --- | --- | --- |
+| fluctuation du seuil réalisé du `topk` | *« Gumbel, SD ≈ 15-20 % »* | **64ᵉ statistique d'ordre, asymptotiquement normale : `sd(t̂₆₄) = √(p(1−p)/D)/(2φ(t)) ≈ 0.042`, soit ≈ 1,6 % de `t`** |
+
+**Motif** : la loi de Gumbel régit le **maximum**, pas le rang 64. Relevé par `lab-math` (`Q-M1-bis`),
+**accepté sans réserve par son auteur `lab-neuro`** le 2026-08-28.
+**Le défaut et son correctif sont INCHANGÉS** — ils ne dépendaient pas de l'amplitude mais de la
+**nature** rang/seuil. L'effet seuil-vs-rang sur `P₂`/`P₃` est borné à `~10⁻³`, ce qui **affaiblit
+l'urgence de 0-171 sans l'annuler** (`lab-neuro`) : la voie (i) — **simulation exacte à sélection
+top-64 par vecteur** — reste la moins chère des deux branches et est **livrée**.
+
+### 14.2 — Déclaration : lecture du vivier `N-état` (opérationnalisation de 0-175)
+
+Le texte gelé *« `x_null` apparié en `(tige, domaine)` aux DEUX membres »* admet **deux lectures
+licites** (famille 0-155). **Lecture retenue : RELATIONNELLE** — `strate(j,a) = strate(j,b) =
+strate(a,b)`.
+
+| Strate | littérale | **relationnelle (RETENUE)** |
+| --- | --- | --- |
+| S3 | 1 | **1** |
+| S2 | 0 | **0** |
+| S1 | 0 | **9** |
+| S0 | 0 | **24, 27 ou 30** |
+
+**Motif, par l'auteur du correctif (`lab-neuro`, 2026-08-28)** : *« Mon intention en 0-175 était de
+neutraliser un confondant de **niveau** — `cos(h_j, paire)` varie de 0.15 à 0.34 selon la strate, donc
+`x_null` doit se tenir à la **même distance structurelle** de `(a,b)` que `a` et `b` se tiennent l'un
+de l'autre. La lecture littérale ne neutralise pas le confondant : elle l'**éteint par vacuité**, en
+supprimant trois strates sur quatre. **Un confondant supprimé avec son support n'est pas un confondant
+contrôlé — c'est une mesure absente.** »*
+**Cardinaux publiés par strate** (`V-appar`), comptés **par énumération**, jamais supposés.
+*Structure source : `pool_v4.py` l. 113-115, 269-274, 441-450 ; `materiel_v4.py` l. 476-477 —
+10 tiges × 2 domaines, 3 membres par famille `(tige, domaine)`, 60 unités par cellule de capture.*
+
+### 14.3 — Falsification SIGNALÉE d'une clause gelée, NON CORRIGÉE
+
+Le **§4.5** porte, dans la ligne `Δ-sansobjet` : *« vivier `x_null` apparié vide (**attendu possible en
+S3**) »*. **Par énumération, cette adresse est INVERSÉE** : le vivier S3 vaut **exactement 1** sous les
+deux lectures — **il n'est jamais vide** — et le vide **certain** est **S2**.
+
+> **La clause n'est pas corrigée.** Elle est **gelée**, et **une prédiction gelée falsifiée est un
+> résultat** (`lab-neuro`, 2026-08-28). **La classe `Δ-sansobjet` reste opérante telle quelle** : elle
+> se déclenche sur la cellule dont le vivier est vide, **quelle qu'elle soit**. Seule sa **prédiction
+> d'adresse** est fausse. Ce résultat se consigne au dépouillement, **il ne se répare pas ici**.
+
+### 14.4 — Déclaration : le bras S3 de l'ordinal N6 est un singleton
+
+`lab-neuro` **MAINTIENT** l'ordinal `Δ_Base(S0) ≥ Δ_Base(S3)`, **sous la seule lecture relationnelle**
+— c'est là qu'il a un domaine (S0 : 24-30 unités, variance de tirage réelle ; S3 : 1 unité).
+
+1. **Le bras S3 a `R ≡ 1` et une variance de tirage NULLE.** Dans le bootstrap joint, le terme S3
+   entre comme **constante**, pas comme estimateur ; la conjonction reste bornée par le `min` (0-63),
+   mais le `min` ne peut être atteint sur S3 que **par cette constante**. À publier comme tel :
+   ***un bras sans variance n'est pas un bras avec variance nulle mesurée.***
+2. **Deux `SANS OBJET` à ne jamais confondre au dépouillement** : *« l'ordre n'a pas de domaine parce
+   que **rien ne bouge** »* (cellule modale signée, `Δ-nul` sur les deux) contre *« parce qu'**un terme
+   n'existe pas** »*. ***Elles n'autorisent pas les mêmes suites.***
+
+### 14.5 — `ρ_ic` : aucun a priori neuro, et c'est un livrable
+
+`lab-neuro` déclare **n'avoir aucun a priori** sur la corrélation intra-unité des accords de signe, et
+**refuse d'en produire un**, au titre de l'interdit **(xxiv) qu'il a lui-même rédigé** : *« `σ± < 0.5`
+n'est pas un fait de neurosciences ; aucun compte neuro ne doit en être propriétaire. »*
+La conjecture `ρ_ic ≲ 0.05–0.1` **appartient à `lab-math` et n'entre dans aucune nulle** ; elle doit le
+rester. **`V-grappe` tranche.** **`Σ-mort` est ATTEIGNABLE, NON MODALE** — statut ratifié par
+`lab-neuro`, qui ratifie **d'avance** que sous `Σ-mort` le brin `σ±` s'éteint **sans rouvrir aucune de
+ses hypothèses**.
+**Frontière chiffrée (`Q-M13`)** : l'IC contient 0.5 ssi **`ρ_ic ≥ ≈ 0.26`** (pour `σ± = 0.410`) à
+**`0.38`** (pour 0.392).
+
+### 14.6 — Fausse alerte de provenance, cause nommée
+
+`lab-math` a signalé `experiments/results/recouvrement-supports/` **introuvable**. **Fausse alerte** :
+`.gitignore` l. 16 exclut `experiments/results/`, et les outils de recherche respectent le
+`.gitignore`. Les fichiers **existent** — écrits par `lab-builder`, relus par `lab-verifier`, hashes
+`V-cache` publiés le 2026-08-26. ***Un résultat négatif sur ce répertoire ne prouve jamais
+l'absence*** — **deuxième occurrence du même piège d'instrument** ; à lire par accès direct, jamais
+par glob.
+
+### 14.7 — Livrables reçus
+
+**`Q-M10` LIVRÉE** (spécification d'implémentation complète, §1 de l'avis `lab-math` du 2026-08-28) :
+identité exacte `ρ_ab = γ_a γ_b + √((1−γ_a²)(1−γ_b²))·c_ab` **démontrée**, **réduction à un facteur
+REFUSÉE** hors S0 (sur S3/S2, `c_ab` est grand et positif), forme gelée = **trivariée exacte réduite
+par conditionnement à une quadrature 1-D**, avec formes fermées `P₂`/`P₃`, tolérances, cas dégénérés et
+cas de banc à identités. **`Q-M1-bis` LIVRÉE** (voie (i), simulation exacte à rang, `N_G = 200`).
+**`Q-M11`, `Q-M12`, `Q-M13`, `Q-M14` livrées** — dont **`DEFF_S ≥ 2.8` démontré** (0-180 confirmé par
+calcul) et le **plug-in `sd_G`** qui fait entrer le terme `O(1/√D)` dans `ε_R`. **Le banc peut
+démarrer.**
+
+### 14.8 — Décision PI du 2026-08-28 : AUCUN PARI PRIS SUR CE RUN, et l'absence est la donnée
+
+**Décision, verbatim** : *« AUCUN pari du registre ne sera pris sur ce run. Après trois cycles
+consécutifs dont l'issue n'était la prédiction de personne, le registre enregistre **l'épuisement du
+répertoire d'hypothèses**, pas de nouvelles variantes du même répertoire. **L'absence de pari EST la
+donnée.** »*
+
+**Portée, déclarée** : **aucun pari nouveau n'est posé** sur Étape A, par personne — ni PI, ni
+`lab-director`, ni `lab-neuro`, ni `lab-math`, ni copilote. Le registre du §« Registre des
+engagements » **n'est pas augmenté**.
+
+**Traitement du pari antérieur, déclaré et soumis à arbitrage** : le pari de `lab-director` (`ρ_Base ∈
+[0.55, 0.72]` · `R-nul` · `Δ-nul` · `Σ-epuise` · `σ±` survit à `V-grappe`) a été **posé le 2026-08-27
+au cadrage, AVANT cette décision**, et il est **daté et consigné**. Il **reste au registre comme fait
+historique** : un registre ne se nettoie pas rétroactivement — ce serait l'inverse exact de **D14-R**.
+Il y porte désormais la mention ***« dernier pari de l'arc — postérieurement à quoi le PI a suspendu la
+prise de paris »***. **Si le PI entend au contraire le retirer, c'est un mot et il est retiré ;
+l'implémentation retenue est celle qui préserve la traçabilité.**
+
+**Ce que l'absence de pari signifie, à consigner tel quel au dépouillement** : elle **n'est pas** une
+abstention prudente ni un défaut de courage. Elle enregistre que **le répertoire d'hypothèses des
+parieurs est épuisé** — et, sous la discipline maison, **ce constat monte d'un étage** : *quand trois
+cycles consécutifs épuisent le répertoire de tous les parieurs, le successeur d'un cycle n'est pas un
+cycle, c'est l'exposition externe.*
+
+### 14.9 — Étape A est le DERNIER ACTE DE MESURE de l'arc
+
+**Décision PI du 2026-08-28.** Quel que soit son verdict, Étape A **clôt l'arc « géométrie
+représentationnelle au locus de capture »**, qui est déclaré **DESCRIPTIVEMENT CLOS**. L'entrée de
+clôture est **une décision, pas un run** ; elle est due **immédiatement après le verdict**.
+
+**Aucun sixième cycle sur ce locus sans hypothèse NEUVE venue de l'EXTÉRIEUR du labo** — lecteur,
+littérature, ou verdict d'un chantier d'un autre étage.
+
+**La file reste intacte et gelée dans son ordre** — `V2-D(b)`, `Q-N3`, `Q-quant`, `I3-sous-P11`, canal
+suffixe : **ce sont des chantiers d'AUTRES étages, non touchés par cette clôture.**
+
+**Successeur immédiat, priorité absolue** : **le cycle de RÉDACTION (`REPORT.md`)**. *Rien d'autre ne
+s'ouvre avant que le plan du rapport soit gelé.*
+
 ## Historique
 
 - **2026-08-27** — **Brouillon (mode cadrage).** Onze défauts (0-157 … 0-167), dont six critiques ;
@@ -798,3 +935,6 @@ pour la fiche `P-cadre`.
   portes, partitions)** et le **§6 (Critères d'abandon)** sont **GELÉS — plus jamais modifiés, par
   personne**. Suite : `Q-M10` (bloquante) à `lab-math`, puis banc D14-S à `E = 0`, puis mesure.
   **Aucune mesure avant PASS intégral du banc.**
+- **2026-09-04** — **TERMINÉ, verdict `REJETE`** sur `H-R` (`R-nul` 24/24) — *résultat gravé d'avance au §6*. Dette **D20/D32 (ii) acquittée en couple (D34)**. `σ±` **clos sur gpt2 seul**, `NON EXPLIQUÉ` sur 2/3. **Deux clauses gelées falsifiées, consignées non réparées** (l'adresse du vivier §14.3, la portée de `Σ-mort`). Trois réserves de publication nommées. **Consigné par le PI avec réserves** ; **D35, D36, D37 gravées**. L'arc est **descriptivement clos**.
+- **2026-08-28** — **`Q-M10` et `Q-M1-bis` livrées** ; quatre arbitrages `lab-neuro` rendus (§14). **Aucune clause gelée touchée.** Une **falsification de clause gelée est SIGNALÉE et non corrigée** (§14.3). **Le banc D14-S peut démarrer.**
+- **2026-08-28** — **Décision PI : aucun pari pris sur ce run** (§14.8) ; **Étape A est le dernier acte de mesure de l'arc** (§14.9). Mesure en cours.

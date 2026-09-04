@@ -606,6 +606,8 @@ sur E1** — l'écriture a besoin du **continu de la surprise** ; le **ternaire 
 
 ## 4. Tableau des poids (à remplir au fil des runs)
 
+> **Déclaration du 2026-09-04 — les cinq cycles de l'arc « géométrie des supports de `topk(G·h)` au locus de capture » NE DOIVENT AUCUNE LIGNE à ce tableau**, et cela se dit plutôt que de se déduire d'une absence. Aucun d'eux ne mesure **E1**, **E2** ni **E3** : ce sont des analyses **CPU pures** sur états conservés, **`M` jamais instanciée, aucune lecture injectée, aucune NLL modifiée**. Le tableau ne bouge donc pas, et **le +57 % d'E2 de X1 y reste acquis et intact** — aucune mesure de **lecture** ne le confirme ni ne l'entame (interdit (xiv), 0-75) ; seule son **attribution** était en jeu, et elle **reste ouverte**.
+
 Référence : config par défaut (`EngramConfig`), seeds fixes, GPT-2 124M.
 Les deltas se lisent **contre la ligne précédente retenue**, pas contre X0.
 Depuis X8, l'interaction E2 seule ne suffit plus (le coût d'échauffement

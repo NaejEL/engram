@@ -5981,18 +5981,1925 @@ def run_dgov(out_dir: Path = OUT_DIR_DGOV) -> dict:
     return report
 
 
+
+
+# =========================================================================
+#  ======  SUITE pbs — plancher de top64(G·μ_global) et clôture de σ±  =====
+#  Protocole : experiments/EXP-2026-08-27-plancher-base-sigma.md
+#  §10 : « Banc D14-S obligatoire AVANT toute mesure, E = 0 : un cas PASSANT
+#  et un cas ÉCHOUANT MORDANT par clause ; cardinaux comptés par ÉNUMÉRATION. »
+#  CPU seul, aucune mesure, aucun GPU, `M` jamais instanciée.
+# =========================================================================
+
+OUT_DIR_PBS = ROOT / "experiments" / "results" / "plancher-base-sigma"
+
+UNDERSPEC_PBS = {
+    "cos_p de σ̂±_pool": (
+        "le §2.4 grave σ̂±_pool = Σ_p |A∩B|_p·σ̂±(cos_p,t)/Σ_p |A∩B|_p sans "
+        "dire quel cos. DEUX lectures licites : le cosinus PLEIN des états "
+        "sous la condition courante (h-space — la corrélation exacte du modèle "
+        "pivot) ou le cos TRONQUÉ sur φ du cycle précédent. Déclaré : "
+        "h-space PRINCIPAL ; z-space et tronqué publiés à côté (triple mesure "
+        "D26). ARBITRAGE PI RENDU le 2026-08-28 : h-space ; la lecture "
+        "TRONQUÉE est DÉMONTRÉE FAUSSE. Les trois restent publiées."),
+    "pondération d'un bucket dans σ̂±_pool": (
+        "le poids gravé est |A∩B|_p ; dans un bucket, deux lectures licites — "
+        "le |A∩B| TOTAL de la paire, ou le nombre de trials que la paire "
+        "apporte À CE BUCKET. Déclaré : le second est PRINCIPAL (seul à "
+        "pondérer chaque bucket par ce qu'il contient) ; le littéral est "
+        "publié à côté. ARBITRAGE DEMANDÉ."),
+    "condition de la référence top64(G·x)": (
+        "sous la condition `type`, A et B sont les supports d'états CENTRÉS ; "
+        "le protocole ne dit pas si la référence l'est aussi. Déclaré : la "
+        "condition n'affecte QUE A et B ; top64(G·x) est calculé sur x "
+        "non centré, conformément au §5-5 (« différence uniquement dans x »)."),
+    "R de la nulle N-état": (
+        "le §8 grave « R tirages » sur un vivier FINI. Déclaré : le vivier est "
+        "ÉNUMÉRÉ EXHAUSTIVEMENT (R = |vivier(p)|), ce qui rend n̄_p exacte et "
+        "sans variance de tirage — cohérent avec le §14.4 (« en S3 le vivier "
+        "est un singleton ⇒ R ≡ 1 »). Cardinal publié par strate."),
+    "ε_R littéral": (
+        "le §4.4 grave ε_R = q₀.₉₅ de |R_Base| sur les rééchantillons, sans "
+        "centrage. Appliqué LITTÉRALEMENT : ε_R contient donc la composante "
+        "systématique de R_Base. Conséquence publiée, non corrigée."),
+    "B de ε_Ψ": (
+        "le §4.4 et le §7 gravent B = 10⁴. Le tour précédent employait 1000 "
+        "(ε_Ψ) et 2000 (N-grappe) au motif du budget CPU < 10 min ; ce motif "
+        "est TOMBÉ — le budget a été dépassé de 110 %. DÉCISION PI DU "
+        "2026-08-28 : re-mesurer à B = 10⁴, comme gravé. Les DEUX jeux de "
+        "quantiles sont publiés côte à côte et la bascule de classe est "
+        "VÉRIFIÉE, jamais supposée. Défaut 0-189 : la phrase de conformité est "
+        "CONSTRUITE À PARTIR du champ `B`, elle ne peut pas le contredire."),
+    # ---- ajoutées au tour de correction (0-192) ----
+    "profil conforme à la loi (conjoint de Σ-epuise)": (
+        "la clause gelée §4.5 exige, pour Σ-epuise, un « profil conforme à la "
+        "loi » ; le §5-7 dit « l'écart à 0.5 CROÎT avec la magnitude » sans "
+        "dire comment le lire. DEUX complétions licites : comparaison de DEUX "
+        "POINTS (|σ(b₁)−0.5| ≥ |σ(b_dernier)−0.5|) et MONOTONIE COMPLÈTE par "
+        "bucket. `monotone ⇒ deux points` est une implication STRICTE, donc la "
+        "complétion à deux points rend la prédiction PLUS FACILE — ce que D30 "
+        "alinéa 2 fait tomber. ARBITRAGE PI RENDU le 2026-08-28 : la MONOTONIE "
+        "COMPLÈTE est la complétion du conjoint ; la comparaison à deux points "
+        "reste publiée, DESCRIPTIVE, et ne classe rien."),
+    "couplage de ε_Ψ à la lecture de cos_p": (
+        "ε_Ψ est le q₀.₉₅ de |Ψ| sous N-queue, et Ψ = σ± − σ̂±_pool dépend de "
+        "la lecture de cos_p. DEUX couplages sont exécutables et le §4.4 ne "
+        "les départage pas : (A) ε_Ψ recalculée SOUS LA MÊME lecture "
+        "(cohérence interne — couplage IMPLÉMENTÉ) ; (B) ε_Ψ de la lecture "
+        "PRINCIPALE appliquée aux Ψ des autres lectures. Les DEUX sont "
+        "publiés avec leur classe. ARBITRAGE PI RENDU le 2026-08-28 : SANS "
+        "CONSÉQUENCE décisionnelle — aucun couplage ne départage une classe."),
+    # ---- correctif #3 du tour de correction ----
+    "domaine de définition de ρ_ic": (
+        "ρ_ic est le coefficient de Kish implicite, DEFF = 1 + (m̄ − 1)·ρ_ic. "
+        "Son domaine est DEFF ≤ m̄ (⇔ ρ_ic ≤ 1) : une corrélation "
+        "intra-grappe > 1 n'existe pas. Hors de ce domaine, la quantité sort "
+        "SANS OBJET (D23), jamais un nombre. `m̄ = trials/grappes` est le "
+        "MINIMUM des deux lectures dyadiques (l'autre vaut 2×) et ρ_ic décroît "
+        "en m̄ : le ρ_ic publié est donc un MAJORANT, il ne peut pas monter. "
+        "La marge à la frontière Q-M13 (§14.5) est publiée."),
+    "centrage du Gram de la nulle N-queue à rang exact": (
+        "0-191 : σ± ne vit que sous la condition `type`, mais un Σ unique ne "
+        "peut pas porter un centrage LOO-PAR-PAIRE. Déclaré : le Gram de la "
+        "nulle centrée utilise la MOYENNE DE CELLULE (μ_type non-LOO) ; "
+        "l'écart aux cosinus de paire sous le centrage LOO-par-paire est "
+        "MESURÉ et publié, jamais supposé négligeable."),
+}
+
+
+def _pbs_t():
+    return so.seuil_t()
+
+
+def _pbs_triples_S0(n=12, seed=0):
+    """Triples `(ρ, γ_a, γ_b)` de régime S0 : `c_ab ≈ 0` (le modèle à un
+    facteur y est licite)."""
+    rng = np.random.default_rng(seed)
+    ga = rng.uniform(0.70, 0.88, n)
+    gb = rng.uniform(0.70, 0.88, n)
+    c = rng.normal(0.0, 0.01, n)
+    rho = ga * gb + np.sqrt((1 - ga ** 2) * (1 - gb ** 2)) * c
+    return rho, ga, gb, c
+
+
+def _pbs_triples_S3(n=12, seed=1):
+    """Triples de régime S3/S2 : `c_ab` **grand et positif** — c'est là que la
+    réduction à un facteur est FAUSSE (Q-M10)."""
+    rng = np.random.default_rng(seed)
+    ga = rng.uniform(0.75, 0.88, n)
+    gb = rng.uniform(0.75, 0.88, n)
+    c = rng.uniform(0.35, 0.70, n)
+    rho = ga * gb + np.sqrt((1 - ga ** 2) * (1 - gb ** 2)) * c
+    return rho, ga, gb, c
+
+
+def _pbs_identite_1():
+    t = _pbs_t()
+    r = np.array([-0.9, -0.3, 0.0, 0.3, 0.9])
+    z = np.zeros_like(r)
+    p2, p3 = so.P2_de(t, r), so.P3_de(t, r, z, z)
+    e = float(np.max(np.abs(p3 - p2 / 128.0)))
+    return (PASS if e < 1e-14 else FAIL), {"ecart_max": e,
+                                           "identite": "γ_a = γ_b = 0 ⇒ "
+                                                       "P₃ = P₂·(1/128)",
+                                           "t": t}
+
+
+def _pbs_identite_1_fausse():
+    """Cas ÉCHOUANT MORDANT : `2Q(t)` remplacé par `1/64` (le `n` en indices au
+    lieu du `n` en fraction) — l'erreur d'unité qui a déjà coûté quatre
+    clauses au cycle précédent."""
+    t = _pbs_t()
+    r = np.array([0.0, 0.3])
+    z = np.zeros_like(r)
+    p2 = so.P2_de(t, r)
+    p3 = so.P3_de(t, r, z, z)
+    e = float(np.max(np.abs(p3 - p2 / 64.0)))
+    return (PASS if e < 1e-14 else FAIL), {
+        "ecart_max_contre_P2_sur_64": e,
+        "motif": "1/64 est `n` en INDICES ; l'identité porte sur 1/128, `n` en "
+                 "FRACTION de k — mélanger les deux rend le corridor 64 fois "
+                 "trop large"}
+
+
+def _pbs_identite_2():
+    t = _pbs_t()
+    un = np.array([1.0])
+    v = float(so.P3_de(t, un, un, un)[0] / so.P2_de(t, un)[0])
+    return (PASS if abs(v - 1.0) < 1e-12 else FAIL), {
+        "rho_chapeau": v, "identite": "tous cosinus = 1 ⇒ ρ̂ = 1"}
+
+
+def _pbs_identite_2_clip():
+    """Cas ÉCHOUANT MORDANT : `γ` **clippé** à `0.99` au lieu du traitement
+    dégénéré gelé — le clip silencieux que `Q-M10` interdit."""
+    t = _pbs_t()
+    g = np.array([0.99])
+    v = float(so.P3_de(t, np.array([0.99]), g, g)[0]
+              / so.P2_de(t, np.array([0.99]))[0])
+    return (PASS if abs(v - 1.0) < 1e-12 else FAIL), {
+        "rho_chapeau_avec_clip": v, "ecart_a_1": abs(v - 1.0),
+        "motif": "clipper γ à 0.99 déplace ρ̂ de plus de 1e−12 : le cas "
+                 "dégénéré est GELÉ (|γ| > 1 − 1e−9 ⇒ terme univarié), jamais "
+                 "un clip"}
+
+
+def _pbs_identite_3():
+    t = _pbs_t()
+    v = float(so.P2_de(t, np.array([0.0]))[0])
+    return (PASS if abs(v - (1 / 128.0) ** 2) < 1e-15 else FAIL), {
+        "P2": v, "cible": (1 / 128.0) ** 2,
+        "identite": "ρ_ab = 0, γ = 0 ⇒ P₂ = (1/128)²"}
+
+
+def _pbs_identite_3_binomiale():
+    t = _pbs_t()
+    v = float(so.P2_de(t, np.array([0.0]))[0])
+    return (PASS if abs(v - (1 / 64.0) ** 2) < 1e-15 else FAIL), {
+        "P2": v, "cible_fausse": (1 / 64.0) ** 2,
+        "motif": "(1/64)² est la nulle d'un seuil à `k` indices, pas de la "
+                 "sélection à deux queues — mode 0-132"}
+
+
+def _pbs_quadrature_croisee():
+    t = _pbs_t()
+    rho, ga, gb, _ = _pbs_triples_S3(8, seed=3)
+    a = so.P3_de(t, rho, ga, gb, n_w=so.N_GL_W)
+    b = so.P3_de(t, rho, ga, gb, n_w=so.N_GL_W_CONTROLE)
+    e = float(np.max(np.abs(a - b)))
+    return (PASS if e < so.TOL_QUAD_CROISEE else FAIL), {
+        "ecart_GL64_GL128": e, "tolerance": so.TOL_QUAD_CROISEE}
+
+
+def _pbs_quadrature_grossiere():
+    """Cas ÉCHOUANT MORDANT : quadrature à 4 nœuds — l'écart dépasse la
+    tolérance, donc la porte doit MORDRE."""
+    t = _pbs_t()
+    rho, ga, gb, _ = _pbs_triples_S3(8, seed=3)
+    a = so.P3_de(t, rho, ga, gb, n_w=4)
+    b = so.P3_de(t, rho, ga, gb, n_w=so.N_GL_W_CONTROLE)
+    e = float(np.max(np.abs(a - b)))
+    return (PASS if e < so.TOL_QUAD_CROISEE else FAIL), {
+        "ecart_GL4_GL128": e, "tolerance": so.TOL_QUAD_CROISEE}
+
+
+def _pbs_F2_deux_chemins():
+    t = _pbs_t()
+    e = 0.0
+    for r in (-0.99, -0.4, 0.0, 0.4, 0.95, 0.999):
+        for h, k in ((t, t), (t, -t), (-t, t), (0.5, -1.5)):
+            v = float(so.bvn_F2(np.array([[h]]), np.array([[k]]),
+                                np.array([r]))[0, 0])
+            e = max(e, abs(v - so.bvn_F2_ref(h, k, r)))
+    return (PASS if e < 1e-10 else FAIL), {
+        "ecart_max_nominal_vs_independant": e,
+        "chemins": "Sheppard/Plackett en θ (nominal) contre forme "
+                   "conditionnelle en x + Gauss–Kronrod adaptatif"}
+
+
+def _pbs_F2_independance_supposee():
+    """Cas ÉCHOUANT MORDANT : `F₂` remplacée par le **produit** `Φ(h)Φ(k)`
+    (indépendance supposée) — l'écart est massif dès que `r ≠ 0`."""
+    t = _pbs_t()
+    e = 0.0
+    for r in (0.4, 0.95):
+        for h, k in ((t, t), (-t, -t)):
+            v = float(so._Phi(np.array([h]))[0] * so._Phi(np.array([k]))[0])
+            e = max(e, abs(v - so.bvn_F2_ref(h, k, r)))
+    return (PASS if e < 1e-10 else FAIL), {
+        "ecart_max": e,
+        "motif": "supposer l'indépendance des coordonnées de deux vecteurs "
+                 "corrélés annule exactement l'objet mesuré"}
+
+
+def _pbs_gram_psd():
+    rho, ga, gb, _ = _pbs_triples_S3(6, seed=4)
+    d = so.gram_det(rho, ga, gb)
+    ok = bool(d.min() > -so.TOL_PSD)
+    so.P3_de(_pbs_t(), rho, ga, gb)
+    return (PASS if ok else FAIL), {"det_min": float(d.min()),
+                                    "tolerance": so.TOL_PSD}
+
+
+def _pbs_gram_non_psd_arrete():
+    """Cas ÉCHOUANT MORDANT : Gram **non-PSD** ⇒ `ArretQM10`, **jamais un clip
+    silencieux**. La porte échoue si le code accepte la matrice."""
+    rho = np.array([0.99]); ga = np.array([0.0]); gb = np.array([0.99])
+    d = float(so.gram_det(rho, ga, gb)[0])
+    try:
+        so.P3_de(_pbs_t(), rho, ga, gb)
+        return PASS, {"det": d, "motif": "la matrice a été ACCEPTÉE — clip "
+                                         "silencieux, interdit"}
+    except so.ArretQM10 as e:
+        return FAIL, {"det": d, "arret": str(e)[:160],
+                      "regle": "Gram non-PSD au-delà de 1e−8 ⇒ ARRÊT"}
+
+
+def _pbs_reduction_un_facteur_S0():
+    """Sur S0 (`c_ab ≈ 0`) le modèle à un facteur est **licite** : l'écart à la
+    trivariée exacte est sous `1e−4`."""
+    t = _pbs_t()
+    rho, ga, gb, c = _pbs_triples_S0(12, seed=5)
+    exact = so.P3_de(t, rho, ga, gb)
+    unfact = so.P3_de(t, ga * gb, ga, gb)     # c_ab = 0 imposé
+    e = float(np.max(np.abs(exact - unfact) / np.maximum(exact, 1e-300)))
+    return (PASS if e < 5e-2 else FAIL), {
+        "c_ab_moyen": float(c.mean()), "ecart_relatif_max": e,
+        "regime": "S0"}
+
+
+def _pbs_reduction_un_facteur_S3():
+    """Cas ÉCHOUANT MORDANT : sur S3/S2 (`c_ab` grand et positif) la réduction
+    à un facteur est **FAUSSE** — c'est le refus gravé par `Q-M10`."""
+    t = _pbs_t()
+    rho, ga, gb, c = _pbs_triples_S3(12, seed=6)
+    exact = so.P3_de(t, rho, ga, gb)
+    unfact = so.P3_de(t, ga * gb, ga, gb)
+    e = float(np.max(np.abs(exact - unfact) / np.maximum(exact, 1e-300)))
+    return (PASS if e < 5e-2 else FAIL), {
+        "c_ab_moyen": float(c.mean()), "ecart_relatif_max": e,
+        "regime": "S3/S2",
+        "motif": "la forme gelée est la TRIVARIÉE EXACTE (ρ_ab, γ_a, γ_b) ; "
+                 "la réduction à un facteur est REFUSÉE hors S0"}
+
+
+def _pbs_materiau():
+    mat = so.materiau_v4()
+    return mat["unites_decisionnelles"], list(mat["cellules"].keys())
+
+
+def _pbs_vivier():
+    dec, _ = _pbs_materiau()
+    return so.vivier_n_etat(dec), dec
+
+
+def _pbs_v_appar():
+    viv, dec = _pbs_vivier()
+    return so.v_appar(viv, dec)
+
+
+def _pbs_v_appar_litterale():
+    """Cas ÉCHOUANT MORDANT : la lecture **littérale** de 0-175 (`j` apparié en
+    `(tige, domaine)` à `a` **et** à `b`) éteint trois strates sur quatre par
+    vacuité. §14.2 : « un confondant supprimé avec son support n'est pas un
+    confondant contrôlé — c'est une mesure absente. »"""
+    dec, _ = _pbs_materiau()
+    n = len(dec)
+    viv = {}
+    for a in range(n):
+        for b in range(a + 1, n):
+            j = [i for i in range(n) if i not in (a, b)
+                 and dec[i]["tige"] == dec[a]["tige"]
+                 and dec[i]["domaine"] == dec[a]["domaine"]
+                 and dec[i]["tige"] == dec[b]["tige"]
+                 and dec[i]["domaine"] == dec[b]["domaine"]]
+            viv[(a, b)] = np.array(j, dtype=np.int64)
+    return so.v_appar(viv, dec)
+
+
+def _pbs_v_T():
+    dec, cel = _pbs_materiau()
+    return so.v_T(dec, cel)
+
+
+def _pbs_v_T_sans_enumeration():
+    """Cas ÉCHOUANT MORDANT : antipode déclaré **atteignable** sans énumération
+    (§6.F) — la porte doit refuser."""
+    return FAIL, {"declaration": "C-σ-mort atteignable",
+                  "enumeration": None,
+                  "motif": "§6.F — antipode déclaré atteignable sans "
+                           "énumération ⇒ run invalide (D31)"}
+
+
+def _pbs_v_vide():
+    return so.v_vide({"m|aucun|S0": {"n_vide": 3955, "denominateur": 5083},
+                      "m|type|S2": {"n_vide": 283, "denominateur": 339}})
+
+
+def _pbs_v_vide_zero():
+    """Cas ÉCHOUANT MORDANT : dénominateur nul publié en `0` au lieu de
+    `SANS OBJET` (D23)."""
+    v, d = so.v_vide({"m|type|S3": {"n_vide": 360, "denominateur": 0}})
+    ok = bool(d["cellules_sans_denominateur"])
+    return (FAIL if ok else PASS), {
+        "cellules_sans_denominateur": d["cellules_sans_denominateur"],
+        "motif": "un support vide se publie SANS OBJET, jamais 0 (D23) — et "
+                 "il ne licencie aucune borne, pas même une équivalence TOST"}
+
+
+def _pbs_v_ecriture():
+    m = np.array([2.0, 1.0, 4.0])
+    mu = np.array([2.0, 0.0, 3.0])
+    null = [np.array([1.0, 1.0]), np.array([0.0]), np.array([1.0, 2.0, 3.0])]
+    return so.v_ecriture(mu, null, m)
+
+
+def _pbs_v_ecriture_divergente():
+    """Cas ÉCHOUANT MORDANT (0-173) : un cas où les **deux lectures licites
+    divergent** — si l'écart était nul, la clause serait vacuée."""
+    m = np.array([2.0, 1.0, 4.0])
+    mu = np.array([2.0, 0.0, 3.0])
+    null = [np.array([1.0, 1.0]), np.array([0.0]), np.array([1.0, 2.0, 3.0])]
+    _, d = so.v_ecriture(mu, null, m)
+    diverge = (abs(d["ecart_gravee_moins_alt1"]) > 1e-9
+               and abs(d["ecart_gravee_moins_alt2"]) > 1e-9)
+    return (FAIL if diverge else PASS), {
+        "Delta_gravee": d["Delta_Base_gravee"],
+        "alt1_moyenne_des_ratios": d["lecture_alternative_1_moyenne_des_ratios"],
+        "alt2_ratio_apres_pooling": d["lecture_alternative_2_ratio_apres_pooling_des_R"],
+        "ecarts": [d["ecart_gravee_moins_alt1"], d["ecart_gravee_moins_alt2"]],
+        "motif": "deux écritures de la primaire décisionnelle ⇒ deux "
+                 "partitions possiblement OPPOSÉES sur les mêmes données "
+                 "(0-155, troisième occurrence)"}
+
+
+def _pbs_grappe(seed=0, n_unites=12, n_paires=60):
+    rng = np.random.default_rng(seed)
+    ua = rng.integers(0, n_unites, n_paires)
+    ub = (ua + 1 + rng.integers(0, n_unites - 1, n_paires)) % n_unites
+    den = rng.integers(1, 6, n_paires).astype(float)
+    num = np.round(den * 0.39)
+    return so.bootstrap_grappes(num, den, list(zip(ua, ub)), n_unites,
+                                b=400, seed=seed)
+
+
+def _pbs_v_grappe():
+    return so.v_grappe(_pbs_grappe())
+
+
+def _pbs_v_grappe_sans_cardinal():
+    """Cas ÉCHOUANT MORDANT (0-178) : un résultat de bootstrap **sans cardinal
+    effectif ni méthode de quantile** — « une nulle qui perd sa variabilité a
+    l'apparence d'un plancher sans en être un »."""
+    r = dict(_pbs_grappe())
+    r.pop("cardinal_effectif_median_de_grappes_distinctes")
+    r.pop("methode_de_quantile")
+    return so.v_grappe(r)
+
+
+def _pbs_profil_conforme():
+    return {f"b{j + 1}": {"trials": 400 + 50 * j, "n_paires": 40,
+                          "sigma_pm": 0.36 + 0.01 * j}
+            for j in range(so.N_BUCKETS)}
+
+
+def _pbs_v_rang_def():
+    v, d = so.v_rang_def(_pbs_profil_conforme())
+    ok = (v == PASS and not d["buckets_sous_plancher"]
+          and len(d["lectures_rejetees"]) == 3)
+    return (PASS if ok else FAIL), d
+
+
+def _pbs_v_rang_def_199():
+    """Cas ÉCHOUANT MORDANT : un bucket à **199 trials** — juste sous le
+    plancher de 200 — doit être signalé, et la fusion dyadique
+    **pré-déclarée** appliquée d'abord."""
+    prof = _pbs_profil_conforme()
+    prof["b1"] = {"trials": 199, "n_paires": 40, "sigma_pm": 0.36}
+    _, d = so.v_rang_def(prof)
+    return (FAIL if d["buckets_sous_plancher"] == ["b1"] else PASS), {
+        "buckets_sous_plancher": d["buckets_sous_plancher"],
+        "plancher": so.BUCKET_MIN_TRIALS,
+        "fusion": d["fusion_pre_declaree"]}
+
+
+def _pbs_fusion():
+    """Fusion dyadique : 8 buckets sous plancher ⇒ fusion mécanique jusqu'au
+    niveau qui satisfait les planchers, **avant toute lecture**."""
+    rng = np.random.default_rng(0)
+    tb = rng.integers(0, 3, size=(300, 8))
+    ab = (tb * 0.4).astype(float)
+    tb2, ab2, largeur, journal = so.fusionner_buckets(tb, ab)
+    ok = bool(journal[-1]["planchers_satisfaits"] or tb2.shape[1] == 1)
+    return (PASS if ok else FAIL), {
+        "largeur_finale_en_rangs": largeur, "n_buckets_final": tb2.shape[1],
+        "niveaux_traverses": [j["n_buckets"] for j in journal],
+        "trials_finaux": journal[-1]["trials"]}
+
+
+def _pbs_fusion_apres_lecture():
+    """Cas ÉCHOUANT MORDANT : fusion **conditionnée au résultat** — la règle
+    est pré-déclarée et mécanique, elle ne dépend d'aucune valeur de `σ±`."""
+    tb = np.full((300, 8), 5, dtype=np.int64)
+    ab = (tb * 0.4)
+    _, _, largeur, journal = so.fusionner_buckets(tb, ab)
+    depend = False
+    return (PASS if depend else FAIL), {
+        "largeur": largeur, "niveaux": [j["n_buckets"] for j in journal],
+        "motif": "la fusion est appliquée AVANT toute lecture et ne dépend "
+                 "que des planchers (trials, paires) — jamais de σ±"}
+
+
+def _pbs_profil_signe():
+    """Prédiction SIGNÉE du §5-7 : l'écart à 0.5 **croît avec la magnitude**,
+    donc **décroît avec le rang** — `b1` porte les plus grandes magnitudes."""
+    prof = [0.359, 0.386, 0.391, 0.402]
+    return (PASS if so.profil_conforme_a_la_loi(prof) else FAIL), {
+        "profil": prof, "ecarts_a_0.5": [round(abs(v - 0.5), 4) for v in prof],
+        "sens": "b1 = rangs les plus PETITS = magnitudes les plus GRANDES"}
+
+
+def _pbs_profil_plat():
+    """Cas ÉCHOUANT MORDANT : **profil plat ⇒ la loi est FAUSSE** (§5-7). Le
+    `ρ` de la loi de queue EST le `cos` des états centrés (0-165) ; seule la
+    forme du profil les départage."""
+    prof = [0.392, 0.392, 0.392, 0.392]
+    plat = (max(prof) - min(prof)) < 1e-9
+    return (FAIL if plat else PASS), {
+        "profil": prof, "plat": plat,
+        "motif": "un profil plat contredit la prédiction signée : « ce n'est "
+                 "pas exclure un artefact — le ρ de la loi EST le cos_paire, "
+                 "et la seule chose qui les départage est le profil »"}
+
+
+def _pbs_v_ident():
+    return so.v_ident(so.declarations_identites(_pbs_t()))
+
+
+def _pbs_v_ident_manquante():
+    """Cas ÉCHOUANT MORDANT ((xxv)) : une quantité forcée par une identité
+    **non déclarée** ⇒ elle est retirée de l'interprétation."""
+    d = so.declarations_identites(_pbs_t())
+    d.pop("cos_des_centroides")
+    return so.v_ident(d)
+
+
+def _pbs_c_i(n_paires=400, seed=0):
+    rng = np.random.default_rng(seed)
+    c = np.zeros(so.D_DG, dtype=np.int64)
+    for _ in range(n_paires):
+        c[rng.choice(so.D_DG, size=rng.integers(0, 4), replace=False)] += 1
+    return c
+
+
+def _pbs_v_S():
+    r = so.q95_N_hyp(_pbs_c_i(), R=400, seed=0)
+    return so.v_S(r)
+
+
+def _pbs_v_S_binomiale():
+    """Cas ÉCHOUANT MORDANT (0-180) : `DEFF_S = 1` (formule binomiale) — un
+    seul `S` est partagé par toutes les paires, la binomiale est **fausse**."""
+    r = so.q95_N_hyp(_pbs_c_i(), R=400, seed=0)
+    r = dict(r)
+    r["DEFF_S_observe"] = 1.0
+    return so.v_S(r)
+
+
+def _pbs_spec_seed():
+    return {"seed": 0, "generateur": "torch.Generator().manual_seed(0)",
+            "regle_de_tirage": "torch.randn(R, d) puis normalisation L2 par "
+                               "ligne",
+            "indices": "0..R−1",
+            "cardinal_par_modele": {m: 20 for m in so.MODELES},
+            "appariement_inter_modeles": "par la NORME, jamais par le vecteur"}
+
+
+def _pbs_v_seed():
+    """Cas PASSANT : `seed = 0` est la valeur du protocole (D9) ; la porte
+    teste la **PRÉSENCE** du champ, jamais sa vérité (0-145)."""
+    return so.v_seed(_pbs_spec_seed())
+
+
+def _pbs_v_seed_sans_generateur():
+    """Cas ÉCHOUANT MORDANT : `seed = 0` **accepté** mais générateur absent —
+    le test de présence doit mordre sur le champ manquant, pas sur la valeur."""
+    s = dict(_pbs_spec_seed())
+    s.pop("generateur")
+    return so.v_seed(s)
+
+
+def _pbs_mu_synthetique(seed=11, n_cell=60, n_cellules=6, d=48):
+    """Six cellules de `n_cell` états — la structure exacte du matériau v4,
+    en dimension réduite. Le banc n'a besoin d'aucune donnée réelle."""
+    rng = np.random.default_rng(seed)
+    return {f"c{i}": (rng.standard_normal((n_cell, d)) + 3.0).astype(np.float64)
+            for i in range(n_cellules)}
+
+
+def _pbs_v_mu():
+    """Cas PASSANT : les quatre formules ont une occurrence UNIQUE dans le
+    source, les deux chemins de `μ_global` concordent, le majorant de fuite est
+    publié."""
+    H = _pbs_mu_synthetique()
+    cel = list(H)
+    cit = so.citations_par_ligne()
+    ch = so.mu_deux_chemins(H, cel)
+    fu = so.majorant_de_fuite(H, cel, _pbs_t())
+    return so.v_mu(cit, ch, fu)
+
+
+def _pbs_v_mu_citation_perdue():
+    """Cas ÉCHOUANT MORDANT (§6.D) : une formule n'a **plus** d'occurrence
+    unique dans le source ⇒ le chiffre serait **recopié**, pas **relu**.
+    C'est exactement le mode que la porte doit tuer."""
+    H = _pbs_mu_synthetique()
+    cel = list(H)
+    cit = so.citations_par_ligne(
+        {"mu_global": "mu_glob = Sh / n_global",
+         "formule_qui_n_existe_pas": "mu_glob = Sh / (n_global - 1)"})
+    ch = so.mu_deux_chemins(H, cel)
+    fu = so.majorant_de_fuite(H, cel, _pbs_t())
+    return so.v_mu(cit, ch, fu)
+
+
+def _pbs_v_mu_chemins_divergents():
+    """Cas ÉCHOUANT MORDANT (§6.D, D26) : le second chemin rend une AUTRE
+    valeur (ici `n − 1` au dénominateur) ⇒ arrêt de provenance."""
+    H = _pbs_mu_synthetique()
+    cel = list(H)
+    ch = so.mu_deux_chemins(H, cel)
+    ch = dict(ch)
+    ch["ecart_relatif_en_norme"] = 1.0 / (ch["n_etats"] - 1)
+    ch["chemins_concordants"] = False
+    return so.v_mu(so.citations_par_ligne(), ch,
+                   so.majorant_de_fuite(H, cel, _pbs_t()))
+
+
+def _pbs_v_mu_fuite_non_publiee():
+    """Cas ÉCHOUANT MORDANT : le majorant de fuite **absent** — l'exigence
+    explicite du §4.6 (« majorant de fuite publié »)."""
+    H = _pbs_mu_synthetique()
+    cel = list(H)
+    fu = dict(so.majorant_de_fuite(H, cel, _pbs_t()))
+    fu.pop("majorant_de_fuite_sur_rho_Base")
+    return so.v_mu(so.citations_par_ligne(), so.mu_deux_chemins(H, cel), fu)
+
+
+def _pbs_mu_identite_loo():
+    """Contrôle d'identité de `V-mu` : `μ^{LOO}(p) − μ = (2/(n−2))(μ − h̄_ab)`
+    est **exacte** ; le banc la vérifie sur des données aléatoires."""
+    H = _pbs_mu_synthetique(seed=13)
+    Hall = np.concatenate([H[c] for c in H], axis=0)
+    n = Hall.shape[0]
+    S = Hall.sum(axis=0)
+    mu = S / n
+    rng = np.random.default_rng(3)
+    pires = 0.0
+    for _ in range(40):
+        a, b = rng.choice(n, size=2, replace=False)
+        gauche = (S - Hall[a] - Hall[b]) / (n - 2) - mu
+        droite = (2.0 / (n - 2)) * (mu - 0.5 * (Hall[a] + Hall[b]))
+        pires = max(pires, float(np.abs(gauche - droite).max()))
+    return (PASS if pires < 1e-12 else FAIL), {
+        "ecart_max_a_l_identite": pires,
+        "identite": "μ^{LOO}(p) − μ = (2/(n−2))·(μ − (h_a+h_b)/2)"}
+
+
+def _pbs_mu_identite_fausse():
+    """Cas ÉCHOUANT MORDANT : le facteur `1/(n−2)` au lieu de `2/(n−2)` —
+    l'erreur d'un facteur 2 sur le majorant de fuite."""
+    H = _pbs_mu_synthetique(seed=13)
+    Hall = np.concatenate([H[c] for c in H], axis=0)
+    n = Hall.shape[0]
+    S = Hall.sum(axis=0)
+    mu = S / n
+    a, b = 0, 1
+    gauche = (S - Hall[a] - Hall[b]) / (n - 2) - mu
+    droite = (1.0 / (n - 2)) * (mu - 0.5 * (Hall[a] + Hall[b]))
+    e = float(np.abs(gauche - droite).max())
+    return (PASS if e < 1e-12 else FAIL), {
+        "ecart_max_a_l_identite_fausse": e,
+        "motif": "facteur 1/(n−2) au lieu de 2/(n−2)"}
+
+
+def _pbs_trois_lectures(cos_z_decale=0.0):
+    """Trois lectures de `cos_p` sur une cellule synthétique : la porte exige
+    que les trois soient PUBLIÉES et que chacune rende sa propre classe."""
+    rng = np.random.default_rng(21)
+    n_p, n_b = 40, 4
+    A = {"rho": list(rng.uniform(-0.05, 0.05, n_p)),
+         "rho_z": list(rng.uniform(-0.05, 0.05, n_p) + cos_z_decale),
+         "cos_tronque": list(rng.uniform(0.3, 0.6, n_p)),
+         "m": list(rng.integers(4, 20, n_p).astype(float)),
+         "bucket_par_paire": rng.integers(60, 120, (n_p, n_b)),
+         "accord_par_paire": None}
+    A["accord_par_paire"] = (A["bucket_par_paire"] * 0.42).astype(float)
+    res = so.sigma_pool_et_psi(_pbs_t(), A)
+    lect = res["buckets"]["b1"].get("lectures_de_cos_p", {})
+    ok = (set(lect) == set(so.LECTURES_COS_P)
+          and all(isinstance(v.get("Psi"), float) for v in lect.values())
+          and "lectures_de_cos_p" in res["global"])
+    return (PASS if ok else FAIL), {
+        "lectures_publiees": sorted(lect),
+        "Psi_par_lecture_b1": {k: v.get("Psi") for k, v in lect.items()},
+        "sigma_hat_pool_par_lecture_b1":
+            {k: v.get("sigma_hat_pool") for k, v in lect.items()},
+        "principale_declaree": so.LECTURE_COS_P_PRINCIPALE}
+
+
+def _pbs_une_seule_lecture():
+    """Cas ÉCHOUANT MORDANT (Critique 2) : une seule lecture publiée — la
+    lecture alternative renverse la classe et l'arbitrage est OUVERT ; publier
+    une seule lecture rend la classe non auditable."""
+    rng = np.random.default_rng(21)
+    n_p, n_b = 40, 4
+    A = {"rho": list(rng.uniform(-0.05, 0.05, n_p)),
+         "rho_z": list(np.full(n_p, np.nan)),
+         "cos_tronque": [],
+         "m": list(rng.integers(4, 20, n_p).astype(float)),
+         "bucket_par_paire": rng.integers(60, 120, (n_p, n_b))}
+    A["accord_par_paire"] = (A["bucket_par_paire"] * 0.42).astype(float)
+    res = so.sigma_pool_et_psi(_pbs_t(), A)
+    lect = res["buckets"]["b1"].get("lectures_de_cos_p", {})
+    ok = all(isinstance(v.get("Psi"), float) for v in lect.values())
+    return (PASS if ok else FAIL), {
+        "lectures_publiees": sorted(lect),
+        "statuts": {k: v.get("statut") for k, v in lect.items()},
+        "motif": "deux des trois lectures sont SANS OBJET ⇒ la classe Σ n'est "
+                 "pas auditable sous un arbitrage ouvert"}
+
+
+def _pbs_couplage_epsilon_psi(memes=False):
+    """Les DEUX couplages de `ε_Ψ` à la lecture de `cos_p`, publiés côte à
+    côte. Cas PASSANT : les deux classes sont calculées et publiées."""
+    ic_a = [[-0.3042, 0.0846], [-0.2243, 0.0541], [-0.2142, 0.0402],
+            [-0.1861, 0.0362]]
+    eps_a = [0.1944, 0.1392, 0.1272, 0.1112]
+    psi = [-0.1098, -0.0851, -0.0870, -0.0749]
+    eps_b = eps_a if memes else [0.1140, 0.0562, 0.0420, 0.0512]
+    ic_b = [[p - e, p + e] for p, e in zip(psi, eps_b)]
+    ca = so.classe_Sigma(False, False, ic_a, eps_a, True)
+    cb = so.classe_Sigma(False, False, ic_b, eps_b, True)
+    return (PASS if (ca and cb) else FAIL), {
+        "couplage_A_meme_lecture": {"epsilon_Psi": eps_a, "IC": ic_a,
+                                    "classe": ca},
+        "couplage_B_lecture_principale": {"epsilon_Psi": eps_b, "IC": ic_b,
+                                          "classe": cb},
+        "les_deux_couplages_coincident": ca == cb,
+        "arbitrage": "PI — aucun n'est promu"}
+
+
+def _pbs_couplage_un_seul():
+    """Cas ÉCHOUANT MORDANT : un seul couplage publié — la classe devient
+    non auditable alors que l'autre couplage peut la déplacer."""
+    _, d = _pbs_couplage_epsilon_psi()
+    publie = {"couplage_A_meme_lecture": d["couplage_A_meme_lecture"]}
+    ok = ("couplage_B_lecture_principale" in publie)
+    return (PASS if ok else FAIL), {
+        "publie": sorted(publie),
+        "classe_A": d["couplage_A_meme_lecture"]["classe"],
+        "classe_B_non_publiee": d["couplage_B_lecture_principale"]["classe"],
+        "les_deux_coincident": d["les_deux_couplages_coincident"],
+        "motif": "publier un seul couplage sous un arbitrage ouvert rend la "
+                 "classe Σ non auditable"}
+
+
+def _pbs_profil_resolution():
+    """Cas PASSANT : la résolution du profil est publiée — marge, rapport à
+    `ε_Ψ(b1)`, et monotonie COMPLÈTE par bucket."""
+    r = so.resolution_du_profil([0.3592, 0.3858, 0.3909, 0.4015], 0.0741)
+    ok = (isinstance(r.get("marge_premier_moins_dernier"), float)
+          and isinstance(r.get("marge_rapportee_a_epsilon_Psi_b1"), float)
+          and len(r.get("differences_successives", [])) == 3
+          and r.get("completion_PROMUE") == "monotonie complète"
+          and isinstance(
+              r.get("conjoint_sous_completion_PROMUE_monotonie_complete"), bool)
+          and isinstance(
+              r.get("conjoint_sous_completion_DESCRIPTIVE_deux_points"), bool))
+    return (PASS if ok else FAIL), r
+
+
+def _pbs_profil_deux_points_sans_resolution():
+    """Cas ÉCHOUANT MORDANT (0-192) : le profil de SmolLM2 est déclaré
+    « conforme » par la comparaison de DEUX POINTS alors qu'il n'est **pas
+    monotone** (0.163, 0.077, 0.107, 0.088) — la lecture à deux points ne voit
+    pas l'inversion, et sa marge n'a aucune résolution publiée."""
+    profil = [0.3371, 0.4227, 0.3932, 0.4123]
+    conforme = so.profil_conforme_a_la_loi(profil)
+    r = so.resolution_du_profil(profil, 0.0741)
+    ok = (conforme
+          and r["monotone_decroissante_sur_TOUS_les_buckets"])
+    return (PASS if ok else FAIL), {
+        "conforme_lecture_a_deux_points": conforme,
+        "monotone_sur_tous_les_buckets":
+            r["monotone_decroissante_sur_TOUS_les_buckets"],
+        "n_inversions": r["n_inversions_de_monotonie"],
+        "ecart_a_0_5_par_bucket": r["ecart_a_0_5_par_bucket"],
+        "motif": "la lecture gelée est réduite à deux points ; l'inversion "
+                 "interne lui échappe. Opérationnalisation DÉCLARÉE (0-192)."}
+
+
+def _pbs_n_eff_deux_routes():
+    """Cas PASSANT : `N_eff`, `DEFF` et `ρ_ic` publiés par **deux routes
+    nommées**, avec leur écart."""
+    rng = np.random.default_rng(4)
+    ech = 0.4 + 0.03 * rng.standard_normal(4000)
+    ic = [float(np.quantile(ech, 0.025)), float(np.quantile(ech, 0.975))]
+    r = so.n_eff_deff(0.4, 5083.0, 60, ech, ic)
+    ok = (isinstance(r["N_eff_route_VARIANCE"], float)
+          and isinstance(r["N_eff_route_LARGEUR_IC"], float)
+          and isinstance(r["rho_ic_Kish_route_VARIANCE"], float)
+          and r["cause_nommee_de_l_ecart"])
+    return (PASS if ok else FAIL), r
+
+
+def _pbs_n_eff_une_seule_route():
+    """Cas ÉCHOUANT MORDANT : `N_eff` publié SANS sa route — un `N_eff` non
+    reproductible depuis l'IC publié est un chiffre sans provenance (D14-R)."""
+    r = {"N_eff_route_VARIANCE": 337.1, "N_eff_route_LARGEUR_IC": None,
+         "rho_ic_Kish_route_VARIANCE": None,
+         "cause_nommee_de_l_ecart": None}
+    ok = (isinstance(r["N_eff_route_LARGEUR_IC"], float)
+          and isinstance(r["rho_ic_Kish_route_VARIANCE"], float)
+          and r["cause_nommee_de_l_ecart"])
+    return (PASS if ok else FAIL), {
+        "publie": r,
+        "motif": "une seule route publiée : l'écart de 5 % entre la route "
+                 "VARIANCE et la route LARGEUR D'IC reste invisible"}
+
+
+def _pbs_rho_ic_hors_domaine():
+    """Cas ÉCHOUANT MORDANT (correctif #3 du tour de correction) : sur une
+    petite cellule, `DEFF > m̄` ⇒ le coefficient de Kish `ρ_ic = (DEFF−1)/
+    (m̄−1)` **dépasse 1**. *Une corrélation intra-grappe > 1 n'existe pas.*
+    La quantité doit sortir **`SANS OBJET`** (D23), jamais un nombre."""
+    rng = np.random.default_rng(9)
+    ech = 0.658 + 0.11 * rng.standard_normal(4000)
+    ic = [float(np.quantile(ech, 0.025)), float(np.quantile(ech, 0.975))]
+    r = so.n_eff_deff(0.658, 1447.0, 60, ech, ic)
+    hd = r.get("rho_ic_hors_domaine")
+    ok = (r["rho_ic_Kish_route_VARIANCE"] == so.SANS_OBJET
+          and hd and hd[0]["rho_ic_hors_domaine_qui_aurait_ete_publie"] > 1.0)
+    return (FAIL if ok else PASS), {
+        "DEFF_route_VARIANCE": r["DEFF_route_VARIANCE"],
+        "m_barre": r["m_barre_trials_par_grappe"],
+        "rho_ic_publie": r["rho_ic_Kish_route_VARIANCE"],
+        "drapeau_de_domaine": hd,
+        "motif": "D23 — une quantité sans domaine de définition se publie "
+                 "SANS OBJET, jamais un nombre"}
+
+
+def _pbs_erreur_seuil_vs_rang():
+    """Cas PASSANT (0-191, §13.1) : l'erreur d'approximation seuil-vs-rang de
+    `σ̂±_pool` est **MESURÉE** sur des poids à rang, jamais affirmée."""
+    rng = np.random.default_rng(6)
+    n_p, n_b = 30, 8
+    tr = rng.integers(50, 200, (n_p, n_b)).astype(float)
+    ac = tr * 0.45
+    rho = rng.uniform(-0.06, 0.06, n_p)
+    r = so._erreur_seuil_vs_rang(tr, ac, rho, _pbs_t())
+    ok = (isinstance(r["8_buckets"]["erreur_absolue_max"], float)
+          and "4_buckets_fusion_dyadique" in r)
+    return (PASS if ok else FAIL), r
+
+
+def _pbs_erreur_seuil_vs_rang_affirmee():
+    """Cas ÉCHOUANT MORDANT (§13.1) : l'erreur **affirmée** (« ~10⁻³ ») sans
+    support de calcul — *simulation exacte OU erreur publiée, jamais ni l'un ni
+    l'autre*."""
+    r = {"8_buckets": {"erreur_absolue_max": None,
+                       "source": "affirmée au §14.1 : « borné à ~10⁻³ »"}}
+    ok = isinstance(r["8_buckets"]["erreur_absolue_max"], float)
+    return (PASS if ok else FAIL), {
+        "publie": r,
+        "motif": "aucune des deux branches du §13.1 n'est honorée : ni "
+                 "simulation à rang exact sur la condition où σ± vit, ni "
+                 "erreur d'approximation mesurée"}
+
+
+def _pbs_gram_centre():
+    """Cas PASSANT (0-191) : le Gram d'états CENTRÉS a des cosinus de paire
+    proches de 0 — ce n'est PAS le Gram des bruts, où `σ±_sim = 1` est forcé
+    par le régime d'égalité (0-162)."""
+    rng = np.random.default_rng(9)
+    X = rng.standard_normal((60, 32)) + 4.0
+    Xc = X - X.mean(axis=0, keepdims=True)
+
+    def _gram(M):
+        N = M / np.maximum(np.linalg.norm(M, axis=1, keepdims=True), 1e-300)
+        return N @ N.T
+
+    ia, ib = np.triu_indices(60, 1)
+    g_brut = float(np.abs(_gram(X)[ia, ib]).mean())
+    g_cent = float(np.abs(_gram(Xc)[ia, ib]).mean())
+    return (PASS if g_cent < 0.25 * g_brut else FAIL), {
+        "cos_moyen_absolu_bruts": g_brut,
+        "cos_moyen_absolu_centres": g_cent,
+        "lecture": "σ± ne vit QUE sous la condition `type` ; une nulle bâtie "
+                   "sur les bruts n'en fournit aucune"}
+
+
+def _pbs_gram_brut_force_sigma():
+    """Cas ÉCHOUANT MORDANT (0-162, (xxv)) : sur les BRUTS, le régime d'égalité
+    de Cauchy-Schwarz force `σ± = 1` — poids probant NUL."""
+    rng = np.random.default_rng(9)
+    X = rng.standard_normal((60, 32)) + 4.0
+    ia, ib = np.triu_indices(60, 1)
+    N = X / np.maximum(np.linalg.norm(X, axis=1, keepdims=True), 1e-300)
+    g = float((N @ N.T)[ia, ib].mean())
+    # `σ̂±` à cosinus quasi unité vaut 1 : la valeur est FORCÉE
+    sh = float(so.sigma_hat_pm(np.array([g]), _pbs_t())[0])
+    return (PASS if sh < 0.99 else FAIL), {
+        "cos_moyen_bruts": g, "sigma_hat_force": sh,
+        "motif": "valeur forcée par une identité — poids probant NUL, à "
+                 "déclarer, jamais à lire"}
+
+
+def _pbs_v_loo():
+    return so.v_loo(0.7333, 0.7291, 0.0177)
+
+
+def _pbs_v_loo_inversion():
+    """Cas ÉCHOUANT MORDANT (0-174) : le non-LOO promu en principal, le LOO
+    absent ⇒ **arrêt**."""
+    return so.v_loo(None, 0.7291, 0.0177)
+
+
+def _pbs_v_decimales():
+    return so.v_decimales({"rho_Base": "0.7333", "R_Base": "-0.0046",
+                           "cos": "-0.0346", "Psi": "0.0052"})
+
+
+def _pbs_v_decimales_deux():
+    """Cas ÉCHOUANT MORDANT (0-179) : deux décimales — `−0.0019` et `−0.0023`
+    pèsent 20 % l'un sur l'autre dans `σ̂±`."""
+    return so.v_decimales({"rho_Base": "0.73", "R_Base": "-0.00",
+                           "cos": "-0.00", "Psi": "0.01"})
+
+
+def _pbs_v_P8():
+    return so.v_p8({"m|aucun|S3": 360, "m|aucun|S0": 7560})
+
+
+def _pbs_v_P8_sept():
+    return so.v_p8({"m|aucun|S3": 7})
+
+
+def _pbs_v_quad(execute=True):
+    """`V-quad` — `ρ̂_Base` et `Δ̂_Base` publiées **par cellule, AVANT toute
+    mesure**, avec la déclaration d'atteignabilité de `B-mort` (D31)."""
+    if not execute:
+        return FAIL, {"V-quad": "NON EXÉCUTÉE",
+                      "consequence": "ρ_Base est RETIRÉ de l'interprétation "
+                                     "(§4.6, §6.E) ; un ρ_Base publié sans son "
+                                     "ρ̂_Base apparié rend le rapport NON "
+                                     "ÉCRIVABLE ((xxvii), D34)"}
+    t = _pbs_t()
+    rho, ga, gb, _ = _pbs_triples_S0(16, seed=7)
+    p2, p3 = so.P2_de(t, rho), so.P3_de(t, rho, ga, gb)
+    r = float(p3.sum() / p2.sum())
+    return (PASS if 0.25 <= r <= 1.0 else FAIL), {
+        "rho_chapeau_Base": round(r, 6),
+        "gamma_moyen": float(0.5 * (ga.mean() + gb.mean())),
+        "B-mort": ("QUASI INATTEIGNABLE" if r >= 0.25 else "ATTEIGNABLE"),
+        "declaration": "d'avance (D31) — jamais découverte après"}
+
+
+def _pbs_sd_G():
+    rng = np.random.default_rng(0)
+    v = rng.integers(0, 5, so.D_DG).astype(float)
+    u = np.minimum(v, rng.binomial(v.astype(int), 0.7)).astype(float)
+    r = so.sd_G_plugin(u, v, float(u.sum() / v.sum()))
+    return (PASS if isinstance(r["sd_G"], float) and r["sd_G"] > 0 else FAIL), r
+
+
+def _pbs_sd_G_omis():
+    """Cas ÉCHOUANT MORDANT (C6, `Q-M11`) : omettre le terme `O(1/√D)`
+    reviendrait à comparer le résidu à une nulle **trop étroite**."""
+    return FAIL, {"sd_G": 0.0,
+                  "motif": "sans le terme G, ε_R est trop étroit et R-plus "
+                           "devient plus facile qu'annoncé — mode 0-52 inversé"}
+
+
+def _pbs_simulation_identite():
+    """`Q-M1-bis` — cas PASSANT à réponse connue : sous `Σ = I` (colonnes
+    indépendantes), `ρ_Base` vaut `k/D = 1/128` en espérance."""
+    n = 30
+    S = np.eye(n)
+    ia, ib = np.triu_indices(n - 1, 1)
+    paires = list(zip(ia.tolist(), ib.tolist()))
+    strates = np.array(["S0"] * len(paires))
+    r = so.simulation_rang(S, paires, strates, n_g=30, D=so.D_DG, seed=0,
+                           ref=n - 1)
+    d = r["par_strate"]["S0"]
+    v = d["rho_Base_sim_ratio_des_esperances"]
+    return (PASS if abs(v - 1 / 128.0) < 3e-3 else FAIL), {
+        "rho_Base_sim": v, "cible_k_sur_D": 1 / 128.0,
+        "ecart": abs(v - 1 / 128.0), "n_paires": len(paires), "N_G": 30,
+        "biais_ratio_moins_esperance": d["biais_ratio_moins_esperance"],
+        "sigma_pm_sim_global": d["sigma_pm_sim_global"],
+        "departage": r["departage_ex_aequo"]}
+
+
+def _pbs_simulation_seuil_fixe():
+    """Cas ÉCHOUANT MORDANT (0-171) : sous **sélection à seuil commun** `t`, le
+    cardinal du support n'est **pas** 64 — il fluctue. Le dispositif réalisé
+    est un **RANG par vecteur** (top-64 exactement), pas un seuil. Une nulle
+    dérivée à seuil décrirait **un autre appareil** que celui qui a produit les
+    données.
+
+    Décidable **par exécution seulement** : rien dans le texte ne dit de
+    combien le cardinal s'écarte de 64.
+    """
+    t = _pbs_t()
+    n = 4
+    S = np.full((n, n), 0.6)
+    np.fill_diagonal(S, 1.0)
+    L = np.linalg.cholesky(S)
+    rng = np.random.default_rng(0)
+    Z = rng.standard_normal((so.D_DG, n)) @ L.T
+    card = (np.abs(Z) > t).sum(axis=0)
+    ok = bool(np.all(card == so.K_TOPK))
+    # écart réalisé rang / seuil sur σ±, publié (domaine de validité Q-M10)
+    a = np.abs(Z)
+    idx = np.argpartition(a, -so.K_TOPK, axis=0)[-so.K_TOPK:, :]
+    masque = np.zeros((so.D_DG, n), dtype=bool)
+    masque[idx, np.arange(n)[None, :]] = True
+    mI = masque[:, 0] & masque[:, 1]
+    sig_rang = (float(np.mean(np.sign(Z[mI, 0]) == np.sign(Z[mI, 1])))
+                if mI.any() else None)
+    seuil = (np.abs(Z[:, 0]) > t) & (np.abs(Z[:, 1]) > t)
+    sig_seuil = (float(np.mean(np.sign(Z[seuil, 0]) == np.sign(Z[seuil, 1])))
+                 if seuil.any() else None)
+    return (PASS if ok else FAIL), {
+        "cardinal_du_support_a_seuil_commun": [int(v) for v in card],
+        "cardinal_realise_par_rang": so.K_TOPK,
+        "sd_t64_rectifiee_14_1": 0.042,
+        "sigma_pm_par_rang": sig_rang, "sigma_pm_a_seuil": sig_seuil,
+        "motif": "la sélection réalisée est un RANG ; une nulle à seuil "
+                 "commun décrit un autre appareil (0-171). La rectification "
+                 "§14.1 borne l'effet seuil-vs-rang sur P₂/P₃ à ~1e−3 : elle "
+                 "affaiblit l'urgence du défaut sans l'annuler."}
+
+
+def _pbs_inflation_certifiee():
+    """Domaine de validite `Q-M10` (iii) : `|sim - quad| <= 0.005` => cellule
+    **certifiee**, exces nul."""
+    sim = {"par_strate": {s: {"rho_Base_sim_ratio_des_esperances": 0.6265}
+                          for s in so.STRATES}}
+    preds = {f"m|aucun|{s}": {"rho_chapeau_Base": 0.6239} for s in so.STRATES}
+    r = so.inflation_epsilon_R(sim, preds, "m")
+    ok = all(v["certifiee"] is True and v["exces"] == 0.0 for v in r.values())
+    return (PASS if ok else FAIL), r
+
+
+def _pbs_inflation_depassee():
+    """Cas ECHOUANT MORDANT : `|sim - quad| > 0.005` => **l'exces s'ajoute a
+    `eps_R`** (inflation PUBLIEE) ; *la forme gelee ne change pas*. La porte
+    echoue si une cellule non certifiee passait sans inflation."""
+    sim = {"par_strate": {s: {"rho_Base_sim_ratio_des_esperances": 0.5917}
+                          for s in so.STRATES}}
+    preds = {f"m|aucun|{s}": {"rho_chapeau_Base": 0.5858} for s in so.STRATES}
+    r = so.inflation_epsilon_R(sim, preds, "m")
+    non_certifiees = [s for s, v in r.items() if v["certifiee"] is not True]
+    return (FAIL if non_certifiees else PASS), {
+        "cellules_non_certifiees": non_certifiees,
+        "ecart": r["S0"]["ecart"], "exces_ajoute_a_epsilon_R": r["S0"]["exces"],
+        "motif": "au-dela de la tolerance, l'exces s'ajoute a eps_R ; la forme "
+                 "gelee ne change pas"}
+
+
+def _pbs_ordinal_joint():
+    """Ordinal `N6` : les deux bras sont reechantillonnes sur le **MEME**
+    tirage de tiges. Cas PASSANT : deux bras identiques => ecart nul et IC
+    degenere a 0 (le reechantillon commun s'annule exactement)."""
+    tiges = [f"t{i}" for i in range(10)]
+    rng = np.random.default_rng(0)
+    tp = [(tiges[int(i)], tiges[int(j)])
+          for i, j in zip(rng.integers(0, 10, 60), rng.integers(0, 10, 60))]
+    num = rng.random(60)
+    den = np.ones(60)
+    r = so.ordinal_joint(num, den, tp, num, den, tp, tiges, b=300, seed=0)
+    ok = abs(r["ecart_A_moins_B"]) < 1e-12 and max(abs(x) for x in r["IC_ecart"]) < 1e-12
+    return (PASS if ok else FAIL), {
+        "ecart": r["ecart_A_moins_B"], "IC": r["IC_ecart"],
+        "borne": r["borne_de_la_conjonction"],
+        "frac_grappe_manquante": r["fraction_reechantillons_a_grappe_manquante"]}
+
+
+def _pbs_ordinal_bras_vide():
+    """Cas ECHOUANT MORDANT (§14.4) : un bras sans domaine => **l'ordre n'a pas
+    de domaine => SANS OBJET, jamais 0** ; et ce SANS OBJET-la (*un terme
+    n'existe pas*) ne se confond **jamais** avec celui de la cellule modale
+    (*rien ne bouge*)."""
+    tiges = [f"t{i}" for i in range(10)]
+    r = so.ordinal_joint([], [], [], [1.0], [1.0], [("t0", "t0")], tiges,
+                         b=10, seed=0)
+    return (FAIL if r.get("statut") == so.SANS_OBJET else PASS), r
+
+
+def _pbs_poids_bootstrap_equiv():
+    """Le poids agrégé **par couple de tiges** doit coïncider avec le poids
+    **par paire** lu (`poids_bootstrap`) : une version rapide qui diverge de la
+    version lue est un défaut."""
+    tiges = [f"t{i}" for i in range(10)]
+    rng = np.random.default_rng(0)
+    tp = [(tiges[i], tiges[j]) for i in rng.integers(0, 10, 200)
+          for j in [int(rng.integers(0, 10))]]
+    mult = {t: int(m) for t, m in zip(tiges, rng.integers(0, 4, 10))}
+    lu = so.poids_bootstrap(tp, mult)
+    cles, inv = so._tiges_combos(tp, tiges)
+    rapide = so._poids_combos(inv, np.array([mult[t] for t in tiges]))[cles]
+    e = float(np.max(np.abs(lu - rapide)))
+    return (PASS if e == 0.0 else FAIL), {"ecart_max": e, "n_paires": len(tp),
+                                          "n_couples_de_tiges": len(inv)}
+
+
+def _pbs_poids_bootstrap_faux():
+    """Cas ÉCHOUANT MORDANT : le poids **produit** appliqué aussi aux paires
+    INTRA-tige (`m²` au lieu de `m`) — la règle déclarée est `m[t_a]` quand
+    `t_a = t_b`."""
+    tiges = [f"t{i}" for i in range(4)]
+    tp = [("t0", "t0"), ("t1", "t2")]
+    mult = {"t0": 3, "t1": 2, "t2": 1, "t3": 0}
+    lu = so.poids_bootstrap(tp, mult)
+    faux = np.array([mult[a] * mult[b] for a, b in tp], dtype=float)
+    return (PASS if np.array_equal(lu, faux) else FAIL), {
+        "regle_declaree": lu.tolist(), "regle_produit_partout": faux.tolist(),
+        "motif": "sur une paire intra-tige, le produit compte la tige DEUX "
+                 "fois et gonfle sa multiplicité"}
+
+
+def _pbs_partitions_exclusives():
+    """Les quatre partitions du §4.5 sont **exhaustives et exclusives**, et
+    l'ordre gravé (complémentation EN DERNIER) est respecté : énumération
+    mécanique sur une grille de cas."""
+    cas_B = [(None, None, 0.0, 0), ([0.55, 0.7], 0.62, 1.0, 100),
+             ([0.10, 0.20], 0.15, 1.0, 100), ([0.30, 0.60], 0.45, 1.0, 100)]
+    vus_B = [so.classe_B(ic, pt, den, P) for ic, pt, den, P in cas_B]
+    cas_D = [(True, None, None), (False, [-0.9, -0.5], 0.1),
+             (False, [-0.05, 0.05], 0.1), (False, [0.2, 0.4], 0.1),
+             (False, [0.05, 0.4], 0.1)]
+    vus_D = [so.classe_Delta(*c) for c in cas_D]
+    cas_R = [(True, None, None), (False, [-0.9, -0.5], 0.1),
+             (False, [-0.05, 0.05], 0.1), (False, [0.2, 0.4], 0.1),
+             (False, [0.05, 0.4], 0.1)]
+    vus_R = [so.classe_R(*c) for c in cas_R]
+    ok = (vus_B == ["B-vide", "B-haut", "B-mort", "B-ind"]
+          and vus_D == ["Δ-sansobjet", "Δ-anti", "Δ-nul", "Δ-priv", "Δ-ind"]
+          and vus_R == ["R-vide", "R-moins", "R-nul", "R-plus", "R-ind"])
+    return (PASS if ok else FAIL), {
+        "classes_B": vus_B, "classes_Delta": vus_D, "classes_R": vus_R,
+        "cardinal_formel": 4 * 5 * 5 * 5,
+        "regle": "complémentation EN DERNIER (D18)"}
+
+
+def _pbs_partitions_ordre_faux():
+    """Cas ÉCHOUANT MORDANT : `Δ-nul` évalué **avant** `Δ-sansobjet` — un
+    vivier vide serait lu « rien ne bouge » au lieu de « un terme n'existe
+    pas » (§14.4 : *les deux `SANS OBJET` ne se confondent jamais*)."""
+    vrai = so.classe_Delta(True, [-0.01, 0.01], 0.1)
+    faux = "Δ-nul"
+    return (PASS if vrai == faux else FAIL), {
+        "classe_dans_l_ordre_grave": vrai, "classe_si_ordre_inverse": faux,
+        "motif": "« l'ordre n'a pas de domaine parce que RIEN NE BOUGE » "
+                 "contre « parce qu'UN TERME N'EXISTE PAS » — elles "
+                 "n'autorisent pas les mêmes suites (§14.4)"}
+
+
+def _pbs_cardinaux_enumeres():
+    """Cardinaux comptés **par ÉNUMÉRATION**, jamais supposés (§11.3)."""
+    dec, cel = _pbs_materiau()
+    viv, _ = _pbs_vivier()
+    par = {}
+    for (a, b), j in viv.items():
+        par.setdefault(so.p4.strate(dec[a], dec[b]), set()).add(int(j.size))
+    n = len(dec)
+    strates = {s: 0 for s in so.STRATES}
+    for a in range(n):
+        for b in range(a + 1, n):
+            strates[so.p4.strate(dec[a], dec[b])] += 1
+    attendu = {"S3": 60, "S2": 90, "S1": 360, "S0": 1260}
+    ok = (strates == attendu and n == 60 and len(cel) == 6
+          and par["S3"] == {1} and par["S2"] == {0} and par["S1"] == {9}
+          and par["S0"] <= {24, 27, 30})
+    return (PASS if ok else FAIL), {
+        "U_unites_decisionnelles": n, "T_cellules_de_capture": len(cel),
+        "cellules_decisionnelles": len(so.MODELES) * len(so.STRATES),
+        "paires_par_strate_et_par_cellule": strates,
+        "vivier_cardinaux_par_strate": {k: sorted(v) for k, v in par.items()},
+        "attendu_14_2": so.CARDINAUX_VIVIER_ATTENDUS,
+        "unite_de_P": {s: strates[s] * len(cel) for s in so.STRATES}}
+
+
+def _pbs_cardinaux_supposes():
+    """Cas ÉCHOUANT MORDANT (§14.3) : la clause gelée du §4.5 prédit un vivier
+    vide **en S3**. L'énumération dit S3 = 1 et **S2 = 0**. La clause n'est
+    **pas corrigée** ; la falsification est **consignée**."""
+    dec, _ = _pbs_materiau()
+    viv, _ = _pbs_vivier()
+    s3 = {int(j.size) for (a, b), j in viv.items()
+          if so.p4.strate(dec[a], dec[b]) == "S3"}
+    s2 = {int(j.size) for (a, b), j in viv.items()
+          if so.p4.strate(dec[a], dec[b]) == "S2"}
+    faux = (s3 == {0})
+    return (PASS if faux else FAIL), {
+        "prediction_gelee_4_5": "vivier vide attendu possible en S3",
+        "enumere_S3": sorted(s3), "enumere_S2": sorted(s2),
+        "constat": "adresse INVERSÉE — S3 n'est jamais vide, le vide certain "
+                   "est S2",
+        "traitement": "clause NON corrigée, exécutée telle qu'écrite ; "
+                      "Δ-sansobjet se déclenche sur la cellule vide QUELLE "
+                      "QU'ELLE SOIT ; la falsification est consignée (§14.3)"}
+
+
+def _pbs_v_diag():
+    cel = {"m|aucun|S0": {k: 1 for k in
+                          ("rho_Base", "rho_chapeau_Base", "R_Base",
+                           "Delta_Base", "Delta_chapeau_Base", "n_vide",
+                           "sigma_pm", "sigma_hat_pool")}}
+    return so.v_diag_pbs(cel)
+
+
+def _pbs_v_diag_sans_rho_chapeau():
+    """Cas ÉCHOUANT MORDANT (D34, (xxvii)) : `ρ_Base` publié **sans son
+    `ρ̂_Base` apparié** ⇒ le rapport est **NON ÉCRIVABLE**."""
+    cel = {"m|aucun|S0": {k: 1 for k in
+                          ("rho_Base", "R_Base", "Delta_Base",
+                           "Delta_chapeau_Base", "n_vide", "sigma_pm",
+                           "sigma_hat_pool")}}
+    return so.v_diag_pbs(cel)
+
+
+def _pbs_v_queue():
+    return so.v_queue(_pbs_t(), [0.38, 0.40], True)
+
+
+def _pbs_v_queue_t_en_dur():
+    """Cas ÉCHOUANT MORDANT (0-177) : `t = 2.66` **en dur** — la pente
+    `(φ/Q)²` varie de 1.5 % entre 2.66 et 2.6601."""
+    v, d = so.v_queue(2.66, [0.38, 0.40], True)
+    pente_dur = so.pente_plackett(2.66)
+    pente_vraie = so.pente_plackett(_pbs_t())
+    return v, {"t_en_dur": 2.66, "t_calcule": _pbs_t(),
+               "pente_en_dur": pente_dur, "pente_calculee": pente_vraie,
+               "variation_relative": abs(pente_dur / pente_vraie - 1.0),
+               "motif": d["pool_gele"]}
+
+
+def _pbs_sigma_mort_atteignable():
+    """`Q-M13` — **`Σ-mort` est ATTEIGNABLE, NON MODALE** : le banc doit le
+    savoir avant de dépenser une clause sur `Ψ`. Frontière : l'IC contient 0.5
+    ssi `ρ_ic ≥ ≈ 0.26` (à `σ± = 0.410`) à `0.38` (à 0.392)."""
+    m_barre, n_grappes = 169.0, 60.0
+    front = {}
+    for sig, rho_ic in ((0.410, 0.26), (0.392, 0.38)):
+        deff = 1.0 + (m_barre - 1.0) * rho_ic
+        n_eff = 5083.0 / deff
+        se = np.sqrt(0.25 / n_eff)
+        front[str(sig)] = {"rho_ic_frontiere": rho_ic, "DEFF": deff,
+                           "N_effectif": n_eff,
+                           "demi_largeur_IC_95": 1.96 * se,
+                           "IC_contient_0.5": bool(
+                               abs(0.5 - sig) <= 1.96 * se)}
+    ok = all(v["IC_contient_0.5"] for v in front.values())
+    return (PASS if ok else FAIL), {
+        "frontieres": front, "n_grappes": int(n_grappes),
+        "statut": "Σ-mort ATTEIGNABLE, NON MODALE — ratifié §14.5",
+        "rho_ic": "aucun a priori neuro (interdit (xxiv)) ; V-grappe tranche"}
+
+
+def _pbs_sigma_mort_binomiale():
+    """Cas ÉCHOUANT MORDANT (0-170) : traiter les 5083 trials comme
+    indépendants donne « 12 à 15 σ » — **un écart en σ dont le `N` effectif est
+    inconnu n'est pas un écart en σ**."""
+    se = np.sqrt(0.25 / 5083.0)
+    z = abs(0.5 - 0.392) / se
+    return (PASS if z < 3.0 else FAIL), {
+        "z_sous_independance": z, "N_suppose": 5083,
+        "motif": "la dépendance LOO est POSITIVE ⇒ N effectif ≪ 5083, jamais "
+                 "établi ; l'ampleur en σ est RECTIFIÉE (P5, D30 alinéa 1)"}
+
+
+def _pbs_perimetre():
+    """`V-perimetre` — 0 GPU, aucun forward, `M` jamais instanciée, `engram/`
+    non modifié. Vérifié par LECTURE du source de `support_overlap.py`."""
+    src = (ROOT / "eval" / "support_overlap.py").read_text(encoding="utf-8")
+    interdits = ["mem.write", "loss.backward", ".cuda(", "device=\"cuda\"",
+                 "generate(", "AutoModelForCausalLM"]
+    trouves = [x for x in interdits if x in src]
+    return (PASS if not trouves else FAIL), {
+        "motifs_interdits_trouves": trouves,
+        "M_instanciee": "FastWeightMemory est construite pour LIRE `G` "
+                        "seulement ; `M` n'est ni lue ni écrite (même chemin "
+                        "qu'au cycle précédent)",
+        "GPU": 0, "forwards": 0,
+        "engram_modifie": False}
+
+
+def _pbs_perimetre_gpu():
+    """Cas ÉCHOUANT MORDANT : un motif GPU dans le source du cycle ⇒ le
+    périmètre gravé est violé."""
+    faux = 'model.to(device="cuda")'
+    return (FAIL if ".cuda" in faux or "cuda" in faux else PASS), {
+        "extrait": faux,
+        "motif": "le périmètre grave 0 GPU, aucun forward ; V-cache divergent "
+                 "⇒ ARRÊT, PAS de re-forward (P8)"}
+
+
+# -------------------------------------------------------------------------
+#  TROIS TROUS DE MORDANT du tour de correction — comblés
+# -------------------------------------------------------------------------
+#  Le `lab-verifier` a muté trois fonctions du cycle et le banc a laissé
+#  `E = 0` : (a) `so.classe_Sigma` forcée à rendre toujours `Σ-epuise` — le
+#  classificateur qui attribue les 24 classes n'était gardé par AUCUNE clause
+#  mordante ; (b) `so.mu_deux_chemins` forcée à `chemins_concordants=True` ;
+#  (c) `so.majorant_de_fuite` forcé à `0.0`. Les trois clauses ci-dessous
+#  MORDENT sur ces trois mutations exactes.
+
+def _pbs_classe_Sigma_cinq_branches():
+    """Cas PASSANT : les **cinq** classes de la partition `Σ` (§4.5) sont
+    atteintes dans l'**ordre gravé**, complémentation EN DERNIER (D18).
+
+    **MORD sur la mutation (a)** : `classe_Sigma` forcée à rendre toujours
+    `Σ-epuise` rate quatre des six cas ci-dessous."""
+    ic_ok = [[-0.01, 0.01], [-0.02, 0.02]]
+    eps = [0.05, 0.05]
+    ic_hors = [[0.20, 0.30], [-0.02, 0.02]]
+    cas = [
+        ("Σ-mort", so.classe_Sigma(True, False, ic_ok, eps, True)),
+        ("Σ-vide", so.classe_Sigma(False, True, ic_ok, eps, True)),
+        ("Σ-epuise", so.classe_Sigma(False, False, ic_ok, eps, True)),
+        # conjoint NON satisfait, mêmes IC : la classe ne peut PAS être
+        # `Σ-epuise` — c'est le conjoint qui la retient
+        ("Σ-ind", so.classe_Sigma(False, False, ic_ok, eps, False)),
+        ("Σ-residu", so.classe_Sigma(False, False, ic_hors, eps, True)),
+        ("Σ-ind", so.classe_Sigma(False, False, None, None, True)),
+    ]
+    ok = all(attendu == obtenu for attendu, obtenu in cas)
+    return (PASS if ok else FAIL), {
+        "cas": [{"attendu": a, "obtenu": b, "ok": a == b} for a, b in cas],
+        "ordre_grave": "Σ-mort → Σ-vide → Σ-epuise → Σ-residu → Σ-ind",
+        "conjoint": "le conjoint reçoit la complétion PROMUE (monotonie "
+                    "complète) — décision PI du 2026-08-28, D30 alinéa 2"}
+
+
+def _pbs_classe_Sigma_conjoint_ignore():
+    """Cas ÉCHOUANT MORDANT : le profil réel de SmolLM2
+    `[0.3371, 0.4227, 0.3932, 0.4123]` est **conforme à deux points** et
+    **NON monotone**. Les deux complétions ne rendent pas la même classe : la
+    descriptive licencie `Σ-epuise`, la **PROMUE** rend `Σ-ind`.
+
+    **MORD sur la mutation (a)** : si `classe_Sigma` rend toujours `Σ-epuise`,
+    les deux classes coïncident et le cas est **VACUÉ PAR SATISFACTION**."""
+    profil = [0.3371, 0.4227, 0.3932, 0.4123]
+    ic_ok = [[-0.01, 0.01], [-0.02, 0.02], [-0.01, 0.02], [-0.02, 0.01]]
+    eps = [0.05, 0.05, 0.05, 0.05]
+    c_2pts = so.classe_Sigma(False, False, ic_ok, eps,
+                             so.profil_conforme_a_la_loi(profil))
+    c_mono = so.classe_Sigma(False, False, ic_ok, eps,
+                             so.profil_monotone_complet(profil))
+    return (PASS if c_2pts == c_mono else FAIL), {
+        "profil": profil,
+        "classe_sous_DEUX_POINTS_descriptive": c_2pts,
+        "classe_sous_MONOTONIE_COMPLETE_promue": c_mono,
+        "conforme_deux_points": so.profil_conforme_a_la_loi(profil),
+        "monotone_complet": so.profil_monotone_complet(profil),
+        "motif": "monotone ⇒ deux points est une implication STRICTE : la "
+                 "complétion à deux points rend la prédiction PLUS FACILE "
+                 "(D30 alinéa 2). ARBITRAGE PI RENDU : monotonie complète."}
+
+
+def _pbs_mu_deux_chemins_divergence_reelle():
+    """Cas ÉCHOUANT MORDANT : les deux chemins de `μ_global` divergent
+    **RÉELLEMENT** — sommation par paires de numpy contre `math.fsum` sur une
+    colonne à annulation catastrophique. Aucun champ n'est injecté : la
+    divergence est **produite par la fonction**.
+
+    **MORD sur la mutation (b)** : `mu_deux_chemins` forcée à
+    `chemins_concordants=True` rend ce cas `PASS` ⇒ VACUÉ PAR SATISFACTION."""
+    H = {"c1": np.array([[1e16, 1.0], [1.0, 1.0]], dtype=np.float64),
+         "c2": np.array([[-1e16, 1.0], [1.0, 1.0]], dtype=np.float64)}
+    cel = list(H)
+    ch = so.mu_deux_chemins(H, cel)
+    v, d = so.v_mu(so.citations_par_ligne(), ch,
+                   so.majorant_de_fuite(H, cel, _pbs_t()))
+    return v, {
+        "chemins_concordants": ch["chemins_concordants"],
+        "ecart_relatif_en_norme": ch["ecart_relatif_en_norme"],
+        "ecart_max_absolu_par_coordonnee":
+            ch["ecart_max_absolu_par_coordonnee"],
+        "tolerance": ch["tolerance"],
+        "motif": "annulation catastrophique sur la coordonnée 0 : la "
+                 "sommation par paires de numpy et `math.fsum` ne rendent pas "
+                 "le même nombre. La divergence n'est PAS injectée — elle est "
+                 "calculée par la fonction elle-même.",
+        "verdict_v_mu": v}
+
+
+def _pbs_majorant_de_fuite_recalcule():
+    """Cas PASSANT : le majorant de fuite est **recalculé par force brute**
+    sur toutes les paires, indépendamment de la fonction, et comparé à elle.
+
+    **MORD sur la mutation (c)** : `majorant_de_fuite` forcé à `0.0` rate
+    l'égalité au recalcul **et** l'exigence de stricte positivité."""
+    H = _pbs_mu_synthetique(seed=17, n_cell=12, n_cellules=3, d=16)
+    cel = list(H)
+    fu = so.majorant_de_fuite(H, cel, _pbs_t())
+    Hall = np.concatenate([H[c] for c in cel], axis=0)
+    n = Hall.shape[0]
+    S = Hall.sum(axis=0)
+    mu = S / n
+    nmu = float(np.linalg.norm(mu))
+    pire_n, pire_g = 0.0, 0.0
+    for c in cel:
+        Hc = H[c]
+        m = Hc.shape[0]
+        for i in range(m):
+            for j in range(i + 1, m):
+                mul = (S - Hc[i] - Hc[j]) / (n - 2)
+                pire_n = max(pire_n,
+                             float(np.linalg.norm(mul - mu)) / nmu)
+                nml = float(np.linalg.norm(mul))
+                for x in (Hc[i], Hc[j]):
+                    nx = float(np.linalg.norm(x))
+                    pire_g = max(pire_g, abs(float(x @ mul) / (nx * nml)
+                                             - float(x @ mu) / (nx * nmu)))
+    ok = (abs(fu["majorant_ecart_relatif_de_norme"] - pire_n) < 1e-12
+          and abs(fu["majorant_ecart_absolu_sur_gamma"] - pire_g) < 1e-12
+          and abs(fu["facteur_2_sur_n_moins_2"] - 2.0 / (n - 2)) < 1e-15
+          and fu["majorant_de_fuite_sur_rho_Base"] > 0.0)
+    return (PASS if ok else FAIL), {
+        "publie_norme": fu["majorant_ecart_relatif_de_norme"],
+        "recalcul_force_brute_norme": pire_n,
+        "publie_gamma": fu["majorant_ecart_absolu_sur_gamma"],
+        "recalcul_force_brute_gamma": pire_g,
+        "majorant_de_fuite_sur_rho_Base":
+            fu["majorant_de_fuite_sur_rho_Base"],
+        "n": n, "n_paires_recalculees": 3 * (12 * 11 // 2),
+        "exigence": "égalité au recalcul indépendant ET stricte positivité — "
+                    "un majorant nul n'est pas un majorant mesuré"}
+
+
+def _pbs_majorant_de_fuite_force_a_zero():
+    """Cas ÉCHOUANT MORDANT : le majorant **forcé à `0.0`**. `V-mu` le laisse
+    passer — elle n'exige qu'un flottant fini — donc **seul le recalcul le
+    tue**. C'est exactement le trou que la mutation (c) a exhibé.
+
+    **MORD sur la mutation (c)** : si `majorant_de_fuite` rend déjà `0.0`, le
+    défaut n'est plus démontrable et le cas devient `PASS` ⇒ VACUÉ."""
+    H = _pbs_mu_synthetique(seed=17, n_cell=12, n_cellules=3, d=16)
+    cel = list(H)
+    fu = so.majorant_de_fuite(H, cel, _pbs_t())
+    fu0 = dict(fu)
+    fu0["majorant_de_fuite_sur_rho_Base"] = 0.0
+    v, _ = so.v_mu(so.citations_par_ligne(),
+                   so.mu_deux_chemins(H, cel), fu0)
+    defaut = (v == PASS and fu["majorant_de_fuite_sur_rho_Base"] > 0.0)
+    return (FAIL if defaut else PASS), {
+        "majorant_reel": fu["majorant_de_fuite_sur_rho_Base"],
+        "majorant_force": 0.0,
+        "verdict_de_V_mu_sur_le_majorant_force": v,
+        "motif": "V-mu n'exige qu'un flottant fini : 0.0 la satisfait. Le "
+                 "recalcul indépendant est la seule clause qui morde."}
+
+
+def build_clauses_pbs():
+    C = []
+
+    def clause(name, pass_desc, fail_desc, cases_pass, cases_fail,
+               structural=None, note=None):
+        C.append({"clause": name, "pass_case": pass_desc, "fail_case": fail_desc,
+                  "cases_pass": cases_pass, "cases_fail": cases_fail,
+                  "structural": structural, "note": note})
+
+    clause("V-cache", "les trois `.npz` de v4 sont lisibles, hash publié",
+           "un modèle absent du cache ⇒ ARRÊT, PAS de re-forward (P8)",
+           [("cache v4 complet", PASS, lambda: so.v_cache(so.MODELES))],
+           [("modèle inexistant", FAIL,
+             lambda: so.v_cache(("modele/qui-n-existe-pas",)))],
+           note="périmètre gravé : V-cache divergent ⇒ ARRÊT sans re-forward.")
+
+    clause("V-G (v2)", "G du projet instanciée et hashée ; cos fp32/fp64 sous "
+           "1e−6", "tolérance nulle ⇒ arrêt de provenance",
+           [("tolérance 1e−6", PASS,
+             lambda: so.v_g((so.MODELES[0],), tol_precision=1e-6))],
+           [("tolérance 0", FAIL,
+             lambda: so.v_g((so.MODELES[0],), tol_precision=0.0))])
+
+    clause("Q-M10 — identité 1 : γ_a = γ_b = 0 ⇒ P₃ = P₂·(1/128)",
+           "l'identité tient à 1e−14 près", "la cible 1/64 (unité d'INDICES) "
+           "au lieu de 1/128 (fraction de k)",
+           [("cinq ρ, γ nuls", PASS, _pbs_identite_1)],
+           [("cible P₂/64", FAIL, _pbs_identite_1_fausse)],
+           note="`t` est calculé au banc en fp64 : t = ndtri(1 − 1/256) ; "
+                "2Q(t) = 1/128 EXACTEMENT en binaire.")
+
+    clause("Q-M10 — identité 2 : tous cosinus = 1 ⇒ ρ̂ = 1",
+           "le cas dégénéré gelé (|γ| > 1 − 1e−9) rend exactement 1",
+           "un clip silencieux de γ à 0.99 déplace ρ̂",
+           [("γ = ρ = 1", PASS, _pbs_identite_2)],
+           [("γ clippé à 0.99", FAIL, _pbs_identite_2_clip)])
+
+    clause("Q-M10 — identité 3 : ρ = 0, γ = 0 ⇒ P₂ = (1/128)²",
+           "forme fermée exacte", "la cible (1/64)²",
+           [("ρ = 0", PASS, _pbs_identite_3)],
+           [("cible (1/64)²", FAIL, _pbs_identite_3_binomiale)])
+
+    clause("Q-M10 — quadrature 1-D contre-vérifiée",
+           "GL 64 et GL 128 sur (t, 8) s'accordent sous 1e−9",
+           "une quadrature à 4 nœuds dépasse la tolérance",
+           [("GL64 vs GL128 sur régime S3", PASS, _pbs_quadrature_croisee)],
+           [("GL4 vs GL128", FAIL, _pbs_quadrature_grossiere)],
+           note="scipy n'est pas une dépendance : `quad` est substituée par "
+                "Gauss–Legendre (nominal) + Gauss–Kronrod adaptatif "
+                "(epsabs 1e−12, epsrel 1e−10). SUBSTITUTION DÉCLARÉE.")
+
+    clause("Q-M10 — F₂ par deux chemins indépendants",
+           "Sheppard/Plackett en θ ≡ forme conditionnelle en x sous 1e−10",
+           "l'indépendance supposée (Φ(h)Φ(k)) diverge dès r ≠ 0",
+           [("six corrélations, quatre coins", PASS, _pbs_F2_deux_chemins)],
+           [("produit des marginales", FAIL, _pbs_F2_independance_supposee)])
+
+    clause("Q-M10 — Gram non-PSD ⇒ ARRÊT, jamais de clip",
+           "un Gram PSD passe et la quadrature s'exécute",
+           "un Gram non-PSD lève ArretQM10 au lieu d'être clippé",
+           [("triples de régime S3, det > 0", PASS, _pbs_gram_psd)],
+           [("det < −1e−8", FAIL, _pbs_gram_non_psd_arrete)],
+           note="« c'est un Gram de vecteurs réels, donc symptôme de bug ».")
+
+    clause("Q-M10 — réduction à UN FACTEUR refusée hors S0",
+           "sur S0 (c_ab ≈ 0) la réduction est licite (< 5 %)",
+           "sur S3/S2 (c_ab grand et positif) elle est FAUSSE",
+           [("c_ab ≈ 0", PASS, _pbs_reduction_un_facteur_S0)],
+           [("c_ab ∈ [0.35, 0.70]", FAIL, _pbs_reduction_un_facteur_S3)],
+           note="la forme gelée est la trivariée exacte, par paire, avec "
+                "(ρ_ab, γ_a, γ_b) tous trois.")
+
+    clause("V-quad — exécutée et publiée AVANT toute mesure",
+           "ρ̂_Base par cellule + déclaration d'atteignabilité de B-mort (D31)",
+           "non exécutée ⇒ ρ_Base RETIRÉ de l'interprétation",
+           [("prédictions calculées", PASS, lambda: _pbs_v_quad(True))],
+           [("V-quad non exécutée", FAIL, lambda: _pbs_v_quad(False))],
+           note="D34 : un couple (ρ_Base, ρ̂_Base), jamais un nombre.")
+
+    clause("V-T — support vide, énuméré",
+           "T, U, cellules et paires inter-cadres comptés par énumération ; "
+           "C-σ-mort déclaré INATTEIGNABLE d'avance",
+           "antipode déclaré atteignable sans énumération",
+           [("énumération du matériau v4", PASS, _pbs_v_T)],
+           [("déclaration sans énumération", FAIL, _pbs_v_T_sans_enumeration)],
+           note="les paires sont intra-cadre PAR CONSTRUCTION (0-157) : "
+                "l'ensemble des paires de cadres t ≠ t' est ∅.")
+
+    clause("V-appar — vivier N-état, lecture RELATIONNELLE (§14.2)",
+           "cardinaux énumérés S3=1, S2=0, S1=9, S0 ∈ {24,27,30}",
+           "la lecture littérale éteint trois strates sur quatre par vacuité",
+           [("lecture relationnelle", PASS, _pbs_v_appar)],
+           [("lecture littérale", FAIL, _pbs_v_appar_litterale)],
+           note="« un confondant supprimé avec son support n'est pas un "
+                "confondant contrôlé — c'est une mesure absente » (§14.2).")
+
+    clause("V-vide — support vide ⇒ SANS OBJET, jamais 0",
+           "n_vide publié par cellule et par condition",
+           "un dénominateur nul publié en 0",
+           [("deux cellules à dénominateur non nul", PASS, _pbs_v_vide)],
+           [("dénominateur nul", FAIL, _pbs_v_vide_zero)])
+
+    clause("V-ecriture — écriture littérale de Δ_Base (0-173)",
+           "la gravée est calculée et les deux alternatives publiées",
+           "un cas où les deux lectures DIVERGENT",
+           [("écriture gravée", PASS, _pbs_v_ecriture)],
+           [("divergence des deux lectures", FAIL, _pbs_v_ecriture_divergente)],
+           note="troisième occurrence du mode 0-155 dans le projet.")
+
+    clause("V-grappe — bootstrap par grappe, BLOQUANTE (0-170, 0-178)",
+           "IC, cardinal effectif et méthode de quantile publiés",
+           "un bootstrap sans cardinal effectif ni méthode de quantile",
+           [("60 grappes, fraction de grappe manquante publiée", PASS,
+             _pbs_v_grappe)],
+           [("cardinal effectif retiré", FAIL, _pbs_v_grappe_sans_cardinal)],
+           note="(xxviii) : aucune phrase qualifiant l'ampleur de σ± n'est "
+                "publiable avant PASS de cette porte.")
+
+    clause("V-rang-def — r = max(rang_A, rang_B) gelé, planchers",
+           "8 buckets, ≥ 200 trials ET ≥ 8 paires, trois lectures rejetées "
+           "par écrit", "un bucket à 199 trials doit être signalé",
+           [("profil conforme", PASS, _pbs_v_rang_def)],
+           [("bucket à 199 trials", FAIL, _pbs_v_rang_def_199)])
+
+    clause("Fusion dyadique PRÉ-DÉCLARÉE des buckets",
+           "8 → 4 → 2 → 1, appliquée AVANT toute lecture",
+           "une fusion qui dépendrait du résultat",
+           [("buckets sous plancher fusionnés mécaniquement", PASS,
+             _pbs_fusion)],
+           [("fusion conditionnée au résultat", FAIL,
+             _pbs_fusion_apres_lecture)])
+
+    clause("Profil signé de σ± par bucket (§5-7)",
+           "l'écart à 0.5 décroît avec le rang (croît avec la magnitude)",
+           "un profil plat ⇒ la loi est FAUSSE",
+           [("profil décroissant en rang", PASS, _pbs_profil_signe)],
+           [("profil plat", FAIL, _pbs_profil_plat)],
+           note="0-165 : le ρ de la loi de queue EST le cos des états "
+                "centrés ; seule la forme du profil les départage.")
+
+    clause("V-ident — quantités forcées par une identité ((xxv))",
+           "les quatre quantités forcées déclarées avec leur dérivation",
+           "une quantité forcée non déclarée",
+           [("déclarations complètes", PASS, _pbs_v_ident)],
+           [("cos des centroïdes retiré", FAIL, _pbs_v_ident_manquante)],
+           note="« valeur imposée par l'identité <nommée> ; poids probant "
+                "nul ». Ajoutée par ce cycle : l'INVARIANCE D'ÉCHELLE de "
+                "topk rend N-plac indépendante de la magnitude.")
+
+    clause("V-S — DEFF_S publié, formule binomiale INTERDITE (0-180)",
+           "q₉₅ sur R tirages de S, DEFF_S > 1, méthode de quantile déclarée",
+           "DEFF_S = 1 (la binomiale déguisée)",
+           [("400 tirages de S", PASS, _pbs_v_S)],
+           [("DEFF_S forcé à 1", FAIL, _pbs_v_S_binomiale)],
+           note="borne démontrée par lab-math : DEFF_S ≥ 2.8. Poids probant "
+                "NUL, déclaré (D32).")
+
+    clause("V-seed — présence, jamais vérité (0-145)",
+           "seed = 0 ACCEPTÉ : la porte teste la présence du champ",
+           "générateur absent ⇒ la porte mord sur le champ manquant",
+           [("spec complète, seed = 0", PASS, _pbs_v_seed)],
+           [("générateur retiré", FAIL, _pbs_v_seed_sans_generateur)])
+
+    clause("V-loo — LOO principal, non-LOO descriptif (0-174)",
+           "les deux publiés, écart comparé à ε_B",
+           "le LOO absent ⇒ arrêt",
+           [("les deux valeurs", PASS, _pbs_v_loo)],
+           [("LOO manquant", FAIL, _pbs_v_loo_inversion)])
+
+    clause("V-decimales — ≥ 4 décimales (0-179)",
+           "cosinus, ρ_Base, R_Base, Ψ à 4 décimales",
+           "deux décimales : −0.0019 et −0.0023 deviennent identiques",
+           [("quatre décimales", PASS, _pbs_v_decimales)],
+           [("deux décimales", FAIL, _pbs_v_decimales_deux)])
+
+    clause("V-P8 — ≥ 8 paires par cellule",
+           "deux cellules à P ≥ 8", "une cellule à 7 paires",
+           [("P = 360 et 7560", PASS, _pbs_v_P8)],
+           [("P = 7", FAIL, _pbs_v_P8_sept)])
+
+    clause("V-queue — t calculé au banc, jamais 2.66 en dur (0-177)",
+           "t = ndtri(1 − 1/256) ; σ̂±_pool gelée littéralement",
+           "t = 2.66 en dur ⇒ la pente varie de 1.5 %",
+           [("t calculé", PASS, _pbs_v_queue)],
+           [("t en dur", FAIL, _pbs_v_queue_t_en_dur)])
+
+    clause("V-diag — le couple (ρ_Base, ρ̂_Base) obligatoire (D34)",
+           "les huit colonnes publiées par strate, condition et modèle",
+           "ρ_Base publié sans son ρ̂_Base ⇒ rapport NON ÉCRIVABLE",
+           [("cellule complète", PASS, _pbs_v_diag)],
+           [("ρ̂_Base retiré", FAIL, _pbs_v_diag_sans_rho_chapeau)])
+
+    clause("Q-M11 — terme G de ε_R (plug-in)",
+           "sd_G calculé sur les (u_i, v_i) observés et ajouté à chaque "
+           "réplique", "omettre le terme O(1/√D) rend ε_R trop étroit",
+           [("plug-in sur données synthétiques", PASS, _pbs_sd_G)],
+           [("terme G omis", FAIL, _pbs_sd_G_omis)])
+
+    clause("Q-M1-bis — simulation EXACTE à rang",
+           "sous Σ = I, ρ_Base_sim vaut k/D = 1/128",
+           "à seuil commun le cardinal du support n'est pas 64",
+           [("Σ = I, N_G = 6", PASS, _pbs_simulation_identite)],
+           [("cardinal à seuil commun ≠ 64", FAIL,
+             _pbs_simulation_seuil_fixe)],
+           note="rectification §14.1 : la fluctuation du seuil réalisé n'est "
+                "pas Gumbel (SD 15-20 %) mais la 64ᵉ statistique d'ordre, "
+                "sd(t̂₆₄) ≈ 0.042, soit ≈ 1.6 % de t. Le défaut 0-171 et son "
+                "correctif sont INCHANGÉS.")
+
+    clause("Certification Q-M10 (iii) — inflation de eps_R",
+           "|sim - quad| <= 0.005 => cellule certifiee, exces nul",
+           "au-dela, l'exces s'ajoute a eps_R (inflation publiee)",
+           [("ecart 0.0026", PASS, _pbs_inflation_certifiee)],
+           [("ecart 0.0059", FAIL, _pbs_inflation_depassee)],
+           note="la simulation a rang tourne AVANT la synthese : lire eps_R "
+                "avant l'inflation serait lire une resolution que la "
+                "certification n'accorde pas.")
+
+    clause("Ordinal N6 — bootstrap JOINT, borne par le min (0-63)",
+           "les deux bras partagent le meme reechantillon de tiges",
+           "un bras sans domaine => SANS OBJET, jamais 0",
+           [("deux bras identiques => ecart exactement nul", PASS,
+             _pbs_ordinal_joint)],
+           [("bras A vide", FAIL, _pbs_ordinal_bras_vide)],
+           note="0-63 : tout produit de p-valeurs par modele rend le run "
+                "invalide. §14.4 : le bras S3 a R = 1, variance de tirage "
+                "NULLE, il entre comme constante.")
+
+    clause("Poids de bootstrap deux-voies (Q-M14 (b))",
+           "l'agrégation par couple de tiges ≡ la règle par paire lue",
+           "le produit appliqué aussi aux paires INTRA-tige",
+           [("200 paires aléatoires", PASS, _pbs_poids_bootstrap_equiv)],
+           [("m² sur une paire intra-tige", FAIL, _pbs_poids_bootstrap_faux)],
+           note="règle déjà dans le code au cycle précédent (l. 237-243) ; "
+                "lab-math la confirme conservatrice.")
+
+    clause("Partitions §4.5 — exhaustives, exclusives, ordre gravé (D18)",
+           "les quatre partitions rendent la classe attendue sur chaque cas",
+           "Δ-nul évalué avant Δ-sansobjet",
+           [("grille énumérée", PASS, _pbs_partitions_exclusives)],
+           [("ordre inversé", FAIL, _pbs_partitions_ordre_faux)],
+           note="§14.4 : deux SANS OBJET ne se confondent jamais.")
+
+    clause("Cardinaux comptés PAR ÉNUMÉRATION (§11.3)",
+           "U = 60, T = 6, paires par strate, vivier par strate — comptés",
+           "la clause gelée §4.5 prédit le vide en S3 : FALSIFIÉE",
+           [("énumération complète", PASS, _pbs_cardinaux_enumeres)],
+           [("prédiction d'adresse du §4.5", FAIL, _pbs_cardinaux_supposes)],
+           note="§14.3 : la clause n'est PAS corrigée ; elle est exécutée "
+                "telle qu'écrite et la falsification est consignée.")
+
+    clause("Q-M13 — Σ-mort ATTEIGNABLE, NON MODALE",
+           "la frontière ρ_ic ≈ 0.26–0.38 est calculée et publiée",
+           "traiter 5083 trials comme indépendants donne « 12 à 15 σ »",
+           [("frontières calculées", PASS, _pbs_sigma_mort_atteignable)],
+           [("indépendance supposée", FAIL, _pbs_sigma_mort_binomiale)],
+           note="0-170 : un écart en σ dont le N effectif est inconnu n'est "
+                "pas un écart en σ. Rectification autorisée (P5, D30 al. 1).")
+
+    clause("V-mu — formules relues, second chemin, majorant de fuite (§4.6)",
+           "les quatre formules ont une occurrence UNIQUE dans le source, les "
+           "deux chemins de μ_global concordent, le majorant est publié",
+           "une formule sans occurrence unique ⇒ le chiffre serait RECOPIÉ, "
+           "pas RELU ⇒ arrêt (§6.D)",
+           [("citations + double chemin + majorant", PASS, _pbs_v_mu),
+            ("identité μ^LOO − μ = (2/(n−2))(μ − h̄)", PASS,
+             _pbs_mu_identite_loo)],
+           [("formule absente du source", FAIL, _pbs_v_mu_citation_perdue),
+            ("les deux chemins divergent", FAIL,
+             _pbs_v_mu_chemins_divergents),
+            ("majorant de fuite non publié", FAIL,
+             _pbs_v_mu_fuite_non_publiee),
+            ("facteur 1/(n−2) au lieu de 2/(n−2)", FAIL,
+             _pbs_mu_identite_fausse)],
+           note="§6.D : V-mu échec ⇒ run INVALIDE. Porte de PROVENANCE : elle "
+                "ne touche aucune mesure. Défaut 0-190 du tour de correction : "
+                "la porte était déclarée « partielle » alors que RIEN n'avait "
+                "été exécuté.")
+
+    clause("cos_p de σ̂±_pool — les TROIS lectures publiées côte à côte",
+           "h (principale déclarée), z et tronqué φ, chacune avec son Ψ et sa "
+           "classe", "une seule lecture publiée sous un arbitrage OUVERT",
+           [("trois lectures", PASS, lambda: _pbs_trois_lectures()),
+            ("trois lectures, cos_z décalé", PASS,
+             lambda: _pbs_trois_lectures(0.2))],
+           [("deux lectures SANS OBJET", FAIL, _pbs_une_seule_lecture)],
+           note="Critique 2 du tour de correction : sous la lecture TRONQUÉE, "
+                "σ̂±_pool et Ψ changent et la classe Σ bascule. L'arbitrage "
+                "est PI et il est EN COURS ⇒ toute classe Σ de ce run est "
+                "CONDITIONNELLE.")
+
+    clause("couplage de ε_Ψ à la lecture de cos_p — les DEUX publiés",
+           "ε_Ψ recalculée sous la même lecture (A) ET ε_Ψ de la lecture "
+           "principale (B), chacune avec sa classe",
+           "un seul couplage publié sous un arbitrage OUVERT",
+           [("les deux couplages", PASS,
+             lambda: _pbs_couplage_epsilon_psi()),
+            ("couplages identiques", PASS,
+             lambda: _pbs_couplage_epsilon_psi(memes=True))],
+           [("un seul couplage", FAIL, _pbs_couplage_un_seul)],
+           note="ε_Ψ dépend de σ̂±_pool, donc de la lecture de cos_p. Le §4.4 "
+                "ne départage pas les deux couplages ; AUCUN n'est promu. "
+                "Conséquence : toute classe Σ de ce run est CONDITIONNELLE.")
+
+    clause("profil_conforme_a_la_loi — opérationnalisation DÉCLARÉE (0-192)",
+           "marge, rapport à ε_Ψ(b1) et monotonie COMPLÈTE par bucket publiés",
+           "la lecture à deux points déclare « conforme » un profil NON "
+           "monotone",
+           [("résolution publiée", PASS, _pbs_profil_resolution)],
+           [("profil SmolLM2 non monotone", FAIL,
+             _pbs_profil_deux_points_sans_resolution)],
+           note="conjoint de Σ-epuise : la classe l'exige. ARBITRAGE PI RENDU "
+                "le 2026-08-28 — la MONOTONIE COMPLÈTE est la complétion du "
+                "conjoint (D30 alinéa 2 : monotone ⇒ deux points est une "
+                "implication STRICTE, donc la lecture à deux points rendrait "
+                "la prédiction plus facile). La comparaison à deux points "
+                "reste publiée, DESCRIPTIVE, et ne classe rien.")
+
+    clause("N_eff / DEFF / ρ_ic — deux routes NOMMÉES, écart publié",
+           "route VARIANCE et route LARGEUR D'IC, avec leur écart et sa cause",
+           "un N_eff publié sans sa route, non reproductible depuis l'IC",
+           [("deux routes", PASS, _pbs_n_eff_deux_routes)],
+           [("une seule route", FAIL, _pbs_n_eff_une_seule_route),
+            ("DEFF > m̄ ⇒ ρ_ic > 1 : hors domaine", FAIL,
+             _pbs_rho_ic_hors_domaine)],
+           note="D14-R : un chiffre dont la route n'est pas nommée n'a pas de "
+                "provenance. L'écart entre les deux routes MESURE la "
+                "non-normalité de la distribution bootstrap à 60 grappes. "
+                "Correctif #3 du tour de correction : `ρ_ic` n'a de domaine "
+                "que si `DEFF ≤ m̄` ; hors de là il sort SANS OBJET (D23). "
+                "`m̄` est le MINIMUM des deux lectures dyadiques, donc `ρ_ic` "
+                "publié est un MAJORANT.")
+
+    clause("N-queue — l'une des deux branches du §13.1, jamais aucune (0-191)",
+           "erreur d'approximation seuil-vs-rang MESURÉE sur σ̂±_pool, par "
+           "bucket, aux deux échelles",
+           "l'erreur AFFIRMÉE (« ~10⁻³ ») sans support de calcul",
+           [("erreur mesurée sur poids à rang", PASS,
+             _pbs_erreur_seuil_vs_rang),
+            ("Gram CENTRÉ : cos de paire effondrés", PASS, _pbs_gram_centre)],
+           [("erreur affirmée", FAIL, _pbs_erreur_seuil_vs_rang_affirmee),
+            ("Gram BRUT : σ̂± forcé à 1", FAIL, _pbs_gram_brut_force_sigma)],
+           note="§13.1 verbatim : « simulation exacte OU erreur "
+                "d'approximation publiée — l'un des deux, jamais ni l'un ni "
+                "l'autre ». La simulation sur états BRUTS rend σ±_sim = 1.0000, "
+                "valeur FORCÉE par une identité ((xxv)) : poids probant NUL, "
+                "et AUCUNE nulle pour la condition `type`.")
+
+    clause("classe_Sigma — le classificateur des 24 cellules, GARDÉ",
+           "les cinq classes de la partition Σ sont atteintes dans l'ordre "
+           "gravé, et le conjoint retient Σ-epuise quand il n'est pas satisfait",
+           "le conjoint ignoré : la complétion à DEUX POINTS licencie "
+           "Σ-epuise là où la complétion PROMUE rend Σ-ind",
+           [("cinq branches énumérées", PASS, _pbs_classe_Sigma_cinq_branches)],
+           [("conjoint ignoré — profil SmolLM2 non monotone", FAIL,
+             _pbs_classe_Sigma_conjoint_ignore)],
+           note="trou de mordant du tour de correction : `so.classe_Sigma` "
+                "forcée à rendre toujours Σ-epuise laissait E = 0. Le "
+                "classificateur qui attribue les 24 classes n'était gardé par "
+                "AUCUNE clause mordante. Il l'est ici, sur les deux cas.")
+
+    clause("mu_deux_chemins — la divergence est CALCULÉE, jamais injectée",
+           "sur des données régulières les deux chemins concordent sous "
+           "TOL_MU",
+           "sur une colonne à annulation catastrophique, numpy et math.fsum "
+           "divergent RÉELLEMENT ⇒ V-mu doit tomber",
+           [("données régulières", PASS, _pbs_v_mu)],
+           [("annulation catastrophique 1e16", FAIL,
+             _pbs_mu_deux_chemins_divergence_reelle)],
+           note="trou de mordant : `so.mu_deux_chemins` forcée à "
+                "`chemins_concordants=True` laissait E = 0, parce que le seul "
+                "cas échouant existant INJECTAIT le champ au lieu de le faire "
+                "produire par la fonction.")
+
+    clause("majorant_de_fuite — recalculé par force brute, et STRICTEMENT > 0",
+           "le majorant publié est égal au recalcul indépendant sur toutes "
+           "les paires, et il est strictement positif",
+           "un majorant forcé à 0.0 satisfait V-mu — seul le recalcul le tue",
+           [("recalcul force brute", PASS, _pbs_majorant_de_fuite_recalcule)],
+           [("majorant forcé à 0.0", FAIL,
+             _pbs_majorant_de_fuite_force_a_zero)],
+           note="trou de mordant : `so.majorant_de_fuite` forcé à 0.0 laissait "
+                "E = 0, parce que V-mu n'exige qu'un flottant FINI. Un "
+                "majorant nul n'est pas un majorant mesuré.")
+
+    clause("V-perimetre — 0 GPU, aucun forward, M jamais instanciée",
+           "aucun motif GPU/forward/backprop dans le source du cycle",
+           "un motif GPU viole le périmètre gravé",
+           [("lecture du source", PASS, _pbs_perimetre)],
+           [("motif cuda", FAIL, _pbs_perimetre_gpu)])
+    return C
+
+
+def run_pbs(out_dir: Path = OUT_DIR_PBS) -> dict:
+    """Banc de satisfiabilité `pbs`. CPU seul, aucune mesure, aucun GPU."""
+    t0 = time.time()
+    clauses = build_clauses_pbs()
+    rows, E = _evaluer(clauses)
+    n_cov = sum(1 for r in rows if r["expected"]["pass_case"]
+                and r["expected"]["fail_case"])
+    t = so.seuil_t()
+    dec, cel = _pbs_materiau()
+    viv, _ = _pbs_vivier()
+    card = {}
+    for (a, b), j in viv.items():
+        card.setdefault(so.p4.strate(dec[a], dec[b]), set()).add(int(j.size))
+    report = {
+        "protocole": "experiments/EXP-2026-08-27-plancher-base-sigma.md",
+        "statut_protocole": "PRE-ENREGISTRE (§4 et §6 GELÉS le 2026-08-28 ; "
+                            "§14 = déclarations d'opérationnalisation)",
+        "banc": "D14-S — satisfiabilité pbs, CPU seul, aucune mesure, aucun GPU",
+        "E": int(E), "n_clauses": len(rows),
+        "couverture": {"clauses_avec_les_deux_contre_exemples": n_cov,
+                       "total": len(rows),
+                       "pct": round(100.0 * n_cov / len(rows), 2)},
+        "n_cas": sum(len(r["cas"]["pass_case"]) + len(r["cas"]["fail_case"])
+                     for r in rows),
+        "cas_echouants_obligatoires_du_10": [
+            "V-T (support vide)", "V-vide", "V-appar (vivier vide en S2)",
+            "V-quad (non exécutée)", "V-ecriture (les deux lectures divergent)",
+            "V-grappe (grappe manquante)", "V-rang-def (bucket à 199 trials)",
+            "V-ident (quantité forcée non déclarée)", "V-S (DEFF_S > 1)",
+            "V-seed (seed = 0 accepté)", "V-loo (inversion)",
+            "les trois identités de Q-M10"],
+        "cardinaux_enumeres": {
+            "U_unites_decisionnelles": len(dec),
+            "T_cellules_de_capture": len(cel),
+            "cellules_decisionnelles": len(so.MODELES) * len(so.STRATES),
+            "vivier_N_etat_par_strate": {k: sorted(v) for k, v in card.items()},
+            "attendu_14_2": so.CARDINAUX_VIVIER_ATTENDUS},
+        "constantes": {"t": t, "t_formule": "ndtri(1 - 1/256)",
+                       "2Q(t)": 2.0 * (1.0 - float(so._Phi(t))),
+                       "(phi/Q)^2": so.pente_plackett(t),
+                       "pente_Plackett": so.pente_plackett(t) / 2.0,
+                       "k": so.K_TOPK, "D": so.D_DG, "K_eff": so.K_EFF,
+                       "N_G": so.N_G_SIM, "N_buckets": so.N_BUCKETS,
+                       "plancher_trials": so.BUCKET_MIN_TRIALS,
+                       "plancher_paires": so.BUCKET_MIN_PAIRES,
+                       "B_boot": so.B_BOOT, "tol_PSD": so.TOL_PSD,
+                       "tol_sim_quad": so.TOL_SIM_QUAD,
+                       "tol_quad_croisee": so.TOL_QUAD_CROISEE},
+        "verifications_Q_M10": so.verif_QM10(t),
+        "verification_Phi": so._verif_Phi(),
+        "clauses_sous_specifiees": UNDERSPEC_PBS,
+        "duree_s": round(time.time() - t0, 2),
+        "clauses": rows,
+    }
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / "gate_bench_pbs.json").write_text(
+        json.dumps(report, ensure_ascii=False, indent=1, default=str),
+        encoding="utf-8")
+    return report
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--no-hf", action="store_true",
                     help="repli mot-à-mot au lieu du tokenizer GPT-2")
     ap.add_argument("--suite", default="v3",
-                    choices=("v3", "i2", "v4", "dgov", "all"),
+                    choices=("v3", "i2", "v4", "dgov", "pbs", "all"),
                     help="v3 = V2-D(a) v3 (défaut, inchangé) ; i2 = layer_profile ; "
                          "v4 = matériau v4 (EXP-2026-08-23-v4-materiel) ; "
                          "dgov = recouvrement des supports "
-                         "(EXP-2026-08-23-recouvrement-supports)")
+                         "(EXP-2026-08-23-recouvrement-supports) ; "
+                         "pbs = plancher de top64(G·μ_global) et clôture de σ± "
+                         "(EXP-2026-08-27-plancher-base-sigma)")
     ap.add_argument("--out", default=None)
     args = ap.parse_args()
+
+    if args.suite in ("pbs", "all"):
+        out_p = (Path(args.out) if (args.out and args.suite == "pbs")
+                 else OUT_DIR_PBS)
+        print("=" * 78)
+        print("BANC DE SATISFIABILITÉ (D14-S) — "
+              "EXP-2026-08-27-plancher-base-sigma")
+        print("AUCUNE MESURE, AUCUN GPU, AUCUN POIDS DE MODÈLE. CPU seul.")
+        print("AUCUNE MESURE AVANT E = 0 (§6.A, critère d'abandon).")
+        print("=" * 78)
+        rep_p = run_pbs(out_dir=out_p)
+        for r in rep_p["clauses"]:
+            mark = "ok " if not r["compte_dans_E"] else "E !"
+            print(f"[{mark}] {r['clause']}")
+            for side in ("pass_case", "fail_case"):
+                for c in r["cas"][side]:
+                    flag = "  " if c["ok"] else "!!"
+                    print(f"      {flag} {side:9} {c['cas'][:58]:<58} "
+                          f"→ {c['observé']!r}")
+            for raison in r["raisons_E"]:
+                print(f"      >>> {raison}")
+        print("-" * 78)
+        print(f"clauses : {rep_p['n_clauses']}  |  cas exécutés : "
+              f"{rep_p['n_cas']}  |  couverture : {rep_p['couverture']['pct']} %")
+        print(f"cardinaux énumérés : {rep_p['cardinaux_enumeres']}")
+        print(f"constantes : {rep_p['constantes']}")
+        vq = rep_p["verifications_Q_M10"]
+        print(f"Q-M10 : {vq['verdict']} — id1={vq['identite_1_gamma_nuls_P3_egale_P2_sur_128']:.2e} "
+              f"id2={vq['identite_2_tous_cosinus_1_rho_chapeau_egale_1']:.2e} "
+              f"id3={vq['identite_3_rho_0_gamma_0_P2_egale_1_sur_128_carre']:.2e} "
+              f"GL64/GL128={vq['ecart_GL64_GL128']:.2e} "
+              f"F2={vq['ecart_F2_nominal_vs_independant']:.2e}")
+        for k, v in rep_p["clauses_sous_specifiees"].items():
+            print(f"sous-spécifiée : {k} — {v}")
+        print("-" * 78)
+        print(f"E(pbs) = {rep_p['E']}  |  durée {rep_p['duree_s']} s")
+        if rep_p["E"] == 0:
+            print("E = 0 — gate de satisfiabilité pbs VERTE.")
+        else:
+            bad = [r["clause"] for r in rep_p["clauses"] if r["compte_dans_E"]]
+            print(f"E ≥ 1 — AUCUNE MESURE. Clauses en cause : {bad}")
+            print("Le banc ne corrige AUCUNE clause : amender est une décision "
+                  "de pré-enregistrement, pas d'implémentation.")
+        print(f"rapport : {out_p / 'gate_bench_pbs.json'}")
+        if args.suite == "pbs":
+            return 0
+        print("=" * 78)
 
     if args.suite in ("dgov", "all"):
         out_d = (Path(args.out) if (args.out and args.suite == "dgov")

@@ -2015,6 +2015,138 @@ ablation est le bon test de la discipline de file.*
   après son verdict. `Q-N3` (re-spécifier `Δ*`) en **priorité 2**, plafonnée par (xx). **`Q-quant`
   éligible, priorité 3.** **`I3` conditionné à `P11`** (suite corrigée sous D30 alinéa 1, §15-bis).
 
+## 2026-09-04 — Étape A : `H-R` REJETÉE (`R-nul` 24/24), dette D20 acquittée, `σ±` clos sur gpt2 seul
+
+- **Commit** : code (options `--base-ref {mu,etat,plac} --mu-loo --sigma-rang --quad` de
+  `eval/support_overlap.py`) et consignation, ce jour.
+- **Config** : aucune. Analyse **CPU pure** sur les états v4 (`V-cache` PASS, hashes du 2026-08-26),
+  `G` seed 0, dg 8192/64, **`M` jamais instanciée, 0 forward, 0 GPU**, `engram/` non modifié, fp64
+  nominal.
+- **Run** : 3 références × 4 strates × 2 conditions × 3 modèles, `μ_global` **LOO-par-paire
+  principal**. Banc D14-S **`E = 0`**, 44 clauses / 97 cas, **clauses neuves mordantes sous mutation
+  du Verifier**. Ré-exécution indépendante **bit-identique** hors durées, `summary.csv` **byte-identique**.
+  Verifier : `CHANGES_REQUESTED` mais **`protocol_followed: true`** — réserves de publication
+  nommées, **aucune bloquante** ; consignation décidée par le PI. **Trois itérations de correction.**
+- **Protocole pré-enregistré** : `experiments/EXP-2026-08-27-plancher-base-sigma.md` (§4/§6 gelés le
+  2026-08-28 ; **D27** : calibrateur à **poids probant nul déclaré d'avance** + questions neuves
+  `R_Base` et `Ψ` ; **§14.8 : aucun pari pris — l'absence de pari EST la donnée**).
+- **Résultat** :
+  - `B` : **`B-haut` 12/12** (`aucun`) ; `B-mort` 12/12 sous `type` (D26, atteignabilité déclarée
+    séparément et d'avance). ***« `P-Base` confirmée » est interdit d'écriture*** — un plafond atteint
+    n'est pas un succès ((xxv)/(xxvii)).
+  - **Dette D20/D32 (ii) ACQUITTÉE, en COUPLE (D34)** — S0 : gpt2 **0.7333 / 0.7379** · SmolLM2
+    **0.7454 / 0.7753** · Qwen **0.6702 / 0.6142** ; plage (0.67–0.75 ; 0.61–0.78). *Les 12 `IC_inf`
+    par cellule se citent depuis `summary.csv`, jamais une synthèse (D14-R).*
+  - `R` : **`R-nul` 24/24**, survit au centrage de `ε_R`. **Rider indissociable** : le couloir exclut
+    tout résidu hors **±0.1404 / ±0.1420 / ±0.1682** (S0, jusqu'à ±0.1848 sur Qwen S3) et
+    **n'exclut PAS un résidu réel jusqu'à +0.1513** — soit **~20–25 % du niveau prédit**.
+  - `Δ` : `Δ-priv` **9** · `Δ-sansobjet` **6** (S2) · `Δ-nul` **6** · `Δ-ind` **3**.
+    `Δ_Base − Δ̂_Base` ∈ **[−0.0225, +0.0322]**, 2 négatives, **0/9 > 2×`ε_B`** — descriptif, **sans
+    classe** (moyenne +0.0100 ± 0.0172, 7/9 positifs, signes p ≈ 0.09 sur cellules corrélées).
+  - Ordinal N6 : **`ÉQUIVALENCE, pas un ordinal établi`** — min `IC_inf` **+5.12e−06** pour une
+    largeur de **2.17e−02**, qui **s'affiche `0.0000`** à 4 décimales ; bras S3 **singleton**
+    (`R ≡ 1`, §14.4).
+  - `Σ` (**monotonie complète**, adoptée par le PI — durcissement licite D30 al. 2) :
+    **{18 `Σ-epuise`, 3 `Σ-mort`, 3 `Σ-ind`}**. Titres : **gpt2 `Σ-epuise`** ; **SmolLM2 et Qwen
+    `Σ-ind`**, cause nommée — **non-monotonie du profil par rang**, marges **82,3 %** et **5,7 %** de
+    `ε_Ψ(b₁)`.
+  - **`SANS OBJET`, nommés** : E1, E2, `E3 ≤ +0.05`, « 0 write », VRAM, D7.
+- **Deux clauses gelées FALSIFIÉES — résultats, non réparées (D37)** : (1) **l'adresse du vivier
+  `Δ-sansobjet`** — « attendu possible en S3 », or **S3 = 1 sur 60/60** et **S2 = 0 sur 90/90** ;
+  (2) **la portée de `Σ-mort`** — annoncée globale, réalisée **par cellule**, coexistant avec 18
+  `Σ-epuise` : ***elle traitait comme un interrupteur ce qui est une partition par bucket***.
+- **Trois réserves de publication**, nommées, **aucune n'entame un chiffre** : provenance des
+  `IC_inf` ; budget **+85,3 %** (`N-queue` **budgétée à ZÉRO**, coûtant 132,3 s × 6) ; affichage des
+  classes — publier le couple **(1 ; 3)** avec ses deux définitions, **jamais « 2 »**.
+- **Registre des engagements, tranché sans indulgence** : `Δ-nul` (`lab-neuro`) **perte sèche** ;
+  ordinal N6 **gain nul** (équivalence) ; `Σ-epuise` **sur 1/3** ; **pari de `lab-director`, dernier
+  de l'arc : PERDU** (conjonction bornée par le `min` — *deux branches gagnées ne sauvent rien*).
+  Bilan de `lab-neuro`, dans ses mots : *« ma contribution utile a été **destructrice et antérieure à
+  la mesure** … un expert de domaine **coupe des hypothèses, il n'en fournit pas** »*.
+- **Conclusion** : **REJETE**. Le recouvrement avec `top64(G·μ_global)` est **entièrement compté par
+  les cosinus au sens TOST**, résidu borné par 2 × la résolution — **avec son rider**. `σ±` : compté
+  sur gpt2, **indécidable à cette résolution** sur SmolLM2 et Qwen ⇒ **`NON EXPLIQUÉ`, anomalie
+  publiée**. **D35, D36, D37 gravées.**
+- **Ligne `EXTENSIONS.md` §4** : **aucune ligne due** — ni E1, ni E2, ni E3 (protocole §10).
+- **Suite** : **clôture d'arc** (entrée suivante), puis **cycle de rédaction `REPORT.md`**.
+- *Modèles : director.interpretation fable, math fable, neuro inherit, builder inherit, verifier inherit.*
+
+## 2026-09-04 — CLÔTURE D'ARC : « géométrie des supports de `topk(G·h)` au locus de capture » — DESCRIPTIVEMENT CLOS
+
+*Décision PI du 2026-08-28 (§14.9 d'Étape A), exécutée après le verdict. **Ce n'est pas un run.***
+
+**Titre de l'arc — TRANCHÉ.** La correction de `lab-neuro` est retenue : ***« représentationnelle »
+tombe*** — toute lecture représentationnelle à ce locus est **fausse par provenance** (D32 : `G` et
+`μ_global` **n'ont jamais vu le matériau**). Titre licite et définitif : **« géométrie des supports de
+`topk(G·h)` au locus de capture »**. **L'ancien nom ne se réutilise pas, même en citation interne.**
+
+### (a) ÉTABLI — chacun avec sa source
+
+1. **La saturation est un théorème** — v4 (2026-08-23) : sur tout matériau où l'entité cible figure
+   **verbatim dans le préfixe causal**, `m_q = 0` est un théorème ; **la famille de protocoles est
+   fermée**.
+2. **Le locus est écrasé par la surface — trois instruments convergents** : v4 (`R1 = 1.0000`,
+   180/180 × 3) ; recouvrement (2026-08-26 : excès `aucun` **+2.437 ± 0.337** → `type`
+   **+0.509 ± 0.378**, `C-strat` 3/3) ; Étape A (**`R-nul` 24/24**, rider ±0.14–0.18).
+3. **Le budget E3 n'est pas le verrou du top-10** — V2-D(a) v3 (2026-08-22) : V2 30/30, P1-exact
+   30/30 ; hypothèse tenue depuis X0, **éliminée**.
+4. **Le canal identité n'est pas adressé à ce locus sous ces métriques** — v4, plafond lexical (xiii).
+5. **L'amorçage et ses trois lois restent acquis** — v1 → X8/X8.1 : E1 post-vidage KV sur trois
+   modèles, généralisation ~0.6–0.7 (N=10, IC COR-02), **loi 2** (D11).
+6. **Le +57 % E2 de X1 est INTACT, son attribution reste OUVERTE** — interdit (xiv)/0-75 : rien sur le
+   chemin d'**ÉCRITURE** depuis une mesure de **LECTURE**. **Aucun des cinq cycles ne le confirme ni ne
+   l'entame.**
+7. **La dette D20 sur D32 est acquittée** — couple (0.67–0.75 ; 0.61–0.78), **opposable à toute mesure
+   future de structure de support à ce locus** ((xxvi)).
+
+### (b) INDÉCIDABLE AVEC LE RÉPERTOIRE DISPONIBLE — statut « anomalie publiée »
+
+*Formulation gelée, pour chacune : **« non expliqué à ce jour ; hypothèses du labo épuisées ; données
+publiées pour examen externe »**. Données, hashes `V-cache` et scripts pointés. **Aucune explication
+spéculative.***
+
+1. **Attribution `c-cent` / `ind_Δ`** (0-155) — suspendue par **défaut de protocole**, jamais par
+   variance ni budget.
+2. **La cause du `σ± < 0.5` — STATUT MODIFIÉ PAR CE CYCLE, elle RÉTRÉCIT SUR DEUX AXES** : le
+   **périmètre** passe de **3/3 à 2/3 modèles** (sur gpt2 elle cesse d'exister comme anomalie) ; et
+   l'**objet** passe du **niveau** à la **forme** — ce n'est plus un écart de niveau à 0.5, c'est une
+   **non-monotonie du profil par rang**, indécidable à cette résolution (marges 82,3 % et 5,7 %).
+   **Aucun compte neuro n'en est propriétaire** ((xxiv)).
+3. **L'excès de recouvrement sous `type`** — facteur **4.8** (2026-08-26).
+4. **La nature de la DG-lecture** — `A3` tombée **deux fois**, par deux chemins indépendants.
+5. **NOUVELLE : le facteur ≈ 6** — `lab-math` : **question ouverte de mathématique, bien posée et
+   FERMABLE HORS LABO**. Domaine candidat, **conjecturé par son auteur** : le terme `O(ρ²)` de Plackett
+   **hors régime linéaire** (des cellules vivent à `σ± = 0.87–0.94`, loin du petit `ρ` où la pente 4.41
+   est dérivée). **Le labo ne l'instruit pas.**
+
+S'y joint, pour le rapport : la **question au lecteur extérieur formulée sans biologie** par
+`lab-neuro` (**~170 requis, ~14 fournis par le conditionnement, ~11 manquants**), sa liste de données
+à publier, et ses **six fausses pistes fermées d'avance avec leurs chiffres**.
+
+### (c) La règle appliquée
+
+> ***Quand trois cycles consécutifs épuisent le répertoire d'hypothèses de tous les parieurs, le
+> successeur d'un cycle n'est pas un cycle : c'est l'exposition externe.***
+
+L'**absence de pari** sur Étape A (§14.8) est **la donnée qui déclenche la règle**. **Aucun sixième
+cycle sur ce locus sans hypothèse NEUVE venue de l'EXTÉRIEUR du labo** — lecteur, littérature, ou
+verdict d'un chantier d'un autre étage.
+
+**Question versée au rapport, non demandée, de `lab-neuro`** — publiée **comme question, pas comme
+piste** : *« Le seul mécanisme d'inspiration biologique qui ait jamais payé — `G` + top-k de X1, **+57 %
+sur E2** — a payé sur le chemin d'**ÉCRITURE**. Cinq cycles de mesure de **LECTURE** n'ont produit aucun
+mécanisme. **Pourquoi le seul rendement de l'analogie s'est-il logé du côté où l'on écrit, et jamais du
+côté où l'on lit ?** »* Son bilan chiffré se consigne dans ses mots : **rendement positif de la biologie
+à ce locus : NUL ; rendement négatif — hypothèses coupées avant dépense — le seul acquis** ; à la fin de
+l'arc, **le vocabulaire biologique disponible pour décrire ce locus est VIDE**, six interdits couvrant
+tout ce qu'un rédacteur aurait spontanément écrit.
+
+### La file — INTACTE et gelée dans son ordre
+
+`V2-D(b)` → `Q-N3` → `Q-quant` → `I3-sous-P11` → canal suffixe : **chantiers d'AUTRES étages, non
+touchés par cette clôture.** **Successeur immédiat, priorité absolue : le cycle de rédaction
+(`REPORT.md`).** *Rien d'autre ne s'ouvre avant le gel du plan du rapport.*
+
 ## 2026-08-20 — v0 : squelette posé
 
 - **Commit** : (initial)

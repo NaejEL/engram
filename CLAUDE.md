@@ -36,7 +36,7 @@ Ce n'est PAS un produit — c'est une expérience falsifiable sur un laptop RTX 
   grep) — recalculé avec incertitude le 2026-08-21 (COR-02) : IC 95 % [0.56,
   0.99], médiane par secret 0.59 [0.45, 0.75] ; à citer « ~0.6–0.7, N=10 ».
 
-## État du projet (2026-08-26)
+## État du projet (2026-09-04)
 
 - Squelette v1 posé et **validé sur GPU** (torch 2.13+cu126 ; GPT-2, SmolLM2 et
   Qwen2.5-1.5B en cache). Parcours complet dans JOURNAL.md : X0 → X1 (gyrus
@@ -130,6 +130,22 @@ Ce n'est PAS un produit — c'est une expérience falsifiable sur un laptop RTX 
   préfixe sont **incompatibles**, ce qui **ferme une famille entière de protocoles**.
   **58 défauts fermés (0-46 … 0-103) avant qu'un octet de matériau n'existe**, dont
   10 + 9 + 6 + 2 par **quatre passes d'audit indépendant**.
+- **ARC CLOS le 2026-09-04 — « géométrie des supports de `topk(G·h)` au locus de capture »,
+  DESCRIPTIVEMENT CLOS.** Cinq cycles. *(Le mot « représentationnelle » est **tombé** : toute
+  lecture représentationnelle à ce locus est **fausse par provenance** — `G` et `μ_global` n'ont
+  jamais vu le matériau, D32. **L'ancien nom ne se réutilise pas.**)* **Aucun sixième cycle sur ce
+  locus sans hypothèse NEUVE venue de l'EXTÉRIEUR du labo.** Successeur, **priorité absolue** :
+  le **cycle de rédaction `REPORT.md`** — *rien d'autre ne s'ouvre avant le gel du plan.* La file
+  (`V2-D(b)` → `Q-N3` → `Q-quant` → `I3-sous-P11` → canal suffixe) reste **intacte et gelée**,
+  ce sont des chantiers d'**autres étages**. Détail : les deux entrées du 2026-09-04 au JOURNAL.
+- **Étape A (`EXP-2026-08-27-plancher-base-sigma.md`) — TERMINÉ le 2026-09-04, `REJETE`.**
+  **`R-nul` 24/24** : le recouvrement avec `top64(G·μ_global)` est **entièrement compté par les
+  cosinus au sens TOST** — *rider indissociable* : résidu borné par 2 × la résolution,
+  **|R| ≤ 0.14–0.18**, et **un résidu réel de +0.15 reste compatible** (~20–25 % du niveau
+  prédit). **Dette D20/D32 (ii) ACQUITTÉE en COUPLE (D34)** : (0.67–0.75 ; 0.61–0.78).
+  **`σ±` clos sur gpt2 SEUL** ; `Σ-ind` sur SmolLM2 et Qwen (**non-monotonie du profil par
+  rang**) ⇒ **`NON EXPLIQUÉ`, anomalie publiée**. **Deux clauses gelées falsifiées**, consignées
+  non réparées. **`P-Base` confirmée » est interdit d'écriture.** 0 GPU.
 - **Cycle « recouvrement des supports de `topk(G·h)` » — TERMINÉ le 2026-08-26.
   Verdict `REJETE` ; maillon centrage `NON ATTRIBUÉ` (0-155).**
   (`experiments/EXP-2026-08-23-recouvrement-supports.md`.)
@@ -161,7 +177,12 @@ Ce n'est PAS un produit — c'est une expérience falsifiable sur un laptop RTX 
   établi. Aucune phrase qualifiant l'ampleur avant la porte `V-grappe`.* Le **+57 % d'E2 de X1 reste acquis et intact** (0-75) ; son
   **attribution** ne s'instruira **pas** par des mesures de support à ce locus. **Suite priorité 1 :
   Étape A CPU pure (`P-Base` + `P-σ`).**
-- **File d'attente (ordre ratifié le 2026-08-26)** : **priorité 1 — Étape A**, CPU pure, mêmes
+- **File d'attente — ORDRE REMPLACÉ le 2026-09-04 par la clôture d'arc.** Priorité absolue :
+  **`REPORT.md`** (cycle de rédaction, plan pré-enregistré, relecture par qui n'a pas écrit la
+  section, banc de cohérence documentaire D14-R sur chaque chiffre cité). Puis la file gelée,
+  inchangée dans son ordre : **`V2-D(b)` → `Q-N3` → `Q-quant` → `I3-sous-P11` → canal suffixe**.
+  *L'ordre ci-dessous est conservé pour mémoire, il ne pilote plus rien :*
+- ~~**File d'attente (ordre ratifié le 2026-08-26)**~~ : **priorité 1 — Étape A**, CPU pure, mêmes
   hashes, `< 10 min` : **`P-Base`** (`|A∩B∩top64(G·μ_global)|/|A∩B| ≥ 0.50`, 4 strates × 3 modèles ;
   antipode **`C-Base-mort`** `< 0.25` sur ≥ 2/3) et **`P-σ`** (antipode `C-σ-mort`). `P-Base`
   **produit le plancher que D20 exige pour D32**. **Priorité 2 — `Q-N3`** : re-spécifier la primaire
@@ -213,6 +234,26 @@ source ; le protocole d'origine fait foi sur le détail.*
   **cause doit être nommée** (puissance, support, précision) avant la suite.
 - **Bin dur (A-5)** — interdit **sous toute forme, y compris adverbiale** : « tendance »,
   « suggère », « va dans le sens de ».
+- **« Représentationnelle » (clôture d'arc, 2026-09-04)** — interdit pour tout ce qui touche les
+  supports de `topk(G·h)` à ce locus. `G` et `μ_global` **n'ont jamais vu le matériau** : toute
+  lecture représentationnelle y est **fausse par provenance** (D32), pas seulement invérifiable.
+  Formulation licite : ***« géométrie des supports de `topk(G·h)` au locus de capture »***.
+- **Le plancher (xxvi)** — un plancher **produit** ne s'écrit **jamais** *« le canal est
+  innocenté »*. Licite : ***« toute mesure future de structure de support à ce locus doit dépasser
+  ⟨le couple⟩ ; en deçà, elle re-publie l'état moyen sous un autre nom »***. Et **D34** : un
+  **couple**, jamais un nombre.
+- **Le niveau prédit par le cosinus (xxvii)** — *« `ρ_Base` est élevé »* ne se lit **jamais**
+  comme une propriété du support. **Un `ρ_Base` publié sans son `ρ̂_Base` apparié rend le rapport
+  NON ÉCRIVABLE.** Et *« `P-Base` confirmée »* est **interdit** : un plafond atteint n'est pas un
+  succès.
+- **`σ±` (xxviii)** — *« la géométrie explique `σ±` »* et *« expliqué partiellement »* sont
+  **interdits**. **`σ± < 0.5` n'est pas un fait de neurosciences** — les taux de décharge sont non
+  négatifs, le signe d'une coordonnée projetée n'a pas de référent : **aucun compte neuro n'en est
+  propriétaire** (xxiv). Formulation unique au 2026-09-04 : *« entièrement compté par la
+  corrélation par paire et la sélection top-64 **sur gpt2** ; **indécidable à cette résolution**
+  sur SmolLM2 et Qwen, pour non-monotonie du profil par rang »*.
+- **Le double comptage (xxix)** — une **seule** cause candidate expliquant **deux** quantités **ne
+  produit pas deux confirmations indépendantes**.
 
 ## Environnement
 
