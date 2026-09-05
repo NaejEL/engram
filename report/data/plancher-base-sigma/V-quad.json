@@ -1,0 +1,694 @@
+{
+  "porte": "V-quad",
+  "verdict": "PASS",
+  "t": 2.6600674686174592,
+  "forme_gelee": "Q-M10 — trivariée exacte (ρ_ab, γ_a, γ_b), réduction à un facteur REFUSÉE hors S0",
+  "modeles": {
+    "gpt2": {
+      "couche": 6,
+      "cellules": {
+        "gpt2|aucun|S3": {
+          "rho_chapeau_Base": 0.6238690665832984,
+          "somme_P3": 0.46656330013559605,
+          "somme_P2": 0.747854518081481,
+          "P": 360,
+          "gamma_moyen": 0.8063180682917469,
+          "gamma_min": 0.6809767029968373,
+          "gamma_max": 0.8646872076135551,
+          "rho_ab_moyen": 0.7434180483963942,
+          "det_Gram_min": 0.059052916900915076,
+          "n_paires_Gram_non_PSD_au_dela_de_1e-8": 0,
+          "c_ab_moyen": 0.27135169305910367,
+          "reduction_a_un_facteur": "REFUSÉE hors S0 (Q-M10) — la forme gelée est la trivariée exacte (ρ_ab, γ_a, γ_b)",
+          "Delta_chapeau_Base": 0.1388240552750531,
+          "somme_P3_null": 0.36274310317975433,
+          "P_avec_vivier": 360,
+          "R_par_paire": {
+            "min": 1,
+            "max": 1
+          },
+          "moyenne_degeneree_R_egale_1": true
+        },
+        "gpt2|aucun|S2": {
+          "rho_chapeau_Base": 0.7076170335995543,
+          "somme_P3": 0.601459802822376,
+          "somme_P2": 0.8499792603392112,
+          "P": 540,
+          "gamma_moyen": 0.8065360264139987,
+          "gamma_min": 0.6811721388505605,
+          "gamma_max": 0.8647907853544662,
+          "rho_ab_moyen": 0.6804044884577923,
+          "det_Gram_min": 0.07634747751597148,
+          "n_paires_Gram_non_PSD_au_dela_de_1e-8": 0,
+          "c_ab_moyen": 0.08624760839469066,
+          "reduction_a_un_facteur": "REFUSÉE hors S0 (Q-M10) — la forme gelée est la trivariée exacte (ρ_ab, γ_a, γ_b)",
+          "Delta_chapeau_Base": "SANS OBJET",
+          "raison_Delta_chapeau": "vivier apparié vide sur toutes les paires ⇒ SANS OBJET (D23)",
+          "R_par_paire": {
+            "min": 0,
+            "max": 0
+          }
+        },
+        "gpt2|aucun|S1": {
+          "rho_chapeau_Base": 0.6575801778546048,
+          "somme_P3": 2.631869321943812,
+          "somme_P2": 4.002355014000643,
+          "P": 2160,
+          "gamma_moyen": 0.8064066842558489,
+          "gamma_min": 0.6807753790531712,
+          "gamma_max": 0.8648111279545018,
+          "rho_ab_moyen": 0.7177266049327521,
+          "det_Gram_min": 0.06065592055277613,
+          "n_paires_Gram_non_PSD_au_dela_de_1e-8": 0,
+          "c_ab_moyen": 0.19599453743898582,
+          "reduction_a_un_facteur": "REFUSÉE hors S0 (Q-M10) — la forme gelée est la trivariée exacte (ρ_ab, γ_a, γ_b)",
+          "Delta_chapeau_Base": 0.2050003374896308,
+          "somme_P3_null": 1.8113851933203642,
+          "P_avec_vivier": 2160,
+          "R_par_paire": {
+            "min": 9,
+            "max": 9
+          },
+          "moyenne_degeneree_R_egale_1": false
+        },
+        "gpt2|aucun|S0": {
+          "rho_chapeau_Base": 0.737870097930778,
+          "somme_P3": 7.934928887604382,
+          "somme_P2": 10.753829040987624,
+          "P": 7560,
+          "gamma_moyen": 0.8066228252063246,
+          "gamma_min": 0.6809799356848871,
+          "gamma_max": 0.8649918329902794,
+          "rho_ab_moyen": 0.6555543805367838,
+          "det_Gram_min": 0.06961570681857787,
+          "n_paires_Gram_non_PSD_au_dela_de_1e-8": 0,
+          "c_ab_moyen": 0.013927515201516081,
+          "reduction_a_un_facteur": "REFUSÉE hors S0 (Q-M10) — la forme gelée est la trivariée exacte (ρ_ab, γ_a, γ_b)",
+          "Delta_chapeau_Base": 0.35518951591079806,
+          "somme_P3_null": 4.115281556348506,
+          "P_avec_vivier": 7560,
+          "R_par_paire": {
+            "min": 24,
+            "max": 30
+          },
+          "moyenne_degeneree_R_egale_1": false
+        },
+        "gpt2|type|S3": {
+          "rho_chapeau_Base": 0.01057533304416935,
+          "somme_P3": 0.0009492291803735262,
+          "somme_P2": 0.08975879779945828,
+          "P": 360,
+          "gamma_moyen": -0.002209699012904076,
+          "gamma_min": -0.2881562391083283,
+          "gamma_max": 0.26881315847861953,
+          "rho_ab_moyen": 0.23915538111212414,
+          "det_Gram_min": 0.5237747775338994,
+          "n_paires_Gram_non_PSD_au_dela_de_1e-8": 0,
+          "c_ab_moyen": 0.24015431885399158,
+          "reduction_a_un_facteur": "REFUSÉE hors S0 (Q-M10) — la forme gelée est la trivariée exacte (ρ_ab, γ_a, γ_b)",
+          "Delta_chapeau_Base": -0.013180248996238262,
+          "somme_P3_null": 0.0021322724849733893,
+          "P_avec_vivier": 360,
+          "R_par_paire": {
+            "min": 1,
+            "max": 1
+          },
+          "moyenne_degeneree_R_egale_1": true
+        },
+        "gpt2|type|S2": {
+          "rho_chapeau_Base": 0.012598877844186479,
+          "somme_P3": 0.0005436371668076981,
+          "somme_P2": 0.04314964979667213,
+          "P": 540,
+          "gamma_moyen": -0.0018221459107676152,
+          "gamma_min": -0.28908514758275156,
+          "gamma_max": 0.27114995958878735,
+          "rho_ab_moyen": 0.042166769264354254,
+          "det_Gram_min": 0.8637087454002337,
+          "n_paires_Gram_non_PSD_au_dela_de_1e-8": 0,
+          "c_ab_moyen": 0.04165711596923437,
+          "reduction_a_un_facteur": "REFUSÉE hors S0 (Q-M10) — la forme gelée est la trivariée exacte (ρ_ab, γ_a, γ_b)",
+          "Delta_chapeau_Base": "SANS OBJET",
+          "raison_Delta_chapeau": "vivier apparié vide sur toutes les paires ⇒ SANS OBJET (D23)",
+          "R_par_paire": {
+            "min": 0,
+            "max": 0
+          }
+        },
+        "gpt2|type|S1": {
+          "rho_chapeau_Base": 0.01167135749665466,
+          "somme_P3": 0.0037869595501278906,
+          "somme_P2": 0.3244660744230772,
+          "P": 2160,
+          "gamma_moyen": -0.002062752932241453,
+          "gamma_min": -0.29189598478649026,
+          "gamma_max": 0.27016329551736334,
+          "rho_ab_moyen": 0.15846959257530865,
+          "det_Gram_min": 0.5830143864399054,
+          "n_paires_Gram_non_PSD_au_dela_de_1e-8": 0,
+          "c_ab_moyen": 0.15965656796544117,
+          "reduction_a_un_facteur": "REFUSÉE hors S0 (Q-M10) — la forme gelée est la trivariée exacte (ρ_ab, γ_a, γ_b)",
+          "Delta_chapeau_Base": -0.006945403483659408,
+          "somme_P3_null": 0.0060405073537552235,
+          "P_avec_vivier": 2160,
+          "R_par_paire": {
+            "min": 9,
+            "max": 9
+          },
+          "moyenne_degeneree_R_egale_1": false
+        },
+        "gpt2|type|S0": {
+          "rho_chapeau_Base": 0.01260780334403128,
+          "somme_P3": 0.007847896827737422,
+          "somme_P2": 0.622463454861289,
+          "P": 7560,
+          "gamma_moyen": -0.0016416618742750083,
+          "gamma_min": -0.2909421706111802,
+          "gamma_max": 0.27173920490502856,
+          "rho_ab_moyen": -0.03634465950036507,
+          "det_Gram_min": 0.8253607930155376,
+          "n_paires_Gram_non_PSD_au_dela_de_1e-8": 0,
+          "c_ab_moyen": -0.036703293826550895,
+          "reduction_a_un_facteur": "REFUSÉE hors S0 (Q-M10) — la forme gelée est la trivariée exacte (ρ_ab, γ_a, γ_b)",
+          "Delta_chapeau_Base": -0.0006623815406417036,
+          "somme_P3_null": 0.0082602051299616,
+          "P_avec_vivier": 7560,
+          "R_par_paire": {
+            "min": 24,
+            "max": 30
+          },
+          "moyenne_degeneree_R_egale_1": false
+        }
+      },
+      "norme_mu_sur_h": 0.8083299439892143,
+      "vivier_par_strate": {
+        "S3": {
+          "n_paires": 60,
+          "cardinal_min": 1,
+          "cardinal_max": 1,
+          "cardinal_moyen": 1.0,
+          "valeurs_distinctes": [
+            1
+          ],
+          "vivier_vide_sur_toutes_les_paires": false
+        },
+        "S2": {
+          "n_paires": 90,
+          "cardinal_min": 0,
+          "cardinal_max": 0,
+          "cardinal_moyen": 0.0,
+          "valeurs_distinctes": [
+            0
+          ],
+          "vivier_vide_sur_toutes_les_paires": true
+        },
+        "S1": {
+          "n_paires": 360,
+          "cardinal_min": 9,
+          "cardinal_max": 9,
+          "cardinal_moyen": 9.0,
+          "valeurs_distinctes": [
+            9
+          ],
+          "vivier_vide_sur_toutes_les_paires": false
+        },
+        "S0": {
+          "n_paires": 1260,
+          "cardinal_min": 24,
+          "cardinal_max": 30,
+          "cardinal_moyen": 25.714285714285715,
+          "valeurs_distinctes": [
+            24,
+            27,
+            30
+          ],
+          "vivier_vide_sur_toutes_les_paires": false
+        }
+      }
+    },
+    "HuggingFaceTB/SmolLM2-360M": {
+      "couche": 16,
+      "cellules": {
+        "HuggingFaceTB/SmolLM2-360M|aucun|S3": {
+          "rho_chapeau_Base": 0.7009850956700403,
+          "somme_P3": 0.6259372845861093,
+          "somme_P2": 0.8929395053511143,
+          "P": 360,
+          "gamma_moyen": 0.8522193527558971,
+          "gamma_min": 0.6775344863243398,
+          "gamma_max": 0.8934031262735835,
+          "rho_ab_moyen": 0.7886106217810297,
+          "det_Gram_min": 0.0299348059509712,
+          "n_paires_Gram_non_PSD_au_dela_de_1e-8": 0,
+          "c_ab_moyen": 0.23199024776845997,
+          "reduction_a_un_facteur": "REFUSÉE hors S0 (Q-M10) — la forme gelée est la trivariée exacte (ρ_ab, γ_a, γ_b)",
+          "Delta_chapeau_Base": 0.1591338868932505,
+          "somme_P3_null": 0.48384035033905004,
+          "P_avec_vivier": 360,
+          "R_par_paire": {
+            "min": 1,
+            "max": 1
+          },
+          "moyenne_degeneree_R_egale_1": true
+        },
+        "HuggingFaceTB/SmolLM2-360M|aucun|S2": {
+          "rho_chapeau_Base": 0.7695835144309732,
+          "somme_P3": 0.8381318688444805,
+          "somme_P2": 1.0890720150940236,
+          "P": 540,
+          "gamma_moyen": 0.8523774384444005,
+          "gamma_min": 0.6775411820653594,
+          "gamma_max": 0.8935827190182117,
+          "rho_ab_moyen": 0.740447352619331,
+          "det_Gram_min": 0.04684507165307883,
+          "n_paires_Gram_non_PSD_au_dela_de_1e-8": 0,
+          "c_ab_moyen": 0.05352787990959064,
+          "reduction_a_un_facteur": "REFUSÉE hors S0 (Q-M10) — la forme gelée est la trivariée exacte (ρ_ab, γ_a, γ_b)",
+          "Delta_chapeau_Base": "SANS OBJET",
+          "raison_Delta_chapeau": "vivier apparié vide sur toutes les paires ⇒ SANS OBJET (D23)",
+          "R_par_paire": {
+            "min": 0,
+            "max": 0
+          }
+        },
+        "HuggingFaceTB/SmolLM2-360M|aucun|S1": {
+          "rho_chapeau_Base": 0.7157670139885598,
+          "somme_P3": 3.6732222262284218,
+          "somme_P2": 5.131868547224127,
+          "P": 2160,
+          "gamma_moyen": 0.8522496250105007,
+          "gamma_min": 0.6771969007383558,
+          "gamma_max": 0.8936097183002872,
+          "rho_ab_moyen": 0.7794389591706629,
+          "det_Gram_min": 0.03547638524414609,
+          "n_paires_Gram_non_PSD_au_dela_de_1e-8": 0,
+          "c_ab_moyen": 0.19803878164766742,
+          "reduction_a_un_facteur": "REFUSÉE hors S0 (Q-M10) — la forme gelée est la trivariée exacte (ρ_ab, γ_a, γ_b)",
+          "Delta_chapeau_Base": 0.18733726267031658,
+          "somme_P3_null": 2.7118320202075594,
+          "P_avec_vivier": 2160,
+          "R_par_paire": {
+            "min": 9,
+            "max": 9
+          },
+          "moyenne_degeneree_R_egale_1": false
+        },
+        "HuggingFaceTB/SmolLM2-360M|aucun|S0": {
+          "rho_chapeau_Base": 0.7753253875262225,
+          "somme_P3": 11.634197121463082,
+          "somme_P2": 15.005567093041435,
+          "P": 7560,
+          "gamma_moyen": 0.8523910712305702,
+          "gamma_min": 0.6773710261167564,
+          "gamma_max": 0.8937114025634987,
+          "rho_ab_moyen": 0.7363590527046237,
+          "det_Gram_min": 0.03717358985251262,
+          "n_paires_Gram_non_PSD_au_dela_de_1e-8": 0,
+          "c_ab_moyen": 0.03713596066649083,
+          "reduction_a_un_facteur": "REFUSÉE hors S0 (Q-M10) — la forme gelée est la trivariée exacte (ρ_ab, γ_a, γ_b)",
+          "Delta_chapeau_Base": 0.300404106094585,
+          "somme_P3_null": 7.126463152435649,
+          "P_avec_vivier": 7560,
+          "R_par_paire": {
+            "min": 24,
+            "max": 30
+          },
+          "moyenne_degeneree_R_egale_1": false
+        },
+        "HuggingFaceTB/SmolLM2-360M|type|S3": {
+          "rho_chapeau_Base": 0.00952258133039838,
+          "somme_P3": 0.0006789169720374967,
+          "somme_P2": 0.07129547635053846,
+          "P": 360,
+          "gamma_moyen": 0.001422865205716362,
+          "gamma_min": -0.3372586307114996,
+          "gamma_max": 0.16563718845547468,
+          "rho_ab_moyen": 0.18572686644433345,
+          "det_Gram_min": 0.5640240501629188,
+          "n_paires_Gram_non_PSD_au_dela_de_1e-8": 0,
+          "c_ab_moyen": 0.18592638317712096,
+          "reduction_a_un_facteur": "REFUSÉE hors S0 (Q-M10) — la forme gelée est la trivariée exacte (ρ_ab, γ_a, γ_b)",
+          "Delta_chapeau_Base": -0.007129511966081573,
+          "somme_P3_null": 0.0011872189238061465,
+          "P_avec_vivier": 360,
+          "R_par_paire": {
+            "min": 1,
+            "max": 1
+          },
+          "moyenne_degeneree_R_egale_1": true
+        },
+        "HuggingFaceTB/SmolLM2-360M|type|S2": {
+          "rho_chapeau_Base": 0.010329301260450788,
+          "somme_P3": 0.00046103783557914865,
+          "somme_P2": 0.04463398093967763,
+          "P": 540,
+          "gamma_moyen": 0.0017586155865460095,
+          "gamma_min": -0.33771813949081786,
+          "gamma_max": 0.16860720168555485,
+          "rho_ab_moyen": -0.009861248030060586,
+          "det_Gram_min": 0.8733016748339538,
+          "n_paires_Gram_non_PSD_au_dela_de_1e-8": 0,
+          "c_ab_moyen": -0.009263381459441989,
+          "reduction_a_un_facteur": "REFUSÉE hors S0 (Q-M10) — la forme gelée est la trivariée exacte (ρ_ab, γ_a, γ_b)",
+          "Delta_chapeau_Base": "SANS OBJET",
+          "raison_Delta_chapeau": "vivier apparié vide sur toutes les paires ⇒ SANS OBJET (D23)",
+          "R_par_paire": {
+            "min": 0,
+            "max": 0
+          }
+        },
+        "HuggingFaceTB/SmolLM2-360M|type|S1": {
+          "rho_chapeau_Base": 0.010012407105633489,
+          "somme_P3": 0.003122705729462242,
+          "somme_P2": 0.3118836156497521,
+          "P": 2160,
+          "gamma_moyen": 0.0014853029936711505,
+          "gamma_min": -0.33870203243993946,
+          "gamma_max": 0.16765926415978583,
+          "rho_ab_moyen": 0.14885563020687667,
+          "det_Gram_min": 0.6360521388418845,
+          "n_paires_Gram_non_PSD_au_dela_de_1e-8": 0,
+          "c_ab_moyen": 0.1493776627089428,
+          "reduction_a_un_facteur": "REFUSÉE hors S0 (Q-M10) — la forme gelée est la trivariée exacte (ρ_ab, γ_a, γ_b)",
+          "Delta_chapeau_Base": -0.005267879402771315,
+          "somme_P3_null": 0.004765671004405416,
+          "P_avec_vivier": 2160,
+          "R_par_paire": {
+            "min": 9,
+            "max": 9
+          },
+          "moyenne_degeneree_R_egale_1": false
+        },
+        "HuggingFaceTB/SmolLM2-360M|type|S0": {
+          "rho_chapeau_Base": 0.010520658056799853,
+          "somme_P3": 0.0067568814925899005,
+          "somme_P2": 0.6422489407136184,
+          "P": 7560,
+          "gamma_moyen": 0.0017987397619989728,
+          "gamma_min": -0.33756541478945923,
+          "gamma_max": 0.16916669966080924,
+          "rho_ab_moyen": -0.0270656947865916,
+          "det_Gram_min": 0.8313948196027817,
+          "n_paires_Gram_non_PSD_au_dela_de_1e-8": 0,
+          "c_ab_moyen": -0.027302434753391346,
+          "reduction_a_un_facteur": "REFUSÉE hors S0 (Q-M10) — la forme gelée est la trivariée exacte (ρ_ab, γ_a, γ_b)",
+          "Delta_chapeau_Base": -0.0015077135403301024,
+          "somme_P3_null": 0.007725208916766488,
+          "P_avec_vivier": 7560,
+          "R_par_paire": {
+            "min": 24,
+            "max": 30
+          },
+          "moyenne_degeneree_R_egale_1": false
+        }
+      },
+      "norme_mu_sur_h": 0.8535693361820047,
+      "vivier_par_strate": {
+        "S3": {
+          "n_paires": 60,
+          "cardinal_min": 1,
+          "cardinal_max": 1,
+          "cardinal_moyen": 1.0,
+          "valeurs_distinctes": [
+            1
+          ],
+          "vivier_vide_sur_toutes_les_paires": false
+        },
+        "S2": {
+          "n_paires": 90,
+          "cardinal_min": 0,
+          "cardinal_max": 0,
+          "cardinal_moyen": 0.0,
+          "valeurs_distinctes": [
+            0
+          ],
+          "vivier_vide_sur_toutes_les_paires": true
+        },
+        "S1": {
+          "n_paires": 360,
+          "cardinal_min": 9,
+          "cardinal_max": 9,
+          "cardinal_moyen": 9.0,
+          "valeurs_distinctes": [
+            9
+          ],
+          "vivier_vide_sur_toutes_les_paires": false
+        },
+        "S0": {
+          "n_paires": 1260,
+          "cardinal_min": 24,
+          "cardinal_max": 30,
+          "cardinal_moyen": 25.714285714285715,
+          "valeurs_distinctes": [
+            24,
+            27,
+            30
+          ],
+          "vivier_vide_sur_toutes_les_paires": false
+        }
+      }
+    },
+    "Qwen/Qwen2.5-1.5B": {
+      "couche": 14,
+      "cellules": {
+        "Qwen/Qwen2.5-1.5B|aucun|S3": {
+          "rho_chapeau_Base": 0.5076869419284287,
+          "somme_P3": 0.2760711453287974,
+          "somme_P2": 0.5437822455707687,
+          "P": 360,
+          "gamma_moyen": 0.7255997136999126,
+          "gamma_min": 0.6168861877014225,
+          "gamma_max": 0.7919150378065054,
+          "rho_ab_moyen": 0.6635063205040523,
+          "det_Gram_min": 0.07850732820265205,
+          "n_paires_Gram_non_PSD_au_dela_de_1e-8": 0,
+          "c_ab_moyen": 0.2919572782907633,
+          "reduction_a_un_facteur": "REFUSÉE hors S0 (Q-M10) — la forme gelée est la trivariée exacte (ρ_ab, γ_a, γ_b)",
+          "Delta_chapeau_Base": 0.10930284088387777,
+          "somme_P3_null": 0.21663420106569792,
+          "P_avec_vivier": 360,
+          "R_par_paire": {
+            "min": 1,
+            "max": 1
+          },
+          "moyenne_degeneree_R_egale_1": true
+        },
+        "Qwen/Qwen2.5-1.5B|aucun|S2": {
+          "rho_chapeau_Base": 0.5858127568934267,
+          "somme_P3": 0.3477499845177717,
+          "somme_P2": 0.5936196855150352,
+          "P": 540,
+          "gamma_moyen": 0.7258708475460919,
+          "gamma_min": 0.6179172707244809,
+          "gamma_max": 0.7926622189298226,
+          "rho_ab_moyen": 0.5933894728142836,
+          "det_Gram_min": 0.14339148768815746,
+          "n_paires_Gram_non_PSD_au_dela_de_1e-8": 0,
+          "c_ab_moyen": 0.14108004430382676,
+          "reduction_a_un_facteur": "REFUSÉE hors S0 (Q-M10) — la forme gelée est la trivariée exacte (ρ_ab, γ_a, γ_b)",
+          "Delta_chapeau_Base": "SANS OBJET",
+          "raison_Delta_chapeau": "vivier apparié vide sur toutes les paires ⇒ SANS OBJET (D23)",
+          "R_par_paire": {
+            "min": 0,
+            "max": 0
+          }
+        },
+        "Qwen/Qwen2.5-1.5B|aucun|S1": {
+          "rho_chapeau_Base": 0.5454164038357323,
+          "somme_P3": 1.5248379468277722,
+          "somme_P2": 2.7957317310298953,
+          "P": 2160,
+          "gamma_moyen": 0.7257311361871255,
+          "gamma_min": 0.6171898441668761,
+          "gamma_max": 0.7924979619938524,
+          "rho_ab_moyen": 0.6294615820009738,
+          "det_Gram_min": 0.11308895891559978,
+          "n_paires_Gram_non_PSD_au_dela_de_1e-8": 0,
+          "c_ab_moyen": 0.21900202850592515,
+          "reduction_a_un_facteur": "REFUSÉE hors S0 (Q-M10) — la forme gelée est la trivariée exacte (ρ_ab, γ_a, γ_b)",
+          "Delta_chapeau_Base": 0.1873349374031908,
+          "somme_P3_null": 1.0010997179991725,
+          "P_avec_vivier": 2160,
+          "R_par_paire": {
+            "min": 9,
+            "max": 9
+          },
+          "moyenne_degeneree_R_egale_1": false
+        },
+        "Qwen/Qwen2.5-1.5B|aucun|S0": {
+          "rho_chapeau_Base": 0.6141794083844219,
+          "somme_P3": 4.5603458670237735,
+          "somme_P2": 7.425103812938973,
+          "P": 7560,
+          "gamma_moyen": 0.7259735967607677,
+          "gamma_min": 0.6176128046646003,
+          "gamma_max": 0.7926840952688815,
+          "rho_ab_moyen": 0.5665702885899692,
+          "det_Gram_min": 0.1327592810011512,
+          "n_paires_Gram_non_PSD_au_dela_de_1e-8": 0,
+          "c_ab_moyen": 0.08377599324077421,
+          "reduction_a_un_facteur": "REFUSÉE hors S0 (Q-M10) — la forme gelée est la trivariée exacte (ρ_ab, γ_a, γ_b)",
+          "Delta_chapeau_Base": 0.3184416596137149,
+          "somme_P3_null": 2.1958834860273644,
+          "P_avec_vivier": 7560,
+          "R_par_paire": {
+            "min": 24,
+            "max": 30
+          },
+          "moyenne_degeneree_R_egale_1": false
+        },
+        "Qwen/Qwen2.5-1.5B|type|S3": {
+          "rho_chapeau_Base": 0.008867297884064644,
+          "somme_P3": 0.0006726750896518415,
+          "somme_P2": 0.07586021113158958,
+          "P": 360,
+          "gamma_moyen": -0.0013231678469825575,
+          "gamma_min": -0.16868222437060418,
+          "gamma_max": 0.1410497334050898,
+          "rho_ab_moyen": 0.2127485177901544,
+          "det_Gram_min": 0.5535165344393813,
+          "n_paires_Gram_non_PSD_au_dela_de_1e-8": 0,
+          "c_ab_moyen": 0.21282610814891972,
+          "reduction_a_un_facteur": "REFUSÉE hors S0 (Q-M10) — la forme gelée est la trivariée exacte (ρ_ab, γ_a, γ_b)",
+          "Delta_chapeau_Base": -0.01806540494427105,
+          "somme_P3_null": 0.0020431205229019056,
+          "P_avec_vivier": 360,
+          "R_par_paire": {
+            "min": 1,
+            "max": 1
+          },
+          "moyenne_degeneree_R_egale_1": true
+        },
+        "Qwen/Qwen2.5-1.5B|type|S2": {
+          "rho_chapeau_Base": 0.009148774455199809,
+          "somme_P3": 0.00040319021588786894,
+          "somme_P2": 0.044070407229102826,
+          "P": 540,
+          "gamma_moyen": -0.0008621086972564632,
+          "gamma_min": -0.17019840404671582,
+          "gamma_max": 0.14403222214585287,
+          "rho_ab_moyen": 0.03970449196854864,
+          "det_Gram_min": 0.8913436318990436,
+          "n_paires_Gram_non_PSD_au_dela_de_1e-8": 0,
+          "c_ab_moyen": 0.03922502327601503,
+          "reduction_a_un_facteur": "REFUSÉE hors S0 (Q-M10) — la forme gelée est la trivariée exacte (ρ_ab, γ_a, γ_b)",
+          "Delta_chapeau_Base": "SANS OBJET",
+          "raison_Delta_chapeau": "vivier apparié vide sur toutes les paires ⇒ SANS OBJET (D23)",
+          "R_par_paire": {
+            "min": 0,
+            "max": 0
+          }
+        },
+        "Qwen/Qwen2.5-1.5B|type|S1": {
+          "rho_chapeau_Base": 0.008865951944352198,
+          "somme_P3": 0.002339244199624331,
+          "somme_P2": 0.26384580181651895,
+          "P": 2160,
+          "gamma_moyen": -0.0011055041187851776,
+          "gamma_min": -0.17074179949041385,
+          "gamma_max": 0.1422540087053491,
+          "rho_ab_moyen": 0.12925098593257295,
+          "det_Gram_min": 0.7525189834613328,
+          "n_paires_Gram_non_PSD_au_dela_de_1e-8": 0,
+          "c_ab_moyen": 0.12954297402023873,
+          "reduction_a_un_facteur": "REFUSÉE hors S0 (Q-M10) — la forme gelée est la trivariée exacte (ρ_ab, γ_a, γ_b)",
+          "Delta_chapeau_Base": -0.006194549760667863,
+          "somme_P3_null": 0.003973650148120069,
+          "P_avec_vivier": 2160,
+          "R_par_paire": {
+            "min": 9,
+            "max": 9
+          },
+          "moyenne_degeneree_R_egale_1": false
+        },
+        "Qwen/Qwen2.5-1.5B|type|S0": {
+          "rho_chapeau_Base": 0.009091023101628574,
+          "somme_P3": 0.0054605155685223394,
+          "somme_P2": 0.6006491796884927,
+          "P": 7560,
+          "gamma_moyen": -0.0007044659496318853,
+          "gamma_min": -0.17058019011316114,
+          "gamma_max": 0.14425143668810136,
+          "rho_ab_moyen": -0.02631462655813258,
+          "det_Gram_min": 0.8719611321011065,
+          "n_paires_Gram_non_PSD_au_dela_de_1e-8": 0,
+          "c_ab_moyen": -0.026370458025756487,
+          "reduction_a_un_facteur": "REFUSÉE hors S0 (Q-M10) — la forme gelée est la trivariée exacte (ρ_ab, γ_a, γ_b)",
+          "Delta_chapeau_Base": -0.002337002112318055,
+          "somme_P3_null": 0.006864233970216454,
+          "P_avec_vivier": 7560,
+          "R_par_paire": {
+            "min": 24,
+            "max": 30
+          },
+          "moyenne_degeneree_R_egale_1": false
+        }
+      },
+      "norme_mu_sur_h": 0.7280703747246317,
+      "vivier_par_strate": {
+        "S3": {
+          "n_paires": 60,
+          "cardinal_min": 1,
+          "cardinal_max": 1,
+          "cardinal_moyen": 1.0,
+          "valeurs_distinctes": [
+            1
+          ],
+          "vivier_vide_sur_toutes_les_paires": false
+        },
+        "S2": {
+          "n_paires": 90,
+          "cardinal_min": 0,
+          "cardinal_max": 0,
+          "cardinal_moyen": 0.0,
+          "valeurs_distinctes": [
+            0
+          ],
+          "vivier_vide_sur_toutes_les_paires": true
+        },
+        "S1": {
+          "n_paires": 360,
+          "cardinal_min": 9,
+          "cardinal_max": 9,
+          "cardinal_moyen": 9.0,
+          "valeurs_distinctes": [
+            9
+          ],
+          "vivier_vide_sur_toutes_les_paires": false
+        },
+        "S0": {
+          "n_paires": 1260,
+          "cardinal_min": 24,
+          "cardinal_max": 30,
+          "cardinal_moyen": 25.714285714285715,
+          "valeurs_distinctes": [
+            24,
+            27,
+            30
+          ],
+          "vivier_vide_sur_toutes_les_paires": false
+        }
+      }
+    }
+  },
+  "declaration_d_atteignabilite_D31": {
+    "B-mort": {
+      "seuil": "point ρ_Base < 0.25 sur 4/4 strates d'au moins 2 modèles/3",
+      "rho_chapeau_min_observe": 0.5076869419284287,
+      "rho_chapeau_max_observe": 0.7753253875262225,
+      "condition_primaire": "aucun",
+      "classe": "QUASI INATTEIGNABLE",
+      "double_mesure_D26_condition_type": {
+        "rho_chapeau_min": 0.008865951944352198,
+        "rho_chapeau_max": 0.01260780334403128,
+        "classe": "ATTEIGNABLE",
+        "statut": "publiee separement — la lecture gelee de C-Base-mort porte sur la cellule decisionnelle (condition `aucun` primaire)"
+      },
+      "motif": "déclaré AVANT mesure (D31) — jamais découvert après"
+    },
+    "C-sigma-mort": {
+      "classe": "INATTEIGNABLE",
+      "motif": "identité du barycentre + support vide (V-T)"
+    }
+  }
+}

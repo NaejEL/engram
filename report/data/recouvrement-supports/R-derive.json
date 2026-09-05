@@ -1,0 +1,19 @@
+{
+  "R_formule": 17,
+  "R": 17,
+  "plafond": 300,
+  "sigma_dir": 0.05218332599808907,
+  "sigma_delta": 0.040601831525618526,
+  "depassement": false,
+  "statut": "sous plafond",
+  "formule": "R = ceil(10·σ̂_dir²/σ̂_Δ²), pilote R₀ = 20",
+  "modele_du_pilote": "gpt2",
+  "R0": 20,
+  "n_paires_du_pilote": 512,
+  "cellule_du_pilote": "T1-A",
+  "seed_echantillon": 0,
+  "unite": "fraction de k (celle de la publication de O)",
+  "O_plac_moyen": 0.3565582275390625,
+  "O_type_moyen": 0.0133056640625,
+  "delta_moyen": 0.3432525634765625
+}

@@ -1,0 +1,1140 @@
+{
+  "V-appar": {
+    "verdict": "PASS",
+    "detail": {
+      "lecture": "RELATIONNELLE (§14.2) — strate(j,a) = strate(j,b) = strate(a,b)",
+      "cardinaux_enumeres": {
+        "S3": {
+          "n_paires": 60,
+          "cardinal_min": 1,
+          "cardinal_max": 1,
+          "cardinal_moyen": 1.0,
+          "valeurs_distinctes": [
+            1
+          ],
+          "vivier_vide_sur_toutes_les_paires": false
+        },
+        "S2": {
+          "n_paires": 90,
+          "cardinal_min": 0,
+          "cardinal_max": 0,
+          "cardinal_moyen": 0.0,
+          "valeurs_distinctes": [
+            0
+          ],
+          "vivier_vide_sur_toutes_les_paires": true
+        },
+        "S1": {
+          "n_paires": 360,
+          "cardinal_min": 9,
+          "cardinal_max": 9,
+          "cardinal_moyen": 9.0,
+          "valeurs_distinctes": [
+            9
+          ],
+          "vivier_vide_sur_toutes_les_paires": false
+        },
+        "S0": {
+          "n_paires": 1260,
+          "cardinal_min": 24,
+          "cardinal_max": 30,
+          "cardinal_moyen": 25.714285714285715,
+          "valeurs_distinctes": [
+            24,
+            27,
+            30
+          ],
+          "vivier_vide_sur_toutes_les_paires": false
+        }
+      },
+      "cardinaux_attendus_14_2": {
+        "S3": [
+          1,
+          1
+        ],
+        "S2": [
+          0,
+          0
+        ],
+        "S1": [
+          9,
+          9
+        ],
+        "S0": [
+          24,
+          30
+        ]
+      },
+      "conformite_par_strate": {
+        "S3": true,
+        "S2": true,
+        "S1": true,
+        "S0": true
+      },
+      "strates_a_vivier_vide": [
+        "S2"
+      ],
+      "falsification_signalee_14_3": {
+        "clause_gelee": "§4.5 Δ-sansobjet : « vivier x_null apparié vide (attendu possible en S3) »",
+        "enumeration": {
+          "S3": [
+            1
+          ],
+          "S2": [
+            0
+          ],
+          "S1": [
+            9
+          ],
+          "S0": [
+            24,
+            27,
+            30
+          ]
+        },
+        "constat": "l'adresse de la clause est INVERSÉE : S3 n'est jamais vide, le vide certain est S2",
+        "traitement": "la clause n'est PAS corrigée ; Δ-sansobjet se déclenche sur la cellule vide QUELLE QU'ELLE SOIT, et la falsification est consignée"
+      }
+    }
+  },
+  "V-T": {
+    "verdict": "PASS",
+    "detail": {
+      "T_nombre_de_cadres": 6,
+      "cellules_de_capture": [
+        "T1-A",
+        "T1-B",
+        "T2-A",
+        "T2-B",
+        "T3-A",
+        "T3-B"
+      ],
+      "unites_decisionnelles_U": 60,
+      "cellules_decisionnelles": 12,
+      "paires_par_cellule_de_capture": 1770,
+      "paires_par_strate_et_par_cellule_de_capture": {
+        "S3": 60,
+        "S2": 90,
+        "S1": 360,
+        "S0": 1260
+      },
+      "paires_inter_cadres_enumerees": 0,
+      "support_clause_2_de_P_sigma": "SANS OBJET",
+      "declaration_d_avance_D31": {
+        "C-sigma-mort": "INATTEIGNABLE — déclaré AVANT mesure (0-158) : identité du barycentre, cos moyen ≈ −1/(T−1) = -0.2000 contre un seuil |cos| ≤ 2/√d ≈ 0.05–0.07",
+        "le_vide_ne_realise_pas_l_antipode": true,
+        "B-mort": "QUASI INATTEIGNABLE — déclaré AVANT mesure par V-quad (0-169) : exigerait γ ≈ 0.5 contre ‖μ‖/‖h‖ = 0.73–0.85"
+      }
+    }
+  },
+  "V-ident": {
+    "verdict": "PASS",
+    "detail": {
+      "quantites_requises": [
+        "rho_Base_sous_regime_gamma",
+        "O_superieur_a_p_sym",
+        "cos_des_centroides",
+        "plac_invariance_d_echelle"
+      ],
+      "declarations": {
+        "rho_Base_sous_regime_gamma": {
+          "derivation": "propriété pivot : (z_a,i, z_b,i, z_μ,i) gaussiens de Gram = cosinus ; ρ̂_Base est fonction croissante de γ seul ⇒ γ ≈ 0.75–0.89 force ρ̂_Base ≈ 0.55–0.75 (Q-M9)",
+          "valeur_forcee": "ρ̂_Base(γ) — calculée par V-quad, publiée par cellule AVANT mesure",
+          "poids_probant": "NUL, déclaré d'avance (D27, entrée (xxv))"
+        },
+        "O_superieur_a_p_sym": {
+          "derivation": "identité de Cauchy–Schwarz sur les masses top-p (§16 du cycle précédent) : |A∩B| ≥ p_sym est vraie en arithmétique réelle",
+          "valeur_forcee": "O ≥ p_sym, toujours",
+          "poids_probant": "NUL (D32)"
+        },
+        "cos_des_centroides": {
+          "derivation": "μ_global est la moyenne NON PONDÉRÉE des T centroïdes de cadre (cellules équi-cardinales) ⇒ Σ_t (μ_t − μ_global) = 0 exactement ⇒ cos moyen par paire = −1/(T−1)",
+          "valeur_forcee": "−1/(T−1) = −0.2000 à T = 6",
+          "poids_probant": "NUL — identité du barycentre (0-159, Q-M4)"
+        },
+        "plac_invariance_d_echelle": {
+          "derivation": "topk(|G·x|, 64) est INVARIANTE D'ÉCHELLE ⇒ top64(G·(c·r)) = top64(G·r) pour tout c > 0 : la contrainte ‖c·r‖ = ‖μ_global‖ n'a AUCUN effet sur le support de la référence placebo",
+          "valeur_forcee": "N-plac est indépendante de la magnitude : elle mesure l'anisotropie de G, pas le décalage mécanique de magnitudes (0-106)",
+          "poids_probant": "NUL sur la magnitude ; la condition est exécutée telle qu'écrite et le constat est publié"
+        },
+        "seuil_t": {
+          "derivation": "t = Φ⁻¹(1 − 1/256) calculé en fp64 au banc (0-177)",
+          "valeur_forcee": "2.660067468617",
+          "poids_probant": "SANS OBJET — c'est une constante, pas une mesure"
+        }
+      },
+      "manques": [],
+      "sans_valeur_forcee": [],
+      "formulation_obligatoire": "« valeur imposée par l'identité <nommée> ; poids probant nul »"
+    }
+  },
+  "V-ecriture": {
+    "verdict": "PASS",
+    "detail": {
+      "ecriture_gravee": "[Σ_p n_p(μ) − Σ_p n̄_p(null)] / Σ_p |A∩B|_p, n̄_p = moyenne des R tirages PAR PAIRE",
+      "Delta_Base_gravee": 0.2857142857142857,
+      "lecture_alternative_1_moyenne_des_ratios": 0.25,
+      "lecture_alternative_2_ratio_apres_pooling_des_R": 0.14285714285714285,
+      "ecart_gravee_moins_alt1": 0.0357142857142857,
+      "ecart_gravee_moins_alt2": 0.14285714285714285,
+      "statut_des_alternatives": "ÉNUMÉRÉES ET REJETÉES par écrit (D31) ; seule la gravée décide"
+    }
+  },
+  "V-queue|gpt2": {
+    "verdict": "PASS",
+    "detail": {
+      "t_calcule_au_banc": 2.6600674686174592,
+      "t_formule": "ndtri(1 - 1/256)",
+      "t_en_dur_interdit": 2.66,
+      "ecart_a_la_valeur_en_dur": 6.746861745909882e-05,
+      "pente_(phi/Q)^2": 8.815564787235882,
+      "sigma_hat_min_max": [
+        0.003611981981073647,
+        1.0
+      ],
+      "pool_gele": "σ̂±_pool = Σ_p |A∩B|_p·σ̂±(cos_p,t)/Σ_p |A∩B|_p — JAMAIS σ̂±(cos̄) (0-172)",
+      "selection": "top-64 PAR VECTEUR (rang), jamais un seuil commun ; la certification est la simulation Q-M1-bis"
+    }
+  },
+  "V-rang-def|gpt2": {
+    "verdict": "PASS",
+    "detail": {
+      "definition_gelee": "r = max(rang_A, rang_B) — l'appartenance à A∩B est bornée par le rang le PIRE des deux",
+      "lectures_rejetees": [
+        "min(rang_A, rang_B) — bornerait par le rang le meilleur, ce qui n'est pas la contrainte d'appartenance",
+        "rang_A seul (ou rang_B seul) — brise la symétrie de la paire",
+        "moyenne des deux rangs — n'est pas un rang, et son bucket n'a pas de domaine entier"
+      ],
+      "n_buckets": 8,
+      "largeur_bucket": 8,
+      "plancher_trials": 200,
+      "plancher_paires": 8,
+      "fusion_pre_declaree": "fusion DYADIQUE : buckets (1,2), (3,4), (5,6), (7,8), puis (1-4), (5-8), puis global — appliquée AVANT toute lecture",
+      "buckets_sous_plancher": [],
+      "profil": {
+        "b1": {
+          "rangs": [
+            1,
+            16
+          ],
+          "trials": 373,
+          "n_paires": 360,
+          "sigma_pm": 0.35924932975871315,
+          "sigma_hat_pool": 0.38701976482002204,
+          "sigma_hat_pool_ponderation_litterale": 0.4066333148574058,
+          "Psi": -0.027770435061308885,
+          "lectures_de_cos_p": {
+            "h": {
+              "sigma_hat_pool": 0.38701976482002204,
+              "Psi": -0.027770435061308885
+            },
+            "z": {
+              "sigma_hat_pool": 0.39441077821083703,
+              "Psi": -0.03516144845212388
+            },
+            "tronque_phi": {
+              "sigma_hat_pool": 0.4690051649846465,
+              "Psi": -0.10975583522593335
+            }
+          },
+          "sous_plancher": false
+        },
+        "b2": {
+          "rangs": [
+            17,
+            32
+          ],
+          "trials": 941,
+          "n_paires": 879,
+          "sigma_pm": 0.38575982996811903,
+          "sigma_hat_pool": 0.3928170528209699,
+          "sigma_hat_pool_ponderation_litterale": 0.39817164247325515,
+          "Psi": -0.007057222852850875,
+          "lectures_de_cos_p": {
+            "h": {
+              "sigma_hat_pool": 0.3928170528209699,
+              "Psi": -0.007057222852850875
+            },
+            "z": {
+              "sigma_hat_pool": 0.3960210572587837,
+              "Psi": -0.010261227290664698
+            },
+            "tronque_phi": {
+              "sigma_hat_pool": 0.4708709822845365,
+              "Psi": -0.08511115231641747
+            }
+          },
+          "sous_plancher": false
+        },
+        "b3": {
+          "rangs": [
+            33,
+            48
+          ],
+          "trials": 1545,
+          "n_paires": 1394,
+          "sigma_pm": 0.39093851132686086,
+          "sigma_hat_pool": 0.3856965554389517,
+          "sigma_hat_pool_ponderation_litterale": 0.3921041500679561,
+          "Psi": 0.0052419558879091555,
+          "lectures_de_cos_p": {
+            "h": {
+              "sigma_hat_pool": 0.3856965554389517,
+              "Psi": 0.0052419558879091555
+            },
+            "z": {
+              "sigma_hat_pool": 0.38726717952238926,
+              "Psi": 0.0036713318044716003
+            },
+            "tronque_phi": {
+              "sigma_hat_pool": 0.47794997252682814,
+              "Psi": -0.08701146119996728
+            }
+          },
+          "sous_plancher": false
+        },
+        "b4": {
+          "rangs": [
+            49,
+            64
+          ],
+          "trials": 2224,
+          "n_paires": 1913,
+          "sigma_pm": 0.40152877697841727,
+          "sigma_hat_pool": 0.3802368844273899,
+          "sigma_hat_pool_ponderation_litterale": 0.3821731024097094,
+          "Psi": 0.02129189255102737,
+          "lectures_de_cos_p": {
+            "h": {
+              "sigma_hat_pool": 0.3802368844273899,
+              "Psi": 0.02129189255102737
+            },
+            "z": {
+              "sigma_hat_pool": 0.38320711529445267,
+              "Psi": 0.018321661683964596
+            },
+            "tronque_phi": {
+              "sigma_hat_pool": 0.47645397369812553,
+              "Psi": -0.07492519671970826
+            }
+          },
+          "sous_plancher": false
+        }
+      }
+    }
+  },
+  "V-vide|gpt2": {
+    "verdict": "PASS",
+    "detail": {
+      "n_vide_par_cellule": {
+        "gpt2|aucun|S3": {
+          "n_vide": 0,
+          "denominateur": 5993
+        },
+        "gpt2|aucun|S2": {
+          "n_vide": 0,
+          "denominateur": 6778
+        },
+        "gpt2|aucun|S1": {
+          "n_vide": 0,
+          "denominateur": 32251
+        },
+        "gpt2|aucun|S0": {
+          "n_vide": 0,
+          "denominateur": 86435
+        },
+        "gpt2|type|S3": {
+          "n_vide": 96,
+          "denominateur": 813
+        },
+        "gpt2|type|S2": {
+          "n_vide": 283,
+          "denominateur": 339
+        },
+        "gpt2|type|S1": {
+          "n_vide": 841,
+          "denominateur": 2681
+        },
+        "gpt2|type|S0": {
+          "n_vide": 3955,
+          "denominateur": 5083
+        }
+      },
+      "cellules_sans_denominateur": [],
+      "manques": [],
+      "regle": "dénominateur nul ⇒ SANS OBJET (D23), jamais 0"
+    }
+  },
+  "V-loo|gpt2": {
+    "verdict": "PASS",
+    "detail": {
+      "rho_Base_mu_LOO_PRINCIPAL": 0.7332677734713947,
+      "rho_Base_mu_non_LOO_descriptif": 0.7337883959044369,
+      "ecart_LOO_moins_non_LOO": -0.0005206224330421838,
+      "epsilon_B": 0.017705777977294744,
+      "ecart_rapporte_a_epsilon_B": -0.02940409812603611,
+      "biais_annonce_3_2": 0.005,
+      "regle": "LOO principal, INCONDITIONNEL (P7) ; inversion ⇒ arrêt"
+    }
+  },
+  "V-diag|gpt2": {
+    "verdict": "PASS",
+    "detail": {
+      "quantites_requises": [
+        "rho_Base",
+        "rho_chapeau_Base",
+        "R_Base",
+        "Delta_Base",
+        "Delta_chapeau_Base",
+        "n_vide",
+        "sigma_pm",
+        "sigma_hat_pool"
+      ],
+      "n_cellules": 8,
+      "manques": [],
+      "n_manques": 0,
+      "regle_D34": "un ρ_Base publié sans son ρ̂_Base apparié rend le rapport NON ÉCRIVABLE ((xxvii), D34)"
+    }
+  },
+  "V-ulp|gpt2": {
+    "verdict": "PASS",
+    "detail": {
+      "marges": {
+        "aucun": {
+          "marge_ulp_min": 182199655520.0,
+          "marge_ulp_mediane": 12269151726640.0,
+          "marge_ulp_max": 96134930653296.0,
+          "n_etats": 256,
+          "chemin_nominal": "fp64",
+          "seuil": "SANS OBJET"
+        },
+        "type": {
+          "marge_ulp_min": 4358785763.0,
+          "marge_ulp_mediane": 7390602223956.0,
+          "marge_ulp_max": 61793021466871.0,
+          "n_etats": 256,
+          "chemin_nominal": "fp64",
+          "seuil": "SANS OBJET"
+        },
+        "mu_global_LOO": {
+          "marge_ulp_min": 5440241237923.0,
+          "marge_ulp_mediane": 24342641037844.0,
+          "marge_ulp_max": 49554233166326.0,
+          "n_etats": 65,
+          "chemin_nominal": "fp64",
+          "seuil": "SANS OBJET"
+        },
+        "plac": {
+          "marge_ulp_min": 181964745354.0,
+          "marge_ulp_mediane": 9149684846977.5,
+          "marge_ulp_max": 51058212489411.0,
+          "n_etats": 40,
+          "chemin_nominal": "fp64",
+          "seuil": "SANS OBJET"
+        }
+      },
+      "conditions_publiees": [
+        "aucun",
+        "mu_global_LOO",
+        "plac",
+        "type"
+      ],
+      "chemin_nominal": "fp64",
+      "seuil": "SANS OBJET"
+    }
+  },
+  "V-S|gpt2": {
+    "verdict": "PASS",
+    "detail": {
+      "q95": 2518.0,
+      "DEFF_S_observe": 1347.0676376591036,
+      "borne_demontree": 2.8,
+      "methode_de_quantile": "np.quantile(method='linear') — type 7 ; encadrement par statistiques d'ordre publié",
+      "formule_binomiale": "INTERDITE (0-180)",
+      "motif_d_echec": null
+    }
+  },
+  "N-hyp|gpt2": {
+    "verdict": "PASS",
+    "detail": {
+      "q95": 2518.0,
+      "encadrement_statistiques_d_ordre": [
+        2518.0,
+        2518.0
+      ],
+      "methode_de_quantile": "np.quantile(method='linear') — type 7 ; encadrement par statistiques d'ordre publié",
+      "R_tirages": 10000,
+      "generateur": "numpy.random.default_rng",
+      "seed": 0,
+      "moyenne_T": 688.8827,
+      "esperance_theorique": 675.2734375,
+      "variance_observee": 902532.4395846684,
+      "variance_de_reference_un_S_par_paire": 669.9978637695312,
+      "DEFF_S_observe": 1347.0676376591036,
+      "DEFF_S_formule": {
+        "Var_T": 834075.0549560592,
+        "somme_c_i": 86435.0,
+        "somme_c_i_carre": 108501103.0,
+        "pi": 0.0078125,
+        "D": 8192,
+        "formule": "Var(T) = π(1−π)[Σc_i² − ((Σc_i)² − Σc_i²)/(D−1)]",
+        "formule_binomiale": "INTERDITE (0-180)"
+      },
+      "borne_demontree": 2.8,
+      "sens_de_la_borne": "borne INFÉRIEURE — la lecture licite est « DEFF_S ≥ 2.8 », donc SATISFAITE, jamais « écart à la borne »",
+      "borne_satisfaite": true,
+      "variance_observee_sur_forme_fermee": 1.0820758086719373,
+      "ecart_forme_fermee_commente": "la variance MESURÉE sur les R tirages et la FORME FERMÉE de Q-M12 ne coïncident pas exactement : l'écart relatif est publié ci-dessus. Cause nommée : la forme fermée traite les 64 indices de S comme un tirage hypergéométrique exact, la mesure les tire effectivement — l'écart est l'erreur de Monte-Carlo sur R tirages plus les termes d'ordre 1/D négligés au dénominateur de référence.",
+      "poids_probant": "NUL, déclaré (D32) — c'est k²/D sous un autre nom"
+    }
+  },
+  "V-P8|gpt2": {
+    "verdict": "PASS",
+    "detail": {
+      "minimum": 8,
+      "cellules_exclues": {},
+      "cardinal_exclu": 0,
+      "n_cellules": 8,
+      "modeles_exclus": [],
+      "regle_modele": "> 2 strates touchées sur un modèle ⇒ modèle exclu (§6.F)"
+    }
+  },
+  "V-queue|HuggingFaceTB/SmolLM2-360M": {
+    "verdict": "PASS",
+    "detail": {
+      "t_calcule_au_banc": 2.6600674686174592,
+      "t_formule": "ndtri(1 - 1/256)",
+      "t_en_dur_interdit": 2.66,
+      "ecart_a_la_valeur_en_dur": 6.746861745909882e-05,
+      "pente_(phi/Q)^2": 8.815564787235882,
+      "sigma_hat_min_max": [
+        0.0007547236424822157,
+        1.0
+      ],
+      "pool_gele": "σ̂±_pool = Σ_p |A∩B|_p·σ̂±(cos_p,t)/Σ_p |A∩B|_p — JAMAIS σ̂±(cos̄) (0-172)",
+      "selection": "top-64 PAR VECTEUR (rang), jamais un seuil commun ; la certification est la simulation Q-M1-bis"
+    }
+  },
+  "V-rang-def|HuggingFaceTB/SmolLM2-360M": {
+    "verdict": "PASS",
+    "detail": {
+      "definition_gelee": "r = max(rang_A, rang_B) — l'appartenance à A∩B est bornée par le rang le PIRE des deux",
+      "lectures_rejetees": [
+        "min(rang_A, rang_B) — bornerait par le rang le meilleur, ce qui n'est pas la contrainte d'appartenance",
+        "rang_A seul (ou rang_B seul) — brise la symétrie de la paire",
+        "moyenne des deux rangs — n'est pas un rang, et son bucket n'a pas de domaine entier"
+      ],
+      "n_buckets": 8,
+      "largeur_bucket": 8,
+      "plancher_trials": 200,
+      "plancher_paires": 8,
+      "fusion_pre_declaree": "fusion DYADIQUE : buckets (1,2), (3,4), (5,6), (7,8), puis (1-4), (5-8), puis global — appliquée AVANT toute lecture",
+      "buckets_sous_plancher": [],
+      "profil": {
+        "b1": {
+          "rangs": [
+            1,
+            16
+          ],
+          "trials": 356,
+          "n_paires": 348,
+          "sigma_pm": 0.33707865168539325,
+          "sigma_hat_pool": 0.3816721240362541,
+          "sigma_hat_pool_ponderation_litterale": 0.39382157612802055,
+          "Psi": -0.04459347235086086,
+          "lectures_de_cos_p": {
+            "h": {
+              "sigma_hat_pool": 0.3816721240362541,
+              "Psi": -0.04459347235086086
+            },
+            "z": {
+              "sigma_hat_pool": 0.379863444576746,
+              "Psi": -0.04278479289135273
+            },
+            "tronque_phi": {
+              "sigma_hat_pool": 0.46036664219181544,
+              "Psi": -0.1232879905064222
+            }
+          },
+          "sous_plancher": false
+        },
+        "b2": {
+          "rangs": [
+            17,
+            32
+          ],
+          "trials": 970,
+          "n_paires": 909,
+          "sigma_pm": 0.422680412371134,
+          "sigma_hat_pool": 0.42618433707120024,
+          "sigma_hat_pool_ponderation_litterale": 0.43441716573334893,
+          "Psi": -0.003503924700066219,
+          "lectures_de_cos_p": {
+            "h": {
+              "sigma_hat_pool": 0.42618433707120024,
+              "Psi": -0.003503924700066219
+            },
+            "z": {
+              "sigma_hat_pool": 0.42557534058915575,
+              "Psi": -0.0028949282180217306
+            },
+            "tronque_phi": {
+              "sigma_hat_pool": 0.4836960909272632,
+              "Psi": -0.06101567855612916
+            }
+          },
+          "sous_plancher": false
+        },
+        "b3": {
+          "rangs": [
+            33,
+            48
+          ],
+          "trials": 1549,
+          "n_paires": 1413,
+          "sigma_pm": 0.3931568754034861,
+          "sigma_hat_pool": 0.3968411913289803,
+          "sigma_hat_pool_ponderation_litterale": 0.3976427104433377,
+          "Psi": -0.0036843159254942304,
+          "lectures_de_cos_p": {
+            "h": {
+              "sigma_hat_pool": 0.3968411913289803,
+              "Psi": -0.0036843159254942304
+            },
+            "z": {
+              "sigma_hat_pool": 0.39602259043542787,
+              "Psi": -0.0028657150319417735
+            },
+            "tronque_phi": {
+              "sigma_hat_pool": 0.47633115095230566,
+              "Psi": -0.08317427554881957
+            }
+          },
+          "sous_plancher": false
+        },
+        "b4": {
+          "rangs": [
+            49,
+            64
+          ],
+          "trials": 2183,
+          "n_paires": 1868,
+          "sigma_pm": 0.4122766834631241,
+          "sigma_hat_pool": 0.4088224151897493,
+          "sigma_hat_pool_ponderation_litterale": 0.4094824644342445,
+          "Psi": 0.0034542682733748054,
+          "lectures_de_cos_p": {
+            "h": {
+              "sigma_hat_pool": 0.4088224151897493,
+              "Psi": 0.0034542682733748054
+            },
+            "z": {
+              "sigma_hat_pool": 0.40534193519930545,
+              "Psi": 0.00693474826381868
+            },
+            "tronque_phi": {
+              "sigma_hat_pool": 0.4806197813583171,
+              "Psi": -0.068343097895193
+            }
+          },
+          "sous_plancher": false
+        }
+      }
+    }
+  },
+  "V-vide|HuggingFaceTB/SmolLM2-360M": {
+    "verdict": "PASS",
+    "detail": {
+      "n_vide_par_cellule": {
+        "HuggingFaceTB/SmolLM2-360M|aucun|S3": {
+          "n_vide": 0,
+          "denominateur": 7275
+        },
+        "HuggingFaceTB/SmolLM2-360M|aucun|S2": {
+          "n_vide": 0,
+          "denominateur": 8385
+        },
+        "HuggingFaceTB/SmolLM2-360M|aucun|S1": {
+          "n_vide": 0,
+          "denominateur": 41338
+        },
+        "HuggingFaceTB/SmolLM2-360M|aucun|S0": {
+          "n_vide": 1,
+          "denominateur": 117578
+        },
+        "HuggingFaceTB/SmolLM2-360M|type|S3": {
+          "n_vide": 122,
+          "denominateur": 558
+        },
+        "HuggingFaceTB/SmolLM2-360M|type|S2": {
+          "n_vide": 272,
+          "denominateur": 366
+        },
+        "HuggingFaceTB/SmolLM2-360M|type|S1": {
+          "n_vide": 789,
+          "denominateur": 2594
+        },
+        "HuggingFaceTB/SmolLM2-360M|type|S0": {
+          "n_vide": 3936,
+          "denominateur": 5058
+        }
+      },
+      "cellules_sans_denominateur": [],
+      "manques": [],
+      "regle": "dénominateur nul ⇒ SANS OBJET (D23), jamais 0"
+    }
+  },
+  "V-loo|HuggingFaceTB/SmolLM2-360M": {
+    "verdict": "PASS",
+    "detail": {
+      "rho_Base_mu_LOO_PRINCIPAL": 0.7454115565837146,
+      "rho_Base_mu_non_LOO_descriptif": 0.7454540815458675,
+      "ecart_LOO_moins_non_LOO": -4.2524962152845625e-05,
+      "epsilon_B": 0.014224150959903264,
+      "ecart_rapporte_a_epsilon_B": -0.0029896309644575673,
+      "biais_annonce_3_2": 0.005,
+      "regle": "LOO principal, INCONDITIONNEL (P7) ; inversion ⇒ arrêt"
+    }
+  },
+  "V-diag|HuggingFaceTB/SmolLM2-360M": {
+    "verdict": "PASS",
+    "detail": {
+      "quantites_requises": [
+        "rho_Base",
+        "rho_chapeau_Base",
+        "R_Base",
+        "Delta_Base",
+        "Delta_chapeau_Base",
+        "n_vide",
+        "sigma_pm",
+        "sigma_hat_pool"
+      ],
+      "n_cellules": 8,
+      "manques": [],
+      "n_manques": 0,
+      "regle_D34": "un ρ_Base publié sans son ρ̂_Base apparié rend le rapport NON ÉCRIVABLE ((xxvii), D34)"
+    }
+  },
+  "V-ulp|HuggingFaceTB/SmolLM2-360M": {
+    "verdict": "PASS",
+    "detail": {
+      "marges": {
+        "aucun": {
+          "marge_ulp_min": 145746952472.0,
+          "marge_ulp_mediane": 7236020708938.0,
+          "marge_ulp_max": 35210018002964.0,
+          "n_etats": 256,
+          "chemin_nominal": "fp64",
+          "seuil": "SANS OBJET"
+        },
+        "type": {
+          "marge_ulp_min": 55316186227.0,
+          "marge_ulp_mediane": 7088266446596.0,
+          "marge_ulp_max": 49469148102524.0,
+          "n_etats": 256,
+          "chemin_nominal": "fp64",
+          "seuil": "SANS OBJET"
+        },
+        "mu_global_LOO": {
+          "marge_ulp_min": 4703935236394.0,
+          "marge_ulp_mediane": 19332862872430.0,
+          "marge_ulp_max": 28276286793110.0,
+          "n_etats": 65,
+          "chemin_nominal": "fp64",
+          "seuil": "SANS OBJET"
+        },
+        "plac": {
+          "marge_ulp_min": 1095018492989.0,
+          "marge_ulp_mediane": 11336404930463.5,
+          "marge_ulp_max": 39698927574686.0,
+          "n_etats": 40,
+          "chemin_nominal": "fp64",
+          "seuil": "SANS OBJET"
+        }
+      },
+      "conditions_publiees": [
+        "aucun",
+        "mu_global_LOO",
+        "plac",
+        "type"
+      ],
+      "chemin_nominal": "fp64",
+      "seuil": "SANS OBJET"
+    }
+  },
+  "V-S|HuggingFaceTB/SmolLM2-360M": {
+    "verdict": "PASS",
+    "detail": {
+      "q95": 3828.349999999995,
+      "DEFF_S_observe": 1701.1048613314267,
+      "borne_demontree": 2.8,
+      "methode_de_quantile": "np.quantile(method='linear') — type 7 ; encadrement par statistiques d'ordre publié",
+      "formule_binomiale": "INTERDITE (0-180)",
+      "motif_d_echec": null
+    }
+  },
+  "N-hyp|HuggingFaceTB/SmolLM2-360M": {
+    "verdict": "PASS",
+    "detail": {
+      "q95": 3828.349999999995,
+      "encadrement_statistiques_d_ordre": [
+        3828.0,
+        3835.0
+      ],
+      "methode_de_quantile": "np.quantile(method='linear') — type 7 ; encadrement par statistiques d'ordre publié",
+      "R_tirages": 10000,
+      "generateur": "numpy.random.default_rng",
+      "seed": 0,
+      "moyenne_T": 905.8986,
+      "esperance_theorique": 918.578125,
+      "variance_observee": 1550389.919309971,
+      "variance_de_reference_un_S_par_paire": 911.4017333984375,
+      "DEFF_S_observe": 1701.1048613314267,
+      "DEFF_S_formule": {
+        "Var_T": 1606886.0395544474,
+        "somme_c_i": 117578.0,
+        "somme_c_i_carre": 208963218.0,
+        "pi": 0.0078125,
+        "D": 8192,
+        "formule": "Var(T) = π(1−π)[Σc_i² − ((Σc_i)² − Σc_i²)/(D−1)]",
+        "formule_binomiale": "INTERDITE (0-180)"
+      },
+      "borne_demontree": 2.8,
+      "sens_de_la_borne": "borne INFÉRIEURE — la lecture licite est « DEFF_S ≥ 2.8 », donc SATISFAITE, jamais « écart à la borne »",
+      "borne_satisfaite": true,
+      "variance_observee_sur_forme_fermee": 0.9648412402287461,
+      "ecart_forme_fermee_commente": "la variance MESURÉE sur les R tirages et la FORME FERMÉE de Q-M12 ne coïncident pas exactement : l'écart relatif est publié ci-dessus. Cause nommée : la forme fermée traite les 64 indices de S comme un tirage hypergéométrique exact, la mesure les tire effectivement — l'écart est l'erreur de Monte-Carlo sur R tirages plus les termes d'ordre 1/D négligés au dénominateur de référence.",
+      "poids_probant": "NUL, déclaré (D32) — c'est k²/D sous un autre nom"
+    }
+  },
+  "V-P8|HuggingFaceTB/SmolLM2-360M": {
+    "verdict": "PASS",
+    "detail": {
+      "minimum": 8,
+      "cellules_exclues": {},
+      "cardinal_exclu": 0,
+      "n_cellules": 8,
+      "modeles_exclus": [],
+      "regle_modele": "> 2 strates touchées sur un modèle ⇒ modèle exclu (§6.F)"
+    }
+  },
+  "V-queue|Qwen/Qwen2.5-1.5B": {
+    "verdict": "PASS",
+    "detail": {
+      "t_calcule_au_banc": 2.6600674686174592,
+      "t_formule": "ndtri(1 - 1/256)",
+      "t_en_dur_interdit": 2.66,
+      "ecart_a_la_valeur_en_dur": 6.746861745909882e-05,
+      "pente_(phi/Q)^2": 8.815564787235882,
+      "sigma_hat_min_max": [
+        0.002926387791081055,
+        1.0
+      ],
+      "pool_gele": "σ̂±_pool = Σ_p |A∩B|_p·σ̂±(cos_p,t)/Σ_p |A∩B|_p — JAMAIS σ̂±(cos̄) (0-172)",
+      "selection": "top-64 PAR VECTEUR (rang), jamais un seuil commun ; la certification est la simulation Q-M1-bis"
+    }
+  },
+  "V-rang-def|Qwen/Qwen2.5-1.5B": {
+    "verdict": "PASS",
+    "detail": {
+      "definition_gelee": "r = max(rang_A, rang_B) — l'appartenance à A∩B est bornée par le rang le PIRE des deux",
+      "lectures_rejetees": [
+        "min(rang_A, rang_B) — bornerait par le rang le meilleur, ce qui n'est pas la contrainte d'appartenance",
+        "rang_A seul (ou rang_B seul) — brise la symétrie de la paire",
+        "moyenne des deux rangs — n'est pas un rang, et son bucket n'a pas de domaine entier"
+      ],
+      "n_buckets": 8,
+      "largeur_bucket": 8,
+      "plancher_trials": 200,
+      "plancher_paires": 8,
+      "fusion_pre_declaree": "fusion DYADIQUE : buckets (1,2), (3,4), (5,6), (7,8), puis (1-4), (5-8), puis global — appliquée AVANT toute lecture",
+      "buckets_sous_plancher": [],
+      "profil": {
+        "b1": {
+          "rangs": [
+            1,
+            16
+          ],
+          "trials": 355,
+          "n_paires": 348,
+          "sigma_pm": 0.4112676056338028,
+          "sigma_hat_pool": 0.40906987823944285,
+          "sigma_hat_pool_ponderation_litterale": 0.40460343900100265,
+          "Psi": 0.0021977273943599718,
+          "lectures_de_cos_p": {
+            "h": {
+              "sigma_hat_pool": 0.40906987823944285,
+              "Psi": 0.0021977273943599718
+            },
+            "z": {
+              "sigma_hat_pool": 0.41006711945922364,
+              "Psi": 0.001200486174579185
+            },
+            "tronque_phi": {
+              "sigma_hat_pool": 0.4734933118334739,
+              "Psi": -0.06222570619967105
+            }
+          },
+          "sous_plancher": false
+        },
+        "b2": {
+          "rangs": [
+            17,
+            32
+          ],
+          "trials": 990,
+          "n_paires": 933,
+          "sigma_pm": 0.402020202020202,
+          "sigma_hat_pool": 0.4040059973631084,
+          "sigma_hat_pool_ponderation_litterale": 0.4130525598667235,
+          "Psi": -0.0019857953429063824,
+          "lectures_de_cos_p": {
+            "h": {
+              "sigma_hat_pool": 0.4040059973631084,
+              "Psi": -0.0019857953429063824
+            },
+            "z": {
+              "sigma_hat_pool": 0.40311547195091124,
+              "Psi": -0.0010952699307092417
+            },
+            "tronque_phi": {
+              "sigma_hat_pool": 0.47888261104893054,
+              "Psi": -0.07686240902872854
+            }
+          },
+          "sous_plancher": false
+        },
+        "b3": {
+          "rangs": [
+            33,
+            48
+          ],
+          "trials": 1529,
+          "n_paires": 1395,
+          "sigma_pm": 0.40876389797253104,
+          "sigma_hat_pool": 0.4097587376958584,
+          "sigma_hat_pool_ponderation_litterale": 0.4142628480556259,
+          "Psi": -0.0009948397233273676,
+          "lectures_de_cos_p": {
+            "h": {
+              "sigma_hat_pool": 0.4097587376958584,
+              "Psi": -0.0009948397233273676
+            },
+            "z": {
+              "sigma_hat_pool": 0.4094478060409849,
+              "Psi": -0.0006839080684538645
+            },
+            "tronque_phi": {
+              "sigma_hat_pool": 0.48024640313961264,
+              "Psi": -0.0714825051670816
+            }
+          },
+          "sous_plancher": false
+        },
+        "b4": {
+          "rangs": [
+            49,
+            64
+          ],
+          "trials": 2092,
+          "n_paires": 1812,
+          "sigma_pm": 0.41539196940726575,
+          "sigma_hat_pool": 0.4112144008843693,
+          "sigma_hat_pool_ponderation_litterale": 0.4164168802133889,
+          "Psi": 0.004177568522896469,
+          "lectures_de_cos_p": {
+            "h": {
+              "sigma_hat_pool": 0.4112144008843693,
+              "Psi": 0.004177568522896469
+            },
+            "z": {
+              "sigma_hat_pool": 0.41193806455885174,
+              "Psi": 0.0034539048484140134
+            },
+            "tronque_phi": {
+              "sigma_hat_pool": 0.48065363449219667,
+              "Psi": -0.06526166508493092
+            }
+          },
+          "sous_plancher": false
+        }
+      }
+    }
+  },
+  "V-vide|Qwen/Qwen2.5-1.5B": {
+    "verdict": "PASS",
+    "detail": {
+      "n_vide_par_cellule": {
+        "Qwen/Qwen2.5-1.5B|aucun|S3": {
+          "n_vide": 0,
+          "denominateur": 4629
+        },
+        "Qwen/Qwen2.5-1.5B|aucun|S2": {
+          "n_vide": 0,
+          "denominateur": 5192
+        },
+        "Qwen/Qwen2.5-1.5B|aucun|S1": {
+          "n_vide": 1,
+          "denominateur": 23980
+        },
+        "Qwen/Qwen2.5-1.5B|aucun|S0": {
+          "n_vide": 3,
+          "denominateur": 65595
+        },
+        "Qwen/Qwen2.5-1.5B|type|S3": {
+          "n_vide": 120,
+          "denominateur": 635
+        },
+        "Qwen/Qwen2.5-1.5B|type|S2": {
+          "n_vide": 260,
+          "denominateur": 407
+        },
+        "Qwen/Qwen2.5-1.5B|type|S1": {
+          "n_vide": 886,
+          "denominateur": 2226
+        },
+        "Qwen/Qwen2.5-1.5B|type|S0": {
+          "n_vide": 3973,
+          "denominateur": 4966
+        }
+      },
+      "cellules_sans_denominateur": [],
+      "manques": [],
+      "regle": "dénominateur nul ⇒ SANS OBJET (D23), jamais 0"
+    }
+  },
+  "V-loo|Qwen/Qwen2.5-1.5B": {
+    "verdict": "PASS",
+    "detail": {
+      "rho_Base_mu_LOO_PRINCIPAL": 0.670173031481058,
+      "rho_Base_mu_non_LOO_descriptif": 0.6750057168991539,
+      "ecart_LOO_moins_non_LOO": -0.0048326854180958945,
+      "epsilon_B": 0.015904339046964536,
+      "ecart_rapporte_a_epsilon_B": -0.30385955705705664,
+      "biais_annonce_3_2": 0.005,
+      "regle": "LOO principal, INCONDITIONNEL (P7) ; inversion ⇒ arrêt"
+    }
+  },
+  "V-diag|Qwen/Qwen2.5-1.5B": {
+    "verdict": "PASS",
+    "detail": {
+      "quantites_requises": [
+        "rho_Base",
+        "rho_chapeau_Base",
+        "R_Base",
+        "Delta_Base",
+        "Delta_chapeau_Base",
+        "n_vide",
+        "sigma_pm",
+        "sigma_hat_pool"
+      ],
+      "n_cellules": 8,
+      "manques": [],
+      "n_manques": 0,
+      "regle_D34": "un ρ_Base publié sans son ρ̂_Base apparié rend le rapport NON ÉCRIVABLE ((xxvii), D34)"
+    }
+  },
+  "V-ulp|Qwen/Qwen2.5-1.5B": {
+    "verdict": "PASS",
+    "detail": {
+      "marges": {
+        "aucun": {
+          "marge_ulp_min": 213117035872.0,
+          "marge_ulp_mediane": 25485615874424.0,
+          "marge_ulp_max": 47508162252588.0,
+          "n_etats": 256,
+          "chemin_nominal": "fp64",
+          "seuil": "SANS OBJET"
+        },
+        "type": {
+          "marge_ulp_min": 108234191165.0,
+          "marge_ulp_mediane": 9238469087987.0,
+          "marge_ulp_max": 103081860122248.0,
+          "n_etats": 256,
+          "chemin_nominal": "fp64",
+          "seuil": "SANS OBJET"
+        },
+        "mu_global_LOO": {
+          "marge_ulp_min": 226932605535.0,
+          "marge_ulp_mediane": 5617433173129.0,
+          "marge_ulp_max": 22541006196816.0,
+          "n_etats": 65,
+          "chemin_nominal": "fp64",
+          "seuil": "SANS OBJET"
+        },
+        "plac": {
+          "marge_ulp_min": 34235233404.0,
+          "marge_ulp_mediane": 8638261192242.0,
+          "marge_ulp_max": 33943392881658.0,
+          "n_etats": 40,
+          "chemin_nominal": "fp64",
+          "seuil": "SANS OBJET"
+        }
+      },
+      "conditions_publiees": [
+        "aucun",
+        "mu_global_LOO",
+        "plac",
+        "type"
+      ],
+      "chemin_nominal": "fp64",
+      "seuil": "SANS OBJET"
+    }
+  },
+  "V-S|Qwen/Qwen2.5-1.5B": {
+    "verdict": "PASS",
+    "detail": {
+      "q95": 2008.4499999999935,
+      "DEFF_S_observe": 909.6355739973266,
+      "borne_demontree": 2.8,
+      "methode_de_quantile": "np.quantile(method='linear') — type 7 ; encadrement par statistiques d'ordre publié",
+      "formule_binomiale": "INTERDITE (0-180)",
+      "motif_d_echec": null
+    }
+  },
+  "N-hyp|Qwen/Qwen2.5-1.5B": {
+    "verdict": "PASS",
+    "detail": {
+      "q95": 2008.4499999999935,
+      "encadrement_statistiques_d_ordre": [
+        2008.0,
+        2017.0
+      ],
+      "methode_de_quantile": "np.quantile(method='linear') — type 7 ; encadrement par statistiques d'ordre publié",
+      "R_tirages": 10000,
+      "generateur": "numpy.random.default_rng",
+      "seed": 0,
+      "moyenne_T": 500.0227,
+      "esperance_theorique": 512.4609375,
+      "variance_observee": 462510.8810728173,
+      "variance_de_reference_un_S_par_paire": 508.45733642578125,
+      "DEFF_S_observe": 909.6355739973266,
+      "DEFF_S_formule": {
+        "Var_T": 488041.43737237836,
+        "somme_c_i": 65595.0,
+        "somme_c_i_carre": 63478735.0,
+        "pi": 0.0078125,
+        "D": 8192,
+        "formule": "Var(T) = π(1−π)[Σc_i² − ((Σc_i)² − Σc_i²)/(D−1)]",
+        "formule_binomiale": "INTERDITE (0-180)"
+      },
+      "borne_demontree": 2.8,
+      "sens_de_la_borne": "borne INFÉRIEURE — la lecture licite est « DEFF_S ≥ 2.8 », donc SATISFAITE, jamais « écart à la borne »",
+      "borne_satisfaite": true,
+      "variance_observee_sur_forme_fermee": 0.9476877282449254,
+      "ecart_forme_fermee_commente": "la variance MESURÉE sur les R tirages et la FORME FERMÉE de Q-M12 ne coïncident pas exactement : l'écart relatif est publié ci-dessus. Cause nommée : la forme fermée traite les 64 indices de S comme un tirage hypergéométrique exact, la mesure les tire effectivement — l'écart est l'erreur de Monte-Carlo sur R tirages plus les termes d'ordre 1/D négligés au dénominateur de référence.",
+      "poids_probant": "NUL, déclaré (D32) — c'est k²/D sous un autre nom"
+    }
+  },
+  "V-P8|Qwen/Qwen2.5-1.5B": {
+    "verdict": "PASS",
+    "detail": {
+      "minimum": 8,
+      "cellules_exclues": {},
+      "cardinal_exclu": 0,
+      "n_cellules": 8,
+      "modeles_exclus": [],
+      "regle_modele": "> 2 strates touchées sur un modèle ⇒ modèle exclu (§6.F)"
+    }
+  }
+}

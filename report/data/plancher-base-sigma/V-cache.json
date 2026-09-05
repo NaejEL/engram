@@ -1,0 +1,60 @@
+{
+  "porte": "V-cache",
+  "verdict": "PASS",
+  "detail": {
+    "repertoire": "C:\\Users\\fuzzz\\engram\\experiments\\results\\v4-materiel\\raw",
+    "fichiers": {
+      "gpt2": {
+        "present": true,
+        "chemin": "C:\\Users\\fuzzz\\engram\\experiments\\results\\v4-materiel\\raw\\etats-gpt2.npz",
+        "taille_octets": 23461342,
+        "sha256": "5ac90c5b49b1c072dfbded36baade788f07c5195d80b1e85a3777cab354c6ed6",
+        "n_cles": 18,
+        "dtype_etats": "float32",
+        "forme_etats": [
+          13,
+          132,
+          768
+        ],
+        "cle_exemple": "T1-A|t"
+      },
+      "HuggingFaceTB/SmolLM2-360M": {
+        "present": true,
+        "chemin": "C:\\Users\\fuzzz\\engram\\experiments\\results\\v4-materiel\\raw\\etats-HuggingFaceTB_SmolLM2-360M.npz",
+        "taille_octets": 74635393,
+        "sha256": "6553621b4d0be03b90b8efc000bd5e62486fec9a1eda6bdbbf8ab6ae7d2104f5",
+        "n_cles": 18,
+        "dtype_etats": "float32",
+        "forme_etats": [
+          33,
+          132,
+          960
+        ],
+        "cle_exemple": "T1-A|t"
+      },
+      "Qwen/Qwen2.5-1.5B": {
+        "present": true,
+        "chemin": "C:\\Users\\fuzzz\\engram\\experiments\\results\\v4-materiel\\raw\\etats-Qwen_Qwen2.5-1.5B.npz",
+        "taille_octets": 104260274,
+        "sha256": "f3792daebf611d957acb44d95861546b084253c4ab70ad3821d8833cf5c4d7dd",
+        "n_cles": 18,
+        "dtype_etats": "float32",
+        "forme_etats": [
+          29,
+          132,
+          1536
+        ],
+        "cle_exemple": "T1-A|t"
+      }
+    },
+    "limite_nommee": "le hash des `.npz` de v4 n'a jamais été pré-enregistré : il est gravé ici pour la suite, ce qui est une LIMITE, pas une vérification (§3)",
+    "poste_gpu_si_echec": {
+      "duree_s": 53.82,
+      "vram_gio_max_reservee": 4.688,
+      "vram_gio_max_allouee": 4.188,
+      "unite": "RÉSERVÉ (§7, 0-142)",
+      "statut": "non déclenché tant que V-cache PASS"
+    },
+    "fichiers_manquants": []
+  }
+}

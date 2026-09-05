@@ -7,6 +7,10 @@ __pycache__/
 
 # Données et sorties d'expériences (jamais commitées ; les résultats vont dans docs/JOURNAL.md)
 data/
+# exception : l'archive de publication DOIT etre versionnee (protocole
+# EXP-2026-09-04-rapport-sous-banc.md §3.4 ; defaut 0-218)
+!report/data/
+!report/data/**
 runs/
 *.pt
 *.safetensors

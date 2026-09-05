@@ -1,0 +1,19 @@
+{
+  "poste": "N-queue — simulation exacte à sélection top-64 par vecteur",
+  "budget_grave_au_9": "négligeable",
+  "duree_par_branche_s": {
+    "gpt2": 138.69,
+    "gpt2|centre": 141.69,
+    "HuggingFaceTB/SmolLM2-360M": 132.68,
+    "HuggingFaceTB/SmolLM2-360M|centre": 124.81,
+    "Qwen/Qwen2.5-1.5B": 128.48,
+    "Qwen/Qwen2.5-1.5B|centre": 127.29
+  },
+  "n_branches": 6,
+  "duree_totale_du_poste_s": 793.64,
+  "duree_moyenne_par_branche_s": 132.27333333333334,
+  "cause_publiee": "le poste `N-queue` est budgété à ZÉRO (« négligeable », §9) et coûte 132.3 s PAR BRANCHE, sur 6 branches — soit 793.6 s au total",
+  "cause_ecartee": "« +390 s pour la SECONDE simulation » — sous-attribution d'un facteur 2 : la PREMIÈRE branche coûte le même prix et c'est elle qui a démoli le poste",
+  "duree_totale_du_run_s": 1111.8,
+  "budget_grave_total_au_9": "< 10 min CPU"
+}

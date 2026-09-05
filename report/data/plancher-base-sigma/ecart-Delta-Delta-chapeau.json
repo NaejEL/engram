@@ -1,0 +1,139 @@
+{
+  "regle": "l'écart se publie par cellule, avec son signe et son rapport à ε_B ; une étendue résumée n'est pas une table",
+  "cellules": {
+    "gpt2|aucun|S3": {
+      "Delta_Base": 0.14667111630235274,
+      "Delta_chapeau_Base": 0.1388240552750531,
+      "ecart_Delta_moins_Delta_chapeau": 0.007847061027299651,
+      "epsilon_B": 0.030681088834695124,
+      "ecart_absolu_rapporte_a_epsilon_B": 0.25576214291410515
+    },
+    "gpt2|aucun|S1": {
+      "Delta_Base": 0.21766766921955907,
+      "Delta_chapeau_Base": 0.2050003374896308,
+      "ecart_Delta_moins_Delta_chapeau": 0.01266733172992826,
+      "epsilon_B": 0.020186151469407297,
+      "ecart_absolu_rapporte_a_epsilon_B": 0.6275258436025298
+    },
+    "gpt2|aucun|S0": {
+      "Delta_Base": 0.37714983856419615,
+      "Delta_chapeau_Base": 0.35518951591079806,
+      "ecart_Delta_moins_Delta_chapeau": 0.02196032265339809,
+      "epsilon_B": 0.017705777977294744,
+      "ecart_absolu_rapporte_a_epsilon_B": 1.2402913151604646
+    },
+    "gpt2|type|S3": {
+      "Delta_Base": -0.006150061500615006,
+      "Delta_chapeau_Base": -0.013180248996238262,
+      "ecart_Delta_moins_Delta_chapeau": 0.007030187495623256,
+      "epsilon_B": 0.013081531188871983,
+      "ecart_absolu_rapporte_a_epsilon_B": 0.5374131968284874
+    },
+    "gpt2|type|S1": {
+      "Delta_Base": 0.0001657756226946825,
+      "Delta_chapeau_Base": -0.006945403483659408,
+      "ecart_Delta_moins_Delta_chapeau": 0.00711117910635409,
+      "epsilon_B": 0.00869504060916665,
+      "ecart_absolu_rapporte_a_epsilon_B": 0.8178431160927768
+    },
+    "gpt2|type|S0": {
+      "Delta_Base": 0.005003606793888124,
+      "Delta_chapeau_Base": -0.0006623815406417036,
+      "ecart_Delta_moins_Delta_chapeau": 0.005665988334529828,
+      "epsilon_B": 0.005689384164900173,
+      "ecart_absolu_rapporte_a_epsilon_B": 0.9958878097009721
+    },
+    "HuggingFaceTB/SmolLM2-360M|aucun|S3": {
+      "Delta_Base": 0.13663230240549828,
+      "Delta_chapeau_Base": 0.1591338868932505,
+      "ecart_Delta_moins_Delta_chapeau": -0.02250158448775222,
+      "epsilon_B": 0.027969226837814328,
+      "ecart_absolu_rapporte_a_epsilon_B": 0.8045122097308078
+    },
+    "HuggingFaceTB/SmolLM2-360M|aucun|S1": {
+      "Delta_Base": 0.17972164433047882,
+      "Delta_chapeau_Base": 0.18733726267031658,
+      "ecart_Delta_moins_Delta_chapeau": -0.00761561833983776,
+      "epsilon_B": 0.016809873144402004,
+      "ecart_absolu_rapporte_a_epsilon_B": 0.4530443671060005
+    },
+    "HuggingFaceTB/SmolLM2-360M|aucun|S0": {
+      "Delta_Base": 0.3058535137903728,
+      "Delta_chapeau_Base": 0.300404106094585,
+      "ecart_Delta_moins_Delta_chapeau": 0.005449407695787778,
+      "epsilon_B": 0.014224150959903264,
+      "ecart_absolu_rapporte_a_epsilon_B": 0.38310952345410415
+    },
+    "HuggingFaceTB/SmolLM2-360M|type|S3": {
+      "Delta_Base": -0.03225806451612903,
+      "Delta_chapeau_Base": -0.007129511966081573,
+      "ecart_Delta_moins_Delta_chapeau": -0.025128552550047457,
+      "epsilon_B": 0.02229929355926039,
+      "ecart_absolu_rapporte_a_epsilon_B": 1.1268766198026996
+    },
+    "HuggingFaceTB/SmolLM2-360M|type|S1": {
+      "Delta_Base": -0.004411890687912276,
+      "Delta_chapeau_Base": -0.005267879402771315,
+      "ecart_Delta_moins_Delta_chapeau": 0.0008559887148590394,
+      "epsilon_B": 0.007198999668829015,
+      "ecart_absolu_rapporte_a_epsilon_B": 0.11890384139971408
+    },
+    "HuggingFaceTB/SmolLM2-360M|type|S0": {
+      "Delta_Base": 0.0025419943470556374,
+      "Delta_chapeau_Base": -0.0015077135403301024,
+      "ecart_Delta_moins_Delta_chapeau": 0.00404970788738574,
+      "epsilon_B": 0.005075209390321501,
+      "ecart_absolu_rapporte_a_epsilon_B": 0.7979390752051714
+    },
+    "Qwen/Qwen2.5-1.5B|aucun|S3": {
+      "Delta_Base": 0.14149924389717,
+      "Delta_chapeau_Base": 0.10930284088387777,
+      "ecart_Delta_moins_Delta_chapeau": 0.03219640301329223,
+      "epsilon_B": 0.034214068993419326,
+      "ecart_absolu_rapporte_a_epsilon_B": 0.9410281781884764
+    },
+    "Qwen/Qwen2.5-1.5B|aucun|S1": {
+      "Delta_Base": 0.21558242980261327,
+      "Delta_chapeau_Base": 0.1873349374031908,
+      "ecart_Delta_moins_Delta_chapeau": 0.02824749239942248,
+      "epsilon_B": 0.021139415924896775,
+      "ecart_absolu_rapporte_a_epsilon_B": 1.3362475339800768
+    },
+    "Qwen/Qwen2.5-1.5B|aucun|S0": {
+      "Delta_Base": 0.33034532894049623,
+      "Delta_chapeau_Base": 0.3184416596137149,
+      "ecart_Delta_moins_Delta_chapeau": 0.01190366932678133,
+      "epsilon_B": 0.015904339046964536,
+      "ecart_absolu_rapporte_a_epsilon_B": 0.7484541980418379
+    },
+    "Qwen/Qwen2.5-1.5B|type|S3": {
+      "Delta_Base": -0.02047244094488189,
+      "Delta_chapeau_Base": -0.01806540494427105,
+      "ecart_Delta_moins_Delta_chapeau": -0.002407036000610839,
+      "epsilon_B": 0.017930076102774507,
+      "ecart_absolu_rapporte_a_epsilon_B": 0.13424572136859883
+    },
+    "Qwen/Qwen2.5-1.5B|type|S1": {
+      "Delta_Base": -0.0047918538484576206,
+      "Delta_chapeau_Base": -0.006194549760667863,
+      "ecart_Delta_moins_Delta_chapeau": 0.001402695912210242,
+      "epsilon_B": 0.007623025569565885,
+      "ecart_absolu_rapporte_a_epsilon_B": 0.1840077669174239
+    },
+    "Qwen/Qwen2.5-1.5B|type|S0": {
+      "Delta_Base": 0.0004717262570665719,
+      "Delta_chapeau_Base": -0.002337002112318055,
+      "ecart_Delta_moins_Delta_chapeau": 0.002808728369384627,
+      "epsilon_B": 0.0050516509460788684,
+      "ecart_absolu_rapporte_a_epsilon_B": 0.5560020673171776
+    }
+  },
+  "etendue_signee": [
+    -0.025128552550047457,
+    0.03219640301329223
+  ],
+  "n_cellules": 18,
+  "n_ecarts_negatifs": 4,
+  "n_depassant_1x_epsilon_B": 3,
+  "n_depassant_2x_epsilon_B": 0
+}

@@ -1,0 +1,291 @@
+{
+  "porte": "V-G",
+  "verdict": "PASS",
+  "detail": {
+    "version": "v2 (§15, 2026-08-26)",
+    "cfg": "model=gpt2 layer=6 lam=2.0 eta=0.2 decay=0.001 thr=4.0 prune=512/0.1 hebb_only=False dg=8192/64 gate=keysim",
+    "tolerance_fp32_fp64": 1e-06,
+    "modeles": {
+      "gpt2": {
+        "couche": 6,
+        "d": 768,
+        "G_du_projet": {
+          "generateur": "torch.randn(dg_dim, d, generator=manual_seed(seed))",
+          "seed": 0,
+          "forme": [
+            8192,
+            768
+          ],
+          "dtype": "torch.float32",
+          "echelle": "aucune (pas de 1/√d)",
+          "sha256": "681252f3beca09826ac3be75a271ef46461ab4bb989bfd66767958d2ffb219ad",
+          "portee": "pour cette G, seed 0 (D9)"
+        },
+        "cos_phi_par_strate_fp32": {
+          "S3": 0.2765880627764596,
+          "S2": 0.20695693966139247,
+          "S1": 0.24789006826122875,
+          "S0": 0.18864584040961097
+        },
+        "cos_phi_par_strate_fp64": {
+          "S3": 0.27658806387056156,
+          "S2": 0.20695694009610738,
+          "S1": 0.24789006929315519,
+          "S0": 0.18864584100542842
+        },
+        "ecart_fp64_moins_fp32": {
+          "S3": 1.0941019756849357e-09,
+          "S2": 4.3471490296376203e-10,
+          "S1": 1.0319264331926092e-09,
+          "S0": 5.95817450932401e-10
+        },
+        "ecart_max_de_precision": 1.0941019756849357e-09,
+        "V-iid": {
+          "verdict": "PASS",
+          "detail": {
+            "moyenne": -0.0032650546209091295,
+            "ecart_type": 1.000476575056003,
+            "forme": [
+              512,
+              768
+            ],
+            "preuve": "par provenance (torch.randn, lignes iid) — M3",
+            "residuel": "sanité de moments ; PAS de KS",
+            "tolerances": {
+              "|moyenne|": 0.02,
+              "|σ−1|": 0.02
+            }
+          }
+        },
+        "divergence_avec_A3": {
+          "A3_publie": {
+            "cos_projection_A3": {
+              "S3": 0.283819903826548,
+              "S2": 0.21455342597155655,
+              "S1": 0.25728208728962476,
+              "S0": 0.19266583529195042
+            },
+            "cos_brut": {
+              "S3": 0.7434180575940343,
+              "S2": 0.6804045050232498,
+              "S1": 0.7177266161474917,
+              "S0": 0.6555543941322458
+            },
+            "compression": {
+              "S3": 0.45959815376748636,
+              "S2": 0.4658510790516932,
+              "S1": 0.4604445288578669,
+              "S0": 0.4628885588402954
+            },
+            "n_paires": {
+              "S3": 60,
+              "S2": 90,
+              "S1": 360,
+              "S0": 1260
+            },
+            "amplitude_de_compression": 0.006252925284206845,
+            "source": "C:\\Users\\fuzzz\\engram\\experiments\\results\\v4-materiel\\mesure-gpt2-seed0.json",
+            "avertissement": "A3 porte sur une AUTRE projection : sa `G` est tirée par numpy.default_rng(0), pas par torch.randn(generator=manual_seed(0)) — 0-135"
+          },
+          "ecart_cos_fp32_moins_A3": {
+            "S3": -0.0072318410500883945,
+            "S2": -0.0075964863101640745,
+            "S1": -0.00939201902839601,
+            "S0": -0.0040199948823394505
+          },
+          "corrcoef_G_projet_vs_G_A3": -0.0008436993989740638,
+          "mention_obligatoire": "A3 porte sur une AUTRE projection (G tirée par numpy, 0-135) : aucune reproduction d'A3 n'est exigée ni possible"
+        },
+        "verdict": "PASS",
+        "duree_s": 0.42
+      },
+      "HuggingFaceTB/SmolLM2-360M": {
+        "couche": 16,
+        "d": 960,
+        "G_du_projet": {
+          "generateur": "torch.randn(dg_dim, d, generator=manual_seed(seed))",
+          "seed": 0,
+          "forme": [
+            8192,
+            960
+          ],
+          "dtype": "torch.float32",
+          "echelle": "aucune (pas de 1/√d)",
+          "sha256": "826dd4f94d9a35cef78542f862638f7b410234f89017fdfc33782b7354aa3fc5",
+          "portee": "pour cette G, seed 0 (D9)"
+        },
+        "cos_phi_par_strate_fp32": {
+          "S3": 0.33684085156354643,
+          "S2": 0.2565608657827532,
+          "S1": 0.31742447217995373,
+          "S0": 0.25677021345328144
+        },
+        "cos_phi_par_strate_fp64": {
+          "S3": 0.33684085005315434,
+          "S2": 0.25656086956072155,
+          "S1": 0.3174244722201665,
+          "S0": 0.25677021505372194
+        },
+        "ecart_fp64_moins_fp32": {
+          "S3": -1.5103920891768041e-09,
+          "S2": 3.777968327067782e-09,
+          "S1": 4.021277755228425e-11,
+          "S0": 1.6004405023473112e-09
+        },
+        "ecart_max_de_precision": 3.777968327067782e-09,
+        "V-iid": {
+          "verdict": "PASS",
+          "detail": {
+            "moyenne": -0.0026875320706424466,
+            "ecart_type": 1.00093836802203,
+            "forme": [
+              512,
+              960
+            ],
+            "preuve": "par provenance (torch.randn, lignes iid) — M3",
+            "residuel": "sanité de moments ; PAS de KS",
+            "tolerances": {
+              "|moyenne|": 0.02,
+              "|σ−1|": 0.02
+            }
+          }
+        },
+        "divergence_avec_A3": {
+          "A3_publie": {
+            "cos_projection_A3": {
+              "S3": 0.34010036575297514,
+              "S2": 0.28245002464563757,
+              "S1": 0.32615144642897775,
+              "S0": 0.27577364778136293
+            },
+            "cos_brut": {
+              "S3": 0.7886106507645714,
+              "S2": 0.7404473593941442,
+              "S1": 0.7794389673681171,
+              "S0": 0.7363590674583244
+            },
+            "compression": {
+              "S3": 0.44851028501159623,
+              "S2": 0.4579973347485066,
+              "S1": 0.4532875209391394,
+              "S0": 0.4605854196769614
+            },
+            "n_paires": {
+              "S3": 60,
+              "S2": 90,
+              "S1": 360,
+              "S0": 1260
+            },
+            "amplitude_de_compression": 0.012075134665365195,
+            "source": "C:\\Users\\fuzzz\\engram\\experiments\\results\\v4-materiel\\mesure-smollm2-360m-seed0.json",
+            "avertissement": "A3 porte sur une AUTRE projection : sa `G` est tirée par numpy.default_rng(0), pas par torch.randn(generator=manual_seed(0)) — 0-135"
+          },
+          "ecart_cos_fp32_moins_A3": {
+            "S3": -0.003259514189428714,
+            "S2": -0.025889158862884343,
+            "S1": -0.008726974249024022,
+            "S0": -0.019003434328081492
+          },
+          "corrcoef_G_projet_vs_G_A3": 0.0009093376150005358,
+          "mention_obligatoire": "A3 porte sur une AUTRE projection (G tirée par numpy, 0-135) : aucune reproduction d'A3 n'est exigée ni possible"
+        },
+        "verdict": "PASS",
+        "duree_s": 0.71
+      },
+      "Qwen/Qwen2.5-1.5B": {
+        "couche": 14,
+        "d": 1536,
+        "G_du_projet": {
+          "generateur": "torch.randn(dg_dim, d, generator=manual_seed(seed))",
+          "seed": 0,
+          "forme": [
+            8192,
+            1536
+          ],
+          "dtype": "torch.float32",
+          "echelle": "aucune (pas de 1/√d)",
+          "sha256": "bcc2f18242d6b4142ce25e37babc5ca79360cde62ebd6b5e26c0c9cb29264b18",
+          "portee": "pour cette G, seed 0 (D9)"
+        },
+        "cos_phi_par_strate_fp32": {
+          "S3": 0.21844153124839066,
+          "S2": 0.16358900389944514,
+          "S1": 0.18832197460449404,
+          "S0": 0.14712111915993903
+        },
+        "cos_phi_par_strate_fp64": {
+          "S3": 0.21844153137354555,
+          "S2": 0.16358900457502548,
+          "S1": 0.188321974861261,
+          "S0": 0.14712111943299055
+        },
+        "ecart_fp64_moins_fp32": {
+          "S3": 1.2515488645448158e-10,
+          "S2": 6.755803416691464e-10,
+          "S1": 2.5676696879806116e-10,
+          "S0": 2.7305152583423364e-10
+        },
+        "ecart_max_de_precision": 6.755803416691464e-10,
+        "V-iid": {
+          "verdict": "PASS",
+          "detail": {
+            "moyenne": -0.0011829698591570628,
+            "ecart_type": 0.9997979809468042,
+            "forme": [
+              512,
+              1536
+            ],
+            "preuve": "par provenance (torch.randn, lignes iid) — M3",
+            "residuel": "sanité de moments ; PAS de KS",
+            "tolerances": {
+              "|moyenne|": 0.02,
+              "|σ−1|": 0.02
+            }
+          }
+        },
+        "divergence_avec_A3": {
+          "A3_publie": {
+            "cos_projection_A3": {
+              "S3": 0.2300616262196046,
+              "S2": 0.17582345239956068,
+              "S1": 0.20327594702916774,
+              "S0": 0.15896987498469317
+            },
+            "cos_brut": {
+              "S3": 0.6635063297218747,
+              "S2": 0.5933894784914122,
+              "S1": 0.6294615918149551,
+              "S0": 0.5665702977114253
+            },
+            "compression": {
+              "S3": 0.43344470350227016,
+              "S2": 0.41756602609185156,
+              "S1": 0.42618564478578735,
+              "S0": 0.40760042272673214
+            },
+            "n_paires": {
+              "S3": 60,
+              "S2": 90,
+              "S1": 360,
+              "S0": 1260
+            },
+            "amplitude_de_compression": 0.02584428077553802,
+            "source": "C:\\Users\\fuzzz\\engram\\experiments\\results\\v4-materiel\\mesure-qwen2.5-1.5b-seed0.json",
+            "avertissement": "A3 porte sur une AUTRE projection : sa `G` est tirée par numpy.default_rng(0), pas par torch.randn(generator=manual_seed(0)) — 0-135"
+          },
+          "ecart_cos_fp32_moins_A3": {
+            "S3": -0.01162009497121394,
+            "S2": -0.012234448500115541,
+            "S1": -0.014953972424673695,
+            "S0": -0.011848755824754142
+          },
+          "corrcoef_G_projet_vs_G_A3": -0.0011579967611975188,
+          "mention_obligatoire": "A3 porte sur une AUTRE projection (G tirée par numpy, 0-135) : aucune reproduction d'A3 n'est exigée ni possible"
+        },
+        "verdict": "PASS",
+        "duree_s": 1.01
+      }
+    },
+    "verdict_porte": "G du projet instanciée et hashée ; cos publiés en fp32 et fp64 ; divergence avec A3 publiée"
+  }
+}

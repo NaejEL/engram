@@ -1,0 +1,73 @@
+{
+  "clause": "C3b",
+  "pass": {
+    "report": "# Rapport\n\n## 3. Provenance\n\nLe compte `R-nul` vaut 24/24 ⟦M-R-NUL⟧, résolu au manifeste.\n\nLes termes du glossaire ne sont pas réemployés ici ; voir l'annexe.\n",
+    "manifeste": [
+      {
+        "id": "M-R-NUL",
+        "valeur": "24/24",
+        "source_fichier": "report/data/plancher-base-sigma/summary.csv",
+        "ancre": "§3 ; graine=0 ; entrees=00000000 ; script=eval/support_overlap.py --depouillement",
+        "hash": "a367873658e37e1da7834ab47edb9bb42aad3cba8a5613c88aeeeed664a9ccb0",
+        "date_source": "2026-08-28",
+        "etiquette": "re-mesuré depuis les bruts",
+        "statut": "décisionnel",
+        "N_eff": "24",
+        "rider_id": "",
+        "paire_id": "",
+        "sections_autorisees": "3"
+      }
+    ],
+    "riders": [],
+    "invalides": [],
+    "relecture": [
+      {
+        "section": "3",
+        "auteur": "lab-math",
+        "relecteur": "lab-neuro",
+        "horodatage": "2026-09-04T10:00",
+        "defauts": "0",
+        "verdict": "RAS"
+      }
+    ],
+    "data": {
+      "report/data/plancher-base-sigma/summary.csv": "condition,metrique,valeur\nR-nul,succes,24/24\n",
+      "eval/support_overlap.py": "# stub de fixture\n"
+    }
+  },
+  "mutant": {
+    "report": "# Rapport\n\n## 3. Provenance\n\nLe compte `R-nul` vaut 24/24 ⟦M-R-NUL⟧, résolu au manifeste.\n\nLa matrice `M` ne souffre pas de cette lecture.\n",
+    "manifeste": [
+      {
+        "id": "M-R-NUL",
+        "valeur": "24/24",
+        "source_fichier": "report/data/plancher-base-sigma/summary.csv",
+        "ancre": "§3 ; graine=0 ; entrees=00000000 ; script=eval/support_overlap.py --depouillement",
+        "hash": "a367873658e37e1da7834ab47edb9bb42aad3cba8a5613c88aeeeed664a9ccb0",
+        "date_source": "2026-08-28",
+        "etiquette": "re-mesuré depuis les bruts",
+        "statut": "décisionnel",
+        "N_eff": "24",
+        "rider_id": "",
+        "paire_id": "",
+        "sections_autorisees": "3"
+      }
+    ],
+    "riders": [],
+    "invalides": [],
+    "relecture": [
+      {
+        "section": "3",
+        "auteur": "lab-math",
+        "relecteur": "lab-neuro",
+        "horodatage": "2026-09-04T10:00",
+        "defauts": "0",
+        "verdict": "RAS"
+      }
+    ],
+    "data": {
+      "report/data/plancher-base-sigma/summary.csv": "condition,metrique,valeur\nR-nul,succes,24/24\n",
+      "eval/support_overlap.py": "# stub de fixture\n"
+    }
+  }
+}

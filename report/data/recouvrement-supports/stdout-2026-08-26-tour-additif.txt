@@ -1,0 +1,137 @@
+model=gpt2 layer=6 lam=2.0 eta=0.2 decay=0.001 thr=4.0 prune=512/0.1 hebb_only=False dg=8192/64 gate=keysim
+
+V-cache : PASS
+  gpt2
+    sha256 = 5ac90c5b49b1c072dfbded36baade788f07c5195d80b1e85a3777cab354c6ed6
+    23461342 octets, dtype=float32, forme=[13, 132, 768]
+  HuggingFaceTB/SmolLM2-360M
+    sha256 = 6553621b4d0be03b90b8efc000bd5e62486fec9a1eda6bdbbf8ab6ae7d2104f5
+    74635393 octets, dtype=float32, forme=[33, 132, 960]
+  Qwen/Qwen2.5-1.5B
+    sha256 = f3792daebf611d957acb44d95861546b084253c4ab70ad3821d8833cf5c4d7dd
+    104260274 octets, dtype=float32, forme=[29, 132, 1536]
+
+V-G (v2) : PASS
+
+  gpt2 (couche 6, d=768)
+    G du projet : sha256 = 681252f3beca09826ac3be75a271ef46461ab4bb989bfd66767958d2ffb219ad
+                  torch.randn(dg_dim, d, generator=manual_seed(seed)), seed 0, forme [8192, 768], aucune (pas de 1/√d)
+    cos φ(h) fp32 : S3=0.276588062776, S2=0.206956939661, S1=0.247890068261, S0=0.188645840410
+    cos φ(h) fp64 : S3=0.276588063871, S2=0.206956940096, S1=0.247890069293, S0=0.188645841005
+    écart fp64−fp32 : S3=+1.094e-09, S2=+4.347e-10, S1=+1.032e-09, S0=+5.958e-10
+    écart max de précision = 1.094e-09 (tolérance 1e-06)
+    divergence avec A3 (obligatoire) : écart cos fp32 − A3 = S3=-7.232e-03, S2=-7.596e-03, S1=-9.392e-03, S0=-4.020e-03
+      corrcoef(G projet, G d'A3) = -0.0008 — A3 porte sur une AUTRE projection (G tirée par numpy, 0-135) : aucune reproduction d'A3 n'est exigée ni possible
+    V-iid : PASS (moyenne -0.00327, σ 1.00048)
+
+  HuggingFaceTB/SmolLM2-360M (couche 16, d=960)
+    G du projet : sha256 = 826dd4f94d9a35cef78542f862638f7b410234f89017fdfc33782b7354aa3fc5
+                  torch.randn(dg_dim, d, generator=manual_seed(seed)), seed 0, forme [8192, 960], aucune (pas de 1/√d)
+    cos φ(h) fp32 : S3=0.336840851564, S2=0.256560865783, S1=0.317424472180, S0=0.256770213453
+    cos φ(h) fp64 : S3=0.336840850053, S2=0.256560869561, S1=0.317424472220, S0=0.256770215054
+    écart fp64−fp32 : S3=-1.510e-09, S2=+3.778e-09, S1=+4.021e-11, S0=+1.600e-09
+    écart max de précision = 3.778e-09 (tolérance 1e-06)
+    divergence avec A3 (obligatoire) : écart cos fp32 − A3 = S3=-3.260e-03, S2=-2.589e-02, S1=-8.727e-03, S0=-1.900e-02
+      corrcoef(G projet, G d'A3) = +0.0009 — A3 porte sur une AUTRE projection (G tirée par numpy, 0-135) : aucune reproduction d'A3 n'est exigée ni possible
+    V-iid : PASS (moyenne -0.00269, σ 1.00094)
+
+  Qwen/Qwen2.5-1.5B (couche 14, d=1536)
+    G du projet : sha256 = bcc2f18242d6b4142ce25e37babc5ca79360cde62ebd6b5e26c0c9cb29264b18
+                  torch.randn(dg_dim, d, generator=manual_seed(seed)), seed 0, forme [8192, 1536], aucune (pas de 1/√d)
+    cos φ(h) fp32 : S3=0.218441531248, S2=0.163589003899, S1=0.188321974604, S0=0.147121119160
+    cos φ(h) fp64 : S3=0.218441531374, S2=0.163589004575, S1=0.188321974861, S0=0.147121119433
+    écart fp64−fp32 : S3=+1.252e-10, S2=+6.756e-10, S1=+2.568e-10, S0=+2.731e-10
+    écart max de précision = 6.756e-10 (tolérance 1e-06)
+    divergence avec A3 (obligatoire) : écart cos fp32 − A3 = S3=-1.162e-02, S2=-1.223e-02, S1=-1.495e-02, S0=-1.185e-02
+      corrcoef(G projet, G d'A3) = -0.0012 — A3 porte sur une AUTRE projection (G tirée par numpy, 0-135) : aucune reproduction d'A3 n'est exigée ni possible
+    V-iid : PASS (moyenne -0.00118, σ 0.99980)
+
+V-norm : PASS
+  gpt2                             LayerNorm  centre=True | "layer_norm_epsilon": 1e-05
+  HuggingFaceTB/SmolLM2-360M       RMSNorm    centre=False | "rms_norm_eps": 1e-05
+  Qwen/Qwen2.5-1.5B                RMSNorm    centre=False | "rms_norm_eps": 1e-06
+
+R dérivé : 17  (sous plafond)
+    R_formule = 17
+    plafond = 300
+    sigma_dir = 0.05218332599808907
+    sigma_delta = 0.040601831525618526
+    depassement = False
+    modele_du_pilote = gpt2
+    R0 = 20
+    n_paires_du_pilote = 512
+
+--- mesure : gpt2 (couche 6, COUCHE_REF (§7)) ---
+    durée 232.52 s ; 1770 paires × 6 cellules ; cardinal intra-tige 150 PAR CELLULE DE CAPTURE = 900 dans l'unité de P
+    split-half : 5400 paires à cheval exclues ; moitiés [30, 30]
+      S3 aucun : O = 5993/23040 = 16.647 indices ; méd 16/1 IQR ['13/1', '20/1'] ; f = 0.2791 ; σ± = 1/1 ; cos = 0.2766 ; p_sym méd = 14
+      S2 aucun : O = 3389/17280 = 12.552 indices ; méd 12/1 IQR ['10/1', '15/1'] ; f = 0.2090 ; σ± = 1/1 ; cos = 0.2070 ; p_sym méd = 10
+      S1 aucun : O = 32251/138240 = 14.931 indices ; méd 14/1 IQR ['12/1', '18/1'] ; f = 0.2502 ; σ± = 1/1 ; cos = 0.2479 ; p_sym méd = 12
+      S0 aucun : O = 17287/96768 = 11.433 indices ; méd 11/1 IQR ['9/1', '14/1'] ; f = 0.1905 ; σ± = 1/1 ; cos = 0.1886 ; p_sym méd = 9
+    ε* — les DEUX règles, côte à côte (aucune promue) :
+      S3 : Δ* = 0.37523 IC ['0.36526', '0.38526'] | min: ε*=0.30417 (ε*/Δ*=0.811, plancher=0.800, signe fixe 0.00) → c-cent | produit: ε*=0.38375 (ε*/Δ*=1.023, plancher=1.000, signe fixe 1.00) → ind_Δ
+      S2 : Δ* = 0.34000 IC ['0.32854', '0.35159'] | min: ε*=0.27643 (ε*/Δ*=0.813, plancher=0.800, signe fixe 0.00) → c-cent | produit: ε*=0.34977 (ε*/Δ*=1.029, plancher=1.000, signe fixe 1.00) → ind_Δ
+      S1 : Δ* = 0.36390 IC ['0.35434', '0.37509'] | min: ε*=0.36161 (ε*/Δ*=0.994, plancher=1.000, signe fixe 0.00) → ind_Δ | produit: ε*=0.22712 (ε*/Δ*=0.624, plancher=0.622, signe fixe 0.00) → c-cent
+      S0 : Δ* = 0.31996 IC ['0.31209', '0.32828'] | min: ε*=0.31371 (ε*/Δ*=0.980, plancher=1.000, signe fixe 0.00) → ind_Δ | produit: ε*=0.18534 (ε*/Δ*=0.579, plancher=0.577, signe fixe 0.00) → c-cent
+    LOO vs split-half (double mesure D26) :
+      S3 : O_type LOO 2.2583 / LOO-sub 2.3583 / split-half 2.6333 | Λ +0.01966 / +0.02122 / +0.02552 | Δ* 0.37523 / 0.38074 / 0.37734 | classes HAUT/c-cent → HAUT/c-cent → HAUT/c-cent
+      S2 : O_type LOO 0.6278 / LOO-sub 0.5542 / split-half 0.6208 | Λ -0.00582 / -0.00697 / -0.00592 | Δ* 0.34000 / 0.34419 / 0.34401 | classes BAS/c-cent → BAS/c-cent → BAS/c-cent
+      S1 : O_type LOO 1.2412 / LOO-sub 1.2571 / split-half 1.4043 | Λ +0.00377 / +0.00402 / +0.00632 | Δ* 0.36390 / 0.36508 / 0.36373 | classes ind_L/ind_Δ → ind_L/ind_Δ → HAUT/ind_Δ
+      S0 : O_type LOO 0.6724 / LOO-sub 0.6876 / split-half 0.6763 | Λ -0.00512 / -0.00488 / -0.00506 | Δ* 0.31996 / 0.31971 / 0.32081 | classes BAS/ind_Δ → BAS/ind_Δ → BAS/ind_Δ
+    anomalie σ± : NON EXPLIQUÉ — 2 cellule(s) signalée(s), DIAGNOSTIQUE (V-diag) — non décisionnelle : ne modifie aucune borne, aucun seuil, aucune classe
+
+--- mesure : HuggingFaceTB/SmolLM2-360M (couche 16, COUCHE_REF (§7)) ---
+    durée 198.66 s ; 1770 paires × 6 cellules ; cardinal intra-tige 150 PAR CELLULE DE CAPTURE = 900 dans l'unité de P
+    split-half : 5400 paires à cheval exclues ; moitiés [30, 30]
+      S3 aucun : O = 485/1536 = 20.208 indices ; méd 20/1 IQR ['16/1', '24/1'] ; f = 0.3397 ; σ± = 1/1 ; cos = 0.3368 ; p_sym méd = 18
+      S2 aucun : O = 559/2304 = 15.528 indices ; méd 15/1 IQR ['13/1', '18/1'] ; f = 0.2589 ; σ± = 1/1 ; cos = 0.2566 ; p_sym méd = 13
+      S1 aucun : O = 20669/69120 = 19.138 indices ; méd 19/1 IQR ['16/1', '23/1'] ; f = 0.3201 ; σ± = 1/1 ; cos = 0.3174 ; p_sym méd = 17
+      S0 aucun : O = 58789/241920 = 15.553 indices ; méd 16/1 IQR ['13/1', '18/1'] ; f = 0.2591 ; σ± = 1/1 ; cos = 0.2568 ; p_sym méd = 13
+    ε* — les DEUX règles, côte à côte (aucune promue) :
+      S3 : Δ* = 0.43548 IC ['0.42653', '0.44337'] | min: ε*=0.35207 (ε*/Δ*=0.808, plancher=0.800, signe fixe 0.00) → c-cent | produit: ε*=0.44224 (ε*/Δ*=1.016, plancher=1.000, signe fixe 1.00) → ind_Δ
+      S2 : Δ* = 0.39131 IC ['0.37928', '0.40417'] | min: ε*=0.31763 (ε*/Δ*=0.812, plancher=0.800, signe fixe 0.00) → c-cent | produit: ε*=0.40198 (ε*/Δ*=1.027, plancher=1.000, signe fixe 1.00) → ind_Δ
+      S1 : Δ* = 0.42634 IC ['0.41598', '0.43463'] | min: ε*=0.42454 (ε*/Δ*=0.996, plancher=1.000, signe fixe 0.00) → ind_Δ | produit: ε*=0.26533 (ε*/Δ*=0.622, plancher=0.622, signe fixe 0.00) → c-cent
+      S0 : Δ* = 0.38781 IC ['0.38209', '0.39488'] | min: ε*=0.38326 (ε*/Δ*=0.988, plancher=1.000, signe fixe 0.00) → ind_Δ | produit: ε*=0.22442 (ε*/Δ*=0.579, plancher=0.577, signe fixe 0.00) → c-cent
+    LOO vs split-half (double mesure D26) :
+      S3 : O_type LOO 1.5500 / LOO-sub 1.5500 / split-half 1.9000 | Λ +0.00859 / +0.00859 / +0.01406 | Δ* 0.43548 / 0.43958 / 0.43483 | classes HAUT/c-cent → ind_L/c-cent → ind_L/c-cent
+      S2 : O_type LOO 0.6778 / LOO-sub 0.7250 / split-half 0.6542 | Λ -0.00503 / -0.00430 / -0.00540 | Δ* 0.39131 / 0.38817 / 0.39002 | classes BAS/c-cent → BAS/c-cent → BAS/c-cent
+      S1 : O_type LOO 1.2009 / LOO-sub 1.2660 / split-half 1.4787 | Λ +0.00314 / +0.00416 / +0.00748 | Δ* 0.42634 / 0.42956 / 0.42697 | classes ind_L/ind_Δ → ind_L/ind_Δ → HAUT/ind_Δ
+      S0 : O_type LOO 0.6690 / LOO-sub 0.6715 / split-half 0.6935 | Λ -0.00517 / -0.00513 / -0.00479 | Δ* 0.38781 / 0.38831 / 0.38867 | classes BAS/ind_Δ → BAS/ind_Δ → BAS/ind_Δ
+    anomalie σ± : NON EXPLIQUÉ — 2 cellule(s) signalée(s), DIAGNOSTIQUE (V-diag) — non décisionnelle : ne modifie aucune borne, aucun seuil, aucune classe
+
+--- mesure : Qwen/Qwen2.5-1.5B (couche 14, COUCHE_REF (§7)) ---
+    durée 198.52 s ; 1770 paires × 6 cellules ; cardinal intra-tige 150 PAR CELLULE DE CAPTURE = 900 dans l'unité de P
+    split-half : 5400 paires à cheval exclues ; moitiés [30, 30]
+      S3 aucun : O = 1543/7680 = 12.858 indices ; méd 12/1 IQR ['9/1', '16/1'] ; f = 0.2209 ; σ± = 1/1 ; cos = 0.2184 ; p_sym méd = 10
+      S2 aucun : O = 649/4320 = 9.615 indices ; méd 9/1 IQR ['7/1', '12/1'] ; f = 0.1656 ; σ± = 1/1 ; cos = 0.1636 ; p_sym méd = 7
+      S1 aucun : O = 1199/6912 = 11.102 indices ; méd 11/1 IQR ['8/1', '14/1'] ; f = 0.1905 ; σ± = 1/1 ; cos = 0.1883 ; p_sym méd = 9
+      S0 aucun : O = 4373/32256 = 8.677 indices ; méd 8/1 IQR ['6/1', '11/1'] ; f = 0.1490 ; σ± = 1/1 ; cos = 0.1471 ; p_sym méd = 7
+    ε* — les DEUX règles, côte à côte (aucune promue) :
+      S3 : Δ* = 0.30455 IC ['0.29632', '0.31304'] | min: ε*=0.24684 (ε*/Δ*=0.811, plancher=0.800, signe fixe 0.00) → c-cent | produit: ε*=0.31170 (ε*/Δ*=1.023, plancher=1.000, signe fixe 1.00) → ind_Δ
+      S2 : Δ* = 0.26844 IC ['0.25942', '0.27734'] | min: ε*=0.21885 (ε*/Δ*=0.815, plancher=0.800, signe fixe 0.00) → c-cent | produit: ε*=0.27599 (ε*/Δ*=1.028, plancher=1.000, signe fixe 1.00) → ind_Δ
+      S1 : Δ* = 0.28743 IC ['0.27843', '0.29949'] | min: ε*=0.28465 (ε*/Δ*=0.990, plancher=1.000, signe fixe 0.00) → ind_Δ | produit: ε*=0.17845 (ε*/Δ*=0.621, plancher=0.622, signe fixe 0.00) → c-cent
+      S0 : Δ* = 0.25176 IC ['0.24580', '0.25793'] | min: ε*=0.24658 (ε*/Δ*=0.979, plancher=1.000, signe fixe 0.00) → ind_Δ | produit: ε*=0.14519 (ε*/Δ*=0.577, plancher=0.577, signe fixe 0.00) → c-cent
+    LOO vs split-half (double mesure D26) :
+      S3 : O_type LOO 1.7639 / LOO-sub 1.4500 / split-half 1.7083 | Λ +0.01194 / +0.00703 / +0.01107 | Δ* 0.30455 / 0.31314 / 0.31065 | classes HAUT/c-cent → ind_L/c-cent → ind_L/c-cent
+      S2 : O_type LOO 0.7537 / LOO-sub 0.8167 / split-half 0.8167 | Λ -0.00385 / -0.00286 / -0.00286 | Δ* 0.26844 / 0.26512 / 0.26664 | classes BAS/c-cent → BAS/c-cent → BAS/c-cent
+      S1 : O_type LOO 1.0306 / LOO-sub 1.0904 / split-half 1.1959 | Λ +0.00048 / +0.00141 / +0.00306 | Δ* 0.28743 / 0.28969 / 0.28950 | classes ind_L/ind_Δ → ind_L/ind_Δ → ind_L/ind_Δ
+      S0 : O_type LOO 0.6569 / LOO-sub 0.6610 / split-half 0.6675 | Λ -0.00536 / -0.00530 / -0.00520 | Δ* 0.25176 / 0.25263 / 0.25403 | classes BAS/ind_Δ → BAS/ind_Δ → BAS/ind_Δ
+    anomalie σ± : NON EXPLIQUÉ — 2 cellule(s) signalée(s), DIAGNOSTIQUE (V-diag) — non décisionnelle : ne modifie aucune borne, aucun seuil, aucune classe
+
+PORTES
+  V-P8       PASS
+  V-couverture PASS
+  V-borne    PASS
+  V-ulp      PASS
+  V-t1       PASS
+  V-core-S   PASS
+  V-seed     PASS
+  V-diag     PASS
+  V-diag-colonnes PASS
+  V-psym-conditions PASS
+  V-identite-decomposition PASS
+  V-norm     PASS
+  V-vacuite  PASS
+
+temps CPU total : 728.8 s
+bruts : C:\Users\fuzzz\engram\experiments\results\recouvrement-supports

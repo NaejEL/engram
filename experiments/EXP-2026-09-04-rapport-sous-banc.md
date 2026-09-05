@@ -1,6 +1,6 @@
 # EXP — Cycle de RÉDACTION : le corpus est-il publiable sous banc ?
 
-Statut : PRE-ENREGISTRE
+Statut : TERMINE — INVALIDE (banc non gelable en l'état, §14)
 
 *Consolidé par `lab-director` le 2026-09-04, sous avis **`lab-neuro` RÉSERVÉ** (7 bloquantes) et
 **`lab-math` RÉSERVÉ** (7 bloquantes). **14/14 traitées.** La consolidation ouvre **21 défauts de plus
@@ -296,7 +296,7 @@ après la première section écrite.
 
 **Fixées** — **plan** : 6 sections + 2 annexes, **format `REPORT.md` unique, ~8–12 000 mots**
 (décision PI) ; **corpus admissible** : `docs/JOURNAL.md`, `experiments/*.md`, `experiments/results/**`
-**par accès direct**, `docs/ARCHITECTURE.md` §3 **D1 → D37**, `docs/EXTENSIONS.md` §4, `README.md`,
+**par accès direct**, `docs/ARCHITECTURE.md` §3 **D1 → D38** *(corrigé, voir §13)*, `docs/EXTENSIONS.md` §4, `README.md`,
 `docs/VISION.md`, commits, **`report/data/`** ; `docs/POSSIBLE_APPROACH.md` et
 `docs/AFTER_v1_THOUGHTS.md` **citables, jamais édités** ; registre au 2026-09-04 **+ les 9 interdits
 gravés** ; **seed 0** ; **licence du texte : CC-BY-4.0** (le code reste AGPL-3.0-or-later) ;
@@ -422,6 +422,108 @@ par énumération**) · `report/relecture.csv` · **`report/data/` + `SHA256SUMS
 
 ---
 
+## 13. Correction de provenance — 2026-09-05, sous D30 alinéa 1
+
+**Défaut `0-230`, relevé par `lab-builder` et déclaré sans être corrigé par lui** — conduite juste : il
+ne modifie pas un protocole pré-enregistré.
+
+| | ancienne valeur | nouvelle valeur |
+| --- | --- | --- |
+| §7, corpus admissible | `docs/ARCHITECTURE.md` §3 **D1 → D37** | `docs/ARCHITECTURE.md` §3 **D1 → D38** |
+
+**Contradiction interne** : le §11 de ce protocole grave **D38** (décision PI **P4**, 2026-09-04) et le
+§7 l'**exclut du corpus admissible**. Sous la lettre du §7, toute citation de D38 dans le rapport
+serait **`SOURCE-ILLICITE`** — alors que **D38 gouverne précisément les citations externes du
+rapport**, dont l'archive dégradée de la section 6.
+
+- **Régime : D30 alinéa 1.** Le critère exécutable — *une donnée du run est-elle nécessaire pour voir
+  l'erreur ?* — rend **non** : la contradiction est **entièrement visible sur le papier**, entre deux
+  sections du même fichier.
+- **Le §7 n'est pas gelé** (seuls le §4 et le §6 le sont), et la correction **ne touche aucune
+  prédiction, aucune porte, aucun critère d'abandon**.
+- **Appliquée par la session principale le 2026-09-05**, tracée ici. *Le PI peut la renverser ; dans ce
+  cas D38 sort du corpus et la section 6 tombe avec elle.*
+- **Note** : le §7 omettait aussi **D14-S**, **D14-R** et **D24-b**, qui portent des suffixes et
+  n'entrent pas dans une plage numérique. La formule « D1 → D38 » **les inclut** — une plage de
+  décisions se lit par **appartenance au registre**, jamais par **ordre lexical**.
+
+
+### 13.1 — Seconde correction, `0-229` — tracée après coup, ce qui est un défaut en soi
+
+| | ancienne valeur | nouvelle valeur |
+| --- | --- | --- |
+| `CLAUDE.md` l. 148 | `**\`P-Base\` confirmée » est interdit d'écriture.**` | `**« \`P-Base\` confirmée » est interdit d'écriture.**` |
+
+Guillemet ouvrant manquant par rapport au verbatim de `docs/JOURNAL.md`. Relevé par `lab-builder`
+(**`0-229`**), qui **a refusé de le corriger** — `CLAUDE.md` lui est interdit d'écriture — et l'a
+déclaré. Corrigé par la session principale le **2026-09-05**, **régime D30 alinéa 1** : visible sur le
+papier, aucune donnée requise, aucune prédiction touchée.
+
+> **Ce qui est fautif ici n'est pas la correction, c'est sa trace.** Je l'ai appliquée **en même temps**
+> que `0-230` et **je n'ai tracé que `0-230`** ; `lab-verifier` l'a relevé au tour suivant
+> (réserve **B-4**) : *« un fichier du Registre édité pendant le cycle qui juge le Registre, sans trace
+> de correction de provenance »*. **Une correction non tracée est indiscernable d'une réécriture
+> silencieuse** — c'est précisément ce que **D37** interdit, et le cycle qui grave la traçabilité l'a
+> enfreinte sur son propre fichier de référence. Consigné ici, **après coup et en le disant**.
+
+### 13.2 — Effet de bord du §13 sur le banc, à consigner
+
+L'ajout du §13 le **2026-09-05** a **changé le hash de ce protocole** et **périmé deux lignes du
+manifeste** (`N-27`, `N-28`, sourcées ici) : l'artefact `report/doc_bench.json` annonçait `32/32`, le
+rejeu de `lab-verifier` a rendu **`31/32`** avec `C2c FAIL` sur `N-27`.
+
+**Le banc a correctement mordu** — c'est l'artefact publié qui affirmait un état révolu. Cause profonde
+relevée par `lab-verifier`, et qui vaut au-delà de ce cycle : ***aucun des 156 tests n'exécutait le banc
+sur les artefacts vivants*** — tous sur fixtures. **Un banc dont aucun test ne touche l'objet qu'il
+juge dérive sans que rien ne le signale.**
+
+*Fait de méthode, à verser au chapitre 3 : **la correction d'un protocole pendant qu'un banc le cite
+est une écriture** (D29), et elle invalide les artefacts qui en dépendent. Elle se fait, mais elle se
+re-court.*
+
+
+## 14. Levée du plafond de la boucle Verify — 2026-09-05, décision PI
+
+**La règle.** La boucle Verify du `/lab-run` plafonne à **trois itérations** : au-delà, elle
+« échoue explicitement », statut `TERMINE — INVALIDE`. Le motif gravé est *« ne jamais approuver par
+épuisement »*.
+
+**L'état au 2026-09-05.** Trois tours Builder/Verifier sur le banc, trois verdicts
+`CHANGES_REQUESTED`, avec à chaque tour `tests_passed`, `protocol_followed` et `rerun_consistent`
+à `true`. Chaque tour a produit un défaut **réel** de la **même classe** — un compte publié plus
+petit que le compte vrai : **0-243** (`max(n, 1)` planche 16 clauses ⇒ 5 publiées au lieu de 21),
+puis, après correction, **0-253** (`C3`, `C7` comptent des **règles** et non des objets ; `C15`,
+`C15b` rendent un plancher **littéral** `return [], 1` ⇒ 21 publiées au lieu de **25**).
+
+**La décision.** Le plafond est **levé pour ce cycle**, pour un **quatrième et dernier tour**, au
+motif suivant, qui est le seul admis : **cette phase ne produit aucune mesure**. Aucun verdict, aucun
+chiffre publié, aucune ligne de journal ne dépend du banc ; le banc est un **instrument en
+construction**, et les trois verdicts portent sur l'instrument, jamais sur un résultat. *Le plafond
+protège l'intégrité d'une mesure ; il n'y en a pas ici.* La règle ne fait pas cette distinction —
+**c'est la décision du PI qui la fait, et c'est pourquoi elle est écrite ici plutôt que supposée.**
+
+**Ce que la levée n'autorise pas.** Elle n'autorise **aucune approbation par épuisement** : si le
+quatrième tour ne rend pas `APPROVED`, le banc est déclaré **non gelable en l'état** et la rédaction
+ne s'ouvre pas. Elle ne s'étend à **aucune** phase de mesure, de ce cycle ou d'un autre : *une levée
+motivée par l'absence de mesure expire à la première mesure.*
+
+**Portée du quatrième tour** — deux objets, et rien d'autre :
+
+1. **La classe du compte planché, fermée par une porte sans données.** `C3` et `C7` comptent des
+   objets de corpus, pas des entrées de registre ; `C15`/`C15b` rendent `0` ; la liste est republiée
+   à **25** ; et le garde-fou cesse d'être un **grep sur deux chaînes littérales** pour devenir
+   l'assertion *« chaque clause rend `n == 0` sur un corpus vide »*, `C0b` seule exemptée, **exemption
+   motivée**. *Troisième fois dans ce cycle que le défaut est trouvé par la porte qui n'avait besoin
+   d'aucune donnée.*
+2. **Le livrable protégé dans les deux sens.** `--force-pass` **écrasait** `report/doc_bench.json`
+   avec un rapport mutant (`E = 32`, 32/32 `PASS`) ; le Verifier l'a reproduit puis **restauré à
+   l'octet**. Le mode mutant cesse d'écrire l'artefact publié, **et** `report/doc_bench.json` entre à
+   `report/SHA256SUMS` avec un test qui l'y vérifie. *Sans le second verrou, le premier ne ferme que
+   le chemin connu.*
+
+**Le §4 et le §6 restent GELÉS.** Cette section est **additive** et ne touche à aucune prédiction, à
+aucune porte, à aucun critère d'abandon.
+
 ## Historique
 
 - **2026-09-04** — **Brouillon (mode cadrage).**
@@ -443,3 +545,4 @@ par énumération**) · `report/relecture.csv` · **`report/data/` + `SHA256SUMS
   partitions)** et le **§6 (critères d'abandon)** sont **GELÉS — plus jamais modifiés, par
   personne**. Suite : les livrables dus des deux experts (§12), puis `tools/doc_bench.py` et son
   banc à **`E = 0`**, puis la rédaction. ***Aucune ligne de prose avant que le banc soit vert.***
+- **2026-09-05** — **TERMINÉ — INVALIDE.** Quatrième tour `CHANGES_REQUESTED` ⇒ **§14 appliqué** : le banc est **non gelable en l'état**, la rédaction **ne s'ouvre pas**. Trois défauts au tour 4 — CRLF des livrables (`sha256sum -c` **55/55 en échec**, faux dès le commit) ; **aucun test n'appelle `main()`**, les deux verrous n'étant gardés que par des greps ; dé-accentuation **aveuglant `C7`, `C9`, `C19`**. **La levée du plafond Verify, motivée par l'absence de mesure, EXPIRE ICI.** Suite : `EXP-2026-09-05-doc-bench-gel.md`. **Les §4 et §6 restent gelés et s'appliqueront inchangés** au cycle de rédaction, derrière le gel du banc.

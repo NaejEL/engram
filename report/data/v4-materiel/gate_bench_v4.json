@@ -1,0 +1,5363 @@
+{
+ "protocole": "experiments/EXP-2026-08-23-v4-materiel.md",
+ "statut_protocole": "PRE-ENREGISTRE",
+ "banc": "D14-S — satisfiabilité v4, CPU seul, aucune mesure, aucun modèle",
+ "tokenizer": "gpt2 + HuggingFaceTB/SmolLM2-360M + Qwen/Qwen2.5-1.5B",
+ "tokenizers": [
+  "gpt2",
+  "HuggingFaceTB/SmolLM2-360M",
+  "Qwen/Qwen2.5-1.5B"
+ ],
+ "E": 0,
+ "n_clauses": 57,
+ "couverture": {
+  "clauses_avec_les_deux_contre_exemples": 57,
+  "total": 57,
+  "pct": 100.0
+ },
+ "n_cas": 167,
+ "sha256_materiau": "6f4da9732254fa4a280d26d33f1280e4572f911dadb0a73c02fe208ded504e3b",
+ "cascade_gravee": [
+  "1-Le=2-3-tokenizers",
+  "2-sous-viviers-domaine-C7",
+  "3-structure-tige-suffixe-ponts",
+  "4-moules-egalisation-prefixe-distance-lexicale",
+  "5-appariement-bandes-frequence-V-freq",
+  "6-type-capitalise",
+  "7-nulle-de-cadre-40-paires",
+  "8-banc"
+ ],
+ "cascade_executee": [
+  "1-Le=2-3-tokenizers",
+  "2-sous-viviers-domaine-C7",
+  "3-structure-tige-suffixe-ponts",
+  "4-moules-egalisation-prefixe-distance-lexicale",
+  "5-appariement-bandes-frequence-V-freq",
+  "6-type-capitalise",
+  "7-nulle-de-cadre-40-paires"
+ ],
+ "garanties_D25": [
+  {
+   "propriete": "C1 — 72 séquences byte-identiques hors slot",
+   "porte": "V-C1",
+   "verdict": "PASS"
+  },
+  {
+   "propriete": "C1' — sélection sur métadonnées déclarées",
+   "porte": "V-C1p",
+   "verdict": "PASS"
+  },
+  {
+   "propriete": "C2 — L_e = 2 (72 entités + 40 paires, 3 tok.)",
+   "porte": "V-C2",
+   "verdict": "PASS"
+  },
+  {
+   "propriete": "C3 — indice de capture constant, variantes appariées",
+   "porte": "V-C3",
+   "verdict": "PASS"
+  },
+  {
+   "propriete": "C4 — aucune paire byte-identique à la capture",
+   "porte": "V-C4",
+   "verdict": "PASS"
+  },
+  {
+   "propriete": "C5 — éligibles >= 60 pour 72/72 requêtes, pool gelé",
+   "porte": "V-C5",
+   "verdict": "PASS"
+  },
+  {
+   "propriete": "C6 — exactement un type capitalisé",
+   "porte": "V-C6",
+   "verdict": "PASS"
+  },
+  {
+   "propriete": "C6 — V-casse mord (>= 90 %)",
+   "porte": "V-casse",
+   "verdict": "PASS"
+  },
+  {
+   "propriete": "C7 — sous-viviers de domaine disjoints",
+   "porte": "V-C7",
+   "verdict": "PASS"
+  },
+  {
+   "propriete": "m1 = 5 pour 60/60 unités décisionnelles",
+   "porte": "V-m1",
+   "verdict": "PASS"
+  },
+  {
+   "propriete": "K_eff = 10 (clusters = tiges)",
+   "porte": "V-Keff",
+   "verdict": "PASS"
+  },
+  {
+   "propriete": "composition gravée du pool P2",
+   "porte": "V-P2",
+   "verdict": "PASS"
+  },
+  {
+   "propriete": "distance lexicale entre variantes >= 50 %",
+   "porte": "V-var-dist",
+   "verdict": "PASS"
+  },
+  {
+   "propriete": "bandes de fréquence appariées <= 0.15",
+   "porte": "V-freq",
+   "verdict": "PASS"
+  },
+  {
+   "propriete": "absence de période sur slot et couple de slots",
+   "porte": "V-periode",
+   "verdict": "PASS"
+  },
+  {
+   "propriete": "diversité de type (3 x 2 = 6 moules)",
+   "porte": "V-div4",
+   "verdict": "PASS"
+  },
+  {
+   "propriete": "paires intra-unité intra-type / strates",
+   "porte": "V-paires4",
+   "verdict": "PASS"
+  },
+  {
+   "propriete": "cardinaux D24-b tronqués (dont 14 à t-1, par sous-vivier)",
+   "porte": "V-D24b",
+   "verdict": "PASS"
+  },
+  {
+   "propriete": "nulle de cadre : 40 paires L_e = 2",
+   "porte": "V-cadre",
+   "verdict": "PASS"
+  },
+  {
+   "propriete": "nulle de nouveauté : pseudo-mots, séparée",
+   "porte": "V-nouveaute",
+   "verdict": "PASS"
+  },
+  {
+   "propriete": "cascade conforme à l'ordre gravé §5.5",
+   "porte": "V-ordre",
+   "verdict": "PASS"
+  }
+ ],
+ "portes_de_generation_en_echec": [],
+ "prerequis_instrument": "PASS",
+ "prerequis_lignes": [
+  {
+   "prerequis": "L_e",
+   "description": "longueur en tokens de l'entité, constante",
+   "attendu": [
+    2
+   ],
+   "observe": [
+    2
+   ],
+   "verdict": "PASS"
+  },
+  {
+   "prerequis": "indice_de_capture_entier_par_cellule",
+   "description": "un entier unique par cellule",
+   "attendu": [
+    7,
+    8,
+    9
+   ],
+   "observe": [
+    7,
+    8,
+    9
+   ],
+   "verdict": "PASS"
+  },
+  {
+   "prerequis": "n_unites_decisionnelles",
+   "description": "60 unités décisionnelles",
+   "attendu": 60,
+   "observe": 60,
+   "verdict": "PASS"
+  },
+  {
+   "prerequis": "n_entites",
+   "description": "72 entités",
+   "attendu": 72,
+   "observe": 72,
+   "verdict": "PASS"
+  },
+  {
+   "prerequis": "K_eff",
+   "description": "10 clusters = tiges",
+   "attendu": 10,
+   "observe": 10,
+   "verdict": "PASS"
+  },
+  {
+   "prerequis": "taille_pool",
+   "description": "pools de 36",
+   "attendu": 36,
+   "observe": 36,
+   "verdict": "PASS"
+  },
+  {
+   "prerequis": "n_cellules",
+   "description": "6 moules",
+   "attendu": 6,
+   "observe": 6,
+   "verdict": "PASS"
+  },
+  {
+   "prerequis": "n_paires_cadre",
+   "description": "40 paires",
+   "attendu": 40,
+   "observe": 40,
+   "verdict": "PASS"
+  },
+  {
+   "prerequis": "M_instanciee",
+   "description": "l'instrument n'instancie JAMAIS M",
+   "attendu": false,
+   "observe": false,
+   "verdict": "PASS"
+  }
+ ],
+ "contre_exemple_fact_pairs": {
+  "C1": "FAIL",
+  "C2": "FAIL",
+  "S-1": "FAIL",
+  "n": 30,
+  "prefixes_distincts": 30,
+  "longueurs_de_slot_observees": [
+   2,
+   3
+  ],
+  "verdict": "ÉCHEC ATTENDU"
+ },
+ "espace_ORD_resolu": {
+  "ORD-1": 1,
+  "ORD-2": 6,
+  "ORD-3": 9,
+  "ORD-0": 9,
+  "ORD-4": 2,
+  "total": 27
+ },
+ "probabilites_sous_la_nulle": {
+  "B": 200000,
+  "seed": 0,
+  "tau": 0.15,
+  "K_eff": 10,
+  "sigma_par_requete": 0.22933,
+  "SE": 0.07252,
+  "calibrateur": {
+   "N-a": 0.92379,
+   "N-ind": 0.03504,
+   "N-b": 0.04102,
+   "INVALIDE-INSTRUMENT": 0.00015
+  },
+  "bandes_primaire": {
+   "C-0": 0.93153,
+   "C-ind": 0.06806,
+   "C−": 0.0002,
+   "C+": 0.00021
+  },
+  "etats_de_maillon": {
+   "0-résolu": 0.93153,
+   "ind": 0.06806,
+   "−": 0.0002,
+   "+": 0.00021
+  },
+  "classes_ORD": {
+   "ORD-0": 0.80905,
+   "ORD-ind": 0.1906,
+   "ORD-3": 0.00017,
+   "ORD-2": 0.00018,
+   "ORD-4": 0.0,
+   "ORD-1": 0.0
+  },
+  "note": "publiées AVANT le run ; aucune relecture a posteriori n'est autorisée (§4.4, §4.5)"
+ },
+ "clauses_sous_specifiees": {
+  "V-freq — rang de fusion": "le protocole écrit « rang de fusion de la tige (gpt2) » sans donner la statistique d'écart. Le banc DÉCLARE : rang = identifiant de token de la forme à espace initial, normalisé par la taille du vocabulaire du tokenizer (r ∈ [0,1]) ; l'écart est la valeur absolue de la différence des MOYENNES de r, énumérée sur les 3 tokenizers et sur les 3 familles d'appariement exigées (sous-viviers 2 à 2, familles d'une même tige, ponté vs non-ponté). La borne 0.15 est celle du protocole. AUCUN test d'homogénéité n'est calculé (0-41).",
+  "V-var-dist — distance": "« ≥ 50 % des tokens diffèrent » est opérationnalisé position par position entre les deux préfixes d'un même TYPE (leurs longueurs sont égales par `C3`), sur les 3 tokenizers ; la valeur retenue est le MIN sur les tokenizers.",
+  "V-periode — période": "« absence de période sur tout slot et tout couple de slots » est opérationnalisée comme : aucune fonction déterministe non triviale d'un slot vers un autre, et aucun couple (slot_a, slot_b) dont le nombre de valeurs distinctes soit strictement inférieur au produit attendu par la structure. Les slots sont (tige, suffixe, domaine, type, variante).",
+  "V-casse — position": "la tige apparaît toujours précédée d'une espace ; `V-casse` compare l'identifiant de « ␣Tige » à celui de « ␣tige » sur les 3 tokenizers.",
+  "forme stratifiée-combinée de M1/M2/M3": "le protocole grave « Σ_domaines (observé − attendu-dans-la-strate) », sans dire à quelle strate appartient une paire INTER-domaines. Déclaré : une moyenne de strate est la moyenne NON PONDÉRÉE des moyennes intra-strate, les strates étant les 4 DOMAINES pour les quantités à domaine identique (S3, S1) et les 6 COUPLES de domaines pour les quantités à domaine différent (S2, S0). Rien n'est poolé ; la nulle de permutation intra-tige est calculée sur la MÊME fonctionnelle.",
+  "ΔR1_inv — R1": "`R1` est l'indicatrice de rang 1 parmi les 37 candidats (36 du pool `C5` gelé + la cible), égalités en MID-RANK (condition E2) : à `g` ex æquo en tête, la cible compte `1/g`.",
+  "clé nulle appariée": "la clé nulle de la requête `i` est l'état de la paire de cadre `i mod 40` dans le MÊME moule — même position de capture, même longueur en tokens (0-58). Appariement déterministe, déclaré, sans aléa.",
+  "clusters du calibrateur": "§4.4 fixe `K_eff = 10` : les clusters sont les 10 tiges DÉCISIONNELLES, et la statistique porte sur les 60 unités décisionnelles × 3 types = 180 requêtes. `C5` (« 72/72 requêtes ») est une CONDITION de génération vérifiée sur les 72 entités ; elle ne définit pas le support de la statistique. Inclure la réserve donnerait `K_eff = 14` et resserrerait l'IC sous la dérivation de `τ`.",
+  "unité de requête": "une requête est (unité, cellule de requête) ; la cellule de requête est l'AUTRE variante du MÊME type (invariance mesurée à trois transformations nommées, §8)."
+ },
+ "duree_s": 14.27,
+ "clauses": [
+  {
+   "clause": "V-C1",
+   "pass_case": "matériau v4 : 72 séquences byte-identiques hors slot",
+   "fail_case": "deux entités en collision ⇒ cardinal < 72",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "matériau v4",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "T1-A": {
+        "prefixes_distincts": 1,
+        "cardinal_tronque_par_tokenizer": {
+         "gpt2": 72,
+         "HuggingFaceTB/SmolLM2-360M": 72,
+         "Qwen/Qwen2.5-1.5B": 72
+        }
+       },
+       "T1-B": {
+        "prefixes_distincts": 1,
+        "cardinal_tronque_par_tokenizer": {
+         "gpt2": 72,
+         "HuggingFaceTB/SmolLM2-360M": 72,
+         "Qwen/Qwen2.5-1.5B": 72
+        }
+       },
+       "T2-A": {
+        "prefixes_distincts": 1,
+        "cardinal_tronque_par_tokenizer": {
+         "gpt2": 72,
+         "HuggingFaceTB/SmolLM2-360M": 72,
+         "Qwen/Qwen2.5-1.5B": 72
+        }
+       },
+       "T2-B": {
+        "prefixes_distincts": 1,
+        "cardinal_tronque_par_tokenizer": {
+         "gpt2": 72,
+         "HuggingFaceTB/SmolLM2-360M": 72,
+         "Qwen/Qwen2.5-1.5B": 72
+        }
+       },
+       "T3-A": {
+        "prefixes_distincts": 1,
+        "cardinal_tronque_par_tokenizer": {
+         "gpt2": 72,
+         "HuggingFaceTB/SmolLM2-360M": 72,
+         "Qwen/Qwen2.5-1.5B": 72
+        }
+       },
+       "T3-B": {
+        "prefixes_distincts": 1,
+        "cardinal_tronque_par_tokenizer": {
+         "gpt2": 72,
+         "HuggingFaceTB/SmolLM2-360M": 72,
+         "Qwen/Qwen2.5-1.5B": 72
+        }
+       }
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "collision d'entités",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "T1-A": {
+        "prefixes_distincts": 1,
+        "cardinal_tronque_par_tokenizer": {
+         "gpt2": 71,
+         "HuggingFaceTB/SmolLM2-360M": 71,
+         "Qwen/Qwen2.5-1.5B": 71
+        }
+       },
+       "T1-B": {
+        "prefixes_distincts": 1,
+        "cardinal_tronque_par_tokenizer": {
+         "gpt2": 71,
+         "HuggingFaceTB/SmolLM2-360M": 71,
+         "Qwen/Qwen2.5-1.5B": 71
+        }
+       },
+       "T2-A": {
+        "prefixes_distincts": 1,
+        "cardinal_tronque_par_tokenizer": {
+         "gpt2": 71,
+         "HuggingFaceTB/SmolLM2-360M": 71,
+         "Qwen/Qwen2.5-1.5B": 71
+        }
+       },
+       "T2-B": {
+        "prefixes_distincts": 1,
+        "cardinal_tronque_par_tokenizer": {
+         "gpt2": 71,
+         "HuggingFaceTB/SmolLM2-360M": 71,
+         "Qwen/Qwen2.5-1.5B": 71
+        }
+       },
+       "T3-A": {
+        "prefixes_distincts": 1,
+        "cardinal_tronque_par_tokenizer": {
+         "gpt2": 71,
+         "HuggingFaceTB/SmolLM2-360M": 71,
+         "Qwen/Qwen2.5-1.5B": 71
+        }
+       },
+       "T3-B": {
+        "prefixes_distincts": 1,
+        "cardinal_tronque_par_tokenizer": {
+         "gpt2": 71,
+         "HuggingFaceTB/SmolLM2-360M": 71,
+         "Qwen/Qwen2.5-1.5B": 71
+        }
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-C1'",
+   "pass_case": "aucune quantité issue d'un modèle n'est lue à la sélection",
+   "fail_case": "une sélection lisant un état ⇒ nulle non exacte",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "métadonnées déclarées seules",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "metadonnees_lues": [
+        "rang de token BPE (métadonnée du tokenizer)",
+        "appartenance lexicale déclarée (sous-viviers, viviers)",
+        "longueur en tokens"
+       ],
+       "quantites_de_modele_lues": [],
+       "M_instanciee": false,
+       "injection": false,
+       "forward": 0
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "sélection sur une quantité de modèle",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "quantites_de_modele_lues": [
+        "cos(h_i, h_j)"
+       ],
+       "motif": "C1' : échangeabilité conditionnelle détruite ; matériau dépendant du modèle"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-C2",
+   "pass_case": "L_e = 2 pour 72/72 entités et 40/40 paires, 3 tokenizers",
+   "fail_case": "une entité à L_e = 3 ⇒ rejet ET re-qualification complète",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "C2 : une SEULE entité à L_e ≠ 2 sur un tokenizer ⇒ rejet de l'entité et re-qualification complète, JAMAIS de rustine locale.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "matériau v4",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "gpt2": {
+        "entites_conformes": 72,
+        "paires_conformes": 40,
+        "violations_entites": [],
+        "violations_paires": []
+       },
+       "HuggingFaceTB/SmolLM2-360M": {
+        "entites_conformes": 72,
+        "paires_conformes": 40,
+        "violations_entites": [],
+        "violations_paires": []
+       },
+       "Qwen/Qwen2.5-1.5B": {
+        "entites_conformes": 72,
+        "paires_conformes": 40,
+        "violations_entites": [],
+        "violations_paires": []
+       }
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "une entité à L_e = 3",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "gpt2": {
+        "entites_conformes": 71,
+        "paires_conformes": 40,
+        "violations_entites": [
+         [
+          "Iron",
+          "kaleidoscope",
+          false
+         ],
+         [
+          "Iron",
+          "kaleidoscope",
+          true
+         ]
+        ],
+        "violations_paires": []
+       },
+       "HuggingFaceTB/SmolLM2-360M": {
+        "entites_conformes": 71,
+        "paires_conformes": 40,
+        "violations_entites": [
+         [
+          "Iron",
+          "kaleidoscope",
+          false
+         ],
+         [
+          "Iron",
+          "kaleidoscope",
+          true
+         ]
+        ],
+        "violations_paires": []
+       },
+       "Qwen/Qwen2.5-1.5B": {
+        "entites_conformes": 71,
+        "paires_conformes": 40,
+        "violations_entites": [
+         [
+          "Iron",
+          "kaleidoscope",
+          false
+         ],
+         [
+          "Iron",
+          "kaleidoscope",
+          true
+         ]
+        ],
+        "violations_paires": []
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-C3",
+   "pass_case": "indice de capture constant ; variantes appariées en longueur",
+   "fail_case": "variantes de longueurs différentes ⇒ 0-43 réintroduit",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "matériau v4",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "T1-A": {
+        "indice_capture": 9,
+        "par_tokenizer": {
+         "gpt2": {
+          "n_tokens_prefixe": 8,
+          "longueurs_de_sequence": [
+           10
+          ]
+         },
+         "HuggingFaceTB/SmolLM2-360M": {
+          "n_tokens_prefixe": 8,
+          "longueurs_de_sequence": [
+           10
+          ]
+         },
+         "Qwen/Qwen2.5-1.5B": {
+          "n_tokens_prefixe": 8,
+          "longueurs_de_sequence": [
+           10
+          ]
+         }
+        }
+       },
+       "T1-B": {
+        "indice_capture": 9,
+        "par_tokenizer": {
+         "gpt2": {
+          "n_tokens_prefixe": 8,
+          "longueurs_de_sequence": [
+           10
+          ]
+         },
+         "HuggingFaceTB/SmolLM2-360M": {
+          "n_tokens_prefixe": 8,
+          "longueurs_de_sequence": [
+           10
+          ]
+         },
+         "Qwen/Qwen2.5-1.5B": {
+          "n_tokens_prefixe": 8,
+          "longueurs_de_sequence": [
+           10
+          ]
+         }
+        }
+       },
+       "T2-A": {
+        "indice_capture": 8,
+        "par_tokenizer": {
+         "gpt2": {
+          "n_tokens_prefixe": 7,
+          "longueurs_de_sequence": [
+           9
+          ]
+         },
+         "HuggingFaceTB/SmolLM2-360M": {
+          "n_tokens_prefixe": 7,
+          "longueurs_de_sequence": [
+           9
+          ]
+         },
+         "Qwen/Qwen2.5-1.5B": {
+          "n_tokens_prefixe": 7,
+          "longueurs_de_sequence": [
+           9
+          ]
+         }
+        }
+       },
+       "T2-B": {
+        "indice_capture": 8,
+        "par_tokenizer": {
+         "gpt2": {
+          "n_tokens_prefixe": 7,
+          "longueurs_de_sequence": [
+           9
+          ]
+         },
+         "HuggingFaceTB/SmolLM2-360M": {
+          "n_tokens_prefixe": 7,
+          "longueurs_de_sequence": [
+           9
+          ]
+         },
+         "Qwen/Qwen2.5-1.5B": {
+          "n_tokens_prefixe": 7,
+          "longueurs_de_sequence": [
+           9
+          ]
+         }
+        }
+       },
+       "T3-A": {
+        "indice_capture": 7,
+        "par_tokenizer": {
+         "gpt2": {
+          "n_tokens_prefixe": 6,
+          "longueurs_de_sequence": [
+           8
+          ]
+         },
+         "HuggingFaceTB/SmolLM2-360M": {
+          "n_tokens_prefixe": 6,
+          "longueurs_de_sequence": [
+           8
+          ]
+         },
+         "Qwen/Qwen2.5-1.5B": {
+          "n_tokens_prefixe": 6,
+          "longueurs_de_sequence": [
+           8
+          ]
+         }
+        }
+       },
+       "T3-B": {
+        "indice_capture": 7,
+        "par_tokenizer": {
+         "gpt2": {
+          "n_tokens_prefixe": 6,
+          "longueurs_de_sequence": [
+           8
+          ]
+         },
+         "HuggingFaceTB/SmolLM2-360M": {
+          "n_tokens_prefixe": 6,
+          "longueurs_de_sequence": [
+           8
+          ]
+         },
+         "Qwen/Qwen2.5-1.5B": {
+          "n_tokens_prefixe": 6,
+          "longueurs_de_sequence": [
+           8
+          ]
+         }
+        }
+       },
+       "appariement_T1": {
+        "egal": true,
+        "A": {
+         "gpt2": 8,
+         "HuggingFaceTB/SmolLM2-360M": 8,
+         "Qwen/Qwen2.5-1.5B": 8
+        },
+        "B": {
+         "gpt2": 8,
+         "HuggingFaceTB/SmolLM2-360M": 8,
+         "Qwen/Qwen2.5-1.5B": 8
+        }
+       },
+       "appariement_T2": {
+        "egal": true,
+        "A": {
+         "gpt2": 7,
+         "HuggingFaceTB/SmolLM2-360M": 7,
+         "Qwen/Qwen2.5-1.5B": 7
+        },
+        "B": {
+         "gpt2": 7,
+         "HuggingFaceTB/SmolLM2-360M": 7,
+         "Qwen/Qwen2.5-1.5B": 7
+        }
+       },
+       "appariement_T3": {
+        "egal": true,
+        "A": {
+         "gpt2": 6,
+         "HuggingFaceTB/SmolLM2-360M": 6,
+         "Qwen/Qwen2.5-1.5B": 6
+        },
+        "B": {
+         "gpt2": 6,
+         "HuggingFaceTB/SmolLM2-360M": 6,
+         "Qwen/Qwen2.5-1.5B": 6
+        }
+       }
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "préfixes de variantes inégaux",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "T1-A": {
+        "indice_capture": 9,
+        "par_tokenizer": {
+         "gpt2": {
+          "n_tokens_prefixe": 8,
+          "longueurs_de_sequence": [
+           10
+          ]
+         },
+         "HuggingFaceTB/SmolLM2-360M": {
+          "n_tokens_prefixe": 8,
+          "longueurs_de_sequence": [
+           10
+          ]
+         },
+         "Qwen/Qwen2.5-1.5B": {
+          "n_tokens_prefixe": 8,
+          "longueurs_de_sequence": [
+           10
+          ]
+         }
+        }
+       },
+       "T1-B": {
+        "indice_capture": 8,
+        "par_tokenizer": {
+         "gpt2": {
+          "n_tokens_prefixe": 7,
+          "longueurs_de_sequence": [
+           9
+          ]
+         },
+         "HuggingFaceTB/SmolLM2-360M": {
+          "n_tokens_prefixe": 7,
+          "longueurs_de_sequence": [
+           9
+          ]
+         },
+         "Qwen/Qwen2.5-1.5B": {
+          "n_tokens_prefixe": 7,
+          "longueurs_de_sequence": [
+           9
+          ]
+         }
+        }
+       },
+       "T2-A": {
+        "indice_capture": 8,
+        "par_tokenizer": {
+         "gpt2": {
+          "n_tokens_prefixe": 7,
+          "longueurs_de_sequence": [
+           9
+          ]
+         },
+         "HuggingFaceTB/SmolLM2-360M": {
+          "n_tokens_prefixe": 7,
+          "longueurs_de_sequence": [
+           9
+          ]
+         },
+         "Qwen/Qwen2.5-1.5B": {
+          "n_tokens_prefixe": 7,
+          "longueurs_de_sequence": [
+           9
+          ]
+         }
+        }
+       },
+       "T2-B": {
+        "indice_capture": 8,
+        "par_tokenizer": {
+         "gpt2": {
+          "n_tokens_prefixe": 7,
+          "longueurs_de_sequence": [
+           9
+          ]
+         },
+         "HuggingFaceTB/SmolLM2-360M": {
+          "n_tokens_prefixe": 7,
+          "longueurs_de_sequence": [
+           9
+          ]
+         },
+         "Qwen/Qwen2.5-1.5B": {
+          "n_tokens_prefixe": 7,
+          "longueurs_de_sequence": [
+           9
+          ]
+         }
+        }
+       },
+       "T3-A": {
+        "indice_capture": 7,
+        "par_tokenizer": {
+         "gpt2": {
+          "n_tokens_prefixe": 6,
+          "longueurs_de_sequence": [
+           8
+          ]
+         },
+         "HuggingFaceTB/SmolLM2-360M": {
+          "n_tokens_prefixe": 6,
+          "longueurs_de_sequence": [
+           8
+          ]
+         },
+         "Qwen/Qwen2.5-1.5B": {
+          "n_tokens_prefixe": 6,
+          "longueurs_de_sequence": [
+           8
+          ]
+         }
+        }
+       },
+       "T3-B": {
+        "indice_capture": 7,
+        "par_tokenizer": {
+         "gpt2": {
+          "n_tokens_prefixe": 6,
+          "longueurs_de_sequence": [
+           8
+          ]
+         },
+         "HuggingFaceTB/SmolLM2-360M": {
+          "n_tokens_prefixe": 6,
+          "longueurs_de_sequence": [
+           8
+          ]
+         },
+         "Qwen/Qwen2.5-1.5B": {
+          "n_tokens_prefixe": 6,
+          "longueurs_de_sequence": [
+           8
+          ]
+         }
+        }
+       },
+       "appariement_T1": {
+        "egal": false,
+        "A": {
+         "gpt2": 8,
+         "HuggingFaceTB/SmolLM2-360M": 8,
+         "Qwen/Qwen2.5-1.5B": 8
+        },
+        "B": {
+         "gpt2": 7,
+         "HuggingFaceTB/SmolLM2-360M": 7,
+         "Qwen/Qwen2.5-1.5B": 7
+        }
+       },
+       "appariement_T2": {
+        "egal": true,
+        "A": {
+         "gpt2": 7,
+         "HuggingFaceTB/SmolLM2-360M": 7,
+         "Qwen/Qwen2.5-1.5B": 7
+        },
+        "B": {
+         "gpt2": 7,
+         "HuggingFaceTB/SmolLM2-360M": 7,
+         "Qwen/Qwen2.5-1.5B": 7
+        }
+       },
+       "appariement_T3": {
+        "egal": true,
+        "A": {
+         "gpt2": 6,
+         "HuggingFaceTB/SmolLM2-360M": 6,
+         "Qwen/Qwen2.5-1.5B": 6
+        },
+        "B": {
+         "gpt2": 6,
+         "HuggingFaceTB/SmolLM2-360M": 6,
+         "Qwen/Qwen2.5-1.5B": 6
+        }
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-C4",
+   "pass_case": "aucune paire décisionnelle byte-identique à la capture",
+   "fail_case": "deux unités identiques ⇒ contraste no-op (0-34)",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "matériau v4",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "T1-A/gpt2": {
+        "n": 60,
+        "distinctes": 60
+       },
+       "T1-A/HuggingFaceTB/SmolLM2-360M": {
+        "n": 60,
+        "distinctes": 60
+       },
+       "T1-A/Qwen/Qwen2.5-1.5B": {
+        "n": 60,
+        "distinctes": 60
+       },
+       "T1-B/gpt2": {
+        "n": 60,
+        "distinctes": 60
+       },
+       "T1-B/HuggingFaceTB/SmolLM2-360M": {
+        "n": 60,
+        "distinctes": 60
+       },
+       "T1-B/Qwen/Qwen2.5-1.5B": {
+        "n": 60,
+        "distinctes": 60
+       },
+       "T2-A/gpt2": {
+        "n": 60,
+        "distinctes": 60
+       },
+       "T2-A/HuggingFaceTB/SmolLM2-360M": {
+        "n": 60,
+        "distinctes": 60
+       },
+       "T2-A/Qwen/Qwen2.5-1.5B": {
+        "n": 60,
+        "distinctes": 60
+       },
+       "T2-B/gpt2": {
+        "n": 60,
+        "distinctes": 60
+       },
+       "T2-B/HuggingFaceTB/SmolLM2-360M": {
+        "n": 60,
+        "distinctes": 60
+       },
+       "T2-B/Qwen/Qwen2.5-1.5B": {
+        "n": 60,
+        "distinctes": 60
+       },
+       "T3-A/gpt2": {
+        "n": 60,
+        "distinctes": 60
+       },
+       "T3-A/HuggingFaceTB/SmolLM2-360M": {
+        "n": 60,
+        "distinctes": 60
+       },
+       "T3-A/Qwen/Qwen2.5-1.5B": {
+        "n": 60,
+        "distinctes": 60
+       },
+       "T3-B/gpt2": {
+        "n": 60,
+        "distinctes": 60
+       },
+       "T3-B/HuggingFaceTB/SmolLM2-360M": {
+        "n": 60,
+        "distinctes": 60
+       },
+       "T3-B/Qwen/Qwen2.5-1.5B": {
+        "n": 60,
+        "distinctes": 60
+       },
+       "regle_egalites": "mid-rank ; bris seedé par cfg.seed ; GRAVÉE AVANT MESURE (condition E2)"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "doublon d'unité",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "T1-A/gpt2": {
+        "n": 60,
+        "distinctes": 59
+       },
+       "T1-A/HuggingFaceTB/SmolLM2-360M": {
+        "n": 60,
+        "distinctes": 59
+       },
+       "T1-A/Qwen/Qwen2.5-1.5B": {
+        "n": 60,
+        "distinctes": 59
+       },
+       "T1-B/gpt2": {
+        "n": 60,
+        "distinctes": 59
+       },
+       "T1-B/HuggingFaceTB/SmolLM2-360M": {
+        "n": 60,
+        "distinctes": 59
+       },
+       "T1-B/Qwen/Qwen2.5-1.5B": {
+        "n": 60,
+        "distinctes": 59
+       },
+       "T2-A/gpt2": {
+        "n": 60,
+        "distinctes": 59
+       },
+       "T2-A/HuggingFaceTB/SmolLM2-360M": {
+        "n": 60,
+        "distinctes": 59
+       },
+       "T2-A/Qwen/Qwen2.5-1.5B": {
+        "n": 60,
+        "distinctes": 59
+       },
+       "T2-B/gpt2": {
+        "n": 60,
+        "distinctes": 59
+       },
+       "T2-B/HuggingFaceTB/SmolLM2-360M": {
+        "n": 60,
+        "distinctes": 59
+       },
+       "T2-B/Qwen/Qwen2.5-1.5B": {
+        "n": 60,
+        "distinctes": 59
+       },
+       "T3-A/gpt2": {
+        "n": 60,
+        "distinctes": 59
+       },
+       "T3-A/HuggingFaceTB/SmolLM2-360M": {
+        "n": 60,
+        "distinctes": 59
+       },
+       "T3-A/Qwen/Qwen2.5-1.5B": {
+        "n": 60,
+        "distinctes": 59
+       },
+       "T3-B/gpt2": {
+        "n": 60,
+        "distinctes": 59
+       },
+       "T3-B/HuggingFaceTB/SmolLM2-360M": {
+        "n": 60,
+        "distinctes": 59
+       },
+       "T3-B/Qwen/Qwen2.5-1.5B": {
+        "n": 60,
+        "distinctes": 59
+       },
+       "regle_egalites": "mid-rank ; bris seedé par cfg.seed ; GRAVÉE AVANT MESURE (condition E2)"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-C5",
+   "pass_case": "éligibles >= 60 pour 72/72 requêtes ; pool de 36 gelé",
+   "fail_case": "éligibles < 36 pour une requête ⇒ design insatisfiable",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "matériau v4",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "eligibles_min": 66,
+       "eligibles_max": 69,
+       "seuil": 60,
+       "n_requetes": 72,
+       "derivation": "72 − 1 − 2 − 3 = 66",
+       "pool_taille": 36,
+       "pool_gele": true,
+       "sha256_pools": "66b438dc93a06e0d"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "seuil porté à 100 (éligibles = 66)",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "eligibles_min": 66,
+       "seuil_du_cas": 100
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-C6",
+   "pass_case": "exactement un type capitalisé",
+   "fail_case": "zéro ou deux types capitalisés",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "matériau v4",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "n_types_capitalises": 1,
+       "attendu": 1
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "deux types capitalisés",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "n_types_capitalises": 2,
+       "attendu": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-casse",
+   "pass_case": "minusculiser la tige change le token pour >= 90 %",
+   "fail_case": "tokenizer insensible à la casse ⇒ clause VRAIE PAR VACUITÉ",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "< 90 % ⇒ clause vraie par vacuité ⇒ mode 0-6/0-8 ⇒ arrêt.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "matériau v4",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "gpt2": {
+        "tiges": 14,
+        "changent": 14,
+        "fraction": 1.0
+       },
+       "HuggingFaceTB/SmolLM2-360M": {
+        "tiges": 14,
+        "changent": 14,
+        "fraction": 1.0
+       },
+       "Qwen/Qwen2.5-1.5B": {
+        "tiges": 14,
+        "changent": 14,
+        "fraction": 1.0
+       },
+       "seuil": 0.9
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "tokenizer insensible à la casse",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "gpt2": {
+        "tiges": 14,
+        "changent": 0,
+        "fraction": 0.0
+       },
+       "HuggingFaceTB/SmolLM2-360M": {
+        "tiges": 14,
+        "changent": 0,
+        "fraction": 0.0
+       },
+       "Qwen/Qwen2.5-1.5B": {
+        "tiges": 14,
+        "changent": 0,
+        "fraction": 0.0
+       },
+       "seuil": 0.9
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-C7",
+   "pass_case": "4 sous-viviers déclarés, lexicalement DISJOINTS",
+   "fail_case": "un suffixe partagé entre deux sous-viviers",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "0-67 : planchers et nulles de M1/M3 PAR DOMAINE, jamais poolés ; cardinal D24-b publié PAR SOUS-VIVIER.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "matériau v4",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "sous_viviers_disjoints": true,
+       "intersections": {
+        "maritime|culinaire": [],
+        "maritime|astronomie": [],
+        "maritime|textile": [],
+        "culinaire|astronomie": [],
+        "culinaire|textile": [],
+        "astronomie|textile": []
+       },
+       "suffixes_hors_sous_vivier": [],
+       "unites_conformes": 72,
+       "n_unites": 72,
+       "stratification": "planchers et nulles M1/M3 PAR DOMAINE, jamais poolés"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "sous-viviers non disjoints",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "sous_viviers_disjoints": false,
+       "intersections": {
+        "maritime|culinaire": [
+         "ship"
+        ],
+        "maritime|astronomie": [],
+        "maritime|textile": [],
+        "culinaire|astronomie": [],
+        "culinaire|textile": [],
+        "astronomie|textile": []
+       },
+       "suffixes_hors_sous_vivier": [],
+       "unites_conformes": 70,
+       "n_unites": 72,
+       "stratification": "planchers et nulles M1/M3 PAR DOMAINE, jamais poolés"
+      }
+     },
+     {
+      "cas": "un suffixe hors du sous-vivier de son domaine",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "sous_viviers_disjoints": true,
+       "intersections": {
+        "maritime|culinaire": [],
+        "maritime|astronomie": [],
+        "maritime|textile": [],
+        "culinaire|astronomie": [],
+        "culinaire|textile": [],
+        "astronomie|textile": []
+       },
+       "suffixes_hors_sous_vivier": [
+        [
+         "Iron",
+         "kitchen",
+         "maritime"
+        ]
+       ],
+       "unites_conformes": 71,
+       "n_unites": 72,
+       "stratification": "planchers et nulles M1/M3 PAR DOMAINE, jamais poolés"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-m1",
+   "pass_case": "m1 = 5 pour 60/60 unités décisionnelles",
+   "fail_case": "une famille à tige simple ⇒ m1 = 2",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "matériau v4",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "m1_distinct": [
+        5
+       ],
+       "n": 60,
+       "attendu": 5
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "m1 = 2 (substitution pontée -> simple)",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "m1": 2,
+       "attendu": 5,
+       "motif": "0-69 : casse m1, la cellule S2 et l'homogénéité des clusters"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-Keff",
+   "pass_case": "K_eff = 10 (clusters = TIGES)",
+   "fail_case": "clustering par FAMILLE ⇒ K = 20, IC sous-estimés d'un facteur 1.41",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "matériau v4",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "K_eff": 10,
+       "attendu": 10,
+       "motif": "clustering par FAMILLE illégitime : les partenaires d'une tige sont à la fois concurrents et requêtes (couplage parfait, 0-50)"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "clustering par famille (K = 20)",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "K": 20,
+       "K_eff_correct": 10,
+       "facteur_de_sous_estimation": 1.41,
+       "motif": "0-50 : les partenaires d'une tige sont à la fois concurrents et requêtes"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-P2",
+   "pass_case": "pool P2 = 5 tige-partagés + 12 même-domaine + 19 autre",
+   "fail_case": "composition non appariée en domaine ⇒ biais du canal C7 non borné",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "matériau v4",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "compositions_observees": {
+        "(5, 12, 19)": 60
+       },
+       "attendu": [
+        5,
+        12,
+        19
+       ],
+       "appariement_de_domaine": {
+        "tige_partages": "2/5 = 0.400",
+        "non_partages": "12/31 = 0.387"
+       },
+       "borne_de_biais_derivee_par_gagnant": 0.004,
+       "borne_sur_D_a_m=18": 0.07
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "composition 5 / 20 / 11",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "composition": [
+        5,
+        20,
+        11
+       ],
+       "attendu": [
+        5,
+        12,
+        19
+       ],
+       "motif": "0-73 : sans cette ligne, l'équilibre serait un accident du tirage"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-var-dist",
+   "pass_case": ">= 50 % des tokens de préfixe diffèrent",
+   "fail_case": "préfixes quasi identiques (1 token sur 8) ⇒ 0-57",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "matériau v4",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "T1": {
+        "gpt2": 1.0,
+        "HuggingFaceTB/SmolLM2-360M": 1.0,
+        "Qwen/Qwen2.5-1.5B": 1.0
+       },
+       "T2": {
+        "gpt2": 1.0,
+        "HuggingFaceTB/SmolLM2-360M": 1.0,
+        "Qwen/Qwen2.5-1.5B": 1.0
+       },
+       "T3": {
+        "gpt2": 1.0,
+        "HuggingFaceTB/SmolLM2-360M": 1.0,
+        "Qwen/Qwen2.5-1.5B": 1.0
+       },
+       "seuil": 0.5
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "distance 1/8 = 0.125",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "distance": 0.125,
+       "seuil": 0.5,
+       "motif": "0-57 : un contraste de 1 token sur 8 est un bruit lexical, pas un contraste de constituants"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-freq",
+   "pass_case": "bandes de fréquence appariées, borne exacte <= 0.15",
+   "fail_case": "un écart de bande à 0.30 ; AUCUN test d'homogénéité",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "matériau v4",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "gpt2": {
+        "sous_viviers_2a2": {
+         "maritime|culinaire": 0.0174,
+         "maritime|astronomie": 0.0016,
+         "maritime|textile": 0.012,
+         "culinaire|astronomie": 0.019,
+         "culinaire|textile": 0.0055,
+         "astronomie|textile": 0.0135
+        },
+        "familles_intra_tige": {
+         "Iron": 0.022,
+         "Silver": 0.0103,
+         "North": 0.0371,
+         "River": 0.0152,
+         "Storm": 0.0221,
+         "Golden": 0.0024,
+         "Copper": 0.0049,
+         "Hollow": 0.0231,
+         "Frost": 0.0361,
+         "Shadow": 0.0101
+        },
+        "ponte_vs_non_ponte": 0.0522
+       },
+       "HuggingFaceTB/SmolLM2-360M": {
+        "sous_viviers_2a2": {
+         "maritime|culinaire": 0.0077,
+         "maritime|astronomie": 0.0449,
+         "maritime|textile": 0.0383,
+         "culinaire|astronomie": 0.0526,
+         "culinaire|textile": 0.046,
+         "astronomie|textile": 0.0066
+        },
+        "familles_intra_tige": {
+         "Iron": 0.0409,
+         "Silver": 0.0943,
+         "North": 0.0328,
+         "River": 0.0117,
+         "Storm": 0.0774,
+         "Golden": 0.002,
+         "Copper": 0.0103,
+         "Hollow": 0.0755,
+         "Frost": 0.054,
+         "Shadow": 0.0222
+        },
+        "ponte_vs_non_ponte": 0.0469
+       },
+       "Qwen/Qwen2.5-1.5B": {
+        "sous_viviers_2a2": {
+         "maritime|culinaire": 0.0011,
+         "maritime|astronomie": 0.0163,
+         "maritime|textile": 0.0175,
+         "culinaire|astronomie": 0.0174,
+         "culinaire|textile": 0.0164,
+         "astronomie|textile": 0.0338
+        },
+        "familles_intra_tige": {
+         "Iron": 0.0266,
+         "Silver": 0.0198,
+         "North": 0.0243,
+         "River": 0.0158,
+         "Storm": 0.043,
+         "Golden": 0.0259,
+         "Copper": 0.0592,
+         "Hollow": 0.0113,
+         "Frost": 0.0007,
+         "Shadow": 0.0107
+        },
+        "ponte_vs_non_ponte": 0.0336
+       },
+       "borne": 0.15,
+       "ecart_max_enumere": 0.0943,
+       "serpentin": "rang de fusion gpt2 de la tige, boustrophédon (§4.7)",
+       "test_d_homogeneite": "AUCUN (0-41)"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "écart de bande 0.30",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "ecart": 0.3,
+       "borne": 0.15,
+       "test_d_homogeneite": "AUCUN (0-41 : blanc-seing N11/D20)"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-D24b",
+   "pass_case": "cardinaux tronqués : 72/cellule, 37/requête, 6/tige, 14 à t-1",
+   "fail_case": "cardinal à t-1 publié à 72 ⇒ FAUX PASS (0-64)",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "matériau v4",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "gpt2": {
+        "par_cellule": {
+         "T1-A": 72,
+         "T1-B": 72,
+         "T2-A": 72,
+         "T2-B": 72,
+         "T3-A": 72,
+         "T3-B": 72
+        },
+        "a_t_moins_1": {
+         "T1-A": 14,
+         "T1-B": 14,
+         "T2-A": 14,
+         "T2-B": 14,
+         "T3-A": 14,
+         "T3-B": 14
+        },
+        "par_tige_ensemble_restreint": {
+         "T1-A": [
+          6
+         ],
+         "T1-B": [
+          6
+         ],
+         "T2-A": [
+          6
+         ],
+         "T2-B": [
+          6
+         ],
+         "T3-A": [
+          6
+         ],
+         "T3-B": [
+          6
+         ]
+        },
+        "par_sous_vivier": {
+         "T1-A": {
+          "maritime": 18,
+          "culinaire": 18,
+          "astronomie": 18,
+          "textile": 18
+         },
+         "T1-B": {
+          "maritime": 18,
+          "culinaire": 18,
+          "astronomie": 18,
+          "textile": 18
+         },
+         "T2-A": {
+          "maritime": 18,
+          "culinaire": 18,
+          "astronomie": 18,
+          "textile": 18
+         },
+         "T2-B": {
+          "maritime": 18,
+          "culinaire": 18,
+          "astronomie": 18,
+          "textile": 18
+         },
+         "T3-A": {
+          "maritime": 18,
+          "culinaire": 18,
+          "astronomie": 18,
+          "textile": 18
+         },
+         "T3-B": {
+          "maritime": 18,
+          "culinaire": 18,
+          "astronomie": 18,
+          "textile": 18
+         }
+        },
+        "par_requete": {
+         "T1-A": [
+          37
+         ],
+         "T1-B": [
+          37
+         ],
+         "T2-A": [
+          37
+         ],
+         "T2-B": [
+          37
+         ],
+         "T3-A": [
+          37
+         ],
+         "T3-B": [
+          37
+         ]
+        }
+       },
+       "HuggingFaceTB/SmolLM2-360M": {
+        "par_cellule": {
+         "T1-A": 72,
+         "T1-B": 72,
+         "T2-A": 72,
+         "T2-B": 72,
+         "T3-A": 72,
+         "T3-B": 72
+        },
+        "a_t_moins_1": {
+         "T1-A": 14,
+         "T1-B": 14,
+         "T2-A": 14,
+         "T2-B": 14,
+         "T3-A": 14,
+         "T3-B": 14
+        },
+        "par_tige_ensemble_restreint": {
+         "T1-A": [
+          6
+         ],
+         "T1-B": [
+          6
+         ],
+         "T2-A": [
+          6
+         ],
+         "T2-B": [
+          6
+         ],
+         "T3-A": [
+          6
+         ],
+         "T3-B": [
+          6
+         ]
+        },
+        "par_sous_vivier": {
+         "T1-A": {
+          "maritime": 18,
+          "culinaire": 18,
+          "astronomie": 18,
+          "textile": 18
+         },
+         "T1-B": {
+          "maritime": 18,
+          "culinaire": 18,
+          "astronomie": 18,
+          "textile": 18
+         },
+         "T2-A": {
+          "maritime": 18,
+          "culinaire": 18,
+          "astronomie": 18,
+          "textile": 18
+         },
+         "T2-B": {
+          "maritime": 18,
+          "culinaire": 18,
+          "astronomie": 18,
+          "textile": 18
+         },
+         "T3-A": {
+          "maritime": 18,
+          "culinaire": 18,
+          "astronomie": 18,
+          "textile": 18
+         },
+         "T3-B": {
+          "maritime": 18,
+          "culinaire": 18,
+          "astronomie": 18,
+          "textile": 18
+         }
+        },
+        "par_requete": {
+         "T1-A": [
+          37
+         ],
+         "T1-B": [
+          37
+         ],
+         "T2-A": [
+          37
+         ],
+         "T2-B": [
+          37
+         ],
+         "T3-A": [
+          37
+         ],
+         "T3-B": [
+          37
+         ]
+        }
+       },
+       "Qwen/Qwen2.5-1.5B": {
+        "par_cellule": {
+         "T1-A": 72,
+         "T1-B": 72,
+         "T2-A": 72,
+         "T2-B": 72,
+         "T3-A": 72,
+         "T3-B": 72
+        },
+        "a_t_moins_1": {
+         "T1-A": 14,
+         "T1-B": 14,
+         "T2-A": 14,
+         "T2-B": 14,
+         "T3-A": 14,
+         "T3-B": 14
+        },
+        "par_tige_ensemble_restreint": {
+         "T1-A": [
+          6
+         ],
+         "T1-B": [
+          6
+         ],
+         "T2-A": [
+          6
+         ],
+         "T2-B": [
+          6
+         ],
+         "T3-A": [
+          6
+         ],
+         "T3-B": [
+          6
+         ]
+        },
+        "par_sous_vivier": {
+         "T1-A": {
+          "maritime": 18,
+          "culinaire": 18,
+          "astronomie": 18,
+          "textile": 18
+         },
+         "T1-B": {
+          "maritime": 18,
+          "culinaire": 18,
+          "astronomie": 18,
+          "textile": 18
+         },
+         "T2-A": {
+          "maritime": 18,
+          "culinaire": 18,
+          "astronomie": 18,
+          "textile": 18
+         },
+         "T2-B": {
+          "maritime": 18,
+          "culinaire": 18,
+          "astronomie": 18,
+          "textile": 18
+         },
+         "T3-A": {
+          "maritime": 18,
+          "culinaire": 18,
+          "astronomie": 18,
+          "textile": 18
+         },
+         "T3-B": {
+          "maritime": 18,
+          "culinaire": 18,
+          "astronomie": 18,
+          "textile": 18
+         }
+        },
+        "par_requete": {
+         "T1-A": [
+          37
+         ],
+         "T1-B": [
+          37
+         ],
+         "T2-A": [
+          37
+         ],
+         "T2-B": [
+          37
+         ],
+         "T3-A": [
+          37
+         ],
+         "T3-B": [
+          37
+         ]
+        }
+       },
+       "drapeau": "contraste minimal : 1 token",
+       "cardinal_t1_attendu": 14
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "t-1 publié à 72",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "cardinal_t1_publie": 72,
+       "cardinal_t1_vrai": 14,
+       "motif": "à t-1 le suffixe n'est pas dans le préfixe causal : les 6 unités d'une tige sont bit-identiques"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-cadre",
+   "pass_case": "nulle de cadre : 40 PAIRES L_e = 2, sans token partagé",
+   "fail_case": "nulle de cadre à L_e = 1 ⇒ non appariée en position (0-58)",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "matériau v4",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "n_paires": 40,
+       "attendu": 40,
+       "mots_distincts": 80,
+       "mots_total": 80,
+       "intersection_avec_entites": [],
+       "L_e": 2,
+       "hors_des_4_domaines": true,
+       "motif": "0-58 : une nulle de cadre à `L_e = 1` ne serait pas capturée à la même position ⇒ non appariée ⇒ ne borne rien",
+       "L_e_gpt2": [
+        2
+       ],
+       "L_e_HuggingFaceTB/SmolLM2-360M": [
+        2
+       ],
+       "L_e_Qwen/Qwen2.5-1.5B": [
+        2
+       ]
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "40 noms communs (L_e = 1)",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "n_paires": 40,
+       "attendu": 40,
+       "mots_distincts": 41,
+       "mots_total": 80,
+       "intersection_avec_entites": [],
+       "L_e": 2,
+       "hors_des_4_domaines": true,
+       "motif": "0-58 : une nulle de cadre à `L_e = 1` ne serait pas capturée à la même position ⇒ non appariée ⇒ ne borne rien",
+       "L_e_gpt2": [
+        2
+       ],
+       "L_e_HuggingFaceTB/SmolLM2-360M": [
+        2
+       ],
+       "L_e_Qwen/Qwen2.5-1.5B": [
+        2
+       ]
+      }
+     },
+     {
+      "cas": "un token partagé entre deux paires",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "n_paires": 40,
+       "attendu": 40,
+       "mots_distincts": 79,
+       "mots_total": 80,
+       "intersection_avec_entites": [],
+       "L_e": 2,
+       "hors_des_4_domaines": true,
+       "motif": "0-58 : une nulle de cadre à `L_e = 1` ne serait pas capturée à la même position ⇒ non appariée ⇒ ne borne rien",
+       "L_e_gpt2": [
+        2
+       ],
+       "L_e_HuggingFaceTB/SmolLM2-360M": [
+        2
+       ],
+       "L_e_Qwen/Qwen2.5-1.5B": [
+        2
+       ]
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-nouveaute",
+   "pass_case": "pseudo-mots : nulle SÉPARÉE, non appariée, déclarée",
+   "fail_case": "pseudo-mots mélangés à la nulle de cadre (0-42)",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "matériau v4",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "n": 20,
+       "attendu": 20,
+       "appariee_en_position": false,
+       "declaration": "non appariée, déclarée telle (§5) ; JAMAIS mélangée à la nulle de cadre (0-42)",
+       "longueurs_gpt2": [
+        2,
+        3,
+        4
+       ],
+       "longueurs_HuggingFaceTB/SmolLM2-360M": [
+        2,
+        3,
+        4
+       ],
+       "longueurs_Qwen/Qwen2.5-1.5B": [
+        2,
+        3,
+        4
+       ]
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "pseudo-mots dans la nulle de cadre",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "melange": true,
+       "motif": "0-42 : les pseudo-mots ne sont pas appariés en position"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-periode",
+   "pass_case": "aucune période sur un slot ni sur un couple de slots",
+   "fail_case": "période 20 sur (entity, verb) ⇒ 10 collisions à N = 30",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "matériau v4",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "tige->suffixe": {
+        "couples_distincts": 60,
+        "fonction_a_vers_b": false,
+        "fonction_b_vers_a": true
+       },
+       "tige->domaine": {
+        "couples_distincts": 20,
+        "fonction_a_vers_b": false,
+        "fonction_b_vers_a": false
+       },
+       "suffixe->domaine": {
+        "couples_distincts": 60,
+        "fonction_a_vers_b": true,
+        "fonction_b_vers_a": false
+       },
+       "suffixes_globalement_uniques": true,
+       "periode_sur_couple": "aucune — le suffixe est une clé unique (0-41/0-34)"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "période 20 sur un couple de slots",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "periode": 20,
+       "collisions_a_N30": 10,
+       "source": "banc v3, 2026-08-22"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-div4",
+   "pass_case": "3 types x 2 variantes = 6 moules",
+   "fail_case": "un seul type ⇒ l'invariance n'est plus mesurable",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "matériau v4",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "types": 3,
+       "variantes": 2,
+       "cellules": 6,
+       "limite_de_validite_externe": "invariance à TROIS transformations nommées, répliquées 72 fois — pas « la paraphrase »"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "un seul type",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "types": 1,
+       "attendu": 3
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-paires4",
+   "pass_case": "S3 = 60, S2 = 90 ; S1 et S0 publiés",
+   "fail_case": "cardinal de strate faux",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "matériau v4",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "strates": {
+        "S3": 60,
+        "S2": 90,
+        "S1": 360,
+        "S0": 1260
+       },
+       "total_paires": 1770,
+       "attendu_S3": 60,
+       "attendu_S2": 90,
+       "paires_intra_unite_intra_type": 180,
+       "note": "S1 et S0 sont PUBLIÉS (le protocole les demande « à publier »)"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "S3 annoncé à 30",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "S3_annonce": 30,
+       "S3_vrai": 60
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-ordre",
+   "pass_case": "cascade §5.5 exécutée dans l'ordre GRAVÉ",
+   "fail_case": "deux étapes permutées",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "matériau v4",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "execute": [
+        "1-Le=2-3-tokenizers",
+        "2-sous-viviers-domaine-C7",
+        "3-structure-tige-suffixe-ponts",
+        "4-moules-egalisation-prefixe-distance-lexicale",
+        "5-appariement-bandes-frequence-V-freq",
+        "6-type-capitalise",
+        "7-nulle-de-cadre-40-paires"
+       ],
+       "grave": [
+        "1-Le=2-3-tokenizers",
+        "2-sous-viviers-domaine-C7",
+        "3-structure-tige-suffixe-ponts",
+        "4-moules-egalisation-prefixe-distance-lexicale",
+        "5-appariement-bandes-frequence-V-freq",
+        "6-type-capitalise",
+        "7-nulle-de-cadre-40-paires"
+       ]
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "étapes 2 et 3 permutées",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "execute": [
+        "1-Le=2-3-tokenizers",
+        "3-structure-tige-suffixe-ponts",
+        "2-sous-viviers-domaine-C7",
+        "4-moules-egalisation-prefixe-distance-lexicale",
+        "5-appariement-bandes-frequence-V-freq",
+        "6-type-capitalise",
+        "7-nulle-de-cadre-40-paires"
+       ],
+       "grave": [
+        "1-Le=2-3-tokenizers",
+        "2-sous-viviers-domaine-C7",
+        "3-structure-tige-suffixe-ponts",
+        "4-moules-egalisation-prefixe-distance-lexicale",
+        "5-appariement-bandes-frequence-V-freq",
+        "6-type-capitalise",
+        "7-nulle-de-cadre-40-paires"
+       ]
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-prereq",
+   "pass_case": "vérification MÉCANIQUE matériau x instrument",
+   "fail_case": "un prérequis violé ⇒ ARRÊT (jamais un avertissement)",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "Liste blanche manuelle PROSCRITE (D25) : la table est exécutée, pas consultée.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "matériau v4",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {}
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "tige morte : 54 unités décisionnelles au lieu de 60",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {}
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-fact-pairs",
+   "pass_case": "`fact_pairs` soumis à la table D25 ÉCHOUE sur C1, C2 et S-1",
+   "fail_case": "s'il passait, c'est la TABLE qui serait fausse",
+   "expected": {
+    "pass_case": [
+     "FAIL",
+     "FAIL",
+     "FAIL"
+    ],
+    "fail_case": [
+     "PASS"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "FAIL",
+     "FAIL",
+     "FAIL"
+    ],
+    "fail_case": [
+     "PASS"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "Les rôles sont inversés ici À DESSEIN : le cas « passant » de la clause est un ÉCHEC de fact_pairs.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "fact_pairs sur C1",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "C1": "FAIL",
+       "C2": "FAIL",
+       "S-1": "FAIL",
+       "n": 30,
+       "prefixes_distincts": 30,
+       "longueurs_de_slot_observees": [
+        2,
+        3
+       ],
+       "verdict": "ÉCHEC ATTENDU"
+      }
+     },
+     {
+      "cas": "fact_pairs sur C2",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "C1": "FAIL",
+       "C2": "FAIL",
+       "S-1": "FAIL",
+       "n": 30,
+       "prefixes_distincts": 30,
+       "longueurs_de_slot_observees": [
+        2,
+        3
+       ],
+       "verdict": "ÉCHEC ATTENDU"
+      }
+     },
+     {
+      "cas": "fact_pairs sur S-1",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "C1": "FAIL",
+       "C2": "FAIL",
+       "S-1": "FAIL",
+       "n": 30,
+       "prefixes_distincts": 30,
+       "longueurs_de_slot_observees": [
+        2,
+        3
+       ],
+       "verdict": "ÉCHEC ATTENDU"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "une table qui laisserait passer fact_pairs",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "consequence": "la table D25 serait fausse",
+       "motif": "eval/pool.py est GELÉ : fact_pairs n'est utilisé QUE comme contre-exemple"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Calibrateur — 4 classes (§4.4)",
+   "pass_case": "un cas synthétique par classe, frontière N-ind comprise",
+   "fail_case": "un IC qui recevrait DEUX verdicts",
+   "expected": {
+    "pass_case": [
+     "N-b",
+     "N-a",
+     "N-ind",
+     "INVALIDE-INSTRUMENT"
+    ],
+    "fail_case": [
+     "N-b",
+     "N-a"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "N-b",
+     "N-a",
+     "N-ind",
+     "INVALIDE-INSTRUMENT"
+    ],
+    "fail_case": [
+     "N-b",
+     "N-a"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "Ordre gravé : INVALIDE-INSTRUMENT -> N-b -> N-a -> N-ind. Seuils À JOUR (0-87).",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "IC = [0.20, 0.60] -> N-b",
+      "attendu": "N-b",
+      "observé": "N-b",
+      "ok": true,
+      "détail": {}
+     },
+     {
+      "cas": "IC = [-0.05, 0.05] -> N-a",
+      "attendu": "N-a",
+      "observé": "N-a",
+      "ok": true,
+      "détail": {}
+     },
+     {
+      "cas": "IC = [-0.50, 0.60] -> N-ind",
+      "attendu": "N-ind",
+      "observé": "N-ind",
+      "ok": true,
+      "détail": {}
+     },
+     {
+      "cas": "IC = [-0.40, -0.20] -> INVALIDE-INSTRUMENT",
+      "attendu": "INVALIDE-INSTRUMENT",
+      "observé": "INVALIDE-INSTRUMENT",
+      "ok": true,
+      "détail": {}
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "IC = [0.01, 0.09] : N-b ET N-a sans ordre",
+      "attendu": "N-b",
+      "observé": "N-b",
+      "ok": true,
+      "détail": {
+       "motif": "0-68 : sans ordre gravé, cet IC tombait dans DEUX classes"
+      }
+     },
+     {
+      "cas": "IC = [-0.14, -0.01] : jamais INVALIDE-INSTRUMENT",
+      "attendu": "N-a",
+      "observé": "N-a",
+      "ok": true,
+      "détail": {
+       "motif": "0-86/0-87 : INVALIDE-INSTRUMENT exige IC_sup < -tau (magnitude) ; il route en N-a"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Calibrateur — asymétrie assumée des seuils",
+   "pass_case": "N-b au seuil d'EXISTENCE (verdict bénin), INVALIDE à la MAGNITUDE",
+   "fail_case": "le miroir exact d'un IC bénin déclencherait l'abandon du run",
+   "expected": {
+    "pass_case": [
+     "N-b"
+    ],
+    "fail_case": [
+     "N-a"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "N-b"
+    ],
+    "fail_case": [
+     "N-a"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "[+0.01, +0.14] -> N-b (verdict bénin : une phrase)",
+      "attendu": "N-b",
+      "observé": "N-b",
+      "ok": true,
+      "détail": {}
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "[-0.01, -0.14] miroir : jamais l'abandon",
+      "attendu": "N-a",
+      "observé": "N-a",
+      "ok": true,
+      "détail": {
+       "alpha_declare": 0.00015,
+       "ancien_alpha_perime": 0.025,
+       "facteur": "~170 (défaut 0-90)"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Bandes de la primaire (§4.5)",
+   "pass_case": "cinq cas : C+, C−, C-0, C-ind de FAMINE, C-ind de RÉSOLUTION",
+   "fail_case": "un IC significatif au bootstrap mais sous la résolution de la nulle",
+   "expected": {
+    "pass_case": [
+     "C+",
+     "C−",
+     "C-0",
+     "C-ind",
+     "C-ind"
+    ],
+    "fail_case": [
+     "C-0",
+     "C-0"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "C+",
+     "C−",
+     "C-0",
+     "C-ind",
+     "C-ind"
+    ],
+    "fail_case": [
+     "C-0",
+     "C-0"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "Ordre gravé : famine -> C+ -> C− -> C-0 -> C-ind. Le cas de résolution (0-89) n'était exercé nulle part avant ce banc.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "IC=[0.30,0.60], eps=0.215 -> C+",
+      "attendu": "C+",
+      "observé": "C+",
+      "ok": true,
+      "détail": {}
+     },
+     {
+      "cas": "IC=[-0.60,-0.30] -> C−",
+      "attendu": "C−",
+      "observé": "C−",
+      "ok": true,
+      "détail": {}
+     },
+     {
+      "cas": "IC=[-0.20,0.20] -> C-0",
+      "attendu": "C-0",
+      "observé": "C-0",
+      "ok": true,
+      "détail": {}
+     },
+     {
+      "cas": "famine globale : somme_m = 40 < 60 -> C-ind",
+      "attendu": "C-ind",
+      "observé": "C-ind",
+      "ok": true,
+      "détail": {}
+     },
+     {
+      "cas": "C-ind de RÉSOLUTION, HORS famine : IC=[0.02,0.50]",
+      "attendu": "C-ind",
+      "observé": "C-ind",
+      "ok": true,
+      "détail": {
+       "cause": "C-ind DE RÉSOLUTION (hors famine) — la classe du calibrateur ne discrimine rien ici",
+       "suite": "effet vrai dans la zone morte déclarée (≈ε à ≈3ε) ⇒ augmenter la résolution (K_eff, requêtes contributives)"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "IC=[0.02,0.18] avec eps=0.215 : jamais C+",
+      "attendu": "C-0",
+      "observé": "C-0",
+      "ok": true,
+      "détail": {
+       "motif": "0-83 : C+ exige IC_inf > eps"
+      }
+     },
+     {
+      "cas": "IC=[-0.18,-0.02] : jamais C−",
+      "attendu": "C-0",
+      "observé": "C-0",
+      "ok": true,
+      "détail": {
+       "motif": "0-83 : C− porte la conséquence la plus lourde"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Famine PARTIELLE concentrée (0-74)",
+   "pass_case": "somme_m >= 60 obtenue par une poignée de requêtes obèses, K_eff^support <= 8 ⇒ C-ind",
+   "fail_case": "la même observation lue en C+ ou en C-0",
+   "expected": {
+    "pass_case": [
+     "C-ind"
+    ],
+    "fail_case": [
+     "C-ind"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "C-ind"
+    ],
+    "fail_case": [
+     "C-ind"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "somme_m = 90, K_support = 5 -> C-ind",
+      "attendu": "C-ind",
+      "observé": "C-ind",
+      "ok": true,
+      "détail": {
+       "cause": "famine PARTIELLE",
+       "suite": "le support s'est effondré sur une minorité de clusters ; la suite se lit sur la distribution des m_q publiée",
+       "jamais": "« augmenter la résolution » par défaut"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "K_support = 5 lu en C+",
+      "attendu": "C-ind",
+      "observé": "C-ind",
+      "ok": true,
+      "détail": {
+       "motif": "une somme qui saute les q indéfinis change silencieusement son propre support"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "§6.G — les six causes de C-ind, aucune muette",
+   "pass_case": "chaque cellule conjointe a sa suite gravée",
+   "fail_case": "la phrase G-bis récitée hors de sa cellule",
+   "expected": {
+    "pass_case": [
+     "famine par SATURATION",
+     "famine par PUISSANCE",
+     "ni la question ni l'instrument ne sont résolus",
+     "la chaîne de mesure est en cause",
+     true,
+     false
+    ],
+    "fail_case": [
+     false
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "famine par SATURATION",
+     "famine par PUISSANCE",
+     "ni la question ni l'instrument ne sont résolus",
+     "la chaîne de mesure est en cause",
+     true,
+     false
+    ],
+    "fail_case": [
+     false
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "(N-b, famine) -> SATURATION",
+      "attendu": "famine par SATURATION",
+      "observé": "famine par SATURATION",
+      "ok": true,
+      "détail": {}
+     },
+     {
+      "cas": "(N-a, famine) -> PUISSANCE",
+      "attendu": "famine par PUISSANCE",
+      "observé": "famine par PUISSANCE",
+      "ok": true,
+      "détail": {}
+     },
+     {
+      "cas": "(N-ind, famine)",
+      "attendu": "ni la question ni l'instrument ne sont résolus",
+      "observé": "ni la question ni l'instrument ne sont résolus",
+      "ok": true,
+      "détail": {}
+     },
+     {
+      "cas": "(INVALIDE, famine)",
+      "attendu": "la chaîne de mesure est en cause",
+      "observé": "la chaîne de mesure est en cause",
+      "ok": true,
+      "détail": {}
+     },
+     {
+      "cas": "G-bis licenciée en N-b x C-ind",
+      "attendu": true,
+      "observé": true,
+      "ok": true,
+      "détail": {}
+     },
+     {
+      "cas": "G-bis NON licenciée en N-a x C-ind",
+      "attendu": false,
+      "observé": false,
+      "ok": true,
+      "détail": {}
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "G-bis en (N-ind, C-ind)",
+      "attendu": false,
+      "observé": false,
+      "ok": true,
+      "détail": {
+       "motif": "défaut D7 : la santé de l'instrument n'y est pas établie ; la phrase serait FAUSSE"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "États de maillon (§4.6)",
+   "pass_case": "+ -> − -> 0-résolu -> ind, `ind` par COMPLÉMENTATION en dernier",
+   "fail_case": "un IC à la fois `+` et `0-résolu`, ou un effet fort routé en `ind`",
+   "expected": {
+    "pass_case": [
+     "+",
+     "−",
+     "0-résolu",
+     "ind"
+    ],
+    "fail_case": [
+     "0-résolu",
+     "+"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "+",
+     "−",
+     "0-résolu",
+     "ind"
+    ],
+    "fail_case": [
+     "0-résolu",
+     "+"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "IC=[0.15,0.40], eps_M=0.1 -> +",
+      "attendu": "+",
+      "observé": "+",
+      "ok": true,
+      "détail": {}
+     },
+     {
+      "cas": "IC=[-0.40,-0.15] -> −",
+      "attendu": "−",
+      "observé": "−",
+      "ok": true,
+      "détail": {}
+     },
+     {
+      "cas": "IC=[-0.08,0.08] -> 0-résolu",
+      "attendu": "0-résolu",
+      "observé": "0-résolu",
+      "ok": true,
+      "détail": {}
+     },
+     {
+      "cas": "IC=[-0.05,0.35] -> ind",
+      "attendu": "ind",
+      "observé": "ind",
+      "ok": true,
+      "détail": {}
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "IC=[0.01,0.05] dans [-0.10,0.10] : jamais `+`",
+      "attendu": "0-résolu",
+      "observé": "0-résolu",
+      "ok": true,
+      "détail": {
+       "motif": "0-78/0-88 : la table normative portait le seuil d'existence, la parenthèse portait ±eps_M"
+      }
+     },
+     {
+      "cas": "IC=[0.20,0.60] : effet FORT, jamais `ind`",
+      "attendu": "+",
+      "observé": "+",
+      "ok": true,
+      "détail": {
+       "motif": "0-78 : `ind` défini positivement et évalué en premier vidait ORD-1 et ORD-4"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Classes ORD — les six (§4.6)",
+   "pass_case": "un cas synthétique par classe ; espace résolu = 27 cellules",
+   "fail_case": "une cellule orpheline, ou deux classes pour la même observation",
+   "expected": {
+    "pass_case": [
+     "ORD-1",
+     "ORD-4",
+     "ORD-2",
+     "ORD-3",
+     "ORD-0",
+     "ORD-ind",
+     "PASS"
+    ],
+    "fail_case": [
+     "ORD-2",
+     "ORD-2"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "ORD-1",
+     "ORD-4",
+     "ORD-2",
+     "ORD-3",
+     "ORD-0",
+     "ORD-ind",
+     "PASS"
+    ],
+    "fail_case": [
+     "ORD-2",
+     "ORD-2"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "Le bloc M2 = + est subordonné à M3, contrôle de manipulation de C7.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "(+,+,+) -> ORD-1",
+      "attendu": "ORD-1",
+      "observé": "ORD-1",
+      "ok": true,
+      "détail": {}
+     },
+     {
+      "cas": "(−,+,+) -> ORD-4",
+      "attendu": "ORD-4",
+      "observé": "ORD-4",
+      "ok": true,
+      "détail": {}
+     },
+     {
+      "cas": "(0-résolu,+,0-résolu) -> ORD-2",
+      "attendu": "ORD-2",
+      "observé": "ORD-2",
+      "ok": true,
+      "détail": {}
+     },
+     {
+      "cas": "(+,−,+) -> ORD-3",
+      "attendu": "ORD-3",
+      "observé": "ORD-3",
+      "ok": true,
+      "détail": {}
+     },
+     {
+      "cas": "(+,0-résolu,+) -> ORD-0",
+      "attendu": "ORD-0",
+      "observé": "ORD-0",
+      "ok": true,
+      "détail": {}
+     },
+     {
+      "cas": "(+,ind,+) -> ORD-ind",
+      "attendu": "ORD-ind",
+      "observé": "ORD-ind",
+      "ok": true,
+      "détail": {}
+     },
+     {
+      "cas": "comptage exécuté = 1+2+6+9+9 = 27",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "comptage_execute": {
+        "ORD-1": 1,
+        "ORD-2": 6,
+        "ORD-3": 9,
+        "ORD-0": 9,
+        "ORD-4": 2,
+        "total": 27
+       },
+       "attendu": {
+        "ORD-1": 1,
+        "ORD-4": 2,
+        "ORD-2": 6,
+        "ORD-3": 9,
+        "ORD-0": 9,
+        "total": 27
+       },
+       "n_classes": 6
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "(−,+,−) : cellule jadis orpheline -> ORD-2",
+      "attendu": "ORD-2",
+      "observé": "ORD-2",
+      "ok": true,
+      "détail": {
+       "motif": "0-77 : ORD-4 portait (M1=+ ou M3=+) et ne couvrait que 4 cellules sur 7"
+      }
+     },
+     {
+      "cas": "(0-résolu,+,−) : jadis orpheline -> ORD-2",
+      "attendu": "ORD-2",
+      "observé": "ORD-2",
+      "ok": true,
+      "détail": {}
+     }
+    ]
+   }
+  },
+  {
+   "clause": "M2 = 0-résolu distinct de M2 = ind (0-72, 0-76)",
+   "pass_case": "0-résolu -> ORD-0 (verdict propre), ind -> ORD-ind",
+   "fail_case": "0-résolu partageant le verdict d'ORD-3",
+   "expected": {
+    "pass_case": [
+     "ORD-0",
+     "ORD-ind",
+     true
+    ],
+    "fail_case": [
+     "ORD-0"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "ORD-0",
+     "ORD-ind",
+     true
+    ],
+    "fail_case": [
+     "ORD-0"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "M2 = 0-résolu -> ORD-0",
+      "attendu": "ORD-0",
+      "observé": "ORD-0",
+      "ok": true,
+      "détail": {}
+     },
+     {
+      "cas": "M2 = ind -> ORD-ind",
+      "attendu": "ORD-ind",
+      "observé": "ORD-ind",
+      "ok": true,
+      "détail": {}
+     },
+     {
+      "cas": "verdicts d'ORD-0 et d'ORD-3 TEXTUELLEMENT distincts",
+      "attendu": true,
+      "observé": true,
+      "ok": true,
+      "détail": {}
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "M2 = 0-résolu lu comme ORD-3",
+      "attendu": "ORD-0",
+      "observé": "ORD-0",
+      "ok": true,
+      "détail": {
+       "motif": "0-76/0-91 : diagnostics OPPOSÉS — là le domaine écrase la tige, ici l'effet est sous la résolution"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Routage `ind` (règle du §4.6)",
+   "pass_case": "un maillon indécis envoie la classification entière en ORD-ind",
+   "fail_case": "un maillon indécis lu comme ORD-2 (« retour au matériau »)",
+   "expected": {
+    "pass_case": [
+     "ORD-ind",
+     "ORD-ind"
+    ],
+    "fail_case": [
+     "ORD-ind"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "ORD-ind",
+     "ORD-ind"
+    ],
+    "fail_case": [
+     "ORD-ind"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "M1 = ind -> ORD-ind",
+      "attendu": "ORD-ind",
+      "observé": "ORD-ind",
+      "ok": true,
+      "détail": {}
+     },
+     {
+      "cas": "M3 = ind -> ORD-ind",
+      "attendu": "ORD-ind",
+      "observé": "ORD-ind",
+      "ok": true,
+      "détail": {}
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "M3 = ind lu comme ORD-2",
+      "attendu": "ORD-ind",
+      "observé": "ORD-ind",
+      "ok": true,
+      "détail": {
+       "motif": "0-76 : ORD-2 prononcerait « retour au matériau » sur un simple manque de résolution"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Schéma 1x / 2x (0-81)",
+   "pass_case": "marge de significativité 1x, couloir d'équivalence 2x ; la classe d'équivalence est MODALE sous la nulle",
+   "fail_case": "couloir réglé sur 1x ⇒ classe structurellement INATTEIGNABLE",
+   "expected": {
+    "pass_case": [
+     true
+    ],
+    "fail_case": [
+     "C-ind"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     true
+    ],
+    "fail_case": [
+     "C-ind"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "P(classe d'équivalence | nulle) dans [0.90, 0.95]",
+      "attendu": true,
+      "observé": true,
+      "ok": true,
+      "détail": {
+       "C-0": 0.93405,
+       "C-ind": 0.0657,
+       "C−": 0.0002,
+       "C+": 5e-05
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "couloir à 1x : IC=[-0.30,0.10], eps=0.215 -> C-ind (classe d'équivalence INATTEIGNABLE)",
+      "attendu": "C-ind",
+      "observé": "C-ind",
+      "ok": true,
+      "détail": {
+       "sous_le_schema_2x": "C-0",
+       "motif": "l'inclusion IC ⊂ [-c,+c] exige |estimé| <= c - hw ; à c = hw le seuil vaut ≈ 0, et augmenter K_eff fait TENDRE P(classe) vers 0"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-compo",
+   "pass_case": "nulle MC seedée exécutée et publiée AVANT lecture de D",
+   "fail_case": "nulle simulée après lecture, ou eps au-dessus de eps_max",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "eps_max = 0.66 est une PORTE : toute valeur MC au-dessus est une erreur de pipeline (0-82).",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "barrière sceller -> publier -> desceller",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "ordre_barriere": [
+        "sceller",
+        "publier",
+        "desceller"
+       ],
+       "ordre_attendu": [
+        "sceller",
+        "publier",
+        "desceller"
+       ],
+       "somme_m_publiee": 200,
+       "exclusion_m0_predeclaree": true,
+       "epsilon": 0.215,
+       "epsilon_max": 0.66,
+       "epsilon_sous_plafond": true
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "eps publié APRÈS lecture de D",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "ordre_barriere": [
+        "desceller",
+        "publier"
+       ],
+       "ordre_attendu": [
+        "sceller",
+        "publier",
+        "desceller"
+       ],
+       "somme_m_publiee": 200,
+       "exclusion_m0_predeclaree": true,
+       "epsilon": 0.215,
+       "epsilon_max": 0.66,
+       "epsilon_sous_plafond": true
+      }
+     },
+     {
+      "cas": "eps MC = 0.75 > eps_max = 0.66",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "ordre_barriere": [
+        "sceller",
+        "publier",
+        "desceller"
+       ],
+       "ordre_attendu": [
+        "sceller",
+        "publier",
+        "desceller"
+       ],
+       "somme_m_publiee": 200,
+       "exclusion_m0_predeclaree": true,
+       "epsilon": 0.75,
+       "epsilon_max": 0.66,
+       "epsilon_sous_plafond": false
+      }
+     },
+     {
+      "cas": "sélection sur m non déclarée",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "ordre_barriere": [
+        "sceller",
+        "publier",
+        "desceller"
+       ],
+       "ordre_attendu": [
+        "sceller",
+        "publier",
+        "desceller"
+       ],
+       "somme_m_publiee": 200,
+       "exclusion_m0_predeclaree": false,
+       "epsilon": 0.215,
+       "epsilon_max": 0.66,
+       "epsilon_sous_plafond": true
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Barrière d'information (exécutable)",
+   "pass_case": "l'ordre sceller/publier/desceller est vérifié à l'exécution",
+   "fail_case": "desceller avant publier lève une exception",
+   "expected": {
+    "pass_case": [
+     [
+      "sceller",
+      "publier",
+      "desceller"
+     ]
+    ],
+    "fail_case": [
+     "EXCEPTION"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     [
+      "sceller",
+      "publier",
+      "desceller"
+     ]
+    ],
+    "fail_case": [
+     "EXCEPTION"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "ordre conforme",
+      "attendu": [
+       "sceller",
+       "publier",
+       "desceller"
+      ],
+      "observé": [
+       "sceller",
+       "publier",
+       "desceller"
+      ],
+      "ok": true,
+      "détail": {}
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "publication avant scellement",
+      "attendu": "EXCEPTION",
+      "observé": "EXCEPTION",
+      "ok": true,
+      "détail": {}
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-plafond",
+   "pass_case": "36/37 et 1/6 en FRACTIONS, plancher stratifié, phrase gravée",
+   "fail_case": "terme interdit détecté, constante absente, ou plancher POOLÉ",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "schéma conforme",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "champs_manquants": [],
+       "termes_interdits_detectes": []
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "terme interdit « adressage »",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "champs_manquants": [],
+       "termes_interdits_detectes": [
+        "adressage"
+       ]
+      }
+     },
+     {
+      "cas": "plancher POOLÉ (0-67)",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "champs_manquants": [
+        "plancher stratifié par domaine (jamais poolé)"
+       ],
+       "termes_interdits_detectes": []
+      }
+     },
+     {
+      "cas": "phrase de périmètre absente",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "champs_manquants": [
+        "phrase gravée du périmètre"
+       ],
+       "termes_interdits_detectes": []
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-calib",
+   "pass_case": "une et une seule des 4 classes ; AUCUN champ décisionnel",
+   "fail_case": "présence d'un champ de verdict d'hypothèse pour la primaire 1",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "schéma conforme",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "champs_manquants": [],
+       "champs_decisionnels_presents": [],
+       "termes_interdits_detectes": []
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "champ décisionnel « verdict_hypothese »",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "champs_manquants": [],
+       "champs_decisionnels_presents": [
+        "verdict_hypothese"
+       ],
+       "termes_interdits_detectes": []
+      }
+     },
+     {
+      "cas": "descriptif obligatoire manquant",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "champs_manquants": [
+        "delta_r1_inv_vs_cle_nulle"
+       ],
+       "champs_decisionnels_presents": [],
+       "termes_interdits_detectes": []
+      }
+     },
+     {
+      "cas": "terme interdit (xiii) « distingue l'unité »",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "champs_manquants": [],
+       "champs_decisionnels_presents": [],
+       "termes_interdits_detectes": [
+        "distingue l'unité"
+       ]
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-perimetre",
+   "pass_case": "les TROIS éléments du §4.9 sont présents",
+   "fail_case": "un seul manquant ⇒ échec du pipeline",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "La différence entre hors-périmètre et angle mort est ENTIÈREMENT dans cette écriture.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "bloc complet",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "elements_manquants": []
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "successeur non désigné",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "elements_manquants": [
+        "successeur_designe"
+       ]
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-bindur",
+   "pass_case": "bin dur marqué DESCRIPTIF, champ décisionnel absent",
+   "fail_case": "présence d'un champ décisionnel de bin dur",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "schéma conforme",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "statut": "DESCRIPTIF",
+       "champ_decisionnel_present": false
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "bin_dur_verdict présent",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "statut": "DESCRIPTIF",
+       "champ_decisionnel_present": true
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-pool",
+   "pass_case": "pool gelé, hash avant = hash après, aucun rang recalculé",
+   "fail_case": "pool rééchantillonné dans un bootstrap",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "pool gelé",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "hash_avant": "abc123",
+       "hash_apres": "abc123",
+       "rangs_recalcules_dans_un_bootstrap": false,
+       "source": "argument (cas de banc synthétique)"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "rangs recalculés dans un échantillon",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "hash_avant": "abc123",
+       "hash_apres": "abc123",
+       "rangs_recalcules_dans_un_bootstrap": true,
+       "source": "argument (cas de banc synthétique)"
+      }
+     },
+     {
+      "cas": "hash modifié",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "hash_avant": "abc123",
+       "hash_apres": "def456",
+       "rangs_recalcules_dans_un_bootstrap": false,
+       "source": "argument (cas de banc synthétique)"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-t1",
+   "pass_case": "aucune statistique intra-tige à t-1",
+   "fail_case": "un cos intra-tige à t-1 (états bit-identiques, 1.0 EXACT)",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "Le cas 1.0 EXACT échappe à la clause NaN (B) : publier le cardinal 14 ne suffisait pas, il fallait une PORTE.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "quantités t-1 inter-tige seules",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "quantites_t1": [
+        {
+         "nom": "cos inter-tige",
+         "intra_tige": false
+        }
+       ],
+       "n_quantites_t1": 1,
+       "fautes": [],
+       "source": "argument (cas de banc synthétique)",
+       "cardinal_t1": 14,
+       "motif": "publier le cardinal 14 ne suffisait pas"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "cos intra-tige à t-1",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "quantites_t1": [
+        {
+         "nom": "cos intra-tige",
+         "intra_tige": true
+        }
+       ],
+       "n_quantites_t1": 1,
+       "fautes": [
+        {
+         "nom": "cos intra-tige",
+         "intra_tige": true
+        }
+       ],
+       "source": "argument (cas de banc synthétique)",
+       "cardinal_t1": 14,
+       "motif": "publier le cardinal 14 ne suffisait pas"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-leak",
+   "pass_case": "B0 <= 0 ET B0' = 0 (IC de permutation contenant 0)",
+   "fail_case": "B0 > 0 (fuite faible) OU B0' != 0 (fuite FORTE)",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "0-97 : B0 est garanti par C7, donc FAIBLE ; B0' est apparié en domaine et prédit EXACTEMENT 0.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "B0 IC=[-0.20,-0.05], B0' IC=[-0.03,0.03]",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "IC_B0": [
+        -0.2,
+        -0.05
+       ],
+       "B0_inferieur_ou_egal_0": true,
+       "IC_B0prime": [
+        -0.03,
+        0.03
+       ],
+       "B0prime_contient_0": true,
+       "antipode": "B0 > 0 OU B0′ ≠ 0 ⇒ FUITE ⇒ arrêt, aucune interprétation de M1/M2/M3"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "B0 > 0 strictement",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "IC_B0": [
+        0.02,
+        0.15
+       ],
+       "B0_inferieur_ou_egal_0": false,
+       "IC_B0prime": [
+        -0.03,
+        0.03
+       ],
+       "B0prime_contient_0": true,
+       "antipode": "B0 > 0 OU B0′ ≠ 0 ⇒ FUITE ⇒ arrêt, aucune interprétation de M1/M2/M3"
+      }
+     },
+     {
+      "cas": "B0' != 0 — le SEUL détecteur qui morde",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "IC_B0": [
+        -0.2,
+        -0.05
+       ],
+       "B0_inferieur_ou_egal_0": true,
+       "IC_B0prime": [
+        0.04,
+        0.12
+       ],
+       "B0prime_contient_0": false,
+       "antipode": "B0 > 0 OU B0′ ≠ 0 ⇒ FUITE ⇒ arrêt, aucune interprétation de M1/M2/M3"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-dtype v2",
+   "pass_case": "deux marges (tête et coupure T), unité = la TIGE",
+   "fail_case": "> 1 TIGE touchée ⇒ INCONCLUSIF-précision, repli fp32 nominal",
+   "expected": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "INCONCLUSIF-précision",
+     "INCONCLUSIF-précision"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "INCONCLUSIF-précision",
+     "INCONCLUSIF-précision"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "aucune tige touchée",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "delta_chapeau": 0.004,
+       "delta_mesure": true,
+       "seuil_2delta": 0.008,
+       "tiges_touchees": [],
+       "n_tiges_touchees": 0,
+       "unite": "TIGE (cluster), jamais la famille",
+       "repli_fp32": "CHEMIN NOMINAL déclaré avant le run (D21 / 0-51)"
+      }
+     },
+     {
+      "cas": "une seule tige touchée",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "delta_chapeau": 0.004,
+       "delta_mesure": true,
+       "seuil_2delta": 0.008,
+       "tiges_touchees": [
+        "Iron"
+       ],
+       "n_tiges_touchees": 1,
+       "unite": "TIGE (cluster), jamais la famille",
+       "repli_fp32": "CHEMIN NOMINAL déclaré avant le run (D21 / 0-51)"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "deux tiges touchées",
+      "attendu": "INCONCLUSIF-précision",
+      "observé": "INCONCLUSIF-précision",
+      "ok": true,
+      "détail": {
+       "delta_chapeau": 0.004,
+       "delta_mesure": true,
+       "seuil_2delta": 0.008,
+       "tiges_touchees": [
+        "Iron",
+        "Silver"
+       ],
+       "n_tiges_touchees": 2,
+       "unite": "TIGE (cluster), jamais la famille",
+       "repli_fp32": "CHEMIN NOMINAL déclaré avant le run (D21 / 0-51)"
+      }
+     },
+     {
+      "cas": "deux familles d'une MÊME tige : l'unité famille ne mordrait pas",
+      "attendu": "INCONCLUSIF-précision",
+      "observé": "INCONCLUSIF-précision",
+      "ok": true,
+      "détail": {
+       "delta_chapeau": 0.004,
+       "delta_mesure": true,
+       "seuil_2delta": 0.008,
+       "tiges_touchees": [
+        "Iron",
+        "North"
+       ],
+       "n_tiges_touchees": 2,
+       "unite": "TIGE (cluster), jamais la famille",
+       "repli_fp32": "CHEMIN NOMINAL déclaré avant le run (D21 / 0-51)"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-surprise",
+   "pass_case": "M1 créditée seulement si son signe est STABLE sur 3 bandes",
+   "fail_case": "M1 présente dans la seule bande de NLL la plus haute ⇒ M1 RETIRÉE",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "Trois bandes — dérivé, non préféré : quatre laisseraient ~2,5 tiges par bande (0-52 rejoué). Tertiles PAR MODÈLE sur la NLL moyenne de PAIRE, avant toute lecture de M1.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "signes (+,+,+)",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "signes_par_bande": [
+        1,
+        1,
+        1
+       ],
+       "stable": true,
+       "M1_retiree": false,
+       "bandes": 3,
+       "coupures": "TERTILES par modèle sur la NLL MOYENNE DE PAIRE, avant toute lecture de M1",
+       "superposition_absolue_nats": 4.0,
+       "interdit": "toute repondération ou sélection après lecture ⇒ run invalide"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "signes (0,0,+) : M1 EST le confondant",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "signes_par_bande": [
+        0,
+        0,
+        1
+       ],
+       "stable": false,
+       "M1_retiree": true,
+       "bandes": 3,
+       "coupures": "TERTILES par modèle sur la NLL MOYENNE DE PAIRE, avant toute lecture de M1",
+       "superposition_absolue_nats": 4.0,
+       "interdit": "toute repondération ou sélection après lecture ⇒ run invalide"
+      }
+     },
+     {
+      "cas": "signes (+,-,+) : non stable",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "signes_par_bande": [
+        1,
+        -1,
+        1
+       ],
+       "stable": false,
+       "M1_retiree": false,
+       "bandes": 3,
+       "coupures": "TERTILES par modèle sur la NLL MOYENNE DE PAIRE, avant toute lecture de M1",
+       "superposition_absolue_nats": 4.0,
+       "interdit": "toute repondération ou sélection après lecture ⇒ run invalide"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-subst",
+   "pass_case": "substitution d'une famille PONTÉE interdite ; K_eff republié",
+   "fail_case": "substitution pontée -> simple, ou K_eff non republié",
+   "expected": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "réparation au niveau UNITÉ, K_eff = 10",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "substitutions": [
+        {
+         "niveau": "unite",
+         "sous_vivier": "maritime"
+        }
+       ],
+       "substitutions_de_famille_pontee": [],
+       "K_eff_republie": 10,
+       "regle": "réserve = stock de SUFFIXES qualifiés par sous-vivier, pas des familles ; tige morte ⇒ K_eff = 9 permis ; K_eff ≤ 8 ⇒ PI"
+      }
+     },
+     {
+      "cas": "tige morte : K_eff = 9 permis",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "substitutions": [
+        {
+         "niveau": "unite"
+        }
+       ],
+       "substitutions_de_famille_pontee": [],
+       "K_eff_republie": 9,
+       "regle": "réserve = stock de SUFFIXES qualifiés par sous-vivier, pas des familles ; tige morte ⇒ K_eff = 9 permis ; K_eff ≤ 8 ⇒ PI"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "substitution d'une famille pontée",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "substitutions": [
+        {
+         "niveau": "famille",
+         "pontee": true
+        }
+       ],
+       "substitutions_de_famille_pontee": [
+        {
+         "niveau": "famille",
+         "pontee": true
+        }
+       ],
+       "K_eff_republie": 10,
+       "regle": "réserve = stock de SUFFIXES qualifiés par sous-vivier, pas des familles ; tige morte ⇒ K_eff = 9 permis ; K_eff ≤ 8 ⇒ PI"
+      }
+     },
+     {
+      "cas": "K_eff = 8 ⇒ retour au PI",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "substitutions": [
+        {
+         "niveau": "unite"
+        }
+       ],
+       "substitutions_de_famille_pontee": [],
+       "K_eff_republie": 8,
+       "regle": "réserve = stock de SUFFIXES qualifiés par sous-vivier, pas des familles ; tige morte ⇒ K_eff = 9 permis ; K_eff ≤ 8 ⇒ PI"
+      }
+     },
+     {
+      "cas": "K_eff non republié",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "substitutions": [
+        {
+         "niveau": "unite"
+        }
+       ],
+       "substitutions_de_famille_pontee": [],
+       "K_eff_republie": null,
+       "regle": "réserve = stock de SUFFIXES qualifiés par sous-vivier, pas des familles ; tige morte ⇒ K_eff = 9 permis ; K_eff ≤ 8 ⇒ PI"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-joint",
+   "pass_case": "IC simultanés par enveloppe bootstrap jointe (max-t)",
+   "fail_case": "« p1.p2.p3 < 0.05 » déclaré significatif",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "Ni min-p (réintroduit des p-valeurs par modèle, 0-63) ni Bonferroni (ignore la dépendance capturée par le bootstrap joint).",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "trois séries corrélées, un seul rééchantillonnage",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "c_star": 2.054477980619579,
+       "IC_simultanes": {
+        "gpt2": [
+         -0.6685770695078357,
+         0.1778010037140082
+        ],
+        "smol": [
+         -0.6658943033768734,
+         0.13933886633748782
+        ],
+        "qwen": [
+         -0.6757110935060555,
+         0.20332599816070723
+        ]
+       },
+       "estimes": {
+        "gpt2": -0.24538803289691374,
+        "smol": -0.2632777185196928,
+        "qwen": -0.2361925476726741
+       },
+       "conjonction_declaree": false,
+       "B": 500,
+       "seed": 1,
+       "regle": "conjonction déclarée ssi 0 est hors des TROIS IC simultanés ; le produit de p-valeurs par modèle est INTERDIT (0-63, clause C-bis)"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "produit de p-valeurs par modèle",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "produit": 0.027,
+       "declare_significatif": true,
+       "raison": "produit de p-valeurs par modèle — INTERDIT (0-63)"
+      }
+     },
+     {
+      "cas": "séries de longueurs différentes",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "raison": "les trois séries n'ont pas le même nombre de tiges"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "eps — ligne canonique unique",
+   "pass_case": "eps = q_0.95(|D_null|), B = 10^4, seedé, <= eps_max",
+   "fail_case": "q_0.975 d'une valeur absolue (2.24 sigma) : eps pire cas 0.746 > 0.66",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "MC hypergéométrique seedée",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "epsilon": 0.18888888888888886,
+       "sigma_null": 0.09585882421202482,
+       "n_eff": 60,
+       "B": 2000,
+       "seed": 0,
+       "formule": "ε = q₀.₉₅(|D̄_null|), enveloppe bilatérale à 95 %",
+       "clusters": [
+        "T0",
+        "T1",
+        "T2",
+        "T3",
+        "T4",
+        "T5",
+        "T6",
+        "T7",
+        "T8",
+        "T9"
+       ],
+       "epsilon_max": 0.66,
+       "sous_plafond": true
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "notation q_0.975 : eps au-dessus du plafond",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "eps_pire_cas_ancienne_notation": 0.746,
+       "eps_max": 0.66,
+       "deplacement_de_la_frontiere_C0_Cind": "13 points"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "eps_M — dérivé PAR RUN, par maillon et par modèle",
+   "pass_case": "enveloppe de permutation intra-tige, jamais une constante absolue",
+   "fail_case": "une constante absolue posée a priori (0-52 sous une autre forme)",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "eps_M dérivé d'un échantillon de permutation",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "epsilon_M": 0.0966484081338886,
+       "sigma_null": 0.05009239527754836,
+       "B": 2000,
+       "formule": "ε_M = q₀.₉₅(|Δcos̄_null|), permutation intra-tige stratifiée par domaine, combinée"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "constante absolue eps_M = 0.10 posée a priori",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "motif": "cos(S_a) - cos(S_b) n'est pas bornée utilement dans [0,1] et son échelle dépend du modèle ET de la couche"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "C(6,3) = 20 partitions par tige",
+   "pass_case": "le cardinal de la permutation intra-tige est exact",
+   "fail_case": "un cardinal différent",
+   "expected": {
+    "pass_case": [
+     20
+    ],
+    "fail_case": [
+     20
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     20
+    ],
+    "fail_case": [
+     20
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "C(6,3)",
+      "attendu": 20,
+      "observé": 20,
+      "ok": true,
+      "détail": {}
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "C(6,2) = 15",
+      "attendu": 20,
+      "observé": 20,
+      "ok": true,
+      "détail": {
+       "faux_cardinal": 15
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Probabilités d'atteinte sous la nulle — publiées AVANT le run",
+   "pass_case": "les 14 classes des trois partitions sont atteignables et non triviales",
+   "fail_case": "une classe de probabilité nulle sous la nulle ET sous l'effet",
+   "expected": {
+    "pass_case": [
+     true,
+     true
+    ],
+    "fail_case": [
+     false
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     true,
+     true
+    ],
+    "fail_case": [
+     false
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "aucune classe toujours vraie (calibrateur)",
+      "attendu": true,
+      "observé": true,
+      "ok": true,
+      "détail": {
+       "N-a": 0.9263,
+       "N-ind": 0.0338,
+       "N-b": 0.0397,
+       "INVALIDE-INSTRUMENT": 0.0002
+      }
+     },
+     {
+      "cas": "INVALIDE-INSTRUMENT reste rarissime (alpha ~ 2e-4)",
+      "attendu": true,
+      "observé": true,
+      "ok": true,
+      "détail": {}
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "alpha périmé 0.025 (ancienne règle IC_sup < 0)",
+      "attendu": false,
+      "observé": false,
+      "ok": true,
+      "détail": {
+       "motif": "0-90 : faux d'un facteur ~170"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-dtype — δ̂ MESURÉ, jamais une constante (issue 1)",
+   "pass_case": "δ̂ = max|Δcos| entre le forward bf16 épinglé et un contrôle fp32 sur m = 60 états",
+   "fail_case": "δ̂ substitué par la constante ULP bf16 ⇒ porte §6.I bloquante en échec",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "INCONCLUSIF-précision"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "INCONCLUSIF-précision"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "Le Vérifieur a mesuré 0.003271 (gpt2) et 0.004862 (SmolLM2) : la constante 2**-8 = 0.003906 est conservatrice sur l'un et ANTI-CONSERVATRICE de 24 % sur l'autre. Une porte bloquante ne se règle pas sur une constante.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "δ̂ issu d'une mesure bf16 vs fp32",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "delta_chapeau": 0.0006223395466804504,
+       "delta_mesure": true,
+       "seuil_2delta": 0.0012446790933609009,
+       "tiges_touchees": [],
+       "n_tiges_touchees": 0,
+       "unite": "TIGE (cluster), jamais la famille",
+       "repli_fp32": "CHEMIN NOMINAL déclaré avant le run (D21 / 0-51)",
+       "mesure_de_delta": {
+        "delta_chapeau_mesure": 0.0006223395466804504
+       }
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "constante 2**-8 sans contrôle fp32",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "raison": "δ̂ n'a pas été MESURÉ : le protocole commande un contrôle fp32 sur m = 60 états et δ̂ = max|Δcos|, pas une constante en dur",
+       "delta_chapeau_fourni": 0.00390625,
+       "porte": "§6.I, bloquante"
+      }
+     },
+     {
+      "cas": "deux tiges touchées sous un δ̂ mesuré",
+      "attendu": "INCONCLUSIF-précision",
+      "observé": "INCONCLUSIF-précision",
+      "ok": true,
+      "détail": {
+       "delta_chapeau": 0.004,
+       "delta_mesure": true,
+       "seuil_2delta": 0.008,
+       "tiges_touchees": [
+        "Iron",
+        "North"
+       ],
+       "n_tiges_touchees": 2,
+       "unite": "TIGE (cluster), jamais la famille",
+       "repli_fp32": "CHEMIN NOMINAL déclaré avant le run (D21 / 0-51)"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Enveloppe de B0′ — nulle PROPRE, jamais composée (issue 5)",
+   "pass_case": "ε_{B0′} = q₀.₉₅(|B0′_null|), même machinerie MC que ε_M",
+   "fail_case": "(ε_M1 + ε_M2)/2 : l'enveloppe d'une somme n'est pas la moyenne des enveloppes",
+   "expected": {
+    "pass_case": [
+     "PROPRE"
+    ],
+    "fail_case": [
+     "COMPOSEE-ANTI-CONSERVATRICE"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PROPRE"
+    ],
+    "fail_case": [
+     "COMPOSEE-ANTI-CONSERVATRICE"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "Direction conservatrice (enveloppe plus étroite ⇒ PASS plus difficile sur `B0′ = 0`), mais `V-leak` est BLOQUANTE (§6.H) et l'opérationnalisation n'était pas déclarée.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "enveloppe dérivée de sa propre permutation",
+      "attendu": "PROPRE",
+      "observé": "PROPRE",
+      "ok": true,
+      "détail": {
+       "epsilon_B0prime_par_sa_propre_nulle": 2.73489,
+       "moyenne_des_enveloppes_de_M1_et_M2": 1.93869,
+       "ratio": 1.4107,
+       "attendu_theorique": "sd(M1+M2) = sqrt(2)·sd sous indépendance"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "composition arithmétique des deux enveloppes",
+      "attendu": "COMPOSEE-ANTI-CONSERVATRICE",
+      "observé": "COMPOSEE-ANTI-CONSERVATRICE",
+      "ok": true,
+      "détail": {
+       "enveloppe_composee": 1.93869,
+       "enveloppe_vraie": 2.73489,
+       "motif": "une enveloppe plus étroite rend le PASS plus difficile sur `B0′ = 0` mais elle n'est pas la nulle de la quantité testée"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-pool — alimentée par l'INSTRUMENTATION du run (issue 3)",
+   "pass_case": "aucun rang calculé sous `_SousBootstrap` ⇒ PASS lu, pas affirmé",
+   "fail_case": "un rang calculé dans un rééchantillon ⇒ FAIL",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "Avant correction, le troisième terme était l'argument codé en dur `False` : la porte affirmait ce qu'elle devait constater.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "rang calculé hors bootstrap",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "hash_avant": "h",
+       "hash_apres": "h",
+       "rangs_recalcules_dans_un_bootstrap": false,
+       "source": "instrumentation d'exécution",
+       "rangs_calcules": 1,
+       "rangs_calcules_dans_un_bootstrap": 0
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "rang calculé DANS un bootstrap",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "hash_avant": "h",
+       "hash_apres": "h",
+       "rangs_recalcules_dans_un_bootstrap": true,
+       "source": "instrumentation d'exécution",
+       "rangs_calcules": 1,
+       "rangs_calcules_dans_un_bootstrap": 1
+      }
+     },
+     {
+      "cas": "hash du pool modifié",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "hash_avant": "avant",
+       "hash_apres": "apres",
+       "rangs_recalcules_dans_un_bootstrap": false,
+       "source": "instrumentation d'exécution",
+       "rangs_calcules": 10,
+       "rangs_calcules_dans_un_bootstrap": 0
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-t1 — alimentée par le REGISTRE des quantités à t−1 (issue 3)",
+   "pass_case": "registre réel, ensembles de comparaison inter-tige ⇒ PASS",
+   "fail_case": "une paire intra-tige enregistrée ⇒ FAIL",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "La granularité est la PAIRE COMPARÉE : un sous-ensemble peut contenir deux membres d'une tige sans jamais les comparer.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "profil inter-tige enregistré",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "quantites_t1": [
+        {
+         "nom": "profil inter-tige",
+         "n_paires_comparees": 2,
+         "n_paires_intra_tige": 0,
+         "intra_tige": false
+        }
+       ],
+       "n_quantites_t1": 1,
+       "fautes": [],
+       "source": "registre d'exécution",
+       "cardinal_t1": 14,
+       "motif": "publier le cardinal 14 ne suffisait pas"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "cos intra-tige enregistré",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "quantites_t1": [
+        {
+         "nom": "cos intra-tige",
+         "n_paires_comparees": 1,
+         "n_paires_intra_tige": 1,
+         "intra_tige": true
+        }
+       ],
+       "n_quantites_t1": 1,
+       "fautes": [
+        {
+         "nom": "cos intra-tige",
+         "n_paires_comparees": 1,
+         "n_paires_intra_tige": 1,
+         "intra_tige": true
+        }
+       ],
+       "source": "registre d'exécution",
+       "cardinal_t1": 14,
+       "motif": "publier le cardinal 14 ne suffisait pas"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-surprise — bandes de NLL non dégénérées (issue 2)",
+   "pass_case": "trois bandes non vides (tertiles PAR MODÈLE sur la NLL de PAIRE)",
+   "fail_case": "tertiles dégénérés ⇒ une seule bande ⇒ porte VIDE",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "La règle de crédit de M1 (signe stable sur les TROIS bandes) n'est évaluable que si les trois bandes existent.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "NLL dispersée",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "n_paires_par_bande": [
+        590,
+        590,
+        590
+       ],
+       "coupures_tertiles": [
+        11.413494652296508,
+        11.991778717442445
+       ],
+       "unite_de_bande": "la PAIRE (moyenne des NLL de ses deux membres)",
+       "motif": "trois bandes non vides : la règle de stabilité du signe de M1 est évaluable"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "NLL constante",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "n_paires_par_bande": [
+        0,
+        0,
+        1770
+       ],
+       "coupures_tertiles": [
+        7.0,
+        7.0
+       ],
+       "unite_de_bande": "la PAIRE (moyenne des NLL de ses deux membres)",
+       "motif": "tertiles dégénérés : une seule bande non vide ⇒ la porte `V-surprise` serait VIDE"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Support vide — eps SANS OBJET, jamais publié en NaN (clause NaN D23)",
+   "pass_case": "n_eff = 0 ⇒ la nulle conditionnelle aux m_q n'a pas de domaine de définition ⇒ SANS OBJET, et la famine emporte C-ind d'office",
+   "fail_case": "un NaN publié comme s'il était une enveloppe",
+   "expected": {
+    "pass_case": [
+     "support vide",
+     "SANS OBJET",
+     "C-ind"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "support vide",
+     "SANS OBJET",
+     "C-ind"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "Une somme qui saute les q indéfinis change son propre support (0-74) ; un support non publié est un support inventé.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "eps sur support vide",
+      "attendu": "support vide",
+      "observé": "support vide",
+      "ok": true,
+      "détail": {}
+     },
+     {
+      "cas": "V-joint sur séries vides",
+      "attendu": "SANS OBJET",
+      "observé": "SANS OBJET",
+      "ok": true,
+      "détail": {}
+     },
+     {
+      "cas": "famine emporte la classification malgré un IC significatif",
+      "attendu": "C-ind",
+      "observé": "C-ind",
+      "ok": true,
+      "détail": {}
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "NaN publié comme enveloppe ⇒ V-compo FAIL",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "ordre_barriere": [
+        "sceller",
+        "publier",
+        "desceller"
+       ],
+       "ordre_attendu": [
+        "sceller",
+        "publier",
+        "desceller"
+       ],
+       "somme_m_publiee": 0,
+       "exclusion_m0_predeclaree": true,
+       "epsilon": NaN,
+       "epsilon_max": 0.66,
+       "epsilon_sous_plafond": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Vocabulaire interdit (§2, i à xiii)",
+   "pass_case": "aucun terme proscrit dans un schéma de sortie",
+   "fail_case": "un terme proscrit détecté ⇒ le rapport ne peut pas être écrit",
+   "expected": {
+    "pass_case": [
+     []
+    ],
+    "fail_case": [
+     true,
+     true
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     []
+    ],
+    "fail_case": [
+     true,
+     true
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "schéma propre",
+      "attendu": [],
+      "observé": [],
+      "ok": true,
+      "détail": {}
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "« séparation de patterns » appliquée à ce run",
+      "attendu": true,
+      "observé": true,
+      "ok": true,
+      "détail": {}
+     },
+     {
+      "cas": "« va dans le sens de » (adverbial, position A-5)",
+      "attendu": true,
+      "observé": true,
+      "ok": true,
+      "détail": {}
+     }
+    ]
+   }
+  }
+ ]
+}

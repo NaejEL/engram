@@ -1,0 +1,300 @@
+{
+  "regle": "le LITTÉRAL est DÉCISIONNEL (clause gelée §4.4) ; le CENTRÉ est DESCRIPTIF et ne classe rien. Les cellules dont la classe changerait sous le centré sont CONSIGNÉES, jamais reclassées.",
+  "cellules": {
+    "gpt2|aucun|S3": {
+      "R_Base": -0.00664897647817575,
+      "IC_R_Base": [
+        -0.08643017424334187,
+        0.07387522788761877
+      ],
+      "epsilon_R_litteral_DECISIONNEL": 0.0808480926890425,
+      "epsilon_R_centre_DESCRIPTIF": 0.08007356652570913,
+      "rapport_centre_sur_litteral": 0.9904199822460581,
+      "classe_R_DECISIONNELLE": "R-nul",
+      "classe_R_sous_le_centre_DESCRIPTIVE": "R-nul"
+    },
+    "gpt2|aucun|S2": {
+      "R_Base": -0.004607296213894774,
+      "IC_R_Base": [
+        -0.08149376732161227,
+        0.0731549792254466
+      ],
+      "epsilon_R_litteral_DECISIONNEL": 0.07759371223950651,
+      "epsilon_R_centre_DESCRIPTIF": 0.0773317925546428,
+      "rapport_centre_sur_litteral": 0.9966244728173947,
+      "classe_R_DECISIONNELLE": "R-nul",
+      "classe_R_sous_le_centre_DESCRIPTIVE": "R-nul"
+    },
+    "gpt2|aucun|S1": {
+      "R_Base": -0.006344557253693206,
+      "IC_R_Base": [
+        -0.08701162227838585,
+        0.0734839640451543
+      ],
+      "epsilon_R_litteral_DECISIONNEL": 0.08112171941396558,
+      "epsilon_R_centre_DESCRIPTIF": 0.08022820775430399,
+      "rapport_centre_sur_litteral": 0.9889855433770828,
+      "classe_R_DECISIONNELLE": "R-nul",
+      "classe_R_sous_le_centre_DESCRIPTIVE": "R-nul"
+    },
+    "gpt2|aucun|S0": {
+      "R_Base": -0.004602324459383245,
+      "IC_R_Base": [
+        -0.07467452283954087,
+        0.0656510544080721
+      ],
+      "epsilon_R_litteral_DECISIONNEL": 0.07103801265764241,
+      "epsilon_R_centre_DESCRIPTIF": 0.07020525530416584,
+      "rapport_centre_sur_litteral": 0.9882772994018016,
+      "classe_R_DECISIONNELLE": "R-nul",
+      "classe_R_sous_le_centre_DESCRIPTIVE": "R-nul"
+    },
+    "gpt2|type|S3": {
+      "R_Base": -0.0031952592434313426,
+      "IC_R_Base": [
+        -0.017255904328382917,
+        0.011883468038448518
+      ],
+      "epsilon_R_litteral_DECISIONNEL": 0.015519829456885717,
+      "epsilon_R_centre_DESCRIPTIF": 0.014551061962108893,
+      "rapport_centre_sur_litteral": 0.9375787280737798,
+      "classe_R_DECISIONNELLE": "R-nul",
+      "classe_R_sous_le_centre_DESCRIPTIVE": "R-nul"
+    },
+    "gpt2|type|S2": {
+      "R_Base": -0.009649025336811848,
+      "IC_R_Base": [
+        -0.016998707056789488,
+        -0.0004522931790950282
+      ],
+      "epsilon_R_litteral_DECISIONNEL": 0.016005485388043496,
+      "epsilon_R_centre_DESCRIPTIF": 0.008283834078895009,
+      "rapport_centre_sur_litteral": 0.5175621905901863,
+      "classe_R_DECISIONNELLE": "R-nul",
+      "classe_R_sous_le_centre_DESCRIPTIVE": "R-ind"
+    },
+    "gpt2|type|S1": {
+      "R_Base": 0.003994438847992858,
+      "IC_R_Base": [
+        -0.010552875588533331,
+        0.020137152470650208
+      ],
+      "epsilon_R_litteral_DECISIONNEL": 0.016967869305415585,
+      "epsilon_R_centre_DESCRIPTIF": 0.015271944352411174,
+      "rapport_centre_sur_litteral": 0.9000508005761733,
+      "classe_R_DECISIONNELLE": "R-nul",
+      "classe_R_sous_le_centre_DESCRIPTIVE": "R-nul"
+    },
+    "gpt2|type|S0": {
+      "R_Base": 0.005688478379360418,
+      "IC_R_Base": [
+        -0.01031960297651539,
+        0.02239785569267021
+      ],
+      "epsilon_R_litteral_DECISIONNEL": 0.019796568554830793,
+      "epsilon_R_centre_DESCRIPTIF": 0.016419002132549935,
+      "rapport_centre_sur_litteral": 0.8293862689927312,
+      "classe_R_DECISIONNELLE": "R-nul",
+      "classe_R_sous_le_centre_DESCRIPTIVE": "R-nul"
+    },
+    "HuggingFaceTB/SmolLM2-360M|aucun|S3": {
+      "R_Base": -0.03198165924392349,
+      "IC_R_Base": [
+        -0.11200680700420436,
+        0.047643313660572235
+      ],
+      "epsilon_R_litteral_DECISIONNEL": 0.09960243098425839,
+      "epsilon_R_centre_DESCRIPTIF": 0.07989275416952347,
+      "rapport_centre_sur_litteral": 0.8021165084027927,
+      "classe_R_DECISIONNELLE": "R-nul",
+      "classe_R_sous_le_centre_DESCRIPTIVE": "R-nul"
+    },
+    "HuggingFaceTB/SmolLM2-360M|aucun|S2": {
+      "R_Base": -0.02503968616621466,
+      "IC_R_Base": [
+        -0.09774597643026021,
+        0.047775173323170966
+      ],
+      "epsilon_R_litteral_DECISIONNEL": 0.08547235183253926,
+      "epsilon_R_centre_DESCRIPTIF": 0.07276929202764747,
+      "rapport_centre_sur_litteral": 0.8513781412054728,
+      "classe_R_DECISIONNELLE": "R-nul",
+      "classe_R_sous_le_centre_DESCRIPTIVE": "R-nul"
+    },
+    "HuggingFaceTB/SmolLM2-360M|aucun|S1": {
+      "R_Base": -0.027925318696092827,
+      "IC_R_Base": [
+        -0.10729212271374279,
+        0.050819174784722636
+      ],
+      "epsilon_R_litteral_DECISIONNEL": 0.09481026455178866,
+      "epsilon_R_centre_DESCRIPTIF": 0.07900324060817396,
+      "rapport_centre_sur_litteral": 0.8332772931460353,
+      "classe_R_DECISIONNELLE": "R-nul",
+      "classe_R_sous_le_centre_DESCRIPTIVE": "R-nul"
+    },
+    "HuggingFaceTB/SmolLM2-360M|aucun|S0": {
+      "R_Base": -0.02991383094250788,
+      "IC_R_Base": [
+        -0.10079194133182809,
+        0.04122808898865808
+      ],
+      "epsilon_R_litteral_DECISIONNEL": 0.08898367618014476,
+      "epsilon_R_centre_DESCRIPTIF": 0.07096798369549723,
+      "rapport_centre_sur_litteral": 0.7975393548792555,
+      "classe_R_DECISIONNELLE": "R-nul",
+      "classe_R_sous_le_centre_DESCRIPTIVE": "R-nul"
+    },
+    "HuggingFaceTB/SmolLM2-360M|type|S3": {
+      "R_Base": 0.004814336232325635,
+      "IC_R_Base": [
+        -0.014434393413270024,
+        0.023423235206725096
+      ],
+      "epsilon_R_litteral_DECISIONNEL": 0.0207784335975451,
+      "epsilon_R_centre_DESCRIPTIF": 0.018915511820530907,
+      "rapport_centre_sur_litteral": 0.9103434930131455,
+      "classe_R_DECISIONNELLE": "R-nul",
+      "classe_R_sous_le_centre_DESCRIPTIVE": "R-nul"
+    },
+    "HuggingFaceTB/SmolLM2-360M|type|S2": {
+      "R_Base": 0.006064141362500032,
+      "IC_R_Base": [
+        -0.02237580255609061,
+        0.03708604321111825
+      ],
+      "epsilon_R_litteral_DECISIONNEL": 0.032519638035886284,
+      "epsilon_R_centre_DESCRIPTIF": 0.029945783531579364,
+      "rapport_centre_sur_litteral": 0.9208523015703126,
+      "classe_R_DECISIONNELLE": "R-nul",
+      "classe_R_sous_le_centre_DESCRIPTIVE": "R-nul"
+    },
+    "HuggingFaceTB/SmolLM2-360M|type|S1": {
+      "R_Base": 0.004636783333842225,
+      "IC_R_Base": [
+        -0.009911280257307533,
+        0.020900676909126524
+      ],
+      "epsilon_R_litteral_DECISIONNEL": 0.01800114096529511,
+      "epsilon_R_centre_DESCRIPTIF": 0.01536902239780567,
+      "rapport_centre_sur_litteral": 0.8537804591073437,
+      "classe_R_DECISIONNELLE": "R-nul",
+      "classe_R_sous_le_centre_DESCRIPTIVE": "R-nul"
+    },
+    "HuggingFaceTB/SmolLM2-360M|type|S0": {
+      "R_Base": 0.005493576818644987,
+      "IC_R_Base": [
+        -0.007911325440251221,
+        0.020606936701890864
+      ],
+      "epsilon_R_litteral_DECISIONNEL": 0.017803893248302383,
+      "epsilon_R_centre_DESCRIPTIF": 0.014318406767695383,
+      "rapport_centre_sur_litteral": 0.8042289721693684,
+      "classe_R_DECISIONNELLE": "R-nul",
+      "classe_R_sous_le_centre_DESCRIPTIVE": "R-nul"
+    },
+    "Qwen/Qwen2.5-1.5B|aucun|S3": {
+      "R_Base": 0.059606209940225474,
+      "IC_R_Base": [
+        -0.033220298922453435,
+        0.1513467866103434
+      ],
+      "epsilon_R_litteral_DECISIONNEL": 0.1365827531376906,
+      "epsilon_R_centre_DESCRIPTIF": 0.09228193106760436,
+      "rapport_centre_sur_litteral": 0.675648491098828,
+      "classe_R_DECISIONNELLE": "R-nul",
+      "classe_R_sous_le_centre_DESCRIPTIVE": "R-nul"
+    },
+    "Qwen/Qwen2.5-1.5B|aucun|S2": {
+      "R_Base": 0.057677227698252787,
+      "IC_R_Base": [
+        -0.02940875597962686,
+        0.14533662400865022
+      ],
+      "epsilon_R_litteral_DECISIONNEL": 0.13229519821658842,
+      "epsilon_R_centre_DESCRIPTIF": 0.0873713926268605,
+      "rapport_centre_sur_litteral": 0.6604275423800307,
+      "classe_R_DECISIONNELLE": "R-nul",
+      "classe_R_sous_le_centre_DESCRIPTIVE": "R-nul"
+    },
+    "Qwen/Qwen2.5-1.5B|aucun|S1": {
+      "R_Base": 0.05675206989237447,
+      "IC_R_Base": [
+        -0.03263946964454941,
+        0.14898836850889063
+      ],
+      "epsilon_R_litteral_DECISIONNEL": 0.1324294263687642,
+      "epsilon_R_centre_DESCRIPTIF": 0.09068122301527606,
+      "rapport_centre_sur_litteral": 0.684751308691501,
+      "classe_R_DECISIONNELLE": "R-nul",
+      "classe_R_sous_le_centre_DESCRIPTIVE": "R-nul"
+    },
+    "Qwen/Qwen2.5-1.5B|aucun|S0": {
+      "R_Base": 0.055993623096636136,
+      "IC_R_Base": [
+        -0.02843889638137831,
+        0.1398658158382924
+      ],
+      "epsilon_R_litteral_DECISIONNEL": 0.12607064866436116,
+      "epsilon_R_centre_DESCRIPTIF": 0.08413299533208059,
+      "rapport_centre_sur_litteral": 0.6673480006918066,
+      "classe_R_DECISIONNELLE": "R-nul",
+      "classe_R_sous_le_centre_DESCRIPTIVE": "R-nul"
+    },
+    "Qwen/Qwen2.5-1.5B|type|S3": {
+      "R_Base": -0.0025680852856394473,
+      "IC_R_Base": [
+        -0.013915461480952563,
+        0.0088709371670475
+      ],
+      "epsilon_R_litteral_DECISIONNEL": 0.012338668212252029,
+      "epsilon_R_centre_DESCRIPTIF": 0.011384848260416157,
+      "rapport_centre_sur_litteral": 0.9226966852963313,
+      "classe_R_DECISIONNELLE": "R-nul",
+      "classe_R_sous_le_centre_DESCRIPTIVE": "R-nul"
+    },
+    "Qwen/Qwen2.5-1.5B|type|S2": {
+      "R_Base": -0.004234769541194895,
+      "IC_R_Base": [
+        -0.012892513367743774,
+        0.00501750208403005
+      ],
+      "epsilon_R_litteral_DECISIONNEL": 0.0115975353526379,
+      "epsilon_R_centre_DESCRIPTIF": 0.00900021360451525,
+      "rapport_centre_sur_litteral": 0.776045369197182,
+      "classe_R_DECISIONNELLE": "R-nul",
+      "classe_R_sous_le_centre_DESCRIPTIVE": "R-nul"
+    },
+    "Qwen/Qwen2.5-1.5B|type|S1": {
+      "R_Base": 0.004161900706141962,
+      "IC_R_Base": [
+        -0.009015553951909118,
+        0.01843768831544884
+      ],
+      "epsilon_R_litteral_DECISIONNEL": 0.015673552994919272,
+      "epsilon_R_centre_DESCRIPTIF": 0.013669438708091824,
+      "rapport_centre_sur_litteral": 0.8721340153392724,
+      "classe_R_DECISIONNELLE": "R-nul",
+      "classe_R_sous_le_centre_DESCRIPTIVE": "R-nul"
+    },
+    "Qwen/Qwen2.5-1.5B|type|S0": {
+      "R_Base": 0.0029911355773887434,
+      "IC_R_Base": [
+        -0.00779175883322474,
+        0.015379142616919046
+      ],
+      "epsilon_R_litteral_DECISIONNEL": 0.013070794498875174,
+      "epsilon_R_centre_DESCRIPTIF": 0.01151924792334121,
+      "rapport_centre_sur_litteral": 0.8812966896796148,
+      "classe_R_DECISIONNELLE": "R-nul",
+      "classe_R_sous_le_centre_DESCRIPTIVE": "R-nul"
+    }
+  },
+  "cellules_qui_basculeraient": [
+    {
+      "cellule": "gpt2|type|S2",
+      "de": "R-nul",
+      "vers": "R-ind"
+    }
+  ]
+}

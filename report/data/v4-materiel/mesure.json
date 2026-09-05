@@ -1,0 +1,2199 @@
+{
+ "protocole": "experiments/EXP-2026-08-23-v4-materiel.md",
+ "config": "model=gpt2 layer=6 lam=2.0 eta=0.2 decay=0.001 thr=4.0 prune=512/0.1 hebb_only=False dg=8192/64 gate=keysim dataset=pool_v4",
+ "seed": 0,
+ "sha256_materiau": "6f4da9732254fa4a280d26d33f1280e4572f911dadb0a73c02fe208ded504e3b",
+ "dtype_du_forward": "bfloat16",
+ "M_instanciee": false,
+ "injection": false,
+ "backprop": false,
+ "E3": "sans objet dans ce run (aucune lecture, aucune injection)",
+ "par_modele": {
+  "gpt2": {
+   "capture": {
+    "modele": "gpt2",
+    "L": 12,
+    "L_attendu": 12,
+    "V-L": "PASS",
+    "device": "cuda",
+    "cuda_disponible": true,
+    "dtype_demande": "bfloat16",
+    "dtype_effectif": "torch.bfloat16",
+    "repli_fp32": false,
+    "duree_chargement_s": 1.84,
+    "cellules": {
+     "T1-A": {
+      "n_sequences": 132,
+      "longueur_max": 12,
+      "indice_capture": 9,
+      "duree_s": 0.3,
+      "dimension": 768,
+      "n_couches_capturees": 13,
+      "nan_ou_inf": false
+     },
+     "T1-B": {
+      "n_sequences": 132,
+      "longueur_max": 12,
+      "indice_capture": 9,
+      "duree_s": 0.06,
+      "dimension": 768,
+      "n_couches_capturees": 13,
+      "nan_ou_inf": false
+     },
+     "T2-A": {
+      "n_sequences": 132,
+      "longueur_max": 11,
+      "indice_capture": 8,
+      "duree_s": 0.06,
+      "dimension": 768,
+      "n_couches_capturees": 13,
+      "nan_ou_inf": false
+     },
+     "T2-B": {
+      "n_sequences": 132,
+      "longueur_max": 11,
+      "indice_capture": 8,
+      "duree_s": 0.06,
+      "dimension": 768,
+      "n_couches_capturees": 13,
+      "nan_ou_inf": false
+     },
+     "T3-A": {
+      "n_sequences": 132,
+      "longueur_max": 10,
+      "indice_capture": 7,
+      "duree_s": 0.05,
+      "dimension": 768,
+      "n_couches_capturees": 13,
+      "nan_ou_inf": false
+     },
+     "T3-B": {
+      "n_sequences": 132,
+      "longueur_max": 10,
+      "indice_capture": 7,
+      "duree_s": 0.06,
+      "dimension": 768,
+      "n_couches_capturees": 13,
+      "nan_ou_inf": false
+     }
+    },
+    "n_forwards": 6,
+    "vram_max_reservee_gio": 0.605,
+    "vram_max_allouee_gio": 0.53,
+    "controle_fp32": {
+     "cellules": [
+      "T1-B",
+      "T1-A"
+     ],
+     "device": "cuda",
+     "repli_cpu": false,
+     "motif_repli": "",
+     "duree_s": 1.24,
+     "vram_max_reservee_gio": 1.082,
+     "n_sequences": 264,
+     "regle": "repli fp32 = CHEMIN NOMINAL déclaré avant le run (D21 / 0-51)"
+    },
+    "duree_totale_s": 12.97
+   },
+   "couche_de_reference": 6,
+   "calibrateur": {
+    "delta_R1_inv": 0.9722222222222221,
+    "IC": [
+     0.9388888888888889,
+     1.0
+    ],
+    "K_eff": 10,
+    "classe": "N-b",
+    "R1_moyen": 1.0,
+    "R1_nul_moyen": 0.027777777777777776,
+    "n_requetes": 180,
+    "par_tige": {
+     "Copper": 0.9444444444444444,
+     "Frost": 1.0,
+     "Golden": 1.0,
+     "Hollow": 1.0,
+     "Iron": 1.0,
+     "North": 0.9444444444444444,
+     "River": 0.8333333333333334,
+     "Shadow": 1.0,
+     "Silver": 1.0,
+     "Storm": 1.0
+    },
+    "plancher_par_domaine": {
+     "maritime": "36/37",
+     "culinaire": "36/37",
+     "astronomie": "36/37",
+     "textile": "36/37"
+    },
+    "descriptif": {
+     "vs_cle_nulle": "compatible avec un encodage de surface ; le canal identité n'est pas adressé par cette primaire",
+     "vs_plancher_lexical": "compatible avec un encodage de surface ; le canal identité n'est pas adressé par cette primaire"
+    }
+   },
+   "primaire": {
+    "D": 0.0,
+    "D_normalise": null,
+    "n_eff": 0,
+    "somme_m": 0,
+    "distribution_m": [
+     60
+    ],
+    "K_eff_support": 0,
+    "epsilon": null,
+    "enveloppe": {
+     "epsilon": null,
+     "n_eff": 0,
+     "B": 10000,
+     "seed": 0,
+     "raison": "support vide"
+    },
+    "IC": null,
+    "estime_par_requete": null,
+    "bande": "C-ind",
+    "V-compo": "SANS OBJET",
+    "detail_V-compo": {
+     "ordre_barriere": [
+      "sceller",
+      "publier",
+      "desceller"
+     ],
+     "ordre_attendu": [
+      "sceller",
+      "publier",
+      "desceller"
+     ],
+     "somme_m_publiee": 0,
+     "exclusion_m0_predeclaree": true,
+     "epsilon": null,
+     "raison": "support vide (n_eff = 0) : la nulle hypergeometrique conditionnelle aux m_q n'a pas de domaine de definition ; la famine globale (Sigma_q m_q < 60) a deja emporte la classification en C-ind d'office (D19)"
+    },
+    "X_par_requete": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "m_par_requete": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "courbe_X_vs_m": {
+     "0": {
+      "n": 60,
+      "exces_moyen": 0.0
+     }
+    },
+    "par_tige": {},
+    "type_de_requete": "T1"
+   },
+   "maillons": {
+    "cos_moyen_par_strate": {
+     "S3": 0.7434180575940343,
+     "S2": 0.67916687099654,
+     "S1": 0.7177266161474917,
+     "S0": 0.65563395838484
+    },
+    "n_paires_par_strate": {
+     "S3": 60,
+     "S2": 90,
+     "S1": 360,
+     "S0": 1260
+    },
+    "n_paires_total": 1770,
+    "etiquette": "global",
+    "C_6_3": 20,
+    "B": 10000,
+    "seed": 0,
+    "couche": 6,
+    "M1": {
+     "observe": 0.06425118659749429,
+     "attendu_sous_la_nulle": 0.003019612999972317,
+     "centre": 0.061231573597521974,
+     "epsilon_M": 0.017212628414974993,
+     "IC": [
+      0.04401894518254698,
+      0.07844420201249697
+     ],
+     "etat": "+",
+     "signe": 1
+    },
+    "M2": {
+     "observe": -0.03855974515095162,
+     "attendu_sous_la_nulle": 0.02895106574754467,
+     "centre": -0.06751081089849628,
+     "epsilon_M": 0.010608939254167908,
+     "IC": [
+      -0.07811975015266419,
+      -0.056901871644328375
+     ],
+     "etat": "−",
+     "signe": -1
+    },
+    "M3": {
+     "observe": 0.062092657762651715,
+     "attendu_sous_la_nulle": 0.005626698845826179,
+     "centre": 0.056465958916825536,
+     "epsilon_M": 0.010355223748624092,
+     "IC": [
+      0.046110735168201446,
+      0.06682118266544963
+     ],
+     "etat": "+",
+     "signe": 1
+    },
+    "B0_prime": {
+     "observe": 0.025691441446542673,
+     "attendu_sous_la_nulle": 0.03197067874751699,
+     "centre": -0.006279237300974315,
+     "epsilon_M": 0.013659574837081924,
+     "IC": [
+      -0.01993881213805624,
+      0.007380337536107609
+     ],
+     "etat": "0-résolu",
+     "signe": 0,
+     "derivation_enveloppe": "nulle de permutation PROPRE, ε_{B0′} = q₀.₉₅(|B0′_null|), même machinerie MC seedée que ε_M — jamais la moyenne de ε_M1 et ε_M2 (l'enveloppe d'une somme n'est pas la moyenne des enveloppes)"
+    },
+    "classe_ORD": "ORD-3",
+    "verdict_ORD": [
+     "le domaine domine la tige ⇒ géométrie sémantique, C5 insuffisante",
+     "retour au banc ; la mesure ne s'interprète pas"
+    ]
+   },
+   "fuite_couche_0": {
+    "B0": -0.04526326038233123,
+    "epsilon_B0": 0.007241320222676003,
+    "IC_B0": [
+     -0.052504580605007234,
+     -0.038021940159655224
+    ],
+    "B0_prime": -0.00648155526311868,
+    "epsilon_B0_prime": 0.009293416274402416,
+    "IC_B0_prime": [
+     -0.015774971537521096,
+     0.0028118610112837367
+    ],
+    "B0_prime_observe": -0.0011889864449148302,
+    "B0_prime_attendu_sous_la_nulle": 0.005292568818203849,
+    "derivation_enveloppe_B0_prime": "nulle de permutation PROPRE, ε_{B0′} = q₀.₉₅(|B0′_null|), même machinerie MC seedée que ε_M — jamais la moyenne de ε_M1 et ε_M2 (l'enveloppe d'une somme n'est pas la moyenne des enveloppes)",
+    "V-leak": "PASS",
+    "detail": {
+     "IC_B0": [
+      -0.052504580605007234,
+      -0.038021940159655224
+     ],
+     "B0_inferieur_ou_egal_0": true,
+     "IC_B0prime": [
+      -0.015774971537521096,
+      0.0028118610112837367
+     ],
+     "B0prime_contient_0": true,
+     "antipode": "B0 > 0 OU B0′ ≠ 0 ⇒ FUITE ⇒ arrêt, aucune interprétation de M1/M2/M3"
+    },
+    "couche": "hidden_states[0]",
+    "cos_moyen_par_strate": {
+     "S3": 0.6983669542604023,
+     "S2": 0.6597679796410195,
+     "S1": 0.6995559407053171,
+     "S0": 0.6565830844383982
+    }
+   },
+   "surprise": {
+    "NLL_moyenne_par_unite": 12.313059071699778,
+    "NLL_min_max": [
+     8.878768841425577,
+     16.452721913655598
+    ],
+    "coupures_tertiles": [
+     11.71039276652866,
+     12.86924205885993
+    ],
+    "n_paires_par_bande": [
+     590,
+     590,
+     590
+    ],
+    "NLL_moyenne_par_strate": {
+     "S3": 12.31305907169978,
+     "S2": 12.313059071699778,
+     "S1": 12.313059071699778,
+     "S0": 12.313059071699778
+    },
+    "superposition_absolue": {
+     "seuil_nats": 4.0,
+     "n_paires_au_dessus": 1770
+    },
+    "unite_de_bande": "la PAIRE, par la moyenne des NLL de ses deux membres",
+    "n_bandes": 3
+   },
+   "precision": {
+    "V-dtype": "PASS",
+    "detail": {
+     "delta_chapeau": 0.003270566463470459,
+     "delta_mesure": true,
+     "seuil_2delta": 0.006541132926940918,
+     "tiges_touchees": [],
+     "n_tiges_touchees": 0,
+     "unite": "TIGE (cluster), jamais la famille",
+     "repli_fp32": "CHEMIN NOMINAL déclaré avant le run (D21 / 0-51)",
+     "mesure_de_delta": {
+      "delta_chapeau_mesure": 0.003270566463470459,
+      "m_requetes": 60,
+      "n_cosinus_compares": 2220,
+      "ecart_median_par_requete": 0.001946777105331421,
+      "cellules": [
+       "T1-B",
+       "T1-A"
+      ],
+      "couche": 6,
+      "constante_ULP_bf16_pour_reference_seulement": 0.00390625,
+      "constante_conservatrice": true
+     },
+     "marges_de_tete_par_tige": {
+      "Iron": 0.145801,
+      "Silver": 0.10878,
+      "North": 0.183675,
+      "River": 0.148391,
+      "Storm": 0.115853,
+      "Golden": 0.150001,
+      "Copper": 0.153549,
+      "Hollow": 0.163975,
+      "Frost": 0.166965,
+      "Shadow": 0.119536
+     },
+     "marges_a_la_coupure_par_tige": {
+      "Iron": 0.145801,
+      "Silver": 0.10878,
+      "North": 0.183675,
+      "River": 0.148391,
+      "Storm": 0.115853,
+      "Golden": 0.150001,
+      "Copper": 0.153549,
+      "Hollow": 0.163975,
+      "Frost": 0.166965,
+      "Shadow": 0.119536
+     },
+     "marge_de_tete_min": 0.10878,
+     "marge_a_la_coupure_min": 0.10878
+    },
+    "modele": "gpt2"
+   },
+   "V-surprise": "FAIL",
+   "detail_V-surprise": {
+    "signes_par_bande": [
+     1,
+     1,
+     0
+    ],
+    "stable": false,
+    "M1_retiree": false,
+    "bandes": 3,
+    "coupures": "TERTILES par modèle sur la NLL MOYENNE DE PAIRE, avant toute lecture de M1",
+    "superposition_absolue_nats": 4.0,
+    "interdit": "toute repondération ou sélection après lecture ⇒ run invalide",
+    "M1_par_bande": {
+     "bande_0": {
+      "n_paires": 590,
+      "n_paires_par_strate": {
+       "S3": 21,
+       "S2": 27,
+       "S1": 137,
+       "S0": 405
+      },
+      "M1_centre": 0.07119440027804068,
+      "epsilon_M": 0.034439618978099364,
+      "IC": [
+       0.036754781299941315,
+       0.10563401925614005
+      ],
+      "etat": "+",
+      "signe": 1
+     },
+     "bande_1": {
+      "n_paires": 590,
+      "n_paires_par_strate": {
+       "S3": 20,
+       "S2": 34,
+       "S1": 95,
+       "S0": 441
+      },
+      "M1_centre": 0.0778772987877274,
+      "epsilon_M": 0.03428635147011977,
+      "IC": [
+       0.043590947317607626,
+       0.11216365025784716
+      ],
+      "etat": "+",
+      "signe": 1
+     },
+     "bande_2": {
+      "n_paires": 590,
+      "n_paires_par_strate": {
+       "S3": 19,
+       "S2": 29,
+       "S1": 128,
+       "S0": 414
+      },
+      "M1_centre": 0.05400155060781833,
+      "epsilon_M": 0.02976617384205396,
+      "IC": [
+       0.02423537676576437,
+       0.0837677244498723
+      ],
+      "etat": "ind",
+      "signe": 0
+     }
+    },
+    "coupures_tertiles": [
+     11.71039276652866,
+     12.86924205885993
+    ],
+    "n_paires_par_bande": [
+     590,
+     590,
+     590
+    ],
+    "superposition_absolue": {
+     "seuil_nats": 4.0,
+     "n_paires_au_dessus": 1770,
+     "n_paires_au_dessous": 0
+    }
+   },
+   "M1_retiree_par_V_surprise": false,
+   "descriptifs_4_8": {
+    "A3": {
+     "table_par_strate": {
+      "S3": {
+       "cos_brut": 0.7434180575940343,
+       "cos_dg": 0.283819903826548,
+       "compression": 0.45959815376748636,
+       "n": 60
+      },
+      "S2": {
+       "cos_brut": 0.6804045050232498,
+       "cos_dg": 0.21455342597155655,
+       "compression": 0.4658510790516932,
+       "n": 90
+      },
+      "S1": {
+       "cos_brut": 0.7177266161474917,
+       "cos_dg": 0.25728208728962476,
+       "compression": 0.4604445288578669,
+       "n": 360
+      },
+      "S0": {
+       "cos_brut": 0.6555543941322458,
+       "cos_dg": 0.19266583529195042,
+       "compression": 0.4628885588402954,
+       "n": 1260
+      }
+     },
+     "amplitude_de_compression": 0.006252925284206845,
+     "G": {
+      "gelee": true,
+      "seed": 0,
+      "dg_dim": 8192,
+      "dg_topk": 64,
+      "apprise": false,
+      "source_des_hyperparametres": "EngramConfig"
+     },
+     "M_instanciee": false,
+     "backprop": false,
+     "prediction": "compression croissante avec le cosinus brut",
+     "antipode": "compression uniforme ⇒ rééchelonnement, pas séparateur",
+     "statut": "DESCRIPTIF — aucune décision n'en dépend (§4.8)"
+    },
+    "A4_t_moins_1": {
+     "t_moins_1": {
+      "cos_S1": 0.6683656784395376,
+      "cos_S0": 0.6684148308067095,
+      "M3_brut": -4.9152367171845235e-05,
+      "n_S1": 360,
+      "n_S0": 1260
+     },
+     "t": {
+      "cos_S1": 0.7177266161474917,
+      "cos_S0": 0.6555543941322458,
+      "M3_brut": 0.06217222201524586,
+      "n_S1": 360,
+      "n_S0": 1260
+     },
+     "cardinal_D24b_a_t_moins_1": 14,
+     "paires_intra_tige_exclues": 150,
+     "discriminant": "confondant de COPIE DE TOKEN : la copie doit être bien plus forte à la capture qu'à t−1 ; profil identique aux deux positions ⇒ pas de signature de copie",
+     "statut": "DESCRIPTIF — aucune décision n'en dépend (§4.8)"
+    },
+    "P1_moins_P2": {
+     "P1": 1.0,
+     "P2": 1.0,
+     "P1_moins_P2": 0.0,
+     "n_requetes": 60,
+     "type_de_requete": "T1",
+     "lecture_gravee": "valeur positive ou nulle : NON INFORMATIVE ; seule une valeur strictement négative est informative (violerait la monotonie stochastique en σ)",
+     "informatif": false,
+     "statut": "DESCRIPTIF par 0-49 — aucune décision n'en dépend"
+    }
+   },
+   "instrumentation_apres_ce_modele": {
+    "profondeur_bootstrap": 0,
+    "rangs_calcules": 540,
+    "rangs_calcules_dans_un_bootstrap": 0,
+    "quantites_t1": [
+     {
+      "nom": "profil A4 à t−1 (inter-tige)",
+      "n_paires_comparees": 1620,
+      "n_paires_intra_tige": 0,
+      "intra_tige": false
+     }
+    ]
+   },
+   "cause_C_ind": {
+    "cause": "famine par SATURATION",
+    "suite": "réduire la dominance de surface",
+    "classe_calibrateur": "N-b"
+   },
+   "phrase_G_bis_licenciee": true
+  },
+  "HuggingFaceTB/SmolLM2-360M": {
+   "capture": {
+    "modele": "HuggingFaceTB/SmolLM2-360M",
+    "L": 32,
+    "L_attendu": 32,
+    "V-L": "PASS",
+    "device": "cuda",
+    "cuda_disponible": true,
+    "dtype_demande": "bfloat16",
+    "dtype_effectif": "torch.bfloat16",
+    "repli_fp32": false,
+    "duree_chargement_s": 2.49,
+    "cellules": {
+     "T1-A": {
+      "n_sequences": 132,
+      "longueur_max": 12,
+      "indice_capture": 9,
+      "duree_s": 0.32,
+      "dimension": 960,
+      "n_couches_capturees": 33,
+      "nan_ou_inf": false
+     },
+     "T1-B": {
+      "n_sequences": 132,
+      "longueur_max": 12,
+      "indice_capture": 9,
+      "duree_s": 0.14,
+      "dimension": 960,
+      "n_couches_capturees": 33,
+      "nan_ou_inf": false
+     },
+     "T2-A": {
+      "n_sequences": 132,
+      "longueur_max": 11,
+      "indice_capture": 8,
+      "duree_s": 0.12,
+      "dimension": 960,
+      "n_couches_capturees": 33,
+      "nan_ou_inf": false
+     },
+     "T2-B": {
+      "n_sequences": 132,
+      "longueur_max": 11,
+      "indice_capture": 8,
+      "duree_s": 0.12,
+      "dimension": 960,
+      "n_couches_capturees": 33,
+      "nan_ou_inf": false
+     },
+     "T3-A": {
+      "n_sequences": 132,
+      "longueur_max": 10,
+      "indice_capture": 7,
+      "duree_s": 0.11,
+      "dimension": 960,
+      "n_couches_capturees": 33,
+      "nan_ou_inf": false
+     },
+     "T3-B": {
+      "n_sequences": 132,
+      "longueur_max": 10,
+      "indice_capture": 7,
+      "duree_s": 0.12,
+      "dimension": 960,
+      "n_couches_capturees": 33,
+      "nan_ou_inf": false
+     }
+    },
+    "n_forwards": 6,
+    "vram_max_reservee_gio": 1.117,
+    "vram_max_allouee_gio": 1.043,
+    "controle_fp32": {
+     "cellules": [
+      "T1-B",
+      "T1-A"
+     ],
+     "device": "cuda",
+     "repli_cpu": false,
+     "motif_repli": "",
+     "duree_s": 1.74,
+     "vram_max_reservee_gio": 2.047,
+     "n_sequences": 264,
+     "regle": "repli fp32 = CHEMIN NOMINAL déclaré avant le run (D21 / 0-51)"
+    },
+    "duree_totale_s": 31.05
+   },
+   "couche_de_reference": 16,
+   "calibrateur": {
+    "delta_R1_inv": 0.9833333333333334,
+    "IC": [
+     0.9666666666666666,
+     1.0
+    ],
+    "K_eff": 10,
+    "classe": "N-b",
+    "R1_moyen": 1.0,
+    "R1_nul_moyen": 0.016666666666666666,
+    "n_requetes": 180,
+    "par_tige": {
+     "Copper": 1.0,
+     "Frost": 0.9444444444444444,
+     "Golden": 1.0,
+     "Hollow": 1.0,
+     "Iron": 1.0,
+     "North": 0.9444444444444444,
+     "River": 0.9444444444444444,
+     "Shadow": 1.0,
+     "Silver": 1.0,
+     "Storm": 1.0
+    },
+    "plancher_par_domaine": {
+     "maritime": "36/37",
+     "culinaire": "36/37",
+     "astronomie": "36/37",
+     "textile": "36/37"
+    },
+    "descriptif": {
+     "vs_cle_nulle": "compatible avec un encodage de surface ; le canal identité n'est pas adressé par cette primaire",
+     "vs_plancher_lexical": "compatible avec un encodage de surface ; le canal identité n'est pas adressé par cette primaire"
+    }
+   },
+   "primaire": {
+    "D": 0.0,
+    "D_normalise": null,
+    "n_eff": 0,
+    "somme_m": 0,
+    "distribution_m": [
+     60
+    ],
+    "K_eff_support": 0,
+    "epsilon": null,
+    "enveloppe": {
+     "epsilon": null,
+     "n_eff": 0,
+     "B": 10000,
+     "seed": 0,
+     "raison": "support vide"
+    },
+    "IC": null,
+    "estime_par_requete": null,
+    "bande": "C-ind",
+    "V-compo": "SANS OBJET",
+    "detail_V-compo": {
+     "ordre_barriere": [
+      "sceller",
+      "publier",
+      "desceller"
+     ],
+     "ordre_attendu": [
+      "sceller",
+      "publier",
+      "desceller"
+     ],
+     "somme_m_publiee": 0,
+     "exclusion_m0_predeclaree": true,
+     "epsilon": null,
+     "raison": "support vide (n_eff = 0) : la nulle hypergeometrique conditionnelle aux m_q n'a pas de domaine de definition ; la famine globale (Sigma_q m_q < 60) a deja emporte la classification en C-ind d'office (D19)"
+    },
+    "X_par_requete": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "m_par_requete": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "courbe_X_vs_m": {
+     "0": {
+      "n": 60,
+      "exces_moyen": 0.0
+     }
+    },
+    "par_tige": {},
+    "type_de_requete": "T1"
+   },
+   "maillons": {
+    "cos_moyen_par_strate": {
+     "S3": 0.7886106507645713,
+     "S2": 0.7385478068465069,
+     "S1": 0.779438967368117,
+     "S0": 0.7364130375620545
+    },
+    "n_paires_par_strate": {
+     "S3": 60,
+     "S2": 90,
+     "S1": 360,
+     "S0": 1260
+    },
+    "n_paires_total": 1770,
+    "etiquette": "global",
+    "C_6_3": 20,
+    "B": 10000,
+    "seed": 0,
+    "couche": 16,
+    "M1": {
+     "observe": 0.05006284391806437,
+     "attendu_sous_la_nulle": 0.003022905667111425,
+     "centre": 0.04703993825095294,
+     "epsilon_M": 0.014214232131709534,
+     "IC": [
+      0.03282570611924341,
+      0.061254170382662475
+     ],
+     "etat": "+",
+     "signe": 1
+    },
+    "M2": {
+     "observe": -0.040891160521610126,
+     "attendu_sous_la_nulle": 0.007074789450271655,
+     "centre": -0.04796594997188178,
+     "epsilon_M": 0.008034554228149941,
+     "IC": [
+      -0.05600050420003172,
+      -0.039931395743731835
+     ],
+     "etat": "−",
+     "signe": -1
+    },
+    "M3": {
+     "observe": 0.04302592980606257,
+     "attendu_sous_la_nulle": 0.004771861046914285,
+     "centre": 0.03825406875914828,
+     "epsilon_M": 0.007474398907081461,
+     "IC": [
+      0.03077966985206682,
+      0.04572846766622974
+     ],
+     "etat": "+",
+     "signe": 1
+    },
+    "B0_prime": {
+     "observe": 0.009171683396454244,
+     "attendu_sous_la_nulle": 0.01009769511738308,
+     "centre": -0.0009260117209288349,
+     "epsilon_M": 0.010496712346212975,
+     "IC": [
+      -0.01142272406714181,
+      0.00957070062528414
+     ],
+     "etat": "0-résolu",
+     "signe": 0,
+     "derivation_enveloppe": "nulle de permutation PROPRE, ε_{B0′} = q₀.₉₅(|B0′_null|), même machinerie MC seedée que ε_M — jamais la moyenne de ε_M1 et ε_M2 (l'enveloppe d'une somme n'est pas la moyenne des enveloppes)"
+    },
+    "classe_ORD": "ORD-3",
+    "verdict_ORD": [
+     "le domaine domine la tige ⇒ géométrie sémantique, C5 insuffisante",
+     "retour au banc ; la mesure ne s'interprète pas"
+    ]
+   },
+   "fuite_couche_0": {
+    "B0": -0.05651302454881361,
+    "epsilon_B0": 0.011742522128018183,
+    "IC_B0": [
+     -0.06825554667683179,
+     -0.04477050242079542
+    ],
+    "B0_prime": -0.0027269687869454166,
+    "epsilon_B0_prime": 0.016201269131741303,
+    "IC_B0_prime": [
+     -0.018928237918686718,
+     0.013474300344795886
+    ],
+    "B0_prime_observe": 0.007834991998970503,
+    "B0_prime_attendu_sous_la_nulle": 0.01056196078591592,
+    "derivation_enveloppe_B0_prime": "nulle de permutation PROPRE, ε_{B0′} = q₀.₉₅(|B0′_null|), même machinerie MC seedée que ε_M — jamais la moyenne de ε_M1 et ε_M2 (l'enveloppe d'une somme n'est pas la moyenne des enveloppes)",
+    "V-leak": "PASS",
+    "detail": {
+     "IC_B0": [
+      -0.06825554667683179,
+      -0.04477050242079542
+     ],
+     "B0_inferieur_ou_egal_0": true,
+     "IC_B0prime": [
+      -0.018928237918686718,
+      0.013474300344795886
+     ],
+     "B0prime_contient_0": true,
+     "antipode": "B0 > 0 OU B0′ ≠ 0 ⇒ FUITE ⇒ arrêt, aucune interprétation de M1/M2/M3"
+    },
+    "couche": "hidden_states[0]",
+    "cos_moyen_par_strate": {
+     "S3": 0.2415066499263048,
+     "S2": 0.18081525509694107,
+     "S1": 0.2336716579273343,
+     "S0": 0.18349410777093453
+    }
+   },
+   "surprise": {
+    "NLL_moyenne_par_unite": 13.017399279276528,
+    "NLL_min_max": [
+     7.466582139333089,
+     18.05479669570923
+    ],
+    "coupures_tertiles": [
+     12.291316522492304,
+     13.688011831707424
+    ],
+    "n_paires_par_bande": [
+     590,
+     590,
+     590
+    ],
+    "NLL_moyenne_par_strate": {
+     "S3": 13.01739927927653,
+     "S2": 13.017399279276528,
+     "S1": 13.01739927927653,
+     "S0": 13.01739927927653
+    },
+    "superposition_absolue": {
+     "seuil_nats": 4.0,
+     "n_paires_au_dessus": 1770
+    },
+    "unite_de_bande": "la PAIRE, par la moyenne des NLL de ses deux membres",
+    "n_bandes": 3
+   },
+   "precision": {
+    "V-dtype": "PASS",
+    "detail": {
+     "delta_chapeau": 0.004861950874328613,
+     "delta_mesure": true,
+     "seuil_2delta": 0.009723901748657227,
+     "tiges_touchees": [],
+     "n_tiges_touchees": 0,
+     "unite": "TIGE (cluster), jamais la famille",
+     "repli_fp32": "CHEMIN NOMINAL déclaré avant le run (D21 / 0-51)",
+     "mesure_de_delta": {
+      "delta_chapeau_mesure": 0.004861950874328613,
+      "m_requetes": 60,
+      "n_cosinus_compares": 2220,
+      "ecart_median_par_requete": 0.0027627646923065186,
+      "cellules": [
+       "T1-B",
+       "T1-A"
+      ],
+      "couche": 16,
+      "constante_ULP_bf16_pour_reference_seulement": 0.00390625,
+      "constante_conservatrice": false
+     },
+     "marges_de_tete_par_tige": {
+      "Iron": 0.100258,
+      "Silver": 0.082976,
+      "North": 0.110186,
+      "River": 0.148005,
+      "Storm": 0.093869,
+      "Golden": 0.109911,
+      "Copper": 0.095477,
+      "Hollow": 0.087478,
+      "Frost": 0.108965,
+      "Shadow": 0.042404
+     },
+     "marges_a_la_coupure_par_tige": {
+      "Iron": 0.100258,
+      "Silver": 0.082976,
+      "North": 0.110186,
+      "River": 0.148005,
+      "Storm": 0.093869,
+      "Golden": 0.109911,
+      "Copper": 0.095477,
+      "Hollow": 0.087478,
+      "Frost": 0.108965,
+      "Shadow": 0.042404
+     },
+     "marge_de_tete_min": 0.042404,
+     "marge_a_la_coupure_min": 0.042404
+    },
+    "modele": "HuggingFaceTB/SmolLM2-360M"
+   },
+   "V-surprise": "FAIL",
+   "detail_V-surprise": {
+    "signes_par_bande": [
+     1,
+     0,
+     0
+    ],
+    "stable": false,
+    "M1_retiree": false,
+    "bandes": 3,
+    "coupures": "TERTILES par modèle sur la NLL MOYENNE DE PAIRE, avant toute lecture de M1",
+    "superposition_absolue_nats": 4.0,
+    "interdit": "toute repondération ou sélection après lecture ⇒ run invalide",
+    "M1_par_bande": {
+     "bande_0": {
+      "n_paires": 590,
+      "n_paires_par_strate": {
+       "S3": 23,
+       "S2": 28,
+       "S1": 129,
+       "S0": 410
+      },
+      "M1_centre": 0.0714843195287301,
+      "epsilon_M": 0.03151509602938864,
+      "IC": [
+       0.03996922349934147,
+       0.10299941555811874
+      ],
+      "etat": "+",
+      "signe": 1
+     },
+     "bande_1": {
+      "n_paires": 590,
+      "n_paires_par_strate": {
+       "S3": 19,
+       "S2": 31,
+       "S1": 107,
+       "S0": 433
+      },
+      "M1_centre": 0.04425847995698411,
+      "epsilon_M": 0.02660366166062131,
+      "IC": [
+       0.017654818296362805,
+       0.07086214161760543
+      ],
+      "etat": "ind",
+      "signe": 0
+     },
+     "bande_2": {
+      "n_paires": 590,
+      "n_paires_par_strate": {
+       "S3": 18,
+       "S2": 31,
+       "S1": 124,
+       "S0": 417
+      },
+      "M1_centre": 0.027208977284615587,
+      "epsilon_M": 0.023926065359923258,
+      "IC": [
+       0.003282911924692329,
+       0.051135042644538845
+      ],
+      "etat": "ind",
+      "signe": 0
+     }
+    },
+    "coupures_tertiles": [
+     12.291316522492304,
+     13.688011831707424
+    ],
+    "n_paires_par_bande": [
+     590,
+     590,
+     590
+    ],
+    "superposition_absolue": {
+     "seuil_nats": 4.0,
+     "n_paires_au_dessus": 1770,
+     "n_paires_au_dessous": 0
+    }
+   },
+   "M1_retiree_par_V_surprise": false,
+   "descriptifs_4_8": {
+    "A3": {
+     "table_par_strate": {
+      "S3": {
+       "cos_brut": 0.7886106507645714,
+       "cos_dg": 0.34010036575297514,
+       "compression": 0.44851028501159623,
+       "n": 60
+      },
+      "S2": {
+       "cos_brut": 0.7404473593941442,
+       "cos_dg": 0.28245002464563757,
+       "compression": 0.4579973347485066,
+       "n": 90
+      },
+      "S1": {
+       "cos_brut": 0.7794389673681171,
+       "cos_dg": 0.32615144642897775,
+       "compression": 0.4532875209391394,
+       "n": 360
+      },
+      "S0": {
+       "cos_brut": 0.7363590674583244,
+       "cos_dg": 0.27577364778136293,
+       "compression": 0.4605854196769614,
+       "n": 1260
+      }
+     },
+     "amplitude_de_compression": 0.012075134665365195,
+     "G": {
+      "gelee": true,
+      "seed": 0,
+      "dg_dim": 8192,
+      "dg_topk": 64,
+      "apprise": false,
+      "source_des_hyperparametres": "EngramConfig"
+     },
+     "M_instanciee": false,
+     "backprop": false,
+     "prediction": "compression croissante avec le cosinus brut",
+     "antipode": "compression uniforme ⇒ rééchelonnement, pas séparateur",
+     "statut": "DESCRIPTIF — aucune décision n'en dépend (§4.8)"
+    },
+    "A4_t_moins_1": {
+     "t_moins_1": {
+      "cos_S1": 0.7485681106646855,
+      "cos_S0": 0.7524660612855639,
+      "M3_brut": -0.0038979506208783876,
+      "n_S1": 360,
+      "n_S0": 1260
+     },
+     "t": {
+      "cos_S1": 0.7794389673681171,
+      "cos_S0": 0.7363590674583244,
+      "M3_brut": 0.043079899909792774,
+      "n_S1": 360,
+      "n_S0": 1260
+     },
+     "cardinal_D24b_a_t_moins_1": 14,
+     "paires_intra_tige_exclues": 150,
+     "discriminant": "confondant de COPIE DE TOKEN : la copie doit être bien plus forte à la capture qu'à t−1 ; profil identique aux deux positions ⇒ pas de signature de copie",
+     "statut": "DESCRIPTIF — aucune décision n'en dépend (§4.8)"
+    },
+    "P1_moins_P2": {
+     "P1": 1.0,
+     "P2": 1.0,
+     "P1_moins_P2": 0.0,
+     "n_requetes": 60,
+     "type_de_requete": "T1",
+     "lecture_gravee": "valeur positive ou nulle : NON INFORMATIVE ; seule une valeur strictement négative est informative (violerait la monotonie stochastique en σ)",
+     "informatif": false,
+     "statut": "DESCRIPTIF par 0-49 — aucune décision n'en dépend"
+    }
+   },
+   "instrumentation_apres_ce_modele": {
+    "profondeur_bootstrap": 0,
+    "rangs_calcules": 1080,
+    "rangs_calcules_dans_un_bootstrap": 0,
+    "quantites_t1": [
+     {
+      "nom": "profil A4 à t−1 (inter-tige)",
+      "n_paires_comparees": 1620,
+      "n_paires_intra_tige": 0,
+      "intra_tige": false
+     },
+     {
+      "nom": "profil A4 à t−1 (inter-tige)",
+      "n_paires_comparees": 1620,
+      "n_paires_intra_tige": 0,
+      "intra_tige": false
+     }
+    ]
+   },
+   "cause_C_ind": {
+    "cause": "famine par SATURATION",
+    "suite": "réduire la dominance de surface",
+    "classe_calibrateur": "N-b"
+   },
+   "phrase_G_bis_licenciee": true
+  },
+  "Qwen/Qwen2.5-1.5B": {
+   "capture": {
+    "modele": "Qwen/Qwen2.5-1.5B",
+    "L": 28,
+    "L_attendu": 28,
+    "V-L": "PASS",
+    "device": "cuda",
+    "cuda_disponible": true,
+    "dtype_demande": "bfloat16",
+    "dtype_effectif": "torch.bfloat16",
+    "repli_fp32": false,
+    "duree_chargement_s": 4.58,
+    "cellules": {
+     "T1-A": {
+      "n_sequences": 132,
+      "longueur_max": 12,
+      "indice_capture": 9,
+      "duree_s": 0.5,
+      "dimension": 1536,
+      "n_couches_capturees": 29,
+      "nan_ou_inf": false
+     },
+     "T1-B": {
+      "n_sequences": 132,
+      "longueur_max": 12,
+      "indice_capture": 9,
+      "duree_s": 0.31,
+      "dimension": 1536,
+      "n_couches_capturees": 29,
+      "nan_ou_inf": false
+     },
+     "T2-A": {
+      "n_sequences": 132,
+      "longueur_max": 11,
+      "indice_capture": 8,
+      "duree_s": 0.28,
+      "dimension": 1536,
+      "n_couches_capturees": 29,
+      "nan_ou_inf": false
+     },
+     "T2-B": {
+      "n_sequences": 132,
+      "longueur_max": 11,
+      "indice_capture": 8,
+      "duree_s": 0.28,
+      "dimension": 1536,
+      "n_couches_capturees": 29,
+      "nan_ou_inf": false
+     },
+     "T3-A": {
+      "n_sequences": 132,
+      "longueur_max": 10,
+      "indice_capture": 7,
+      "duree_s": 0.27,
+      "dimension": 1536,
+      "n_couches_capturees": 29,
+      "nan_ou_inf": false
+     },
+     "T3-B": {
+      "n_sequences": 132,
+      "longueur_max": 10,
+      "indice_capture": 7,
+      "duree_s": 0.27,
+      "dimension": 1536,
+      "n_couches_capturees": 29,
+      "nan_ou_inf": false
+     }
+    },
+    "n_forwards": 6,
+    "vram_max_reservee_gio": 4.01,
+    "vram_max_allouee_gio": 3.657,
+    "controle_fp32": {
+     "cellules": [
+      "T1-B",
+      "T1-A"
+     ],
+     "device": "cuda",
+     "repli_cpu": false,
+     "motif_repli": "",
+     "duree_s": 80.69,
+     "vram_max_reservee_gio": 7.266,
+     "n_sequences": 264,
+     "regle": "repli fp32 = CHEMIN NOMINAL déclaré avant le run (D21 / 0-51)"
+    },
+    "duree_totale_s": 124.12
+   },
+   "couche_de_reference": 14,
+   "calibrateur": {
+    "delta_R1_inv": 0.9833333333333332,
+    "IC": [
+     0.9555555555555555,
+     1.0
+    ],
+    "K_eff": 10,
+    "classe": "N-b",
+    "R1_moyen": 1.0,
+    "R1_nul_moyen": 0.016666666666666666,
+    "n_requetes": 180,
+    "par_tige": {
+     "Copper": 1.0,
+     "Frost": 1.0,
+     "Golden": 1.0,
+     "Hollow": 1.0,
+     "Iron": 1.0,
+     "North": 0.8888888888888888,
+     "River": 0.9444444444444444,
+     "Shadow": 1.0,
+     "Silver": 1.0,
+     "Storm": 1.0
+    },
+    "plancher_par_domaine": {
+     "maritime": "36/37",
+     "culinaire": "36/37",
+     "astronomie": "36/37",
+     "textile": "36/37"
+    },
+    "descriptif": {
+     "vs_cle_nulle": "compatible avec un encodage de surface ; le canal identité n'est pas adressé par cette primaire",
+     "vs_plancher_lexical": "compatible avec un encodage de surface ; le canal identité n'est pas adressé par cette primaire"
+    }
+   },
+   "primaire": {
+    "D": 0.0,
+    "D_normalise": null,
+    "n_eff": 0,
+    "somme_m": 0,
+    "distribution_m": [
+     60
+    ],
+    "K_eff_support": 0,
+    "epsilon": null,
+    "enveloppe": {
+     "epsilon": null,
+     "n_eff": 0,
+     "B": 10000,
+     "seed": 0,
+     "raison": "support vide"
+    },
+    "IC": null,
+    "estime_par_requete": null,
+    "bande": "C-ind",
+    "V-compo": "SANS OBJET",
+    "detail_V-compo": {
+     "ordre_barriere": [
+      "sceller",
+      "publier",
+      "desceller"
+     ],
+     "ordre_attendu": [
+      "sceller",
+      "publier",
+      "desceller"
+     ],
+     "somme_m_publiee": 0,
+     "exclusion_m0_predeclaree": true,
+     "epsilon": null,
+     "raison": "support vide (n_eff = 0) : la nulle hypergeometrique conditionnelle aux m_q n'a pas de domaine de definition ; la famine globale (Sigma_q m_q < 60) a deja emporte la classification en C-ind d'office (D19)"
+    },
+    "X_par_requete": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "m_par_requete": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "courbe_X_vs_m": {
+     "0": {
+      "n": 60,
+      "exces_moyen": 0.0
+     }
+    },
+    "par_tige": {},
+    "type_de_requete": "T1"
+   },
+   "maillons": {
+    "cos_moyen_par_strate": {
+     "S3": 0.6635063297218747,
+     "S2": 0.5935016938565689,
+     "S1": 0.629461591814955,
+     "S0": 0.5666794880390125
+    },
+    "n_paires_par_strate": {
+     "S3": 60,
+     "S2": 90,
+     "S1": 360,
+     "S0": 1260
+    },
+    "n_paires_total": 1770,
+    "etiquette": "global",
+    "C_6_3": 20,
+    "B": 10000,
+    "seed": 0,
+    "couche": 14,
+    "M1": {
+     "observe": 0.07000463586530581,
+     "attendu_sous_la_nulle": 0.0014378403164465037,
+     "centre": 0.0685667955488593,
+     "epsilon_M": 0.020103432428093548,
+     "IC": [
+      0.048463363120765754,
+      0.08867022797695286
+     ],
+     "etat": "+",
+     "signe": 1
+    },
+    "M2": {
+     "observe": -0.035959897958386056,
+     "attendu_sous_la_nulle": 0.03453892937586629,
+     "centre": -0.07049882733425235,
+     "epsilon_M": 0.011633360464412696,
+     "IC": [
+      -0.08213218779866505,
+      -0.05886546686983965
+     ],
+     "etat": "−",
+     "signe": -1
+    },
+    "M3": {
+     "observe": 0.06278210377594251,
+     "attendu_sous_la_nulle": 0.006417685829666403,
+     "centre": 0.056364417946276106,
+     "epsilon_M": 0.010906003844530722,
+     "IC": [
+      0.045458414101745385,
+      0.06727042179080683
+     ],
+     "etat": "+",
+     "signe": 1
+    },
+    "B0_prime": {
+     "observe": 0.03404473790691975,
+     "attendu_sous_la_nulle": 0.03597676969231279,
+     "centre": -0.001932031785393036,
+     "epsilon_M": 0.015156097452176975,
+     "IC": [
+      -0.017088129237570013,
+      0.013224065666783939
+     ],
+     "etat": "0-résolu",
+     "signe": 0,
+     "derivation_enveloppe": "nulle de permutation PROPRE, ε_{B0′} = q₀.₉₅(|B0′_null|), même machinerie MC seedée que ε_M — jamais la moyenne de ε_M1 et ε_M2 (l'enveloppe d'une somme n'est pas la moyenne des enveloppes)"
+    },
+    "classe_ORD": "ORD-3",
+    "verdict_ORD": [
+     "le domaine domine la tige ⇒ géométrie sémantique, C5 insuffisante",
+     "retour au banc ; la mesure ne s'interprète pas"
+    ]
+   },
+   "fuite_couche_0": {
+    "B0": -0.07819918370316141,
+    "epsilon_B0": 0.01420142216766546,
+    "IC_B0": [
+     -0.09240060587082687,
+     -0.06399776153549595
+    ],
+    "B0_prime": -0.003933136567147355,
+    "epsilon_B0_prime": 0.019416708479365885,
+    "IC_B0_prime": [
+     -0.02334984504651324,
+     0.01548357191221853
+    ],
+    "B0_prime_observe": 0.0063529108444021765,
+    "B0_prime_attendu_sous_la_nulle": 0.010286047411549532,
+    "derivation_enveloppe_B0_prime": "nulle de permutation PROPRE, ε_{B0′} = q₀.₉₅(|B0′_null|), même machinerie MC seedée que ε_M — jamais la moyenne de ε_M1 et ε_M2 (l'enveloppe d'une somme n'est pas la moyenne des enveloppes)",
+    "V-leak": "PASS",
+    "detail": {
+     "IC_B0": [
+      -0.09240060587082687,
+      -0.06399776153549595
+     ],
+     "B0_inferieur_ou_egal_0": true,
+     "IC_B0prime": [
+      -0.02334984504651324,
+      0.01548357191221853
+     ],
+     "B0prime_contient_0": true,
+     "antipode": "B0 > 0 OU B0′ ≠ 0 ⇒ FUITE ⇒ arrêt, aucune interprétation de M1/M2/M3"
+    },
+    "couche": "hidden_states[0]",
+    "cos_moyen_par_strate": {
+     "S3": 0.13700809649502238,
+     "S2": 0.060726803507552385,
+     "S1": 0.1306551856506202,
+     "S0": 0.06109188579755823
+    }
+   },
+   "surprise": {
+    "NLL_moyenne_par_unite": 13.771213234795464,
+    "NLL_min_max": [
+     7.8496518929799395,
+     19.24452304840088
+    ],
+    "coupures_tertiles": [
+     13.11672027905782,
+     14.55583871735467
+    ],
+    "n_paires_par_bande": [
+     589,
+     591,
+     590
+    ],
+    "NLL_moyenne_par_strate": {
+     "S3": 13.771213234795464,
+     "S2": 13.771213234795463,
+     "S1": 13.771213234795464,
+     "S0": 13.771213234795464
+    },
+    "superposition_absolue": {
+     "seuil_nats": 4.0,
+     "n_paires_au_dessus": 1770
+    },
+    "unite_de_bande": "la PAIRE, par la moyenne des NLL de ses deux membres",
+    "n_bandes": 3
+   },
+   "precision": {
+    "V-dtype": "PASS",
+    "detail": {
+     "delta_chapeau": 0.005862414836883545,
+     "delta_mesure": true,
+     "seuil_2delta": 0.01172482967376709,
+     "tiges_touchees": [],
+     "n_tiges_touchees": 0,
+     "unite": "TIGE (cluster), jamais la famille",
+     "repli_fp32": "CHEMIN NOMINAL déclaré avant le run (D21 / 0-51)",
+     "mesure_de_delta": {
+      "delta_chapeau_mesure": 0.005862414836883545,
+      "m_requetes": 60,
+      "n_cosinus_compares": 2220,
+      "ecart_median_par_requete": 0.0035644620656967163,
+      "cellules": [
+       "T1-B",
+       "T1-A"
+      ],
+      "couche": 14,
+      "constante_ULP_bf16_pour_reference_seulement": 0.00390625,
+      "constante_conservatrice": false
+     },
+     "marges_de_tete_par_tige": {
+      "Iron": 0.166571,
+      "Silver": 0.146032,
+      "North": 0.223013,
+      "River": 0.238131,
+      "Storm": 0.188349,
+      "Golden": 0.215748,
+      "Copper": 0.154169,
+      "Hollow": 0.160811,
+      "Frost": 0.196328,
+      "Shadow": 0.088331
+     },
+     "marges_a_la_coupure_par_tige": {
+      "Iron": 0.166571,
+      "Silver": 0.146032,
+      "North": 0.223013,
+      "River": 0.238131,
+      "Storm": 0.188349,
+      "Golden": 0.215748,
+      "Copper": 0.154169,
+      "Hollow": 0.160811,
+      "Frost": 0.196328,
+      "Shadow": 0.088331
+     },
+     "marge_de_tete_min": 0.088331,
+     "marge_a_la_coupure_min": 0.088331
+    },
+    "modele": "Qwen/Qwen2.5-1.5B"
+   },
+   "V-surprise": "FAIL",
+   "detail_V-surprise": {
+    "signes_par_bande": [
+     1,
+     0,
+     0
+    ],
+    "stable": false,
+    "M1_retiree": false,
+    "bandes": 3,
+    "coupures": "TERTILES par modèle sur la NLL MOYENNE DE PAIRE, avant toute lecture de M1",
+    "superposition_absolue_nats": 4.0,
+    "interdit": "toute repondération ou sélection après lecture ⇒ run invalide",
+    "M1_par_bande": {
+     "bande_0": {
+      "n_paires": 589,
+      "n_paires_par_strate": {
+       "S3": 20,
+       "S2": 35,
+       "S1": 121,
+       "S0": 413
+      },
+      "M1_centre": 0.11423613058042473,
+      "epsilon_M": 0.043607259596352095,
+      "IC": [
+       0.07062887098407264,
+       0.15784339017677682
+      ],
+      "etat": "+",
+      "signe": 1
+     },
+     "bande_1": {
+      "n_paires": 591,
+      "n_paires_par_strate": {
+       "S3": 19,
+       "S2": 19,
+       "S1": 122,
+       "S0": 431
+      },
+      "M1_centre": 0.05952055094938493,
+      "epsilon_M": 0.04877652810167756,
+      "IC": [
+       0.010744022847707368,
+       0.10829707905106249
+      ],
+      "etat": "ind",
+      "signe": 0
+     },
+     "bande_2": {
+      "n_paires": 590,
+      "n_paires_par_strate": {
+       "S3": 21,
+       "S2": 36,
+       "S1": 117,
+       "S0": 416
+      },
+      "M1_centre": 0.051905200500862246,
+      "epsilon_M": 0.02599766627846438,
+      "IC": [
+       0.025907534222397867,
+       0.07790286677932662
+      ],
+      "etat": "ind",
+      "signe": 0
+     }
+    },
+    "coupures_tertiles": [
+     13.11672027905782,
+     14.55583871735467
+    ],
+    "n_paires_par_bande": [
+     589,
+     591,
+     590
+    ],
+    "superposition_absolue": {
+     "seuil_nats": 4.0,
+     "n_paires_au_dessus": 1770,
+     "n_paires_au_dessous": 0
+    }
+   },
+   "M1_retiree_par_V_surprise": false,
+   "descriptifs_4_8": {
+    "A3": {
+     "table_par_strate": {
+      "S3": {
+       "cos_brut": 0.6635063297218747,
+       "cos_dg": 0.2300616262196046,
+       "compression": 0.43344470350227016,
+       "n": 60
+      },
+      "S2": {
+       "cos_brut": 0.5933894784914122,
+       "cos_dg": 0.17582345239956068,
+       "compression": 0.41756602609185156,
+       "n": 90
+      },
+      "S1": {
+       "cos_brut": 0.6294615918149551,
+       "cos_dg": 0.20327594702916774,
+       "compression": 0.42618564478578735,
+       "n": 360
+      },
+      "S0": {
+       "cos_brut": 0.5665702977114253,
+       "cos_dg": 0.15896987498469317,
+       "compression": 0.40760042272673214,
+       "n": 1260
+      }
+     },
+     "amplitude_de_compression": 0.02584428077553802,
+     "G": {
+      "gelee": true,
+      "seed": 0,
+      "dg_dim": 8192,
+      "dg_topk": 64,
+      "apprise": false,
+      "source_des_hyperparametres": "EngramConfig"
+     },
+     "M_instanciee": false,
+     "backprop": false,
+     "prediction": "compression croissante avec le cosinus brut",
+     "antipode": "compression uniforme ⇒ rééchelonnement, pas séparateur",
+     "statut": "DESCRIPTIF — aucune décision n'en dépend (§4.8)"
+    },
+    "A4_t_moins_1": {
+     "t_moins_1": {
+      "cos_S1": 0.565888716156284,
+      "cos_S0": 0.5700666889193512,
+      "M3_brut": -0.004177972763067195,
+      "n_S1": 360,
+      "n_S0": 1260
+     },
+     "t": {
+      "cos_S1": 0.6294615918149551,
+      "cos_S0": 0.5665702977114253,
+      "M3_brut": 0.06289129410352978,
+      "n_S1": 360,
+      "n_S0": 1260
+     },
+     "cardinal_D24b_a_t_moins_1": 14,
+     "paires_intra_tige_exclues": 150,
+     "discriminant": "confondant de COPIE DE TOKEN : la copie doit être bien plus forte à la capture qu'à t−1 ; profil identique aux deux positions ⇒ pas de signature de copie",
+     "statut": "DESCRIPTIF — aucune décision n'en dépend (§4.8)"
+    },
+    "P1_moins_P2": {
+     "P1": 1.0,
+     "P2": 1.0,
+     "P1_moins_P2": 0.0,
+     "n_requetes": 60,
+     "type_de_requete": "T1",
+     "lecture_gravee": "valeur positive ou nulle : NON INFORMATIVE ; seule une valeur strictement négative est informative (violerait la monotonie stochastique en σ)",
+     "informatif": false,
+     "statut": "DESCRIPTIF par 0-49 — aucune décision n'en dépend"
+    }
+   },
+   "instrumentation_apres_ce_modele": {
+    "profondeur_bootstrap": 0,
+    "rangs_calcules": 1620,
+    "rangs_calcules_dans_un_bootstrap": 0,
+    "quantites_t1": [
+     {
+      "nom": "profil A4 à t−1 (inter-tige)",
+      "n_paires_comparees": 1620,
+      "n_paires_intra_tige": 0,
+      "intra_tige": false
+     },
+     {
+      "nom": "profil A4 à t−1 (inter-tige)",
+      "n_paires_comparees": 1620,
+      "n_paires_intra_tige": 0,
+      "intra_tige": false
+     },
+     {
+      "nom": "profil A4 à t−1 (inter-tige)",
+      "n_paires_comparees": 1620,
+      "n_paires_intra_tige": 0,
+      "intra_tige": false
+     }
+    ]
+   },
+   "cause_C_ind": {
+    "cause": "famine par SATURATION",
+    "suite": "réduire la dominance de surface",
+    "classe_calibrateur": "N-b"
+   },
+   "phrase_G_bis_licenciee": true
+  }
+ },
+ "V-joint": "SANS OBJET",
+ "detail_V-joint": {
+  "raison": "aucune tige contributive sur aucun modele (famine globale)"
+ },
+ "portes_de_schema": {
+  "V-plafond": "PASS",
+  "V-calib": "PASS",
+  "V-perimetre": "PASS",
+  "V-bindur": "PASS",
+  "V-pool": "PASS",
+  "V-t1": "PASS",
+  "V-subst": "PASS",
+  "V-ord": "PASS",
+  "V-surprise": "FAIL",
+  "V-dtype": "PASS"
+ },
+ "detail_portes": {
+  "V-plafond": {
+   "champs_manquants": [],
+   "termes_interdits_detectes": []
+  },
+  "V-calib": {
+   "champs_manquants": [],
+   "champs_decisionnels_presents": [],
+   "termes_interdits_detectes": []
+  },
+  "V-perimetre": {
+   "elements_manquants": []
+  },
+  "V-bindur": {
+   "statut": "DESCRIPTIF",
+   "champ_decisionnel_present": false
+  },
+  "V-pool": {
+   "hash_avant": "6f4da9732254fa4a280d26d33f1280e4572f911dadb0a73c02fe208ded504e3b",
+   "hash_apres": "6f4da9732254fa4a280d26d33f1280e4572f911dadb0a73c02fe208ded504e3b",
+   "rangs_recalcules_dans_un_bootstrap": false,
+   "source": "instrumentation d'exécution",
+   "rangs_calcules": 1620,
+   "rangs_calcules_dans_un_bootstrap": 0
+  },
+  "V-t1": {
+   "quantites_t1": [
+    {
+     "nom": "profil A4 à t−1 (inter-tige)",
+     "n_paires_comparees": 1620,
+     "n_paires_intra_tige": 0,
+     "intra_tige": false
+    },
+    {
+     "nom": "profil A4 à t−1 (inter-tige)",
+     "n_paires_comparees": 1620,
+     "n_paires_intra_tige": 0,
+     "intra_tige": false
+    },
+    {
+     "nom": "profil A4 à t−1 (inter-tige)",
+     "n_paires_comparees": 1620,
+     "n_paires_intra_tige": 0,
+     "intra_tige": false
+    }
+   ],
+   "n_quantites_t1": 3,
+   "fautes": [],
+   "source": "registre d'exécution",
+   "cardinal_t1": 14,
+   "motif": "publier le cardinal 14 ne suffisait pas"
+  },
+  "V-subst": {
+   "substitutions": [],
+   "substitutions_de_famille_pontee": [],
+   "K_eff_republie": 10,
+   "regle": "réserve = stock de SUFFIXES qualifiés par sous-vivier, pas des familles ; tige morte ⇒ K_eff = 9 permis ; K_eff ≤ 8 ⇒ PI"
+  },
+  "V-ord": {
+   "comptage_execute": {
+    "ORD-1": 1,
+    "ORD-2": 6,
+    "ORD-3": 9,
+    "ORD-0": 9,
+    "ORD-4": 2,
+    "total": 27
+   },
+   "attendu": {
+    "ORD-1": 1,
+    "ORD-4": 2,
+    "ORD-2": 6,
+    "ORD-3": 9,
+    "ORD-0": 9,
+    "total": 27
+   },
+   "n_classes": 6
+  }
+ },
+ "instrumentation_du_run": {
+  "profondeur_bootstrap": 0,
+  "rangs_calcules": 1620,
+  "rangs_calcules_dans_un_bootstrap": 0,
+  "quantites_t1": [
+   {
+    "nom": "profil A4 à t−1 (inter-tige)",
+    "n_paires_comparees": 1620,
+    "n_paires_intra_tige": 0,
+    "intra_tige": false
+   },
+   {
+    "nom": "profil A4 à t−1 (inter-tige)",
+    "n_paires_comparees": 1620,
+    "n_paires_intra_tige": 0,
+    "intra_tige": false
+   },
+   {
+    "nom": "profil A4 à t−1 (inter-tige)",
+    "n_paires_comparees": 1620,
+    "n_paires_intra_tige": 0,
+    "intra_tige": false
+   }
+  ]
+ },
+ "schema_de_sortie": {
+  "classe": "N-b",
+  "delta_r1_inv_vs_cle_nulle": "compatible avec un encodage de surface ; le canal identité n'est pas adressé par cette primaire",
+  "delta_r1_inv_vs_plancher_lexical": "compatible avec un encodage de surface ; le canal identité n'est pas adressé par cette primaire",
+  "plancher_lexical_fraction": "36/37",
+  "hasard_tige_restreint_fraction": "1/6",
+  "plancher_par_domaine": {
+   "maritime": "36/37",
+   "culinaire": "36/37",
+   "astronomie": "36/37",
+   "textile": "36/37"
+  },
+  "phrase_perimetre": "la primaire 1 ne peut, à elle seule, distinguer un adressage représentationnel d'un transcript lexical ; cette distinction n'est pas au périmètre de ce run",
+  "bin_dur_statut": "DESCRIPTIF"
+ },
+ "perimetre": {
+  "mecanisme": "les suffixes étant globalement uniques, aucun concurrent ne partage le suffixe de la requête — ni la nulle 1/37 du calibrateur ni la nulle hypergéométrique de la primaire ne peuvent monitorer ce canal",
+  "limite_nommee": "aucune formulation du rapport ne peut exclure que l'effet mesuré transite par le canal suffixe",
+  "successeur_designe": "successeur de v4-matériel, matériau PROPRE requis (~20 tiges / 40 familles) : la cellule « suffixe partagé × domaine différent » est structurellement interdite sous C7, et la version intra-domaine ferait tomber K_eff à 5"
+ },
+ "probabilites_sous_la_nulle": {
+  "B": 200000,
+  "seed": 0,
+  "tau": 0.15,
+  "K_eff": 10,
+  "sigma_par_requete": 0.22933,
+  "SE": 0.07252,
+  "calibrateur": {
+   "N-a": 0.92379,
+   "N-ind": 0.03504,
+   "N-b": 0.04102,
+   "INVALIDE-INSTRUMENT": 0.00015
+  },
+  "bandes_primaire": {
+   "C-0": 0.93153,
+   "C-ind": 0.06806,
+   "C−": 0.0002,
+   "C+": 0.00021
+  },
+  "etats_de_maillon": {
+   "0-résolu": 0.93153,
+   "ind": 0.06806,
+   "−": 0.0002,
+   "+": 0.00021
+  },
+  "classes_ORD": {
+   "ORD-0": 0.80905,
+   "ORD-ind": 0.1906,
+   "ORD-3": 0.00017,
+   "ORD-2": 0.00018,
+   "ORD-4": 0.0,
+   "ORD-1": 0.0
+  },
+  "note": "publiées AVANT le run ; aucune relecture a posteriori n'est autorisée (§4.4, §4.5)"
+ },
+ "operationnalisations_declarees": {
+  "forme stratifiée-combinée de M1/M2/M3": "le protocole grave « Σ_domaines (observé − attendu-dans-la-strate) », sans dire à quelle strate appartient une paire INTER-domaines. Déclaré : une moyenne de strate est la moyenne NON PONDÉRÉE des moyennes intra-strate, les strates étant les 4 DOMAINES pour les quantités à domaine identique (S3, S1) et les 6 COUPLES de domaines pour les quantités à domaine différent (S2, S0). Rien n'est poolé ; la nulle de permutation intra-tige est calculée sur la MÊME fonctionnelle.",
+  "ΔR1_inv — R1": "`R1` est l'indicatrice de rang 1 parmi les 37 candidats (36 du pool `C5` gelé + la cible), égalités en MID-RANK (condition E2) : à `g` ex æquo en tête, la cible compte `1/g`.",
+  "clé nulle appariée": "la clé nulle de la requête `i` est l'état de la paire de cadre `i mod 40` dans le MÊME moule — même position de capture, même longueur en tokens (0-58). Appariement déterministe, déclaré, sans aléa.",
+  "clusters du calibrateur": "§4.4 fixe `K_eff = 10` : les clusters sont les 10 tiges DÉCISIONNELLES, et la statistique porte sur les 60 unités décisionnelles × 3 types = 180 requêtes. `C5` (« 72/72 requêtes ») est une CONDITION de génération vérifiée sur les 72 entités ; elle ne définit pas le support de la statistique. Inclure la réserve donnerait `K_eff = 14` et resserrerait l'IC sous la dérivation de `τ`.",
+  "unité de requête": "une requête est (unité, cellule de requête) ; la cellule de requête est l'AUTRE variante du MÊME type (invariance mesurée à trois transformations nommées, §8)."
+ },
+ "clause_NaN_D23": {
+  "etats_captures": {
+   "gpt2": true,
+   "HuggingFaceTB/SmolLM2-360M": true,
+   "Qwen/Qwen2.5-1.5B": true
+  },
+  "quantites_publiees_non_finies": [],
+  "regle": "reductions NaN-STRICTES ; une quantite sans domaine de definition est declaree SANS OBJET, jamais publiee en NaN"
+ },
+ "duree_totale_s": 196.58
+}

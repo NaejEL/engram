@@ -1,0 +1,154 @@
+==============================================================================
+BANC DE SATISFIABILITÉ (D14-S) — EXP-2026-08-27-plancher-base-sigma
+AUCUNE MESURE, AUCUN GPU, AUCUN POIDS DE MODÈLE. CPU seul.
+AUCUNE MESURE AVANT E = 0 (§6.A, critère d'abandon).
+==============================================================================
+[ok ] V-cache
+         pass_case cache v4 complet                                           → 'PASS'
+         fail_case modèle inexistant                                          → 'FAIL'
+[ok ] V-G (v2)
+         pass_case tolérance 1e−6                                             → 'PASS'
+         fail_case tolérance 0                                                → 'FAIL'
+[ok ] Q-M10 — identité 1 : γ_a = γ_b = 0 ⇒ P₃ = P₂·(1/128)
+         pass_case cinq ρ, γ nuls                                             → 'PASS'
+         fail_case cible P₂/64                                                → 'FAIL'
+[ok ] Q-M10 — identité 2 : tous cosinus = 1 ⇒ ρ̂ = 1
+         pass_case γ = ρ = 1                                                  → 'PASS'
+         fail_case γ clippé à 0.99                                            → 'FAIL'
+[ok ] Q-M10 — identité 3 : ρ = 0, γ = 0 ⇒ P₂ = (1/128)²
+         pass_case ρ = 0                                                      → 'PASS'
+         fail_case cible (1/64)²                                              → 'FAIL'
+[ok ] Q-M10 — quadrature 1-D contre-vérifiée
+         pass_case GL64 vs GL128 sur régime S3                                → 'PASS'
+         fail_case GL4 vs GL128                                               → 'FAIL'
+[ok ] Q-M10 — F₂ par deux chemins indépendants
+         pass_case six corrélations, quatre coins                             → 'PASS'
+         fail_case produit des marginales                                     → 'FAIL'
+[ok ] Q-M10 — Gram non-PSD ⇒ ARRÊT, jamais de clip
+         pass_case triples de régime S3, det > 0                              → 'PASS'
+         fail_case det < −1e−8                                                → 'FAIL'
+[ok ] Q-M10 — réduction à UN FACTEUR refusée hors S0
+         pass_case c_ab ≈ 0                                                   → 'PASS'
+         fail_case c_ab ∈ [0.35, 0.70]                                        → 'FAIL'
+[ok ] V-quad — exécutée et publiée AVANT toute mesure
+         pass_case prédictions calculées                                      → 'PASS'
+         fail_case V-quad non exécutée                                        → 'FAIL'
+[ok ] V-T — support vide, énuméré
+         pass_case énumération du matériau v4                                 → 'PASS'
+         fail_case déclaration sans énumération                               → 'FAIL'
+[ok ] V-appar — vivier N-état, lecture RELATIONNELLE (§14.2)
+         pass_case lecture relationnelle                                      → 'PASS'
+         fail_case lecture littérale                                          → 'FAIL'
+[ok ] V-vide — support vide ⇒ SANS OBJET, jamais 0
+         pass_case deux cellules à dénominateur non nul                       → 'PASS'
+         fail_case dénominateur nul                                           → 'FAIL'
+[ok ] V-ecriture — écriture littérale de Δ_Base (0-173)
+         pass_case écriture gravée                                            → 'PASS'
+         fail_case divergence des deux lectures                               → 'FAIL'
+[ok ] V-grappe — bootstrap par grappe, BLOQUANTE (0-170, 0-178)
+         pass_case 60 grappes, fraction de grappe manquante publiée           → 'PASS'
+         fail_case cardinal effectif retiré                                   → 'FAIL'
+[ok ] V-rang-def — r = max(rang_A, rang_B) gelé, planchers
+         pass_case profil conforme                                            → 'PASS'
+         fail_case bucket à 199 trials                                        → 'FAIL'
+[ok ] Fusion dyadique PRÉ-DÉCLARÉE des buckets
+         pass_case buckets sous plancher fusionnés mécaniquement              → 'PASS'
+         fail_case fusion conditionnée au résultat                            → 'FAIL'
+[ok ] Profil signé de σ± par bucket (§5-7)
+         pass_case profil décroissant en rang                                 → 'PASS'
+         fail_case profil plat                                                → 'FAIL'
+[ok ] V-ident — quantités forcées par une identité ((xxv))
+         pass_case déclarations complètes                                     → 'PASS'
+         fail_case cos des centroïdes retiré                                  → 'FAIL'
+[ok ] V-S — DEFF_S publié, formule binomiale INTERDITE (0-180)
+         pass_case 400 tirages de S                                           → 'PASS'
+         fail_case DEFF_S forcé à 1                                           → 'FAIL'
+[ok ] V-seed — présence, jamais vérité (0-145)
+         pass_case spec complète, seed = 0                                    → 'PASS'
+         fail_case générateur retiré                                          → 'FAIL'
+[ok ] V-loo — LOO principal, non-LOO descriptif (0-174)
+         pass_case les deux valeurs                                           → 'PASS'
+         fail_case LOO manquant                                               → 'FAIL'
+[ok ] V-decimales — ≥ 4 décimales (0-179)
+         pass_case quatre décimales                                           → 'PASS'
+         fail_case deux décimales                                             → 'FAIL'
+[ok ] V-P8 — ≥ 8 paires par cellule
+         pass_case P = 360 et 7560                                            → 'PASS'
+         fail_case P = 7                                                      → 'FAIL'
+[ok ] V-queue — t calculé au banc, jamais 2.66 en dur (0-177)
+         pass_case t calculé                                                  → 'PASS'
+         fail_case t en dur                                                   → 'FAIL'
+[ok ] V-diag — le couple (ρ_Base, ρ̂_Base) obligatoire (D34)
+         pass_case cellule complète                                           → 'PASS'
+         fail_case ρ̂_Base retiré                                             → 'FAIL'
+[ok ] Q-M11 — terme G de ε_R (plug-in)
+         pass_case plug-in sur données synthétiques                           → 'PASS'
+         fail_case terme G omis                                               → 'FAIL'
+[ok ] Q-M1-bis — simulation EXACTE à rang
+         pass_case Σ = I, N_G = 6                                             → 'PASS'
+         fail_case cardinal à seuil commun ≠ 64                               → 'FAIL'
+[ok ] Certification Q-M10 (iii) — inflation de eps_R
+         pass_case ecart 0.0026                                               → 'PASS'
+         fail_case ecart 0.0059                                               → 'FAIL'
+[ok ] Ordinal N6 — bootstrap JOINT, borne par le min (0-63)
+         pass_case deux bras identiques => ecart exactement nul               → 'PASS'
+         fail_case bras A vide                                                → 'FAIL'
+[ok ] Poids de bootstrap deux-voies (Q-M14 (b))
+         pass_case 200 paires aléatoires                                      → 'PASS'
+         fail_case m² sur une paire intra-tige                                → 'FAIL'
+[ok ] Partitions §4.5 — exhaustives, exclusives, ordre gravé (D18)
+         pass_case grille énumérée                                            → 'PASS'
+         fail_case ordre inversé                                              → 'FAIL'
+[ok ] Cardinaux comptés PAR ÉNUMÉRATION (§11.3)
+         pass_case énumération complète                                       → 'PASS'
+         fail_case prédiction d'adresse du §4.5                               → 'FAIL'
+[ok ] Q-M13 — Σ-mort ATTEIGNABLE, NON MODALE
+         pass_case frontières calculées                                       → 'PASS'
+         fail_case indépendance supposée                                      → 'FAIL'
+[ok ] V-mu — formules relues, second chemin, majorant de fuite (§4.6)
+         pass_case citations + double chemin + majorant                       → 'PASS'
+         pass_case identité μ^LOO − μ = (2/(n−2))(μ − h̄)                     → 'PASS'
+         fail_case formule absente du source                                  → 'FAIL'
+         fail_case les deux chemins divergent                                 → 'FAIL'
+         fail_case majorant de fuite non publié                               → 'FAIL'
+         fail_case facteur 1/(n−2) au lieu de 2/(n−2)                         → 'FAIL'
+[ok ] cos_p de σ̂±_pool — les TROIS lectures publiées côte à côte
+         pass_case trois lectures                                             → 'PASS'
+         pass_case trois lectures, cos_z décalé                               → 'PASS'
+         fail_case deux lectures SANS OBJET                                   → 'FAIL'
+[ok ] couplage de ε_Ψ à la lecture de cos_p — les DEUX publiés
+         pass_case les deux couplages                                         → 'PASS'
+         pass_case couplages identiques                                       → 'PASS'
+         fail_case un seul couplage                                           → 'FAIL'
+[ok ] profil_conforme_a_la_loi — opérationnalisation DÉCLARÉE (0-192)
+         pass_case résolution publiée                                         → 'PASS'
+         fail_case profil SmolLM2 non monotone                                → 'FAIL'
+[ok ] N_eff / DEFF / ρ_ic — deux routes NOMMÉES, écart publié
+         pass_case deux routes                                                → 'PASS'
+         fail_case une seule route                                            → 'FAIL'
+[ok ] N-queue — l'une des deux branches du §13.1, jamais aucune (0-191)
+         pass_case erreur mesurée sur poids à rang                            → 'PASS'
+         pass_case Gram CENTRÉ : cos de paire effondrés                       → 'PASS'
+         fail_case erreur affirmée                                            → 'FAIL'
+         fail_case Gram BRUT : σ̂± forcé à 1                                  → 'FAIL'
+[ok ] V-perimetre — 0 GPU, aucun forward, M jamais instanciée
+         pass_case lecture du source                                          → 'PASS'
+         fail_case motif cuda                                                 → 'FAIL'
+------------------------------------------------------------------------------
+clauses : 41  |  cas exécutés : 90  |  couverture : 100.0 %
+cardinaux énumérés : {'U_unites_decisionnelles': 60, 'T_cellules_de_capture': 6, 'cellules_decisionnelles': 12, 'vivier_N_etat_par_strate': {'S3': [1], 'S2': [0], 'S0': [24, 27, 30], 'S1': [9]}, 'attendu_14_2': {'S3': (1, 1), 'S2': (0, 0), 'S1': (9, 9), 'S0': (24, 30)}}
+constantes : {'t': 2.6600674686174592, 't_formule': 'ndtri(1 - 1/256)', '2Q(t)': 0.0078125, '(phi/Q)^2': 8.815564787235882, 'pente_Plackett': 4.407782393617941, 'k': 64, 'D': 8192, 'K_eff': 10, 'N_G': 200, 'N_buckets': 8, 'plancher_trials': 200, 'plancher_paires': 8, 'B_boot': 10000, 'tol_PSD': 1e-08, 'tol_sim_quad': 0.005, 'tol_quad_croisee': 1e-09}
+Q-M10 : PASS — id1=5.06e-18 id2=1.67e-13 id3=0.00e+00 GL64/GL128=3.21e-17 F2=1.38e-13
+sous-spécifiée : cos_p de σ̂±_pool — le §2.4 grave σ̂±_pool = Σ_p |A∩B|_p·σ̂±(cos_p,t)/Σ_p |A∩B|_p sans dire quel cos. DEUX lectures licites : le cosinus PLEIN des états sous la condition courante (h-space — la corrélation exacte du modèle pivot) ou le cos TRONQUÉ sur φ du cycle précédent. Déclaré : h-space PRINCIPAL ; z-space et tronqué publiés à côté (triple mesure D26). ARBITRAGE DEMANDÉ.
+sous-spécifiée : pondération d'un bucket dans σ̂±_pool — le poids gravé est |A∩B|_p ; dans un bucket, deux lectures licites — le |A∩B| TOTAL de la paire, ou le nombre de trials que la paire apporte À CE BUCKET. Déclaré : le second est PRINCIPAL (seul à pondérer chaque bucket par ce qu'il contient) ; le littéral est publié à côté. ARBITRAGE DEMANDÉ.
+sous-spécifiée : condition de la référence top64(G·x) — sous la condition `type`, A et B sont les supports d'états CENTRÉS ; le protocole ne dit pas si la référence l'est aussi. Déclaré : la condition n'affecte QUE A et B ; top64(G·x) est calculé sur x non centré, conformément au §5-5 (« différence uniquement dans x »).
+sous-spécifiée : R de la nulle N-état — le §8 grave « R tirages » sur un vivier FINI. Déclaré : le vivier est ÉNUMÉRÉ EXHAUSTIVEMENT (R = |vivier(p)|), ce qui rend n̄_p exacte et sans variance de tirage — cohérent avec le §14.4 (« en S3 le vivier est un singleton ⇒ R ≡ 1 »). Cardinal publié par strate.
+sous-spécifiée : ε_R littéral — le §4.4 grave ε_R = q₀.₉₅ de |R_Base| sur les rééchantillons, sans centrage. Appliqué LITTÉRALEMENT : ε_R contient donc la composante systématique de R_Base. Conséquence publiée, non corrigée.
+sous-spécifiée : B de ε_Ψ — le §4.4 grave B = 10⁴ ; le budget CPU gravé est < 10 min. Déclaré : B = 1000 pour ε_Ψ et 2000 pour N-grappe, RÉDUCTION PUBLIÉE, jamais absorbée. Défaut 0-189 CORRIGÉ : la phrase de réduction est désormais CONSTRUITE À PARTIR du champ `B`, elle ne peut plus le contredire.
+sous-spécifiée : profil conforme à la loi (conjoint de Σ-epuise) — la clause gelée §4.5 exige, pour Σ-epuise, un « profil conforme à la loi » ; le §5-7 dit « l'écart à 0.5 CROÎT avec la magnitude » sans dire comment le lire. Appliqué : comparaison de DEUX POINTS, |σ(b₁)−0.5| ≥ |σ(b_dernier)−0.5|. Cette lecture n'a AUCUNE résolution et ne voit pas les inversions internes. Sa marge, son rapport à ε_Ψ(b₁) et la monotonie COMPLÈTE par bucket sont publiés à côté. AUCUNE n'est promue — arbitrage PI.
+sous-spécifiée : couplage de ε_Ψ à la lecture de cos_p — ε_Ψ est le q₀.₉₅ de |Ψ| sous N-queue, et Ψ = σ± − σ̂±_pool dépend de la lecture de cos_p. DEUX couplages sont exécutables et le §4.4 ne les départage pas : (A) ε_Ψ recalculée SOUS LA MÊME lecture (cohérence interne — couplage IMPLÉMENTÉ) ; (B) ε_Ψ de la lecture PRINCIPALE appliquée aux Ψ des autres lectures. Les DEUX sont publiés avec leur classe. AUCUN n'est promu — ARBITRAGE PI DEMANDÉ. Conséquence gravée : toute classe Σ de ce run est CONDITIONNELLE.
+sous-spécifiée : centrage du Gram de la nulle N-queue à rang exact — 0-191 : σ± ne vit que sous la condition `type`, mais un Σ unique ne peut pas porter un centrage LOO-PAR-PAIRE. Déclaré : le Gram de la nulle centrée utilise la MOYENNE DE CELLULE (μ_type non-LOO) ; l'écart aux cosinus de paire sous le centrage LOO-par-paire est MESURÉ et publié, jamais supposé négligeable.
+------------------------------------------------------------------------------
+E(pbs) = 0  |  durée 4.09 s
+E = 0 — gate de satisfiabilité pbs VERTE.
+rapport : C:\Users\fuzzz\engram\experiments\results\plancher-base-sigma\gate_bench_pbs.json

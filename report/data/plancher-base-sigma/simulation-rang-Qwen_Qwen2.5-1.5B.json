@@ -1,0 +1,488 @@
+{
+  "N_G": 200,
+  "n_vecteurs": 361,
+  "seed": 0,
+  "t": 2.6600674686174592,
+  "departage_ex_aequo": "par INDICE (argsort stable) — déclaré ; probabilité d'ex æquo nulle p.s.",
+  "par_strate": {
+    "S3": {
+      "rho_Base_sim_moyenne": 0.5117636292690628,
+      "rho_Base_sim_sd": 0.033491388414549524,
+      "rho_Base_sim_ratio_des_esperances": 0.5129427555137186,
+      "biais_ratio_moins_esperance": -0.0011791262446557704,
+      "sigma_pm_sim_par_bucket": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "sigma_pm_sim_global": 1.0,
+      "trials_moyens_par_bucket": [
+        336.8,
+        460.81,
+        519.925,
+        565.495,
+        598.28,
+        626.72,
+        655.565,
+        676.92
+      ],
+      "N_queue_erreur_seuil_vs_rang": {
+        "lecture": "σ̂±_pool (seuil fixe) recalculée SUR la nulle à rang exact, mêmes poids, mêmes buckets",
+        "8_buckets": {
+          "niveau": "8 buckets de 8 rangs",
+          "n_buckets": 8,
+          "trials_par_bucket": [
+            67360.0,
+            92162.0,
+            103985.0,
+            113099.0,
+            119656.0,
+            125344.0,
+            131113.0,
+            135384.0
+          ],
+          "sigma_hat_pool_seuil_fixe": [
+            0.9999997453245183,
+            0.9999997139168623,
+            0.9999996912678809,
+            0.9999996837722516,
+            0.9999996697320986,
+            0.9999996677465102,
+            0.9999996509157523,
+            0.9999996480862793
+          ],
+          "sigma_pm_a_rang_exact": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "erreur_seuil_moins_rang": [
+            -2.546754817034369e-07,
+            -2.860831377349271e-07,
+            -3.087321190919923e-07,
+            -3.162277484314302e-07,
+            -3.302679013605925e-07,
+            -3.3225348983201286e-07,
+            -3.490842477305023e-07,
+            -3.5191372071974314e-07
+          ],
+          "erreur_absolue_max": 3.5191372071974314e-07,
+          "global_sigma_hat_pool": 0.9999996780024686,
+          "global_sigma_pm_a_rang": 1.0
+        },
+        "4_buckets_fusion_dyadique": {
+          "niveau": "4 buckets de 16 rangs (échelle des données)",
+          "n_buckets": 4,
+          "trials_par_bucket": [
+            159522.0,
+            217084.0,
+            245000.0,
+            266497.0
+          ],
+          "sigma_hat_pool_seuil_fixe": [
+            0.9999997271791063,
+            0.999999687362719,
+            0.9999996687162553,
+            0.9999996494783426
+          ],
+          "sigma_pm_a_rang_exact": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "erreur_seuil_moins_rang": [
+            -2.7282089365421314e-07,
+            -3.126372809525435e-07,
+            -3.3128374465896115e-07,
+            -3.5052165736626506e-07
+          ],
+          "erreur_absolue_max": 3.5052165736626506e-07,
+          "global_sigma_hat_pool": 0.9999996780024686,
+          "global_sigma_pm_a_rang": 1.0
+        },
+        "branche_du_13_1_honoree": "les DEUX : simulation exacte à rang ET erreur d'approximation seuil-vs-rang publiée pour σ̂±_pool"
+      }
+    },
+    "S2": {
+      "rho_Base_sim_moyenne": 0.589667548797052,
+      "rho_Base_sim_sd": 0.03736856861948239,
+      "rho_Base_sim_ratio_des_esperances": 0.5916685570518241,
+      "biais_ratio_moins_esperance": -0.0020010082547721186,
+      "sigma_pm_sim_par_bucket": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.9999796814614987,
+        1.0
+      ],
+      "sigma_pm_sim_global": 0.9999969066424698,
+      "trials_moyens_par_bucket": [
+        323.235,
+        482.115,
+        553.9,
+        615.09,
+        663.63,
+        704.575,
+        738.53,
+        768.025
+      ],
+      "N_queue_erreur_seuil_vs_rang": {
+        "lecture": "σ̂±_pool (seuil fixe) recalculée SUR la nulle à rang exact, mêmes poids, mêmes buckets",
+        "8_buckets": {
+          "niveau": "8 buckets de 8 rangs",
+          "n_buckets": 8,
+          "trials_par_bucket": [
+            64647.0,
+            96423.0,
+            110780.0,
+            123018.0,
+            132726.0,
+            140915.0,
+            147706.0,
+            153605.0
+          ],
+          "sigma_hat_pool_seuil_fixe": [
+            0.9999987030455783,
+            0.9999986085543885,
+            0.999998546536732,
+            0.999998498962584,
+            0.9999984501400586,
+            0.9999984513486405,
+            0.9999984357355438,
+            0.9999984002744302
+          ],
+          "sigma_pm_a_rang_exact": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            0.9999796893829634,
+            1.0
+          ],
+          "erreur_seuil_moins_rang": [
+            -1.2969544217478202e-06,
+            -1.3914456115093898e-06,
+            -1.453463267964139e-06,
+            -1.5010374160295825e-06,
+            -1.5498599413854564e-06,
+            -1.5486513594842322e-06,
+            1.874635258036772e-05,
+            -1.5997255697897117e-06
+          ],
+          "erreur_absolue_max": 1.874635258036772e-05,
+          "global_sigma_hat_pool": 0.9999984900364365,
+          "global_sigma_pm_a_rang": 0.9999969066424698
+        },
+        "4_buckets_fusion_dyadique": {
+          "niveau": "4 buckets de 16 rangs (échelle des données)",
+          "n_buckets": 4,
+          "trials_par_bucket": [
+            161070.0,
+            233798.0,
+            273641.0,
+            301311.0
+          ],
+          "sigma_hat_pool_seuil_fixe": [
+            0.9999986464793401,
+            0.9999985215045395,
+            0.9999984507624335,
+            0.9999984176578619
+          ],
+          "sigma_pm_a_rang_exact": [
+            1.0,
+            1.0,
+            1.0,
+            0.9999900435098619
+          ],
+          "erreur_seuil_moins_rang": [
+            -1.3535206598858096e-06,
+            -1.4784954605051581e-06,
+            -1.5492375664560853e-06,
+            8.374148000034332e-06
+          ],
+          "erreur_absolue_max": 8.374148000034332e-06,
+          "global_sigma_hat_pool": 0.9999984900364365,
+          "global_sigma_pm_a_rang": 0.9999969066424698
+        },
+        "branche_du_13_1_honoree": "les DEUX : simulation exacte à rang ET erreur d'approximation seuil-vs-rang publiée pour σ̂±_pool"
+      }
+    },
+    "S1": {
+      "rho_Base_sim_moyenne": 0.5484783066540063,
+      "rho_Base_sim_sd": 0.03430802849274439,
+      "rho_Base_sim_ratio_des_esperances": 0.5499844491948626,
+      "biais_ratio_moins_esperance": -0.0015061425408562368,
+      "sigma_pm_sim_par_bucket": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.9999983633387889,
+        0.9999985268120213,
+        0.9999956545108057,
+        0.9999985528219972
+      ],
+      "sigma_pm_sim_global": 0.9999986858474532,
+      "trials_moyens_par_bucket": [
+        1638.765,
+        2318.225,
+        2640.075,
+        2892.975,
+        3103.705,
+        3267.585,
+        3416.895,
+        3550.175
+      ],
+      "N_queue_erreur_seuil_vs_rang": {
+        "lecture": "σ̂±_pool (seuil fixe) recalculée SUR la nulle à rang exact, mêmes poids, mêmes buckets",
+        "8_buckets": {
+          "niveau": "8 buckets de 8 rangs",
+          "n_buckets": 8,
+          "trials_par_bucket": [
+            327753.0,
+            463645.0,
+            528015.0,
+            578595.0,
+            620741.0,
+            653517.0,
+            683379.0,
+            710035.0
+          ],
+          "sigma_hat_pool_seuil_fixe": [
+            0.999999452802196,
+            0.9999993813238375,
+            0.999999366527142,
+            0.9999993349307412,
+            0.9999993066041799,
+            0.9999992958426094,
+            0.9999992843164323,
+            0.9999992656783434
+          ],
+          "sigma_pm_a_rang_exact": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            0.9999983890221525,
+            0.9999984698179236,
+            0.9999956100494748,
+            0.9999985916187231
+          ],
+          "erreur_seuil_moins_rang": [
+            -5.471978039572889e-07,
+            -6.186761625226467e-07,
+            -6.33472857947126e-07,
+            -6.650692587761853e-07,
+            9.1758202735992e-07,
+            8.260246857627607e-07,
+            3.6742669574652e-06,
+            6.740596203425042e-07
+          ],
+          "erreur_absolue_max": 3.6742669574652e-06,
+          "global_sigma_hat_pool": 0.9999993239657644,
+          "global_sigma_pm_a_rang": 0.9999986858474532
+        },
+        "4_buckets_fusion_dyadique": {
+          "niveau": "4 buckets de 16 rangs (échelle des données)",
+          "n_buckets": 4,
+          "trials_par_bucket": [
+            791398.0,
+            1106610.0,
+            1274258.0,
+            1393414.0
+          ],
+          "sigma_hat_pool_seuil_fixe": [
+            0.9999994109261948,
+            0.9999993500068508,
+            0.9999993010849921,
+            0.9999992748191145
+          ],
+          "sigma_pm_a_rang_exact": [
+            1.0,
+            1.0,
+            0.9999984304591378,
+            0.9999971293527983
+          ],
+          "erreur_seuil_moins_rang": [
+            -5.890738051794742e-07,
+            -6.499931491932287e-07,
+            8.706258542989787e-07,
+            2.1454663162723264e-06
+          ],
+          "erreur_absolue_max": 2.1454663162723264e-06,
+          "global_sigma_hat_pool": 0.9999993239657644,
+          "global_sigma_pm_a_rang": 0.9999986858474532
+        },
+        "branche_du_13_1_honoree": "les DEUX : simulation exacte à rang ET erreur d'approximation seuil-vs-rang publiée pour σ̂±_pool"
+      }
+    },
+    "S0": {
+      "rho_Base_sim_moyenne": 0.617473655801414,
+      "rho_Base_sim_sd": 0.03595091717565733,
+      "rho_Base_sim_ratio_des_esperances": 0.6197041918708507,
+      "biais_ratio_moins_esperance": -0.002230536069436684,
+      "sigma_pm_sim_par_bucket": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.9999974658448116,
+        0.999993827751786,
+        0.9999919756112439,
+        0.9999872342839217
+      ],
+      "sigma_pm_sim_global": 0.9999954613695292,
+      "trials_moyens_par_bucket": [
+        3900.54,
+        5887.59,
+        6874.82,
+        7671.43,
+        8314.35,
+        8854.455,
+        9334.59,
+        9753.19
+      ],
+      "N_queue_erreur_seuil_vs_rang": {
+        "lecture": "σ̂±_pool (seuil fixe) recalculée SUR la nulle à rang exact, mêmes poids, mêmes buckets",
+        "8_buckets": {
+          "niveau": "8 buckets de 8 rangs",
+          "n_buckets": 8,
+          "trials_par_bucket": [
+            780108.0,
+            1177518.0,
+            1374964.0,
+            1534286.0,
+            1662870.0,
+            1770891.0,
+            1866918.0,
+            1950638.0
+          ],
+          "sigma_hat_pool_seuil_fixe": [
+            0.9999962968134873,
+            0.9999959985875116,
+            0.9999958184013309,
+            0.9999956596447248,
+            0.9999955668524926,
+            0.9999954841111538,
+            0.9999954366133584,
+            0.9999953875734517
+          ],
+          "sigma_pm_a_rang_exact": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            0.9999975945203173,
+            0.9999937884375718,
+            0.9999919653675201,
+            0.9999871836804164
+          ],
+          "erreur_seuil_moins_rang": [
+            -3.703186512660217e-06,
+            -4.001412488352507e-06,
+            -4.181598669106279e-06,
+            -4.340355275189722e-06,
+            -2.027667824755497e-06,
+            1.6956735819917412e-06,
+            3.4712458383268086e-06,
+            8.203893035352294e-06
+          ],
+          "erreur_absolue_max": 8.203893035352294e-06,
+          "global_sigma_hat_pool": 0.9999956350709475,
+          "global_sigma_pm_a_rang": 0.9999954613695292
+        },
+        "4_buckets_fusion_dyadique": {
+          "niveau": "4 buckets de 16 rangs (échelle des données)",
+          "n_buckets": 4,
+          "trials_par_bucket": [
+            1957626.0,
+            2909250.0,
+            3433761.0,
+            3817556.0
+          ],
+          "sigma_hat_pool_seuil_fixe": [
+            0.9999961174296549,
+            0.999995734675959,
+            0.9999955241803636,
+            0.9999954115556762
+          ],
+          "sigma_pm_a_rang_exact": [
+            1.0,
+            1.0,
+            0.9999956316121011,
+            0.9999895220921449
+          ],
+          "erreur_seuil_moins_rang": [
+            -3.882570345115077e-06,
+            -4.265324040964025e-06,
+            -1.074317375060474e-07,
+            5.889463531305594e-06
+          ],
+          "erreur_absolue_max": 5.889463531305594e-06,
+          "global_sigma_hat_pool": 0.9999956350709475,
+          "global_sigma_pm_a_rang": 0.9999954613695292
+        },
+        "branche_du_13_1_honoree": "les DEUX : simulation exacte à rang ET erreur d'approximation seuil-vs-rang publiée pour σ̂±_pool"
+      }
+    }
+  },
+  "duree_s": 128.48,
+  "ecart_gamma_LOO_moins_non_LOO": {
+    "moyen": -0.001795891592538607,
+    "max_absolu": 0.002560525297697014
+  },
+  "inflation_epsilon_R": {
+    "S3": {
+      "ecart": 0.005255813585289926,
+      "tolerance": 0.005,
+      "exces": 0.0002558135852899256,
+      "certifiee": false,
+      "rho_Base_sim": 0.5129427555137186,
+      "rho_chapeau_quad": 0.5076869419284287,
+      "regle": "au-delà de la tolérance, l'excès s'ajoute à ε_R (inflation publiée) ; la forme gelée ne change pas"
+    },
+    "S2": {
+      "ecart": 0.005855800158397373,
+      "tolerance": 0.005,
+      "exces": 0.0008558001583973728,
+      "certifiee": false,
+      "rho_Base_sim": 0.5916685570518241,
+      "rho_chapeau_quad": 0.5858127568934267,
+      "regle": "au-delà de la tolérance, l'excès s'ajoute à ε_R (inflation publiée) ; la forme gelée ne change pas"
+    },
+    "S1": {
+      "ecart": 0.004568045359130246,
+      "tolerance": 0.005,
+      "exces": 0.0,
+      "certifiee": true,
+      "rho_Base_sim": 0.5499844491948626,
+      "rho_chapeau_quad": 0.5454164038357323,
+      "regle": "au-delà de la tolérance, l'excès s'ajoute à ε_R (inflation publiée) ; la forme gelée ne change pas"
+    },
+    "S0": {
+      "ecart": 0.005524783486428819,
+      "tolerance": 0.005,
+      "exces": 0.0005247834864288191,
+      "certifiee": false,
+      "rho_Base_sim": 0.6197041918708507,
+      "rho_chapeau_quad": 0.6141794083844219,
+      "regle": "au-delà de la tolérance, l'excès s'ajoute à ε_R (inflation publiée) ; la forme gelée ne change pas"
+    }
+  }
+}

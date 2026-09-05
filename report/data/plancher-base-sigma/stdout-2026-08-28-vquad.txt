@@ -1,0 +1,125 @@
+model=gpt2 layer=6 lam=2.0 eta=0.2 decay=0.001 thr=4.0 prune=512/0.1 hebb_only=False dg=8192/64 gate=keysim
+
+V-cache : PASS
+  gpt2
+    sha256 = 5ac90c5b49b1c072dfbded36baade788f07c5195d80b1e85a3777cab354c6ed6
+    23461342 octets, dtype=float32, forme=[13, 132, 768]
+  HuggingFaceTB/SmolLM2-360M
+    sha256 = 6553621b4d0be03b90b8efc000bd5e62486fec9a1eda6bdbbf8ab6ae7d2104f5
+    74635393 octets, dtype=float32, forme=[33, 132, 960]
+  Qwen/Qwen2.5-1.5B
+    sha256 = f3792daebf611d957acb44d95861546b084253c4ab70ad3821d8833cf5c4d7dd
+    104260274 octets, dtype=float32, forme=[29, 132, 1536]
+
+V-G (v2) : PASS
+
+  gpt2 (couche 6, d=768)
+    G du projet : sha256 = 681252f3beca09826ac3be75a271ef46461ab4bb989bfd66767958d2ffb219ad
+                  torch.randn(dg_dim, d, generator=manual_seed(seed)), seed 0, forme [8192, 768], aucune (pas de 1/√d)
+    cos φ(h) fp32 : S3=0.276588062776, S2=0.206956939661, S1=0.247890068261, S0=0.188645840410
+    cos φ(h) fp64 : S3=0.276588063871, S2=0.206956940096, S1=0.247890069293, S0=0.188645841005
+    écart fp64−fp32 : S3=+1.094e-09, S2=+4.347e-10, S1=+1.032e-09, S0=+5.958e-10
+    écart max de précision = 1.094e-09 (tolérance 1e-06)
+    divergence avec A3 (obligatoire) : écart cos fp32 − A3 = S3=-7.232e-03, S2=-7.596e-03, S1=-9.392e-03, S0=-4.020e-03
+      corrcoef(G projet, G d'A3) = -0.0008 — A3 porte sur une AUTRE projection (G tirée par numpy, 0-135) : aucune reproduction d'A3 n'est exigée ni possible
+    V-iid : PASS (moyenne -0.00327, σ 1.00048)
+
+  HuggingFaceTB/SmolLM2-360M (couche 16, d=960)
+    G du projet : sha256 = 826dd4f94d9a35cef78542f862638f7b410234f89017fdfc33782b7354aa3fc5
+                  torch.randn(dg_dim, d, generator=manual_seed(seed)), seed 0, forme [8192, 960], aucune (pas de 1/√d)
+    cos φ(h) fp32 : S3=0.336840851564, S2=0.256560865783, S1=0.317424472180, S0=0.256770213453
+    cos φ(h) fp64 : S3=0.336840850053, S2=0.256560869561, S1=0.317424472220, S0=0.256770215054
+    écart fp64−fp32 : S3=-1.510e-09, S2=+3.778e-09, S1=+4.021e-11, S0=+1.600e-09
+    écart max de précision = 3.778e-09 (tolérance 1e-06)
+    divergence avec A3 (obligatoire) : écart cos fp32 − A3 = S3=-3.260e-03, S2=-2.589e-02, S1=-8.727e-03, S0=-1.900e-02
+      corrcoef(G projet, G d'A3) = +0.0009 — A3 porte sur une AUTRE projection (G tirée par numpy, 0-135) : aucune reproduction d'A3 n'est exigée ni possible
+    V-iid : PASS (moyenne -0.00269, σ 1.00094)
+
+  Qwen/Qwen2.5-1.5B (couche 14, d=1536)
+    G du projet : sha256 = bcc2f18242d6b4142ce25e37babc5ca79360cde62ebd6b5e26c0c9cb29264b18
+                  torch.randn(dg_dim, d, generator=manual_seed(seed)), seed 0, forme [8192, 1536], aucune (pas de 1/√d)
+    cos φ(h) fp32 : S3=0.218441531248, S2=0.163589003899, S1=0.188321974604, S0=0.147121119160
+    cos φ(h) fp64 : S3=0.218441531374, S2=0.163589004575, S1=0.188321974861, S0=0.147121119433
+    écart fp64−fp32 : S3=+1.252e-10, S2=+6.756e-10, S1=+2.568e-10, S0=+2.731e-10
+    écart max de précision = 6.756e-10 (tolérance 1e-06)
+    divergence avec A3 (obligatoire) : écart cos fp32 − A3 = S3=-1.162e-02, S2=-1.223e-02, S1=-1.495e-02, S0=-1.185e-02
+      corrcoef(G projet, G d'A3) = -0.0012 — A3 porte sur une AUTRE projection (G tirée par numpy, 0-135) : aucune reproduction d'A3 n'est exigée ni possible
+    V-iid : PASS (moyenne -0.00118, σ 0.99980)
+
+V-norm : PASS
+  gpt2                             LayerNorm  centre=True | "layer_norm_epsilon": 1e-05
+  HuggingFaceTB/SmolLM2-360M       RMSNorm    centre=False | "rms_norm_eps": 1e-05
+  Qwen/Qwen2.5-1.5B                RMSNorm    centre=False | "rms_norm_eps": 1e-06
+  portes de provenance publiées dans : C:\Users\fuzzz\engram\experiments\results\recouvrement-supports, C:\Users\fuzzz\engram\experiments\results\plancher-base-sigma
+
+t = ndtri(1 - 1/256) = 2.660067468617459   (2Q(t) = 0.007812500000 ; (φ/Q)² = 8.815565 ; pente Plackett = 4.407782)
+
+Q-M10 — vérifications numériques : PASS
+    identite_1_gamma_nuls_P3_egale_P2_sur_128                  = 5.055e-18
+    identite_2_tous_cosinus_1_rho_chapeau_egale_1              = 1.666e-13
+    identite_3_rho_0_gamma_0_P2_egale_1_sur_128_carre          = 0.000e+00
+    ecart_GL64_GL128                                           = 3.209e-17
+    ecart_GL64_GaussKronrod_adaptatif                          = 2.205e-17
+    ecart_F2_nominal_vs_independant                            = 1.382e-13
+
+V-ident : PASS  (5 quantités forcées déclarées AVANT mesure)
+
+--- V-mu ---
+  gpt2 (couche 6) : PASS
+      mu_global                  l. [4772]  unique=True  « mu_glob = Sh / n_global »
+      mu_global_LOO_par_paire    l. [4806]  unique=True  « mu_h = (Sh[None, :] - Hc[a] - Hc[b]) / (n_global - 2) »
+      mu_type_LOO_par_paire      l. [4807]  unique=True  « mu_type_h = (sHc[None, :] - Hc[a] - Hc[b]) / (n_dec - 2) »
+      top64_de_G_x               l. [324]  unique=True  « def support_topk(z, k: int = K_TOPK): »
+      μ_global, deux chemins : écart relatif = 0.000e+00 (tolérance 1e-12) ; écart max par coordonnée = 0.000e+00 ; cos = 1.000000000000000
+      majorant de fuite : ‖Δμ‖/‖μ‖ ≤ 0.00413 ; |Δγ| ≤ 0.00259 ; dρ̂/dγ = +3.0066 ⇒ fuite sur ρ_Base ≤ 0.00778 (annoncé au §3.2 : 5e-03)
+  HuggingFaceTB/SmolLM2-360M (couche 16) : PASS
+      mu_global                  l. [4772]  unique=True  « mu_glob = Sh / n_global »
+      mu_global_LOO_par_paire    l. [4806]  unique=True  « mu_h = (Sh[None, :] - Hc[a] - Hc[b]) / (n_global - 2) »
+      mu_type_LOO_par_paire      l. [4807]  unique=True  « mu_type_h = (sHc[None, :] - Hc[a] - Hc[b]) / (n_dec - 2) »
+      top64_de_G_x               l. [324]  unique=True  « def support_topk(z, k: int = K_TOPK): »
+      μ_global, deux chemins : écart relatif = 0.000e+00 (tolérance 1e-12) ; écart max par coordonnée = 0.000e+00 ; cos = 1.000000000000000
+      majorant de fuite : ‖Δμ‖/‖μ‖ ≤ 0.00349 ; |Δγ| ≤ 0.00198 ; dρ̂/dγ = +3.2176 ⇒ fuite sur ρ_Base ≤ 0.00636 (annoncé au §3.2 : 5e-03)
+  Qwen/Qwen2.5-1.5B (couche 14) : PASS
+      mu_global                  l. [4772]  unique=True  « mu_glob = Sh / n_global »
+      mu_global_LOO_par_paire    l. [4806]  unique=True  « mu_h = (Sh[None, :] - Hc[a] - Hc[b]) / (n_global - 2) »
+      mu_type_LOO_par_paire      l. [4807]  unique=True  « mu_type_h = (sHc[None, :] - Hc[a] - Hc[b]) / (n_dec - 2) »
+      top64_de_G_x               l. [324]  unique=True  « def support_topk(z, k: int = K_TOPK): »
+      μ_global, deux chemins : écart relatif = 0.000e+00 (tolérance 1e-12) ; écart max par coordonnée = 0.000e+00 ; cos = 1.000000000000000
+      majorant de fuite : ‖Δμ‖/‖μ‖ ≤ 0.00517 ; |Δγ| ≤ 0.00364 ; dρ̂/dγ = +2.7767 ⇒ fuite sur ρ_Base ≤ 0.01012 (annoncé au §3.2 : 5e-03)
+
+V-mu : PASS
+
+--- V-quad : gpt2 (couche 6) ---
+    aucun  S3 : P =   360  γ̄ = +0.8063  ρ̄_ab = +0.7434  c̄_ab = +0.2714  ρ̂_Base = 0.6239  Δ̂_Base = 0.1388
+    aucun  S2 : P =   540  γ̄ = +0.8065  ρ̄_ab = +0.6804  c̄_ab = +0.0862  ρ̂_Base = 0.7076  Δ̂_Base = SANS OBJET
+    aucun  S1 : P =  2160  γ̄ = +0.8064  ρ̄_ab = +0.7177  c̄_ab = +0.1960  ρ̂_Base = 0.6576  Δ̂_Base = 0.2050
+    aucun  S0 : P =  7560  γ̄ = +0.8066  ρ̄_ab = +0.6556  c̄_ab = +0.0139  ρ̂_Base = 0.7379  Δ̂_Base = 0.3552
+    type   S3 : P =   360  γ̄ = -0.0022  ρ̄_ab = +0.2392  c̄_ab = +0.2402  ρ̂_Base = 0.0106  Δ̂_Base = -0.0132
+    type   S2 : P =   540  γ̄ = -0.0018  ρ̄_ab = +0.0422  c̄_ab = +0.0417  ρ̂_Base = 0.0126  Δ̂_Base = SANS OBJET
+    type   S1 : P =  2160  γ̄ = -0.0021  ρ̄_ab = +0.1585  c̄_ab = +0.1597  ρ̂_Base = 0.0117  Δ̂_Base = -0.0069
+    type   S0 : P =  7560  γ̄ = -0.0016  ρ̄_ab = -0.0363  c̄_ab = -0.0367  ρ̂_Base = 0.0126  Δ̂_Base = -0.0007
+
+--- V-quad : HuggingFaceTB/SmolLM2-360M (couche 16) ---
+    aucun  S3 : P =   360  γ̄ = +0.8522  ρ̄_ab = +0.7886  c̄_ab = +0.2320  ρ̂_Base = 0.7010  Δ̂_Base = 0.1591
+    aucun  S2 : P =   540  γ̄ = +0.8524  ρ̄_ab = +0.7404  c̄_ab = +0.0535  ρ̂_Base = 0.7696  Δ̂_Base = SANS OBJET
+    aucun  S1 : P =  2160  γ̄ = +0.8522  ρ̄_ab = +0.7794  c̄_ab = +0.1980  ρ̂_Base = 0.7158  Δ̂_Base = 0.1873
+    aucun  S0 : P =  7560  γ̄ = +0.8524  ρ̄_ab = +0.7364  c̄_ab = +0.0371  ρ̂_Base = 0.7753  Δ̂_Base = 0.3004
+    type   S3 : P =   360  γ̄ = +0.0014  ρ̄_ab = +0.1857  c̄_ab = +0.1859  ρ̂_Base = 0.0095  Δ̂_Base = -0.0071
+    type   S2 : P =   540  γ̄ = +0.0018  ρ̄_ab = -0.0099  c̄_ab = -0.0093  ρ̂_Base = 0.0103  Δ̂_Base = SANS OBJET
+    type   S1 : P =  2160  γ̄ = +0.0015  ρ̄_ab = +0.1489  c̄_ab = +0.1494  ρ̂_Base = 0.0100  Δ̂_Base = -0.0053
+    type   S0 : P =  7560  γ̄ = +0.0018  ρ̄_ab = -0.0271  c̄_ab = -0.0273  ρ̂_Base = 0.0105  Δ̂_Base = -0.0015
+
+--- V-quad : Qwen/Qwen2.5-1.5B (couche 14) ---
+    aucun  S3 : P =   360  γ̄ = +0.7256  ρ̄_ab = +0.6635  c̄_ab = +0.2920  ρ̂_Base = 0.5077  Δ̂_Base = 0.1093
+    aucun  S2 : P =   540  γ̄ = +0.7259  ρ̄_ab = +0.5934  c̄_ab = +0.1411  ρ̂_Base = 0.5858  Δ̂_Base = SANS OBJET
+    aucun  S1 : P =  2160  γ̄ = +0.7257  ρ̄_ab = +0.6295  c̄_ab = +0.2190  ρ̂_Base = 0.5454  Δ̂_Base = 0.1873
+    aucun  S0 : P =  7560  γ̄ = +0.7260  ρ̄_ab = +0.5666  c̄_ab = +0.0838  ρ̂_Base = 0.6142  Δ̂_Base = 0.3184
+    type   S3 : P =   360  γ̄ = -0.0013  ρ̄_ab = +0.2127  c̄_ab = +0.2128  ρ̂_Base = 0.0089  Δ̂_Base = -0.0181
+    type   S2 : P =   540  γ̄ = -0.0009  ρ̄_ab = +0.0397  c̄_ab = +0.0392  ρ̂_Base = 0.0091  Δ̂_Base = SANS OBJET
+    type   S1 : P =  2160  γ̄ = -0.0011  ρ̄_ab = +0.1293  c̄_ab = +0.1295  ρ̂_Base = 0.0089  Δ̂_Base = -0.0062
+    type   S0 : P =  7560  γ̄ = -0.0007  ρ̄_ab = -0.0263  c̄_ab = -0.0264  ρ̂_Base = 0.0091  Δ̂_Base = -0.0023
+
+V-quad : PASS — B-mort declaree QUASI INATTEIGNABLE AVANT mesure sur la condition PRIMAIRE `aucun` (rho_chapeau_Base dans [0.5077, 0.7753]) ; double mesure D26 condition `type` : [0.0089, 0.0126] => ATTEIGNABLE
+
+temps CPU total : 191.8 s
+V-quad exécutée et publiée. Relancer sans --quad pour la mesure.

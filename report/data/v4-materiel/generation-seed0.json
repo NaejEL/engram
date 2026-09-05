@@ -1,0 +1,62 @@
+{
+ "command": ".venv\\Scripts\\python eval\\pool_v4.py",
+ "condition": "generation-materiau",
+ "seed": 0,
+ "config": "model=gpt2 layer=6 lam=2.0 eta=0.2 decay=0.001 thr=4.0 prune=512/0.1 hebb_only=False dg=8192/64 gate=keysim dataset=pool_v4",
+ "metrics": {
+  "verdict_generation": "PASS",
+  "portes_en_echec": [],
+  "sha256_materiau": "6f4da9732254fa4a280d26d33f1280e4572f911dadb0a73c02fe208ded504e3b",
+  "prerequis_instrument": "PASS",
+  "garanties_D25": {
+   "V-C1": "PASS",
+   "V-C1p": "PASS",
+   "V-C2": "PASS",
+   "V-C3": "PASS",
+   "V-C4": "PASS",
+   "V-C5": "PASS",
+   "V-C6": "PASS",
+   "V-casse": "PASS",
+   "V-C7": "PASS",
+   "V-m1": "PASS",
+   "V-Keff": "PASS",
+   "V-P2": "PASS",
+   "V-var-dist": "PASS",
+   "V-freq": "PASS",
+   "V-periode": "PASS",
+   "V-div4": "PASS",
+   "V-paires4": "PASS",
+   "V-D24b": "PASS",
+   "V-cadre": "PASS",
+   "V-nouveaute": "PASS",
+   "V-ordre": "PASS"
+  },
+  "contre_exemple_fact_pairs": {
+   "C1": "FAIL",
+   "C2": "FAIL",
+   "S-1": "FAIL",
+   "n": 30,
+   "prefixes_distincts": 30,
+   "longueurs_de_slot_observees": [
+    2,
+    3
+   ],
+   "verdict": "ÉCHEC ATTENDU"
+  },
+  "cascade_executee": [
+   "1-Le=2-3-tokenizers",
+   "2-sous-viviers-domaine-C7",
+   "3-structure-tige-suffixe-ponts",
+   "4-moules-egalisation-prefixe-distance-lexicale",
+   "5-appariement-bandes-frequence-V-freq",
+   "6-type-capitalise",
+   "7-nulle-de-cadre-40-paires"
+  ]
+ },
+ "writes": "sans objet (M jamais instanciee)",
+ "duration_s": 7.41,
+ "device": "cpu (3 tokenizers HF en cache)",
+ "stdout": "==============================================================================\nMATÉRIAU v4 — génération et qualification (aucun GPU, aucun modèle)\nprotocole : experiments/EXP-2026-08-23-v4-materiel.md  |  statut : PRE-ENREGISTRE\nconfig    : model=gpt2 layer=6 lam=2.0 eta=0.2 decay=0.001 thr=4.0 prune=512/0.1 hebb_only=False dg=8192/64 gate=keysim dataset=pool_v4\ndataset   : pool_v4   seed : 0\nsha256    : 6f4da9732254fa4a280d26d33f1280e4…\n==============================================================================\n[cascade] 1-Le=2-3-tokenizers\n          rendement_suffixes = {'maritime': [35, 33], 'culinaire': [34, 34], 'astronomie': [30, 30], 'textile': [35, 35]}\n          rendement_tiges = [93, 57]\n          rendement_cadre = [153, 150, 150]\n[cascade] 2-sous-viviers-domaine-C7\n          collisions_inter_sous_viviers = []\n          taille_sous_viviers = {'maritime': 33, 'culinaire': 34, 'astronomie': 30, 'textile': 35}\n[cascade] 3-structure-tige-suffixe-ponts\n          tiges_pontees = ['Iron', 'Silver', 'North', 'River', 'Storm', 'Golden', 'Copper', 'Hollow', 'Frost', 'Shadow']\n          tiges_simples = ['Stone', 'Bright', 'Quiet', 'Summer']\n          affectation_domaines = {'North': ['maritime', 'culinaire'], 'Storm': ['maritime', 'astronomie'], 'Iron': ['maritime', 'textile'], 'River': ['culinaire', 'astronomie'], 'Silver': ['culinaire', 'textile'], 'Shadow': ['astronomie', 'textile'], 'Golden': ['maritime', 'culinaire'], 'Copper': ['astronomie', 'textile'], 'Hollow': ['maritime', 'astronomie'], 'Frost': ['culinaire', 'textile']}\n          n_familles_decisionnelles = 20\n          n_familles_reserve = 4\n[cascade] 4-moules-egalisation-prefixe-distance-lexicale\n          cellules = {'T1-A': {'gpt2': 8, 'HuggingFaceTB/SmolLM2-360M': 8, 'Qwen/Qwen2.5-1.5B': 8}, 'T1-B': {'gpt2': 8, 'HuggingFaceTB/SmolLM2-360M': 8, 'Qwen/Qwen2.5-1.5B': 8}, 'T2-A': {'gpt2': 7, 'HuggingFaceTB/SmolLM2-360M': 7, 'Qwen/Qwen2.5-1.5B': 7}, 'T2-B': {'gpt2': 7, 'HuggingFaceTB/SmolLM2-360M': 7, 'Qwen/Qwen2.5-1.5B': 7}, 'T3-A': {'gpt2': 6, 'HuggingFaceTB/SmolLM2-360M': 6, 'Qwen/Qwen2.5-1.5B': 6}, 'T3-B': {'gpt2': 6, 'HuggingFaceTB/SmolLM2-360M': 6, 'Qwen/Qwen2.5-1.5B': 6}}\n          distance_lexicale_par_type = {'T1': {'gpt2': 1.0, 'HuggingFaceTB/SmolLM2-360M': 1.0, 'Qwen/Qwen2.5-1.5B': 1.0}, 'T2': {'gpt2': 1.0, 'HuggingFaceTB/SmolLM2-360M': 1.0, 'Qwen/Qwen2.5-1.5B': 1.0}, 'T3': {'gpt2': 1.0, 'HuggingFaceTB/SmolLM2-360M': 1.0, 'Qwen/Qwen2.5-1.5B': 1.0}}\n[cascade] 5-appariement-bandes-frequence-V-freq\n          ecart_intra_bande = [0.03847, 0.05297, 0.06544, 0.07483, 0.08514, 0.09061, 0.09466, 0.10695, 0.10917, 0.11055, 0.11285, 0.11413, 0.11328, 0.13244, 0.13401]\n          ecart_reserve_vs_decisionnel = {'maritime': 0.02227, 'culinaire': 0.01151, 'astronomie': 0.02644, 'textile': 0.19724}\n          suffixes_par_domaine_indexes_par_bande = {'maritime': ['ship', 'crew', 'channel', 'ocean', 'fleet', 'shore', 'bay', 'sail', 'mast', 'rope', 'navy', 'tide', 'hull', 'harbor', 'voyage'], 'culinaire': ['kitchen', 'dinner', 'butter', 'bread', 'pepper', 'honey', 'breakfast', 'dough', 'soup', 'salad', 'dessert', 'syrup', 'spice', 'vinegar', 'feast'], 'astronomie': ['star', 'universe', 'sky', 'moon', 'spectrum', 'gravity', 'orbit', 'galaxy', 'cluster', 'horizon', 'eclipse', 'telescope', 'stellar', 'lunar', 'asteroid'], 'textile': ['felt', 'thread', 'button', 'fabric', 'hem', 'seam', 'cotton', 'needle', 'cloth', 'spinning', 'yarn', 'wool', 'stitch', 'silk', 'dye']}\n          coloration_des_tiges = {'Iron': 0, 'Silver': 1, 'North': 2, 'River': 0, 'Storm': 1, 'Golden': 3, 'Copper': 2, 'Hollow': 4, 'Frost': 4, 'Shadow': 3}\n          stock_reserve_par_sous_vivier = {'maritime': ['anchor', 'deck', 'reef', 'beacon', 'buoy', 'canvas', 'cargo', 'coast', 'current', 'dock', 'ferry', 'helm', 'pier', 'port', 'sea', 'tug', 'wave', 'wreck'], 'culinaire': ['broth', 'cheese', 'flour', 'bakery', 'chef', 'cuisine', 'grill', 'jam', 'kettle', 'lunch', 'oven', 'pasta', 'pastry', 'pudding', 'recipe', 'roast', 'sauce', 'sausage', 'stew'], 'astronomie': ['crater', 'satellite', 'sun', 'astronomy', 'celestial', 'comet', 'constellation', 'cosmos', 'meteor', 'planet', 'radiation', 'ray', 'solar', 'space', 'twilight'], 'textile': ['fibre', 'shirt', 'tailor', 'apparel', 'cloak', 'collar', 'garment', 'glove', 'knit', 'lace', 'linen', 'ribbon', 'robe', 'sewing', 'sleeve', 'sock', 'textile', 'velvet', 'weave', 'weaving']}\n[cascade] 6-type-capitalise\n          n_types_capitalises = 1\n          type_capitalise = ['T3']\n[cascade] 7-nulle-de-cadre-40-paires\n          n_paires_cadre = 40\n          candidats_premiers = 150\n          candidats_seconds = 150\n------------------------------------------------------------------------------\nTABLE DES GARANTIES D25\n  [PASS] V-C1         C1 — 72 séquences byte-identiques hors slot\n  [PASS] V-C1p        C1' — sélection sur métadonnées déclarées\n  [PASS] V-C2         C2 — L_e = 2 (72 entités + 40 paires, 3 tok.)\n  [PASS] V-C3         C3 — indice de capture constant, variantes appariées\n  [PASS] V-C4         C4 — aucune paire byte-identique à la capture\n  [PASS] V-C5         C5 — éligibles >= 60 pour 72/72 requêtes, pool gelé\n  [PASS] V-C6         C6 — exactement un type capitalisé\n  [PASS] V-casse      C6 — V-casse mord (>= 90 %)\n  [PASS] V-C7         C7 — sous-viviers de domaine disjoints\n  [PASS] V-m1         m1 = 5 pour 60/60 unités décisionnelles\n  [PASS] V-Keff       K_eff = 10 (clusters = tiges)\n  [PASS] V-P2         composition gravée du pool P2\n  [PASS] V-var-dist   distance lexicale entre variantes >= 50 %\n  [PASS] V-freq       bandes de fréquence appariées <= 0.15\n  [PASS] V-periode    absence de période sur slot et couple de slots\n  [PASS] V-div4       diversité de type (3 x 2 = 6 moules)\n  [PASS] V-paires4    paires intra-unité intra-type / strates\n  [PASS] V-D24b       cardinaux D24-b tronqués (dont 14 à t-1, par sous-vivier)\n  [PASS] V-cadre      nulle de cadre : 40 paires L_e = 2\n  [PASS] V-nouveaute  nulle de nouveauté : pseudo-mots, séparée\n  [PASS] V-ordre      cascade conforme à l'ordre gravé §5.5\n------------------------------------------------------------------------------\nprérequis instrument : PASS\n  [PASS] L_e                                    attendu=[2] observé=[2]\n  [PASS] indice_de_capture_entier_par_cellule   attendu=[7, 8, 9] observé=[7, 8, 9]\n  [PASS] n_unites_decisionnelles                attendu=60 observé=60\n  [PASS] n_entites                              attendu=72 observé=72\n  [PASS] K_eff                                  attendu=10 observé=10\n  [PASS] taille_pool                            attendu=36 observé=36\n  [PASS] n_cellules                             attendu=6 observé=6\n  [PASS] n_paires_cadre                         attendu=40 observé=40\n  [PASS] M_instanciee                           attendu=False observé=False\n------------------------------------------------------------------------------\ncontre-exemple fact_pairs : {'C1': 'FAIL', 'C2': 'FAIL', 'S-1': 'FAIL', 'n': 30, 'prefixes_distincts': 30, 'longueurs_de_slot_observees': [2, 3], 'verdict': 'ÉCHEC ATTENDU'}\n------------------------------------------------------------------------------\nVERDICT GÉNÉRATION : PASS\ndurée : 7.41 s\nrapport : C:\\Users\\fuzzz\\engram\\experiments\\results\\v4-materiel\\pool_v4.json\n",
+ "rerun": false,
+ "note_iteration_2": "run NON re-execute : les six correctifs portent sur l'instrument de mesure, pas sur le materiau. SHA verifie identique au gel : 6f4da9732254fa4a280d26d33f1280e4572f911dadb0a73c02fe208ded504e3b"
+}

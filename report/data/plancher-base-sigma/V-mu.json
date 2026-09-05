@@ -1,0 +1,307 @@
+{
+  "porte": "V-mu",
+  "verdict": "PASS",
+  "regle": "§6.D — V-mu échec ⇒ run INVALIDE",
+  "modeles": {
+    "gpt2": {
+      "verdict": "PASS",
+      "detail": {
+        "citations_par_ligne_de_code": {
+          "_bloc_de_declaration_exclu": {
+            "lignes": [
+              3681,
+              3682,
+              3683,
+              3684,
+              3685,
+              3686,
+              3687,
+              3688
+            ],
+            "motif": "la déclaration porte les expressions ; l'inclure ferait mordre la porte sur son propre registre"
+          },
+          "mu_global": {
+            "expression_attendue": "mu_glob = Sh / n_global",
+            "lignes": [
+              4972
+            ],
+            "occurrence_unique": true,
+            "ligne_relue": "mu_glob = Sh / n_global",
+            "fichier": "support_overlap.py"
+          },
+          "mu_global_LOO_par_paire": {
+            "expression_attendue": "mu_h = (Sh[None, :] - Hc[a] - Hc[b]) / (n_global - 2)",
+            "lignes": [
+              5006
+            ],
+            "occurrence_unique": true,
+            "ligne_relue": "mu_h = (Sh[None, :] - Hc[a] - Hc[b]) / (n_global - 2)",
+            "fichier": "support_overlap.py"
+          },
+          "mu_type_LOO_par_paire": {
+            "expression_attendue": "mu_type_h = (sHc[None, :] - Hc[a] - Hc[b]) / (n_dec - 2)",
+            "lignes": [
+              5007
+            ],
+            "occurrence_unique": true,
+            "ligne_relue": "mu_type_h = (sHc[None, :] - Hc[a] - Hc[b]) / (n_dec - 2)",
+            "fichier": "support_overlap.py"
+          },
+          "top64_de_G_x": {
+            "expression_attendue": "def support_topk(z, k: int = K_TOPK):",
+            "lignes": [
+              324
+            ],
+            "occurrence_unique": true,
+            "ligne_relue": "def support_topk(z, k: int = K_TOPK):",
+            "fichier": "support_overlap.py"
+          }
+        },
+        "double_chemin_mu_global": {
+          "n_etats": 360,
+          "d": 768,
+          "cardinaux_par_cellule": {
+            "T1-A": 60,
+            "T1-B": 60,
+            "T2-A": 60,
+            "T2-B": 60,
+            "T3-A": 60,
+            "T3-B": 60
+          },
+          "cellules_equicardinales": true,
+          "norme_mu_global": 72.95632561876481,
+          "chemin_1_nominal": "numpy sum(axis=0)/n, ordre des cellules du matériau — c'est la ligne citée `mu_global`",
+          "chemin_2_independant": "math.fsum par coordonnée (arrondi correct), cellules parcourues dans l'ORDRE INVERSE",
+          "ecart_max_absolu_par_coordonnee": 0.0,
+          "ecart_relatif_en_norme": 0.0,
+          "cosinus_des_deux_chemins": 1.0,
+          "tolerance": 1e-12,
+          "chemins_concordants": true,
+          "chemin_3_descriptif_moyenne_des_moyennes": {
+            "ecart_relatif_en_norme": 1.2295605333667756e-16,
+            "licite_parce_que": "cellules équi-cardinales (vérifié ci-dessus)"
+          }
+        },
+        "majorant_de_fuite": {
+          "identite": "μ^{LOO}(p) − μ = (2/(n−2))·(μ − (h_a+h_b)/2) — exacte",
+          "n": 360,
+          "facteur_2_sur_n_moins_2": 0.00558659217877095,
+          "majorant_ecart_relatif_de_norme": 0.0041253817382275685,
+          "majorant_ecart_absolu_sur_gamma": 0.0025888984276805083,
+          "gamma_moyen_non_LOO": 0.8073916926574843,
+          "sensibilite_d_rho_chapeau_d_gamma_mesuree": 3.0065978377186164,
+          "majorant_de_fuite_sur_rho_Base": 0.007783776414737342,
+          "valeur_annoncee_au_3_2": 0.005,
+          "regle": "publié, jamais absorbé — c'est POURQUOI le LOO est principal et inconditionnel (P7)"
+        },
+        "majorant_rapporte_a_epsilon_B": null,
+        "majorant_rapporte_a_epsilon_R": null,
+        "regle": "V-mu / V-loo échec, ou chiffre cité de mémoire ⇒ run INVALIDE (§6.D)",
+        "motifs_d_echec": null,
+        "modele": "gpt2",
+        "couche": 6,
+        "duree_s": 0.65
+      }
+    },
+    "HuggingFaceTB/SmolLM2-360M": {
+      "verdict": "PASS",
+      "detail": {
+        "citations_par_ligne_de_code": {
+          "_bloc_de_declaration_exclu": {
+            "lignes": [
+              3681,
+              3682,
+              3683,
+              3684,
+              3685,
+              3686,
+              3687,
+              3688
+            ],
+            "motif": "la déclaration porte les expressions ; l'inclure ferait mordre la porte sur son propre registre"
+          },
+          "mu_global": {
+            "expression_attendue": "mu_glob = Sh / n_global",
+            "lignes": [
+              4972
+            ],
+            "occurrence_unique": true,
+            "ligne_relue": "mu_glob = Sh / n_global",
+            "fichier": "support_overlap.py"
+          },
+          "mu_global_LOO_par_paire": {
+            "expression_attendue": "mu_h = (Sh[None, :] - Hc[a] - Hc[b]) / (n_global - 2)",
+            "lignes": [
+              5006
+            ],
+            "occurrence_unique": true,
+            "ligne_relue": "mu_h = (Sh[None, :] - Hc[a] - Hc[b]) / (n_global - 2)",
+            "fichier": "support_overlap.py"
+          },
+          "mu_type_LOO_par_paire": {
+            "expression_attendue": "mu_type_h = (sHc[None, :] - Hc[a] - Hc[b]) / (n_dec - 2)",
+            "lignes": [
+              5007
+            ],
+            "occurrence_unique": true,
+            "ligne_relue": "mu_type_h = (sHc[None, :] - Hc[a] - Hc[b]) / (n_dec - 2)",
+            "fichier": "support_overlap.py"
+          },
+          "top64_de_G_x": {
+            "expression_attendue": "def support_topk(z, k: int = K_TOPK):",
+            "lignes": [
+              324
+            ],
+            "occurrence_unique": true,
+            "ligne_relue": "def support_topk(z, k: int = K_TOPK):",
+            "fichier": "support_overlap.py"
+          }
+        },
+        "double_chemin_mu_global": {
+          "n_etats": 360,
+          "d": 960,
+          "cardinaux_par_cellule": {
+            "T1-A": 60,
+            "T1-B": 60,
+            "T2-A": 60,
+            "T2-B": 60,
+            "T3-A": 60,
+            "T3-B": 60
+          },
+          "cellules_equicardinales": true,
+          "norme_mu_global": 217.98342796516448,
+          "chemin_1_nominal": "numpy sum(axis=0)/n, ordre des cellules du matériau — c'est la ligne citée `mu_global`",
+          "chemin_2_independant": "math.fsum par coordonnée (arrondi correct), cellules parcourues dans l'ORDRE INVERSE",
+          "ecart_max_absolu_par_coordonnee": 0.0,
+          "ecart_relatif_en_norme": 0.0,
+          "cosinus_des_deux_chemins": 1.0,
+          "tolerance": 1e-12,
+          "chemins_concordants": true,
+          "chemin_3_descriptif_moyenne_des_moyennes": {
+            "ecart_relatif_en_norme": 1.5255793317906548e-16,
+            "licite_parce_que": "cellules équi-cardinales (vérifié ci-dessus)"
+          }
+        },
+        "majorant_de_fuite": {
+          "identite": "μ^{LOO}(p) − μ = (2/(n−2))·(μ − (h_a+h_b)/2) — exacte",
+          "n": 360,
+          "facteur_2_sur_n_moins_2": 0.00558659217877095,
+          "majorant_ecart_relatif_de_norme": 0.0034938423466058122,
+          "majorant_ecart_absolu_sur_gamma": 0.0019757116333742886,
+          "gamma_moyen_non_LOO": 0.8522365930764845,
+          "sensibilite_d_rho_chapeau_d_gamma_mesuree": 3.217573617226299,
+          "majorant_de_fuite_sur_rho_Base": 0.00635699762679219,
+          "valeur_annoncee_au_3_2": 0.005,
+          "regle": "publié, jamais absorbé — c'est POURQUOI le LOO est principal et inconditionnel (P7)"
+        },
+        "majorant_rapporte_a_epsilon_B": null,
+        "majorant_rapporte_a_epsilon_R": null,
+        "regle": "V-mu / V-loo échec, ou chiffre cité de mémoire ⇒ run INVALIDE (§6.D)",
+        "motifs_d_echec": null,
+        "modele": "HuggingFaceTB/SmolLM2-360M",
+        "couche": 16,
+        "duree_s": 1.07
+      }
+    },
+    "Qwen/Qwen2.5-1.5B": {
+      "verdict": "PASS",
+      "detail": {
+        "citations_par_ligne_de_code": {
+          "_bloc_de_declaration_exclu": {
+            "lignes": [
+              3681,
+              3682,
+              3683,
+              3684,
+              3685,
+              3686,
+              3687,
+              3688
+            ],
+            "motif": "la déclaration porte les expressions ; l'inclure ferait mordre la porte sur son propre registre"
+          },
+          "mu_global": {
+            "expression_attendue": "mu_glob = Sh / n_global",
+            "lignes": [
+              4972
+            ],
+            "occurrence_unique": true,
+            "ligne_relue": "mu_glob = Sh / n_global",
+            "fichier": "support_overlap.py"
+          },
+          "mu_global_LOO_par_paire": {
+            "expression_attendue": "mu_h = (Sh[None, :] - Hc[a] - Hc[b]) / (n_global - 2)",
+            "lignes": [
+              5006
+            ],
+            "occurrence_unique": true,
+            "ligne_relue": "mu_h = (Sh[None, :] - Hc[a] - Hc[b]) / (n_global - 2)",
+            "fichier": "support_overlap.py"
+          },
+          "mu_type_LOO_par_paire": {
+            "expression_attendue": "mu_type_h = (sHc[None, :] - Hc[a] - Hc[b]) / (n_dec - 2)",
+            "lignes": [
+              5007
+            ],
+            "occurrence_unique": true,
+            "ligne_relue": "mu_type_h = (sHc[None, :] - Hc[a] - Hc[b]) / (n_dec - 2)",
+            "fichier": "support_overlap.py"
+          },
+          "top64_de_G_x": {
+            "expression_attendue": "def support_topk(z, k: int = K_TOPK):",
+            "lignes": [
+              324
+            ],
+            "occurrence_unique": true,
+            "ligne_relue": "def support_topk(z, k: int = K_TOPK):",
+            "fichier": "support_overlap.py"
+          }
+        },
+        "double_chemin_mu_global": {
+          "n_etats": 360,
+          "d": 1536,
+          "cardinaux_par_cellule": {
+            "T1-A": 60,
+            "T1-B": 60,
+            "T2-A": 60,
+            "T2-B": 60,
+            "T3-A": 60,
+            "T3-B": 60
+          },
+          "cellules_equicardinales": true,
+          "norme_mu_global": 43.43865073227346,
+          "chemin_1_nominal": "numpy sum(axis=0)/n, ordre des cellules du matériau — c'est la ligne citée `mu_global`",
+          "chemin_2_independant": "math.fsum par coordonnée (arrondi correct), cellules parcourues dans l'ORDRE INVERSE",
+          "ecart_max_absolu_par_coordonnee": 0.0,
+          "ecart_relatif_en_norme": 0.0,
+          "cosinus_des_deux_chemins": 1.0,
+          "tolerance": 1e-12,
+          "chemins_concordants": true,
+          "chemin_3_descriptif_moyenne_des_moyennes": {
+            "ecart_relatif_en_norme": 1.2149735476525823e-16,
+            "licite_parce_que": "cellules équi-cardinales (vérifié ci-dessus)"
+          }
+        },
+        "majorant_de_fuite": {
+          "identite": "μ^{LOO}(p) − μ = (2/(n−2))·(μ − (h_a+h_b)/2) — exacte",
+          "n": 360,
+          "facteur_2_sur_n_moins_2": 0.00558659217877095,
+          "majorant_ecart_relatif_de_norme": 0.005167299825161343,
+          "majorant_ecart_absolu_sur_gamma": 0.003644992267352709,
+          "gamma_moyen_non_LOO": 0.7268937169543418,
+          "sensibilite_d_rho_chapeau_d_gamma_mesuree": 2.776657715208297,
+          "majorant_de_fuite_sur_rho_Base": 0.010120895901019484,
+          "valeur_annoncee_au_3_2": 0.005,
+          "regle": "publié, jamais absorbé — c'est POURQUOI le LOO est principal et inconditionnel (P7)"
+        },
+        "majorant_rapporte_a_epsilon_B": null,
+        "majorant_rapporte_a_epsilon_R": null,
+        "regle": "V-mu / V-loo échec, ou chiffre cité de mémoire ⇒ run INVALIDE (§6.D)",
+        "motifs_d_echec": null,
+        "modele": "Qwen/Qwen2.5-1.5B",
+        "couche": 14,
+        "duree_s": 1.48
+      }
+    }
+  }
+}

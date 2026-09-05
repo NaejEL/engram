@@ -1,0 +1,41 @@
+{
+  "verdict": "PASS",
+  "detail": {
+    "quantites_requises": [
+      "rho_Base_sous_regime_gamma",
+      "O_superieur_a_p_sym",
+      "cos_des_centroides",
+      "plac_invariance_d_echelle"
+    ],
+    "declarations": {
+      "rho_Base_sous_regime_gamma": {
+        "derivation": "propriété pivot : (z_a,i, z_b,i, z_μ,i) gaussiens de Gram = cosinus ; ρ̂_Base est fonction croissante de γ seul ⇒ γ ≈ 0.75–0.89 force ρ̂_Base ≈ 0.55–0.75 (Q-M9)",
+        "valeur_forcee": "ρ̂_Base(γ) — calculée par V-quad, publiée par cellule AVANT mesure",
+        "poids_probant": "NUL, déclaré d'avance (D27, entrée (xxv))"
+      },
+      "O_superieur_a_p_sym": {
+        "derivation": "identité de Cauchy–Schwarz sur les masses top-p (§16 du cycle précédent) : |A∩B| ≥ p_sym est vraie en arithmétique réelle",
+        "valeur_forcee": "O ≥ p_sym, toujours",
+        "poids_probant": "NUL (D32)"
+      },
+      "cos_des_centroides": {
+        "derivation": "μ_global est la moyenne NON PONDÉRÉE des T centroïdes de cadre (cellules équi-cardinales) ⇒ Σ_t (μ_t − μ_global) = 0 exactement ⇒ cos moyen par paire = −1/(T−1)",
+        "valeur_forcee": "−1/(T−1) = −0.2000 à T = 6",
+        "poids_probant": "NUL — identité du barycentre (0-159, Q-M4)"
+      },
+      "plac_invariance_d_echelle": {
+        "derivation": "topk(|G·x|, 64) est INVARIANTE D'ÉCHELLE ⇒ top64(G·(c·r)) = top64(G·r) pour tout c > 0 : la contrainte ‖c·r‖ = ‖μ_global‖ n'a AUCUN effet sur le support de la référence placebo",
+        "valeur_forcee": "N-plac est indépendante de la magnitude : elle mesure l'anisotropie de G, pas le décalage mécanique de magnitudes (0-106)",
+        "poids_probant": "NUL sur la magnitude ; la condition est exécutée telle qu'écrite et le constat est publié"
+      },
+      "seuil_t": {
+        "derivation": "t = Φ⁻¹(1 − 1/256) calculé en fp64 au banc (0-177)",
+        "valeur_forcee": "2.660067468617",
+        "poids_probant": "SANS OBJET — c'est une constante, pas une mesure"
+      }
+    },
+    "manques": [],
+    "sans_valeur_forcee": [],
+    "formulation_obligatoire": "« valeur imposée par l'identité <nommée> ; poids probant nul »"
+  }
+}

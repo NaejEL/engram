@@ -1,0 +1,94 @@
+{
+  "regle": "écriture conditionnée à l'absence du fichier ; un fichier présent est relu et comparé, jamais écrasé (D14-R)",
+  "repertoires": [
+    "C:\\Users\\fuzzz\\engram\\experiments\\results\\recouvrement-supports",
+    "C:\\Users\\fuzzz\\engram\\experiments\\results\\plancher-base-sigma"
+  ],
+  "fichiers": {
+    "C:\\Users\\fuzzz\\engram\\experiments\\results\\recouvrement-supports\\V-cache.json": {
+      "action": "AUCUNE — fichier préexistant, NON RÉÉCRIT",
+      "sha256_sur_disque": "e529eeb09efe1b595a913bbf289ee6e0215e5a193858386dc0167c4ad900b5a2",
+      "sha256_qui_aurait_ete_ecrit": "e529eeb09efe1b595a913bbf289ee6e0215e5a193858386dc0167c4ad900b5a2",
+      "identique": true,
+      "cles_divergentes": null,
+      "consequence": "aucune — le fichier sur disque est hash-identique à ce que ce run aurait écrit"
+    },
+    "C:\\Users\\fuzzz\\engram\\experiments\\results\\plancher-base-sigma\\V-cache.json": {
+      "action": "AUCUNE — fichier préexistant, NON RÉÉCRIT",
+      "sha256_sur_disque": "e529eeb09efe1b595a913bbf289ee6e0215e5a193858386dc0167c4ad900b5a2",
+      "sha256_qui_aurait_ete_ecrit": "e529eeb09efe1b595a913bbf289ee6e0215e5a193858386dc0167c4ad900b5a2",
+      "identique": true,
+      "cles_divergentes": null,
+      "consequence": "aucune — le fichier sur disque est hash-identique à ce que ce run aurait écrit"
+    },
+    "C:\\Users\\fuzzz\\engram\\experiments\\results\\recouvrement-supports\\V-G.json": {
+      "action": "AUCUNE — fichier préexistant, NON RÉÉCRIT",
+      "sha256_sur_disque": "f6bd47295750ff3e08864f467704f210b4b7555c0776d5e0a547de2b28e645fe",
+      "sha256_qui_aurait_ete_ecrit": "21fd2028d958cc8fc875c8b559969b98ae51a747430769317d7d0da8785bc2fc",
+      "identique": false,
+      "cles_divergentes": [
+        {
+          "chemin": "/detail/modeles/HuggingFaceTB/SmolLM2-360M/duree_s",
+          "valeur_recalculee": 0.9,
+          "valeur_sur_disque": 0.71
+        },
+        {
+          "chemin": "/detail/modeles/Qwen/Qwen2.5-1.5B/duree_s",
+          "valeur_recalculee": 1.25,
+          "valeur_sur_disque": 1.01
+        },
+        {
+          "chemin": "/detail/modeles/gpt2/duree_s",
+          "valeur_recalculee": 0.48,
+          "valeur_sur_disque": 0.42
+        }
+      ],
+      "consequence": "DIVERGENCE — le fichier sur disque DIFFÈRE de ce que ce run aurait écrit ; il n'est PAS écrasé, les clés divergentes sont NOMMÉES ci-dessus"
+    },
+    "C:\\Users\\fuzzz\\engram\\experiments\\results\\plancher-base-sigma\\V-G.json": {
+      "action": "AUCUNE — fichier préexistant, NON RÉÉCRIT",
+      "sha256_sur_disque": "f6bd47295750ff3e08864f467704f210b4b7555c0776d5e0a547de2b28e645fe",
+      "sha256_qui_aurait_ete_ecrit": "21fd2028d958cc8fc875c8b559969b98ae51a747430769317d7d0da8785bc2fc",
+      "identique": false,
+      "cles_divergentes": [
+        {
+          "chemin": "/detail/modeles/HuggingFaceTB/SmolLM2-360M/duree_s",
+          "valeur_recalculee": 0.9,
+          "valeur_sur_disque": 0.71
+        },
+        {
+          "chemin": "/detail/modeles/Qwen/Qwen2.5-1.5B/duree_s",
+          "valeur_recalculee": 1.25,
+          "valeur_sur_disque": 1.01
+        },
+        {
+          "chemin": "/detail/modeles/gpt2/duree_s",
+          "valeur_recalculee": 0.48,
+          "valeur_sur_disque": 0.42
+        }
+      ],
+      "consequence": "DIVERGENCE — le fichier sur disque DIFFÈRE de ce que ce run aurait écrit ; il n'est PAS écrasé, les clés divergentes sont NOMMÉES ci-dessus"
+    },
+    "C:\\Users\\fuzzz\\engram\\experiments\\results\\recouvrement-supports\\V-norm.json": {
+      "action": "AUCUNE — fichier préexistant, NON RÉÉCRIT",
+      "sha256_sur_disque": "0784323037b9182ffbb779a559cf33464e97b860bcb012dfb66d41421fd46b86",
+      "sha256_qui_aurait_ete_ecrit": "0784323037b9182ffbb779a559cf33464e97b860bcb012dfb66d41421fd46b86",
+      "identique": true,
+      "cles_divergentes": null,
+      "consequence": "aucune — le fichier sur disque est hash-identique à ce que ce run aurait écrit"
+    },
+    "C:\\Users\\fuzzz\\engram\\experiments\\results\\plancher-base-sigma\\V-norm.json": {
+      "action": "AUCUNE — fichier préexistant, NON RÉÉCRIT",
+      "sha256_sur_disque": "0784323037b9182ffbb779a559cf33464e97b860bcb012dfb66d41421fd46b86",
+      "sha256_qui_aurait_ete_ecrit": "0784323037b9182ffbb779a559cf33464e97b860bcb012dfb66d41421fd46b86",
+      "identique": true,
+      "cles_divergentes": null,
+      "consequence": "aucune — le fichier sur disque est hash-identique à ce que ce run aurait écrit"
+    }
+  },
+  "comptes": {
+    "ecrits_car_absents": 0,
+    "preexistants_hash_identiques_INTACTS": 4,
+    "preexistants_DIVERGENTS_non_ecrases": 2
+  }
+}

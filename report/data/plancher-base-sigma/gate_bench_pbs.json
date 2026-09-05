@@ -1,0 +1,4247 @@
+{
+ "protocole": "experiments/EXP-2026-08-27-plancher-base-sigma.md",
+ "statut_protocole": "PRE-ENREGISTRE (§4 et §6 GELÉS le 2026-08-28 ; §14 = déclarations d'opérationnalisation)",
+ "banc": "D14-S — satisfiabilité pbs, CPU seul, aucune mesure, aucun GPU",
+ "E": 0,
+ "n_clauses": 44,
+ "couverture": {
+  "clauses_avec_les_deux_contre_exemples": 44,
+  "total": 44,
+  "pct": 100.0
+ },
+ "n_cas": 97,
+ "cas_echouants_obligatoires_du_10": [
+  "V-T (support vide)",
+  "V-vide",
+  "V-appar (vivier vide en S2)",
+  "V-quad (non exécutée)",
+  "V-ecriture (les deux lectures divergent)",
+  "V-grappe (grappe manquante)",
+  "V-rang-def (bucket à 199 trials)",
+  "V-ident (quantité forcée non déclarée)",
+  "V-S (DEFF_S > 1)",
+  "V-seed (seed = 0 accepté)",
+  "V-loo (inversion)",
+  "les trois identités de Q-M10"
+ ],
+ "cardinaux_enumeres": {
+  "U_unites_decisionnelles": 60,
+  "T_cellules_de_capture": 6,
+  "cellules_decisionnelles": 12,
+  "vivier_N_etat_par_strate": {
+   "S3": [
+    1
+   ],
+   "S2": [
+    0
+   ],
+   "S0": [
+    24,
+    27,
+    30
+   ],
+   "S1": [
+    9
+   ]
+  },
+  "attendu_14_2": {
+   "S3": [
+    1,
+    1
+   ],
+   "S2": [
+    0,
+    0
+   ],
+   "S1": [
+    9,
+    9
+   ],
+   "S0": [
+    24,
+    30
+   ]
+  }
+ },
+ "constantes": {
+  "t": 2.6600674686174592,
+  "t_formule": "ndtri(1 - 1/256)",
+  "2Q(t)": 0.0078125,
+  "(phi/Q)^2": 8.815564787235882,
+  "pente_Plackett": 4.407782393617941,
+  "k": 64,
+  "D": 8192,
+  "K_eff": 10,
+  "N_G": 200,
+  "N_buckets": 8,
+  "plancher_trials": 200,
+  "plancher_paires": 8,
+  "B_boot": 10000,
+  "tol_PSD": 1e-08,
+  "tol_sim_quad": 0.005,
+  "tol_quad_croisee": 1e-09
+ },
+ "verifications_Q_M10": {
+  "t": 2.6600674686174592,
+  "t_formule": "ndtri(1 - 1/256)",
+  "2Q(t)": 0.0078125,
+  "(phi/Q)^2": 8.815564787235882,
+  "pente_Plackett": 4.407782393617941,
+  "identite_1_gamma_nuls_P3_egale_P2_sur_128": 5.0550926292136644e-18,
+  "identite_2_tous_cosinus_1_rho_chapeau_egale_1": 1.66644475996236e-13,
+  "identite_3_rho_0_gamma_0_P2_egale_1_sur_128_carre": 0.0,
+  "ecart_GL64_GL128": 3.209238430557093e-17,
+  "tolerance_croisee": 1e-09,
+  "ecart_GL64_GaussKronrod_adaptatif": 2.2049326408213506e-17,
+  "ecart_F2_nominal_vs_independant": 1.3817867568295217e-13,
+  "substitutions_declarees": {
+   "scipy.special.ndtri": "_ndtri (AS 241), vérifié par math.erfc",
+   "scipy.stats.norm.cdf": "_Phi via math.erfc",
+   "CDF normale bivariée": "bvn_F2 (Sheppard/Plackett en θ, NOMINAL) vérifiée par bvn_F2_ref (forme conditionnelle + Gauss–Kronrod adaptatif)",
+   "scipy.integrate.quad": "quad_gk (Gauss–Kronrod 7/15 adaptatif, epsabs=1e-12, epsrel=1e-10) ; chemin NOMINAL = Gauss–Legendre 64 sur (t, 8), contre-vérifié GL128 et GK"
+  },
+  "verdict": "PASS"
+ },
+ "verification_Phi": {
+  "ecart_max_torch_vs_math_erfc": 2.168404344971009e-19,
+  "points": [
+   -8.0,
+   -3.0,
+   -0.5,
+   0.0,
+   0.5,
+   2.66,
+   3.0,
+   8.0
+  ]
+ },
+ "clauses_sous_specifiees": {
+  "cos_p de σ̂±_pool": "le §2.4 grave σ̂±_pool = Σ_p |A∩B|_p·σ̂±(cos_p,t)/Σ_p |A∩B|_p sans dire quel cos. DEUX lectures licites : le cosinus PLEIN des états sous la condition courante (h-space — la corrélation exacte du modèle pivot) ou le cos TRONQUÉ sur φ du cycle précédent. Déclaré : h-space PRINCIPAL ; z-space et tronqué publiés à côté (triple mesure D26). ARBITRAGE PI RENDU le 2026-08-28 : h-space ; la lecture TRONQUÉE est DÉMONTRÉE FAUSSE. Les trois restent publiées.",
+  "pondération d'un bucket dans σ̂±_pool": "le poids gravé est |A∩B|_p ; dans un bucket, deux lectures licites — le |A∩B| TOTAL de la paire, ou le nombre de trials que la paire apporte À CE BUCKET. Déclaré : le second est PRINCIPAL (seul à pondérer chaque bucket par ce qu'il contient) ; le littéral est publié à côté. ARBITRAGE DEMANDÉ.",
+  "condition de la référence top64(G·x)": "sous la condition `type`, A et B sont les supports d'états CENTRÉS ; le protocole ne dit pas si la référence l'est aussi. Déclaré : la condition n'affecte QUE A et B ; top64(G·x) est calculé sur x non centré, conformément au §5-5 (« différence uniquement dans x »).",
+  "R de la nulle N-état": "le §8 grave « R tirages » sur un vivier FINI. Déclaré : le vivier est ÉNUMÉRÉ EXHAUSTIVEMENT (R = |vivier(p)|), ce qui rend n̄_p exacte et sans variance de tirage — cohérent avec le §14.4 (« en S3 le vivier est un singleton ⇒ R ≡ 1 »). Cardinal publié par strate.",
+  "ε_R littéral": "le §4.4 grave ε_R = q₀.₉₅ de |R_Base| sur les rééchantillons, sans centrage. Appliqué LITTÉRALEMENT : ε_R contient donc la composante systématique de R_Base. Conséquence publiée, non corrigée.",
+  "B de ε_Ψ": "le §4.4 et le §7 gravent B = 10⁴. Le tour précédent employait 1000 (ε_Ψ) et 2000 (N-grappe) au motif du budget CPU < 10 min ; ce motif est TOMBÉ — le budget a été dépassé de 110 %. DÉCISION PI DU 2026-08-28 : re-mesurer à B = 10⁴, comme gravé. Les DEUX jeux de quantiles sont publiés côte à côte et la bascule de classe est VÉRIFIÉE, jamais supposée. Défaut 0-189 : la phrase de conformité est CONSTRUITE À PARTIR du champ `B`, elle ne peut pas le contredire.",
+  "profil conforme à la loi (conjoint de Σ-epuise)": "la clause gelée §4.5 exige, pour Σ-epuise, un « profil conforme à la loi » ; le §5-7 dit « l'écart à 0.5 CROÎT avec la magnitude » sans dire comment le lire. DEUX complétions licites : comparaison de DEUX POINTS (|σ(b₁)−0.5| ≥ |σ(b_dernier)−0.5|) et MONOTONIE COMPLÈTE par bucket. `monotone ⇒ deux points` est une implication STRICTE, donc la complétion à deux points rend la prédiction PLUS FACILE — ce que D30 alinéa 2 fait tomber. ARBITRAGE PI RENDU le 2026-08-28 : la MONOTONIE COMPLÈTE est la complétion du conjoint ; la comparaison à deux points reste publiée, DESCRIPTIVE, et ne classe rien.",
+  "couplage de ε_Ψ à la lecture de cos_p": "ε_Ψ est le q₀.₉₅ de |Ψ| sous N-queue, et Ψ = σ± − σ̂±_pool dépend de la lecture de cos_p. DEUX couplages sont exécutables et le §4.4 ne les départage pas : (A) ε_Ψ recalculée SOUS LA MÊME lecture (cohérence interne — couplage IMPLÉMENTÉ) ; (B) ε_Ψ de la lecture PRINCIPALE appliquée aux Ψ des autres lectures. Les DEUX sont publiés avec leur classe. ARBITRAGE PI RENDU le 2026-08-28 : SANS CONSÉQUENCE décisionnelle — aucun couplage ne départage une classe.",
+  "domaine de définition de ρ_ic": "ρ_ic est le coefficient de Kish implicite, DEFF = 1 + (m̄ − 1)·ρ_ic. Son domaine est DEFF ≤ m̄ (⇔ ρ_ic ≤ 1) : une corrélation intra-grappe > 1 n'existe pas. Hors de ce domaine, la quantité sort SANS OBJET (D23), jamais un nombre. `m̄ = trials/grappes` est le MINIMUM des deux lectures dyadiques (l'autre vaut 2×) et ρ_ic décroît en m̄ : le ρ_ic publié est donc un MAJORANT, il ne peut pas monter. La marge à la frontière Q-M13 (§14.5) est publiée.",
+  "centrage du Gram de la nulle N-queue à rang exact": "0-191 : σ± ne vit que sous la condition `type`, mais un Σ unique ne peut pas porter un centrage LOO-PAR-PAIRE. Déclaré : le Gram de la nulle centrée utilise la MOYENNE DE CELLULE (μ_type non-LOO) ; l'écart aux cosinus de paire sous le centrage LOO-par-paire est MESURÉ et publié, jamais supposé négligeable."
+ },
+ "duree_s": 2.73,
+ "clauses": [
+  {
+   "clause": "V-cache",
+   "pass_case": "les trois `.npz` de v4 sont lisibles, hash publié",
+   "fail_case": "un modèle absent du cache ⇒ ARRÊT, PAS de re-forward (P8)",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "périmètre gravé : V-cache divergent ⇒ ARRÊT sans re-forward.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "cache v4 complet",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "repertoire": "C:\\Users\\fuzzz\\engram\\experiments\\results\\v4-materiel\\raw",
+       "fichiers": {
+        "gpt2": {
+         "present": true,
+         "chemin": "C:\\Users\\fuzzz\\engram\\experiments\\results\\v4-materiel\\raw\\etats-gpt2.npz",
+         "taille_octets": 23461342,
+         "sha256": "5ac90c5b49b1c072dfbded36baade788f07c5195d80b1e85a3777cab354c6ed6",
+         "n_cles": 18,
+         "dtype_etats": "float32",
+         "forme_etats": [
+          13,
+          132,
+          768
+         ],
+         "cle_exemple": "T1-A|t"
+        },
+        "HuggingFaceTB/SmolLM2-360M": {
+         "present": true,
+         "chemin": "C:\\Users\\fuzzz\\engram\\experiments\\results\\v4-materiel\\raw\\etats-HuggingFaceTB_SmolLM2-360M.npz",
+         "taille_octets": 74635393,
+         "sha256": "6553621b4d0be03b90b8efc000bd5e62486fec9a1eda6bdbbf8ab6ae7d2104f5",
+         "n_cles": 18,
+         "dtype_etats": "float32",
+         "forme_etats": [
+          33,
+          132,
+          960
+         ],
+         "cle_exemple": "T1-A|t"
+        },
+        "Qwen/Qwen2.5-1.5B": {
+         "present": true,
+         "chemin": "C:\\Users\\fuzzz\\engram\\experiments\\results\\v4-materiel\\raw\\etats-Qwen_Qwen2.5-1.5B.npz",
+         "taille_octets": 104260274,
+         "sha256": "f3792daebf611d957acb44d95861546b084253c4ab70ad3821d8833cf5c4d7dd",
+         "n_cles": 18,
+         "dtype_etats": "float32",
+         "forme_etats": [
+          29,
+          132,
+          1536
+         ],
+         "cle_exemple": "T1-A|t"
+        }
+       },
+       "limite_nommee": "le hash des `.npz` de v4 n'a jamais été pré-enregistré : il est gravé ici pour la suite, ce qui est une LIMITE, pas une vérification (§3)",
+       "poste_gpu_si_echec": {
+        "duree_s": 53.82,
+        "vram_gio_max_reservee": 4.688,
+        "vram_gio_max_allouee": 4.188,
+        "unite": "RÉSERVÉ (§7, 0-142)",
+        "statut": "non déclenché tant que V-cache PASS"
+       },
+       "fichiers_manquants": []
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "modèle inexistant",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "repertoire": "C:\\Users\\fuzzz\\engram\\experiments\\results\\v4-materiel\\raw",
+       "fichiers": {
+        "modele/qui-n-existe-pas": {
+         "present": false,
+         "chemin": "C:\\Users\\fuzzz\\engram\\experiments\\results\\v4-materiel\\raw\\etats-modele_qui-n-existe-pas.npz"
+        }
+       },
+       "limite_nommee": "le hash des `.npz` de v4 n'a jamais été pré-enregistré : il est gravé ici pour la suite, ce qui est une LIMITE, pas une vérification (§3)",
+       "poste_gpu_si_echec": {
+        "duree_s": 53.82,
+        "vram_gio_max_reservee": 4.688,
+        "vram_gio_max_allouee": 4.188,
+        "unite": "RÉSERVÉ (§7, 0-142)",
+        "statut": "non déclenché tant que V-cache PASS"
+       },
+       "fichiers_manquants": [
+        "C:\\Users\\fuzzz\\engram\\experiments\\results\\v4-materiel\\raw\\etats-modele_qui-n-existe-pas.npz"
+       ]
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-G (v2)",
+   "pass_case": "G du projet instanciée et hashée ; cos fp32/fp64 sous 1e−6",
+   "fail_case": "tolérance nulle ⇒ arrêt de provenance",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "tolérance 1e−6",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "version": "v2 (§15, 2026-08-26)",
+       "cfg": "model=gpt2 layer=6 lam=2.0 eta=0.2 decay=0.001 thr=4.0 prune=512/0.1 hebb_only=False dg=8192/64 gate=keysim",
+       "tolerance_fp32_fp64": 1e-06,
+       "modeles": {
+        "gpt2": {
+         "couche": 6,
+         "d": 768,
+         "G_du_projet": {
+          "generateur": "torch.randn(dg_dim, d, generator=manual_seed(seed))",
+          "seed": 0,
+          "forme": [
+           8192,
+           768
+          ],
+          "dtype": "torch.float32",
+          "echelle": "aucune (pas de 1/√d)",
+          "sha256": "681252f3beca09826ac3be75a271ef46461ab4bb989bfd66767958d2ffb219ad",
+          "portee": "pour cette G, seed 0 (D9)"
+         },
+         "cos_phi_par_strate_fp32": {
+          "S3": 0.2765880627764596,
+          "S2": 0.20695693966139247,
+          "S1": 0.24789006826122875,
+          "S0": 0.18864584040961097
+         },
+         "cos_phi_par_strate_fp64": {
+          "S3": 0.27658806387056156,
+          "S2": 0.20695694009610738,
+          "S1": 0.24789006929315519,
+          "S0": 0.18864584100542842
+         },
+         "ecart_fp64_moins_fp32": {
+          "S3": 1.0941019756849357e-09,
+          "S2": 4.3471490296376203e-10,
+          "S1": 1.0319264331926092e-09,
+          "S0": 5.95817450932401e-10
+         },
+         "ecart_max_de_precision": 1.0941019756849357e-09,
+         "V-iid": {
+          "verdict": "PASS",
+          "detail": {
+           "moyenne": -0.0032650546209091295,
+           "ecart_type": 1.000476575056003,
+           "forme": [
+            512,
+            768
+           ],
+           "preuve": "par provenance (torch.randn, lignes iid) — M3",
+           "residuel": "sanité de moments ; PAS de KS",
+           "tolerances": {
+            "|moyenne|": 0.02,
+            "|σ−1|": 0.02
+           }
+          }
+         },
+         "divergence_avec_A3": {
+          "A3_publie": {
+           "cos_projection_A3": {
+            "S3": 0.283819903826548,
+            "S2": 0.21455342597155655,
+            "S1": 0.25728208728962476,
+            "S0": 0.19266583529195042
+           },
+           "cos_brut": {
+            "S3": 0.7434180575940343,
+            "S2": 0.6804045050232498,
+            "S1": 0.7177266161474917,
+            "S0": 0.6555543941322458
+           },
+           "compression": {
+            "S3": 0.45959815376748636,
+            "S2": 0.4658510790516932,
+            "S1": 0.4604445288578669,
+            "S0": 0.4628885588402954
+           },
+           "n_paires": {
+            "S3": 60,
+            "S2": 90,
+            "S1": 360,
+            "S0": 1260
+           },
+           "amplitude_de_compression": 0.006252925284206845,
+           "source": "C:\\Users\\fuzzz\\engram\\experiments\\results\\v4-materiel\\mesure-gpt2-seed0.json",
+           "avertissement": "A3 porte sur une AUTRE projection : sa `G` est tirée par numpy.default_rng(0), pas par torch.randn(generator=manual_seed(0)) — 0-135"
+          },
+          "ecart_cos_fp32_moins_A3": {
+           "S3": -0.0072318410500883945,
+           "S2": -0.0075964863101640745,
+           "S1": -0.00939201902839601,
+           "S0": -0.0040199948823394505
+          },
+          "corrcoef_G_projet_vs_G_A3": -0.0008436993989740638,
+          "mention_obligatoire": "A3 porte sur une AUTRE projection (G tirée par numpy, 0-135) : aucune reproduction d'A3 n'est exigée ni possible"
+         },
+         "verdict": "PASS",
+         "duree_s": 0.41
+        }
+       },
+       "verdict_porte": "G du projet instanciée et hashée ; cos publiés en fp32 et fp64 ; divergence avec A3 publiée"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "tolérance 0",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "version": "v2 (§15, 2026-08-26)",
+       "cfg": "model=gpt2 layer=6 lam=2.0 eta=0.2 decay=0.001 thr=4.0 prune=512/0.1 hebb_only=False dg=8192/64 gate=keysim",
+       "tolerance_fp32_fp64": 0.0,
+       "modeles": {
+        "gpt2": {
+         "couche": 6,
+         "d": 768,
+         "G_du_projet": {
+          "generateur": "torch.randn(dg_dim, d, generator=manual_seed(seed))",
+          "seed": 0,
+          "forme": [
+           8192,
+           768
+          ],
+          "dtype": "torch.float32",
+          "echelle": "aucune (pas de 1/√d)",
+          "sha256": "681252f3beca09826ac3be75a271ef46461ab4bb989bfd66767958d2ffb219ad",
+          "portee": "pour cette G, seed 0 (D9)"
+         },
+         "cos_phi_par_strate_fp32": {
+          "S3": 0.2765880627764596,
+          "S2": 0.20695693966139247,
+          "S1": 0.24789006826122875,
+          "S0": 0.18864584040961097
+         },
+         "cos_phi_par_strate_fp64": {
+          "S3": 0.27658806387056156,
+          "S2": 0.20695694009610738,
+          "S1": 0.24789006929315519,
+          "S0": 0.18864584100542842
+         },
+         "ecart_fp64_moins_fp32": {
+          "S3": 1.0941019756849357e-09,
+          "S2": 4.3471490296376203e-10,
+          "S1": 1.0319264331926092e-09,
+          "S0": 5.95817450932401e-10
+         },
+         "ecart_max_de_precision": 1.0941019756849357e-09,
+         "V-iid": {
+          "verdict": "PASS",
+          "detail": {
+           "moyenne": -0.0032650546209091295,
+           "ecart_type": 1.000476575056003,
+           "forme": [
+            512,
+            768
+           ],
+           "preuve": "par provenance (torch.randn, lignes iid) — M3",
+           "residuel": "sanité de moments ; PAS de KS",
+           "tolerances": {
+            "|moyenne|": 0.02,
+            "|σ−1|": 0.02
+           }
+          }
+         },
+         "divergence_avec_A3": {
+          "A3_publie": {
+           "cos_projection_A3": {
+            "S3": 0.283819903826548,
+            "S2": 0.21455342597155655,
+            "S1": 0.25728208728962476,
+            "S0": 0.19266583529195042
+           },
+           "cos_brut": {
+            "S3": 0.7434180575940343,
+            "S2": 0.6804045050232498,
+            "S1": 0.7177266161474917,
+            "S0": 0.6555543941322458
+           },
+           "compression": {
+            "S3": 0.45959815376748636,
+            "S2": 0.4658510790516932,
+            "S1": 0.4604445288578669,
+            "S0": 0.4628885588402954
+           },
+           "n_paires": {
+            "S3": 60,
+            "S2": 90,
+            "S1": 360,
+            "S0": 1260
+           },
+           "amplitude_de_compression": 0.006252925284206845,
+           "source": "C:\\Users\\fuzzz\\engram\\experiments\\results\\v4-materiel\\mesure-gpt2-seed0.json",
+           "avertissement": "A3 porte sur une AUTRE projection : sa `G` est tirée par numpy.default_rng(0), pas par torch.randn(generator=manual_seed(0)) — 0-135"
+          },
+          "ecart_cos_fp32_moins_A3": {
+           "S3": -0.0072318410500883945,
+           "S2": -0.0075964863101640745,
+           "S1": -0.00939201902839601,
+           "S0": -0.0040199948823394505
+          },
+          "corrcoef_G_projet_vs_G_A3": -0.0008436993989740638,
+          "mention_obligatoire": "A3 porte sur une AUTRE projection (G tirée par numpy, 0-135) : aucune reproduction d'A3 n'est exigée ni possible"
+         },
+         "verdict": "FAIL",
+         "duree_s": 0.41
+        }
+       },
+       "verdict_porte": "hash absent, G non instanciable, ou divergence fp32/fp64 > tolérance ⇒ arrêt de provenance (D14-R)"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Q-M10 — identité 1 : γ_a = γ_b = 0 ⇒ P₃ = P₂·(1/128)",
+   "pass_case": "l'identité tient à 1e−14 près",
+   "fail_case": "la cible 1/64 (unité d'INDICES) au lieu de 1/128 (fraction de k)",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "`t` est calculé au banc en fp64 : t = ndtri(1 − 1/256) ; 2Q(t) = 1/128 EXACTEMENT en binaire.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "cinq ρ, γ nuls",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "ecart_max": 5.0550926292136644e-18,
+       "identite": "γ_a = γ_b = 0 ⇒ P₃ = P₂·(1/128)",
+       "t": 2.6600674686174592
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "cible P₂/64",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "ecart_max_contre_P2_sur_64": 1.983283813138792e-06,
+       "motif": "1/64 est `n` en INDICES ; l'identité porte sur 1/128, `n` en FRACTION de k — mélanger les deux rend le corridor 64 fois trop large"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Q-M10 — identité 2 : tous cosinus = 1 ⇒ ρ̂ = 1",
+   "pass_case": "le cas dégénéré gelé (|γ| > 1 − 1e−9) rend exactement 1",
+   "fail_case": "un clip silencieux de γ à 0.99 déplace ρ̂",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "γ = ρ = 1",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "rho_chapeau": 0.9999999999998334,
+       "identite": "tous cosinus = 1 ⇒ ρ̂ = 1"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "γ clippé à 0.99",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "rho_chapeau_avec_clip": 0.9129892260064647,
+       "ecart_a_1": 0.0870107739935353,
+       "motif": "clipper γ à 0.99 déplace ρ̂ de plus de 1e−12 : le cas dégénéré est GELÉ (|γ| > 1 − 1e−9 ⇒ terme univarié), jamais un clip"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Q-M10 — identité 3 : ρ = 0, γ = 0 ⇒ P₂ = (1/128)²",
+   "pass_case": "forme fermée exacte",
+   "fail_case": "la cible (1/64)²",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "ρ = 0",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "P2": 6.103515625e-05,
+       "cible": 6.103515625e-05,
+       "identite": "ρ_ab = 0, γ = 0 ⇒ P₂ = (1/128)²"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "cible (1/64)²",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "P2": 6.103515625e-05,
+       "cible_fausse": 0.000244140625,
+       "motif": "(1/64)² est la nulle d'un seuil à `k` indices, pas de la sélection à deux queues — mode 0-132"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Q-M10 — quadrature 1-D contre-vérifiée",
+   "pass_case": "GL 64 et GL 128 sur (t, 8) s'accordent sous 1e−9",
+   "fail_case": "une quadrature à 4 nœuds dépasse la tolérance",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "scipy n'est pas une dépendance : `quad` est substituée par Gauss–Legendre (nominal) + Gauss–Kronrod adaptatif (epsabs 1e−12, epsrel 1e−10). SUBSTITUTION DÉCLARÉE.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "GL64 vs GL128 sur régime S3",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "ecart_GL64_GL128": 3.924811864397526e-17,
+       "tolerance": 1e-09
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "GL4 vs GL128",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "ecart_GL4_GL128": 0.00010826338485971001,
+       "tolerance": 1e-09
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Q-M10 — F₂ par deux chemins indépendants",
+   "pass_case": "Sheppard/Plackett en θ ≡ forme conditionnelle en x sous 1e−10",
+   "fail_case": "l'indépendance supposée (Φ(h)Φ(k)) diverge dès r ≠ 0",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "six corrélations, quatre coins",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "ecart_max_nominal_vs_independant": 2.9976021664879227e-15,
+       "chemins": "Sheppard/Plackett en θ (nominal) contre forme conditionnelle en x + Gauss–Kronrod adaptatif"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "produit des marginales",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "ecart_max": 0.002464613256053437,
+       "motif": "supposer l'indépendance des coordonnées de deux vecteurs corrélés annule exactement l'objet mesuré"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Q-M10 — Gram non-PSD ⇒ ARRÊT, jamais de clip",
+   "pass_case": "un Gram PSD passe et la quadrature s'exécute",
+   "fail_case": "un Gram non-PSD lève ArretQM10 au lieu d'être clippé",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "« c'est un Gram de vecteurs réels, donc symptôme de bug ».",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "triples de régime S3, det > 0",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "det_min": 0.03046364257938139,
+       "tolerance": 1e-08
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "det < −1e−8",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "det": -0.9601999999999999,
+       "arret": "Gram non-PSD : det_min = -9.602e-01 < -1e-08 — c'est un Gram de vecteurs réels, donc symptôme de BUG. ARRÊT (jamais de clip silencieux).",
+       "regle": "Gram non-PSD au-delà de 1e−8 ⇒ ARRÊT"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Q-M10 — réduction à UN FACTEUR refusée hors S0",
+   "pass_case": "sur S0 (c_ab ≈ 0) la réduction est licite (< 5 %)",
+   "fail_case": "sur S3/S2 (c_ab grand et positif) elle est FAUSSE",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "la forme gelée est la trivariée exacte, par paire, avec (ρ_ab, γ_a, γ_b) tous trois.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "c_ab ≈ 0",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "c_ab_moyen": -0.004057693021142449,
+       "ecart_relatif_max": 0.012663856584585938,
+       "regime": "S0"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "c_ab ∈ [0.35, 0.70]",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "c_ab_moyen": 0.5266364556827453,
+       "ecart_relatif_max": 0.4658329687248635,
+       "regime": "S3/S2",
+       "motif": "la forme gelée est la TRIVARIÉE EXACTE (ρ_ab, γ_a, γ_b) ; la réduction à un facteur est REFUSÉE hors S0"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-quad — exécutée et publiée AVANT toute mesure",
+   "pass_case": "ρ̂_Base par cellule + déclaration d'atteignabilité de B-mort (D31)",
+   "fail_case": "non exécutée ⇒ ρ_Base RETIRÉ de l'interprétation",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "D34 : un couple (ρ_Base, ρ̂_Base), jamais un nombre.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "prédictions calculées",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "rho_chapeau_Base": 0.741686,
+       "gamma_moyen": 0.792142273410575,
+       "B-mort": "QUASI INATTEIGNABLE",
+       "declaration": "d'avance (D31) — jamais découverte après"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "V-quad non exécutée",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "V-quad": "NON EXÉCUTÉE",
+       "consequence": "ρ_Base est RETIRÉ de l'interprétation (§4.6, §6.E) ; un ρ_Base publié sans son ρ̂_Base apparié rend le rapport NON ÉCRIVABLE ((xxvii), D34)"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-T — support vide, énuméré",
+   "pass_case": "T, U, cellules et paires inter-cadres comptés par énumération ; C-σ-mort déclaré INATTEIGNABLE d'avance",
+   "fail_case": "antipode déclaré atteignable sans énumération",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "les paires sont intra-cadre PAR CONSTRUCTION (0-157) : l'ensemble des paires de cadres t ≠ t' est ∅.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "énumération du matériau v4",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "T_nombre_de_cadres": 6,
+       "cellules_de_capture": [
+        "T1-A",
+        "T1-B",
+        "T2-A",
+        "T2-B",
+        "T3-A",
+        "T3-B"
+       ],
+       "unites_decisionnelles_U": 60,
+       "cellules_decisionnelles": 12,
+       "paires_par_cellule_de_capture": 1770,
+       "paires_par_strate_et_par_cellule_de_capture": {
+        "S3": 60,
+        "S2": 90,
+        "S1": 360,
+        "S0": 1260
+       },
+       "paires_inter_cadres_enumerees": 0,
+       "support_clause_2_de_P_sigma": "SANS OBJET",
+       "declaration_d_avance_D31": {
+        "C-sigma-mort": "INATTEIGNABLE — déclaré AVANT mesure (0-158) : identité du barycentre, cos moyen ≈ −1/(T−1) = -0.2000 contre un seuil |cos| ≤ 2/√d ≈ 0.05–0.07",
+        "le_vide_ne_realise_pas_l_antipode": true,
+        "B-mort": "QUASI INATTEIGNABLE — déclaré AVANT mesure par V-quad (0-169) : exigerait γ ≈ 0.5 contre ‖μ‖/‖h‖ = 0.73–0.85"
+       }
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "déclaration sans énumération",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "declaration": "C-σ-mort atteignable",
+       "enumeration": null,
+       "motif": "§6.F — antipode déclaré atteignable sans énumération ⇒ run invalide (D31)"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-appar — vivier N-état, lecture RELATIONNELLE (§14.2)",
+   "pass_case": "cardinaux énumérés S3=1, S2=0, S1=9, S0 ∈ {24,27,30}",
+   "fail_case": "la lecture littérale éteint trois strates sur quatre par vacuité",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "« un confondant supprimé avec son support n'est pas un confondant contrôlé — c'est une mesure absente » (§14.2).",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "lecture relationnelle",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "lecture": "RELATIONNELLE (§14.2) — strate(j,a) = strate(j,b) = strate(a,b)",
+       "cardinaux_enumeres": {
+        "S3": {
+         "n_paires": 60,
+         "cardinal_min": 1,
+         "cardinal_max": 1,
+         "cardinal_moyen": 1.0,
+         "valeurs_distinctes": [
+          1
+         ],
+         "vivier_vide_sur_toutes_les_paires": false
+        },
+        "S2": {
+         "n_paires": 90,
+         "cardinal_min": 0,
+         "cardinal_max": 0,
+         "cardinal_moyen": 0.0,
+         "valeurs_distinctes": [
+          0
+         ],
+         "vivier_vide_sur_toutes_les_paires": true
+        },
+        "S1": {
+         "n_paires": 360,
+         "cardinal_min": 9,
+         "cardinal_max": 9,
+         "cardinal_moyen": 9.0,
+         "valeurs_distinctes": [
+          9
+         ],
+         "vivier_vide_sur_toutes_les_paires": false
+        },
+        "S0": {
+         "n_paires": 1260,
+         "cardinal_min": 24,
+         "cardinal_max": 30,
+         "cardinal_moyen": 25.714285714285715,
+         "valeurs_distinctes": [
+          24,
+          27,
+          30
+         ],
+         "vivier_vide_sur_toutes_les_paires": false
+        }
+       },
+       "cardinaux_attendus_14_2": {
+        "S3": [
+         1,
+         1
+        ],
+        "S2": [
+         0,
+         0
+        ],
+        "S1": [
+         9,
+         9
+        ],
+        "S0": [
+         24,
+         30
+        ]
+       },
+       "conformite_par_strate": {
+        "S3": true,
+        "S2": true,
+        "S1": true,
+        "S0": true
+       },
+       "strates_a_vivier_vide": [
+        "S2"
+       ],
+       "falsification_signalee_14_3": {
+        "clause_gelee": "§4.5 Δ-sansobjet : « vivier x_null apparié vide (attendu possible en S3) »",
+        "enumeration": {
+         "S3": [
+          1
+         ],
+         "S2": [
+          0
+         ],
+         "S1": [
+          9
+         ],
+         "S0": [
+          24,
+          27,
+          30
+         ]
+        },
+        "constat": "l'adresse de la clause est INVERSÉE : S3 n'est jamais vide, le vide certain est S2",
+        "traitement": "la clause n'est PAS corrigée ; Δ-sansobjet se déclenche sur la cellule vide QUELLE QU'ELLE SOIT, et la falsification est consignée"
+       }
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "lecture littérale",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "lecture": "RELATIONNELLE (§14.2) — strate(j,a) = strate(j,b) = strate(a,b)",
+       "cardinaux_enumeres": {
+        "S3": {
+         "n_paires": 60,
+         "cardinal_min": 1,
+         "cardinal_max": 1,
+         "cardinal_moyen": 1.0,
+         "valeurs_distinctes": [
+          1
+         ],
+         "vivier_vide_sur_toutes_les_paires": false
+        },
+        "S2": {
+         "n_paires": 90,
+         "cardinal_min": 0,
+         "cardinal_max": 0,
+         "cardinal_moyen": 0.0,
+         "valeurs_distinctes": [
+          0
+         ],
+         "vivier_vide_sur_toutes_les_paires": true
+        },
+        "S1": {
+         "n_paires": 360,
+         "cardinal_min": 0,
+         "cardinal_max": 0,
+         "cardinal_moyen": 0.0,
+         "valeurs_distinctes": [
+          0
+         ],
+         "vivier_vide_sur_toutes_les_paires": true
+        },
+        "S0": {
+         "n_paires": 1260,
+         "cardinal_min": 0,
+         "cardinal_max": 0,
+         "cardinal_moyen": 0.0,
+         "valeurs_distinctes": [
+          0
+         ],
+         "vivier_vide_sur_toutes_les_paires": true
+        }
+       },
+       "cardinaux_attendus_14_2": {
+        "S3": [
+         1,
+         1
+        ],
+        "S2": [
+         0,
+         0
+        ],
+        "S1": [
+         9,
+         9
+        ],
+        "S0": [
+         24,
+         30
+        ]
+       },
+       "conformite_par_strate": {
+        "S3": true,
+        "S2": true,
+        "S1": false,
+        "S0": false
+       },
+       "strates_a_vivier_vide": [
+        "S2",
+        "S1",
+        "S0"
+       ],
+       "falsification_signalee_14_3": {
+        "clause_gelee": "§4.5 Δ-sansobjet : « vivier x_null apparié vide (attendu possible en S3) »",
+        "enumeration": {
+         "S3": [
+          1
+         ],
+         "S2": [
+          0
+         ],
+         "S1": [
+          0
+         ],
+         "S0": [
+          0
+         ]
+        },
+        "constat": "l'adresse de la clause est INVERSÉE : S3 n'est jamais vide, le vide certain est S2",
+        "traitement": "la clause n'est PAS corrigée ; Δ-sansobjet se déclenche sur la cellule vide QUELLE QU'ELLE SOIT, et la falsification est consignée"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-vide — support vide ⇒ SANS OBJET, jamais 0",
+   "pass_case": "n_vide publié par cellule et par condition",
+   "fail_case": "un dénominateur nul publié en 0",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "deux cellules à dénominateur non nul",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "n_vide_par_cellule": {
+        "m|aucun|S0": {
+         "n_vide": 3955,
+         "denominateur": 5083
+        },
+        "m|type|S2": {
+         "n_vide": 283,
+         "denominateur": 339
+        }
+       },
+       "cellules_sans_denominateur": [],
+       "manques": [],
+       "regle": "dénominateur nul ⇒ SANS OBJET (D23), jamais 0"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "dénominateur nul",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "cellules_sans_denominateur": [
+        "m|type|S3"
+       ],
+       "motif": "un support vide se publie SANS OBJET, jamais 0 (D23) — et il ne licencie aucune borne, pas même une équivalence TOST"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-ecriture — écriture littérale de Δ_Base (0-173)",
+   "pass_case": "la gravée est calculée et les deux alternatives publiées",
+   "fail_case": "un cas où les deux lectures DIVERGENT",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "troisième occurrence du mode 0-155 dans le projet.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "écriture gravée",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "ecriture_gravee": "[Σ_p n_p(μ) − Σ_p n̄_p(null)] / Σ_p |A∩B|_p, n̄_p = moyenne des R tirages PAR PAIRE",
+       "Delta_Base_gravee": 0.2857142857142857,
+       "lecture_alternative_1_moyenne_des_ratios": 0.25,
+       "lecture_alternative_2_ratio_apres_pooling_des_R": 0.14285714285714285,
+       "ecart_gravee_moins_alt1": 0.0357142857142857,
+       "ecart_gravee_moins_alt2": 0.14285714285714285,
+       "statut_des_alternatives": "ÉNUMÉRÉES ET REJETÉES par écrit (D31) ; seule la gravée décide"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "divergence des deux lectures",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "Delta_gravee": 0.2857142857142857,
+       "alt1_moyenne_des_ratios": 0.25,
+       "alt2_ratio_apres_pooling": 0.14285714285714285,
+       "ecarts": [
+        0.0357142857142857,
+        0.14285714285714285
+       ],
+       "motif": "deux écritures de la primaire décisionnelle ⇒ deux partitions possiblement OPPOSÉES sur les mêmes données (0-155, troisième occurrence)"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-grappe — bootstrap par grappe, BLOQUANTE (0-170, 0-178)",
+   "pass_case": "IC, cardinal effectif et méthode de quantile publiés",
+   "fail_case": "un bootstrap sans cardinal effectif ni méthode de quantile",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "(xxviii) : aucune phrase qualifiant l'ampleur de σ± n'est publiable avant PASS de cette porte.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "60 grappes, fraction de grappe manquante publiée",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "IC_sigma_pm_sous_grappes": [
+        0.35970818850537545,
+        0.4225400128040973
+       ],
+       "estime": 0.39378238341968913,
+       "n_grappes": 12,
+       "cardinal_effectif_median": 8.0,
+       "fraction_reechantillons_a_grappe_manquante": 1.0,
+       "methode_de_quantile": "percentile, np.quantile(method='linear') — type 7 (D24)",
+       "ecart_a_0_5_survit": true,
+       "classe_si_non": "Σ-mort — « il n'y a pas d'anomalie à expliquer » ; N-queue sans objet, Q-M1 tombe pour une raison qui n'est pas la sienne",
+       "interdit_xxviii": "aucune phrase qualifiant l'ampleur de σ± n'est publiable avant PASS de cette porte"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "cardinal effectif retiré",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "IC_sigma_pm_sous_grappes": [
+        0.35970818850537545,
+        0.4225400128040973
+       ],
+       "estime": 0.39378238341968913,
+       "n_grappes": 12,
+       "cardinal_effectif_median": null,
+       "fraction_reechantillons_a_grappe_manquante": 1.0,
+       "methode_de_quantile": null,
+       "ecart_a_0_5_survit": true,
+       "classe_si_non": "Σ-mort — « il n'y a pas d'anomalie à expliquer » ; N-queue sans objet, Q-M1 tombe pour une raison qui n'est pas la sienne",
+       "interdit_xxviii": "aucune phrase qualifiant l'ampleur de σ± n'est publiable avant PASS de cette porte"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-rang-def — r = max(rang_A, rang_B) gelé, planchers",
+   "pass_case": "8 buckets, ≥ 200 trials ET ≥ 8 paires, trois lectures rejetées par écrit",
+   "fail_case": "un bucket à 199 trials doit être signalé",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "profil conforme",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "definition_gelee": "r = max(rang_A, rang_B) — l'appartenance à A∩B est bornée par le rang le PIRE des deux",
+       "lectures_rejetees": [
+        "min(rang_A, rang_B) — bornerait par le rang le meilleur, ce qui n'est pas la contrainte d'appartenance",
+        "rang_A seul (ou rang_B seul) — brise la symétrie de la paire",
+        "moyenne des deux rangs — n'est pas un rang, et son bucket n'a pas de domaine entier"
+       ],
+       "n_buckets": 8,
+       "largeur_bucket": 8,
+       "plancher_trials": 200,
+       "plancher_paires": 8,
+       "fusion_pre_declaree": "fusion DYADIQUE : buckets (1,2), (3,4), (5,6), (7,8), puis (1-4), (5-8), puis global — appliquée AVANT toute lecture",
+       "buckets_sous_plancher": [],
+       "profil": {
+        "b1": {
+         "trials": 400,
+         "n_paires": 40,
+         "sigma_pm": 0.36
+        },
+        "b2": {
+         "trials": 450,
+         "n_paires": 40,
+         "sigma_pm": 0.37
+        },
+        "b3": {
+         "trials": 500,
+         "n_paires": 40,
+         "sigma_pm": 0.38
+        },
+        "b4": {
+         "trials": 550,
+         "n_paires": 40,
+         "sigma_pm": 0.39
+        },
+        "b5": {
+         "trials": 600,
+         "n_paires": 40,
+         "sigma_pm": 0.39999999999999997
+        },
+        "b6": {
+         "trials": 650,
+         "n_paires": 40,
+         "sigma_pm": 0.41
+        },
+        "b7": {
+         "trials": 700,
+         "n_paires": 40,
+         "sigma_pm": 0.42
+        },
+        "b8": {
+         "trials": 750,
+         "n_paires": 40,
+         "sigma_pm": 0.43
+        }
+       }
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "bucket à 199 trials",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "buckets_sous_plancher": [
+        "b1"
+       ],
+       "plancher": 200,
+       "fusion": "fusion DYADIQUE : buckets (1,2), (3,4), (5,6), (7,8), puis (1-4), (5-8), puis global — appliquée AVANT toute lecture"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Fusion dyadique PRÉ-DÉCLARÉE des buckets",
+   "pass_case": "8 → 4 → 2 → 1, appliquée AVANT toute lecture",
+   "fail_case": "une fusion qui dépendrait du résultat",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "buckets sous plancher fusionnés mécaniquement",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "largeur_finale_en_rangs": 8,
+       "n_buckets_final": 8,
+       "niveaux_traverses": [
+        8
+       ],
+       "trials_finaux": [
+        334,
+        327,
+        281,
+        296,
+        314,
+        316,
+        282,
+        315
+       ]
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "fusion conditionnée au résultat",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "largeur": 8,
+       "niveaux": [
+        8
+       ],
+       "motif": "la fusion est appliquée AVANT toute lecture et ne dépend que des planchers (trials, paires) — jamais de σ±"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Profil signé de σ± par bucket (§5-7)",
+   "pass_case": "l'écart à 0.5 décroît avec le rang (croît avec la magnitude)",
+   "fail_case": "un profil plat ⇒ la loi est FAUSSE",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "0-165 : le ρ de la loi de queue EST le cos des états centrés ; seule la forme du profil les départage.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "profil décroissant en rang",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "profil": [
+        0.359,
+        0.386,
+        0.391,
+        0.402
+       ],
+       "ecarts_a_0.5": [
+        0.141,
+        0.114,
+        0.109,
+        0.098
+       ],
+       "sens": "b1 = rangs les plus PETITS = magnitudes les plus GRANDES"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "profil plat",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "profil": [
+        0.392,
+        0.392,
+        0.392,
+        0.392
+       ],
+       "plat": true,
+       "motif": "un profil plat contredit la prédiction signée : « ce n'est pas exclure un artefact — le ρ de la loi EST le cos_paire, et la seule chose qui les départage est le profil »"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-ident — quantités forcées par une identité ((xxv))",
+   "pass_case": "les quatre quantités forcées déclarées avec leur dérivation",
+   "fail_case": "une quantité forcée non déclarée",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "« valeur imposée par l'identité <nommée> ; poids probant nul ». Ajoutée par ce cycle : l'INVARIANCE D'ÉCHELLE de topk rend N-plac indépendante de la magnitude.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "déclarations complètes",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "quantites_requises": [
+        "rho_Base_sous_regime_gamma",
+        "O_superieur_a_p_sym",
+        "cos_des_centroides",
+        "plac_invariance_d_echelle"
+       ],
+       "declarations": {
+        "rho_Base_sous_regime_gamma": {
+         "derivation": "propriété pivot : (z_a,i, z_b,i, z_μ,i) gaussiens de Gram = cosinus ; ρ̂_Base est fonction croissante de γ seul ⇒ γ ≈ 0.75–0.89 force ρ̂_Base ≈ 0.55–0.75 (Q-M9)",
+         "valeur_forcee": "ρ̂_Base(γ) — calculée par V-quad, publiée par cellule AVANT mesure",
+         "poids_probant": "NUL, déclaré d'avance (D27, entrée (xxv))"
+        },
+        "O_superieur_a_p_sym": {
+         "derivation": "identité de Cauchy–Schwarz sur les masses top-p (§16 du cycle précédent) : |A∩B| ≥ p_sym est vraie en arithmétique réelle",
+         "valeur_forcee": "O ≥ p_sym, toujours",
+         "poids_probant": "NUL (D32)"
+        },
+        "cos_des_centroides": {
+         "derivation": "μ_global est la moyenne NON PONDÉRÉE des T centroïdes de cadre (cellules équi-cardinales) ⇒ Σ_t (μ_t − μ_global) = 0 exactement ⇒ cos moyen par paire = −1/(T−1)",
+         "valeur_forcee": "−1/(T−1) = −0.2000 à T = 6",
+         "poids_probant": "NUL — identité du barycentre (0-159, Q-M4)"
+        },
+        "plac_invariance_d_echelle": {
+         "derivation": "topk(|G·x|, 64) est INVARIANTE D'ÉCHELLE ⇒ top64(G·(c·r)) = top64(G·r) pour tout c > 0 : la contrainte ‖c·r‖ = ‖μ_global‖ n'a AUCUN effet sur le support de la référence placebo",
+         "valeur_forcee": "N-plac est indépendante de la magnitude : elle mesure l'anisotropie de G, pas le décalage mécanique de magnitudes (0-106)",
+         "poids_probant": "NUL sur la magnitude ; la condition est exécutée telle qu'écrite et le constat est publié"
+        },
+        "seuil_t": {
+         "derivation": "t = Φ⁻¹(1 − 1/256) calculé en fp64 au banc (0-177)",
+         "valeur_forcee": "2.660067468617",
+         "poids_probant": "SANS OBJET — c'est une constante, pas une mesure"
+        }
+       },
+       "manques": [],
+       "sans_valeur_forcee": [],
+       "formulation_obligatoire": "« valeur imposée par l'identité <nommée> ; poids probant nul »"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "cos des centroïdes retiré",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "quantites_requises": [
+        "rho_Base_sous_regime_gamma",
+        "O_superieur_a_p_sym",
+        "cos_des_centroides",
+        "plac_invariance_d_echelle"
+       ],
+       "declarations": {
+        "rho_Base_sous_regime_gamma": {
+         "derivation": "propriété pivot : (z_a,i, z_b,i, z_μ,i) gaussiens de Gram = cosinus ; ρ̂_Base est fonction croissante de γ seul ⇒ γ ≈ 0.75–0.89 force ρ̂_Base ≈ 0.55–0.75 (Q-M9)",
+         "valeur_forcee": "ρ̂_Base(γ) — calculée par V-quad, publiée par cellule AVANT mesure",
+         "poids_probant": "NUL, déclaré d'avance (D27, entrée (xxv))"
+        },
+        "O_superieur_a_p_sym": {
+         "derivation": "identité de Cauchy–Schwarz sur les masses top-p (§16 du cycle précédent) : |A∩B| ≥ p_sym est vraie en arithmétique réelle",
+         "valeur_forcee": "O ≥ p_sym, toujours",
+         "poids_probant": "NUL (D32)"
+        },
+        "plac_invariance_d_echelle": {
+         "derivation": "topk(|G·x|, 64) est INVARIANTE D'ÉCHELLE ⇒ top64(G·(c·r)) = top64(G·r) pour tout c > 0 : la contrainte ‖c·r‖ = ‖μ_global‖ n'a AUCUN effet sur le support de la référence placebo",
+         "valeur_forcee": "N-plac est indépendante de la magnitude : elle mesure l'anisotropie de G, pas le décalage mécanique de magnitudes (0-106)",
+         "poids_probant": "NUL sur la magnitude ; la condition est exécutée telle qu'écrite et le constat est publié"
+        },
+        "seuil_t": {
+         "derivation": "t = Φ⁻¹(1 − 1/256) calculé en fp64 au banc (0-177)",
+         "valeur_forcee": "2.660067468617",
+         "poids_probant": "SANS OBJET — c'est une constante, pas une mesure"
+        }
+       },
+       "manques": [
+        "cos_des_centroides"
+       ],
+       "sans_valeur_forcee": [],
+       "formulation_obligatoire": "« valeur imposée par l'identité <nommée> ; poids probant nul »"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-S — DEFF_S publié, formule binomiale INTERDITE (0-180)",
+   "pass_case": "q₉₅ sur R tirages de S, DEFF_S > 1, méthode de quantile déclarée",
+   "fail_case": "DEFF_S = 1 (la binomiale déguisée)",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "borne démontrée par lab-math : DEFF_S ≥ 2.8. Poids probant NUL, déclaré (D32).",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "400 tirages de S",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "q95": 9.0,
+       "DEFF_S_observe": 1.2083056703919715,
+       "borne_demontree": 2.8,
+       "methode_de_quantile": "np.quantile(method='linear') — type 7 ; encadrement par statistiques d'ordre publié",
+       "formule_binomiale": "INTERDITE (0-180)",
+       "motif_d_echec": null
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "DEFF_S forcé à 1",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "q95": 9.0,
+       "DEFF_S_observe": 1.0,
+       "borne_demontree": 2.8,
+       "methode_de_quantile": "np.quantile(method='linear') — type 7 ; encadrement par statistiques d'ordre publié",
+       "formule_binomiale": "INTERDITE (0-180)",
+       "motif_d_echec": "DEFF_S absent, ≤ 1, ou méthode de quantile non déclarée — la formule binomiale est fausse ici"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-seed — présence, jamais vérité (0-145)",
+   "pass_case": "seed = 0 ACCEPTÉ : la porte teste la présence du champ",
+   "fail_case": "générateur absent ⇒ la porte mord sur le champ manquant",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "spec complète, seed = 0",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "champs_manquants": [],
+       "modeles_sans_cardinal": [],
+       "appariement_par_le_vecteur": false,
+       "spec": {
+        "seed": 0,
+        "generateur": "torch.Generator().manual_seed(0)",
+        "regle_de_tirage": "torch.randn(R, d) puis normalisation L2 par ligne",
+        "indices": "0..R−1",
+        "cardinal_par_modele": {
+         "gpt2": 20,
+         "HuggingFaceTB/SmolLM2-360M": 20,
+         "Qwen/Qwen2.5-1.5B": 20
+        },
+        "appariement_inter_modeles": "par la NORME, jamais par le vecteur"
+       },
+       "regle": "appariement inter-modèles par la NORME, jamais par le VECTEUR"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "générateur retiré",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "champs_manquants": [
+        "generateur"
+       ],
+       "modeles_sans_cardinal": [],
+       "appariement_par_le_vecteur": false,
+       "spec": {
+        "seed": 0,
+        "regle_de_tirage": "torch.randn(R, d) puis normalisation L2 par ligne",
+        "indices": "0..R−1",
+        "cardinal_par_modele": {
+         "gpt2": 20,
+         "HuggingFaceTB/SmolLM2-360M": 20,
+         "Qwen/Qwen2.5-1.5B": 20
+        },
+        "appariement_inter_modeles": "par la NORME, jamais par le vecteur"
+       },
+       "regle": "appariement inter-modèles par la NORME, jamais par le VECTEUR"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-loo — LOO principal, non-LOO descriptif (0-174)",
+   "pass_case": "les deux publiés, écart comparé à ε_B",
+   "fail_case": "le LOO absent ⇒ arrêt",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "les deux valeurs",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "rho_Base_mu_LOO_PRINCIPAL": 0.7333,
+       "rho_Base_mu_non_LOO_descriptif": 0.7291,
+       "ecart_LOO_moins_non_LOO": 0.0041999999999999815,
+       "epsilon_B": 0.0177,
+       "ecart_rapporte_a_epsilon_B": 0.2372881355932193,
+       "biais_annonce_3_2": 0.005,
+       "regle": "LOO principal, INCONDITIONNEL (P7) ; inversion ⇒ arrêt"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "LOO manquant",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "rho_Base_mu_LOO_PRINCIPAL": null,
+       "rho_Base_mu_non_LOO_descriptif": 0.7291,
+       "ecart_LOO_moins_non_LOO": null,
+       "epsilon_B": 0.0177,
+       "ecart_rapporte_a_epsilon_B": null,
+       "biais_annonce_3_2": 0.005,
+       "regle": "LOO principal, INCONDITIONNEL (P7) ; inversion ⇒ arrêt"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-decimales — ≥ 4 décimales (0-179)",
+   "pass_case": "cosinus, ρ_Base, R_Base, Ψ à 4 décimales",
+   "fail_case": "deux décimales : −0.0019 et −0.0023 deviennent identiques",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "quatre décimales",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "minimum_de_decimales": 4,
+       "decimales_par_quantite": {
+        "rho_Base": 4,
+        "R_Base": 4,
+        "cos": 4,
+        "Psi": 4
+       },
+       "insuffisants": [],
+       "regle": "O en entiers exacts ; cosinus, ρ_Base, R_Base, Ψ à ≥ 4 décimales"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "deux décimales",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "minimum_de_decimales": 4,
+       "decimales_par_quantite": {
+        "rho_Base": 2,
+        "R_Base": 2,
+        "cos": 2,
+        "Psi": 2
+       },
+       "insuffisants": [
+        "rho_Base",
+        "R_Base",
+        "cos",
+        "Psi"
+       ],
+       "regle": "O en entiers exacts ; cosinus, ρ_Base, R_Base, Ψ à ≥ 4 décimales"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-P8 — ≥ 8 paires par cellule",
+   "pass_case": "deux cellules à P ≥ 8",
+   "fail_case": "une cellule à 7 paires",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "P = 360 et 7560",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "minimum": 8,
+       "cellules_exclues": {},
+       "cardinal_exclu": 0,
+       "n_cellules": 2,
+       "modeles_exclus": [],
+       "regle_modele": "> 2 strates touchées sur un modèle ⇒ modèle exclu (§6.F)"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "P = 7",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "minimum": 8,
+       "cellules_exclues": {
+        "m|aucun|S3": 7
+       },
+       "cardinal_exclu": 1,
+       "n_cellules": 1,
+       "modeles_exclus": [],
+       "regle_modele": "> 2 strates touchées sur un modèle ⇒ modèle exclu (§6.F)"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-queue — t calculé au banc, jamais 2.66 en dur (0-177)",
+   "pass_case": "t = ndtri(1 − 1/256) ; σ̂±_pool gelée littéralement",
+   "fail_case": "t = 2.66 en dur ⇒ la pente varie de 1.5 %",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "t calculé",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "t_calcule_au_banc": 2.6600674686174592,
+       "t_formule": "ndtri(1 - 1/256)",
+       "t_en_dur_interdit": 2.66,
+       "ecart_a_la_valeur_en_dur": 6.746861745909882e-05,
+       "pente_(phi/Q)^2": 8.815564787235882,
+       "sigma_hat_min_max": [
+        0.38,
+        0.4
+       ],
+       "pool_gele": "σ̂±_pool = Σ_p |A∩B|_p·σ̂±(cos_p,t)/Σ_p |A∩B|_p — JAMAIS σ̂±(cos̄) (0-172)",
+       "selection": "top-64 PAR VECTEUR (rang), jamais un seuil commun ; la certification est la simulation Q-M1-bis"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "t en dur",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "t_en_dur": 2.66,
+       "t_calcule": 2.6600674686174592,
+       "pente_en_dur": 8.815197180583295,
+       "pente_calculee": 8.815564787235882,
+       "variation_relative": 4.169972786305376e-05,
+       "motif": "σ̂±_pool = Σ_p |A∩B|_p·σ̂±(cos_p,t)/Σ_p |A∩B|_p — JAMAIS σ̂±(cos̄) (0-172)"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-diag — le couple (ρ_Base, ρ̂_Base) obligatoire (D34)",
+   "pass_case": "les huit colonnes publiées par strate, condition et modèle",
+   "fail_case": "ρ_Base publié sans son ρ̂_Base ⇒ rapport NON ÉCRIVABLE",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "cellule complète",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "quantites_requises": [
+        "rho_Base",
+        "rho_chapeau_Base",
+        "R_Base",
+        "Delta_Base",
+        "Delta_chapeau_Base",
+        "n_vide",
+        "sigma_pm",
+        "sigma_hat_pool"
+       ],
+       "n_cellules": 1,
+       "manques": [],
+       "n_manques": 0,
+       "regle_D34": "un ρ_Base publié sans son ρ̂_Base apparié rend le rapport NON ÉCRIVABLE ((xxvii), D34)"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "ρ̂_Base retiré",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "quantites_requises": [
+        "rho_Base",
+        "rho_chapeau_Base",
+        "R_Base",
+        "Delta_Base",
+        "Delta_chapeau_Base",
+        "n_vide",
+        "sigma_pm",
+        "sigma_hat_pool"
+       ],
+       "n_cellules": 1,
+       "manques": [
+        "m|aucun|S0 : rho_chapeau_Base absent"
+       ],
+       "n_manques": 1,
+       "regle_D34": "un ρ_Base publié sans son ρ̂_Base apparié rend le rapport NON ÉCRIVABLE ((xxvii), D34)"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Q-M11 — terme G de ε_R (plug-in)",
+   "pass_case": "sd_G calculé sur les (u_i, v_i) observés et ajouté à chaque réplique",
+   "fail_case": "omettre le terme O(1/√D) rend ε_R trop étroit",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "plug-in sur données synthétiques",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "sd_G": 0.003590602851300579,
+       "v_barre": 1.9935302734375,
+       "D": 8192,
+       "formule": "√(Var_i(u_i − ρ̂ v_i)/D)/v̄"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "terme G omis",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "sd_G": 0.0,
+       "motif": "sans le terme G, ε_R est trop étroit et R-plus devient plus facile qu'annoncé — mode 0-52 inversé"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Q-M1-bis — simulation EXACTE à rang",
+   "pass_case": "sous Σ = I, ρ_Base_sim vaut k/D = 1/128",
+   "fail_case": "à seuil commun le cardinal du support n'est pas 64",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "rectification §14.1 : la fluctuation du seuil réalisé n'est pas Gumbel (SD 15-20 %) mais la 64ᵉ statistique d'ordre, sd(t̂₆₄) ≈ 0.042, soit ≈ 1.6 % de t. Le défaut 0-171 et son correctif sont INCHANGÉS.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "Σ = I, N_G = 6",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "rho_Base_sim": 0.006476683937823834,
+       "cible_k_sur_D": 0.0078125,
+       "ecart": 0.0013358160621761662,
+       "n_paires": 406,
+       "N_G": 30,
+       "biais_ratio_moins_esperance": 1.627325708435101e-05,
+       "sigma_pm_sim_global": 0.4998380829015544,
+       "departage": "par INDICE (argsort stable) — déclaré ; probabilité d'ex æquo nulle p.s."
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "cardinal à seuil commun ≠ 64",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "cardinal_du_support_a_seuil_commun": [
+        75,
+        52,
+        72,
+        67
+       ],
+       "cardinal_realise_par_rang": 64,
+       "sd_t64_rectifiee_14_1": 0.042,
+       "sigma_pm_par_rang": 1.0,
+       "sigma_pm_a_seuil": 1.0,
+       "motif": "la sélection réalisée est un RANG ; une nulle à seuil commun décrit un autre appareil (0-171). La rectification §14.1 borne l'effet seuil-vs-rang sur P₂/P₃ à ~1e−3 : elle affaiblit l'urgence du défaut sans l'annuler."
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Certification Q-M10 (iii) — inflation de eps_R",
+   "pass_case": "|sim - quad| <= 0.005 => cellule certifiee, exces nul",
+   "fail_case": "au-dela, l'exces s'ajoute a eps_R (inflation publiee)",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "la simulation a rang tourne AVANT la synthese : lire eps_R avant l'inflation serait lire une resolution que la certification n'accorde pas.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "ecart 0.0026",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "S3": {
+        "ecart": 0.0025999999999999357,
+        "tolerance": 0.005,
+        "exces": 0.0,
+        "certifiee": true,
+        "rho_Base_sim": 0.6265,
+        "rho_chapeau_quad": 0.6239,
+        "regle": "au-delà de la tolérance, l'excès s'ajoute à ε_R (inflation publiée) ; la forme gelée ne change pas"
+       },
+       "S2": {
+        "ecart": 0.0025999999999999357,
+        "tolerance": 0.005,
+        "exces": 0.0,
+        "certifiee": true,
+        "rho_Base_sim": 0.6265,
+        "rho_chapeau_quad": 0.6239,
+        "regle": "au-delà de la tolérance, l'excès s'ajoute à ε_R (inflation publiée) ; la forme gelée ne change pas"
+       },
+       "S1": {
+        "ecart": 0.0025999999999999357,
+        "tolerance": 0.005,
+        "exces": 0.0,
+        "certifiee": true,
+        "rho_Base_sim": 0.6265,
+        "rho_chapeau_quad": 0.6239,
+        "regle": "au-delà de la tolérance, l'excès s'ajoute à ε_R (inflation publiée) ; la forme gelée ne change pas"
+       },
+       "S0": {
+        "ecart": 0.0025999999999999357,
+        "tolerance": 0.005,
+        "exces": 0.0,
+        "certifiee": true,
+        "rho_Base_sim": 0.6265,
+        "rho_chapeau_quad": 0.6239,
+        "regle": "au-delà de la tolérance, l'excès s'ajoute à ε_R (inflation publiée) ; la forme gelée ne change pas"
+       }
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "ecart 0.0059",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "cellules_non_certifiees": [
+        "S3",
+        "S2",
+        "S1",
+        "S0"
+       ],
+       "ecart": 0.005900000000000016,
+       "exces_ajoute_a_epsilon_R": 0.0009000000000000162,
+       "motif": "au-dela de la tolerance, l'exces s'ajoute a eps_R ; la forme gelee ne change pas"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Ordinal N6 — bootstrap JOINT, borne par le min (0-63)",
+   "pass_case": "les deux bras partagent le meme reechantillon de tiges",
+   "fail_case": "un bras sans domaine => SANS OBJET, jamais 0",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "0-63 : tout produit de p-valeurs par modele rend le run invalide. §14.4 : le bras S3 a R = 1, variance de tirage NULLE, il entre comme constante.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "deux bras identiques => ecart exactement nul",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "ecart": 0.0,
+       "IC": [
+        0.0,
+        0.0
+       ],
+       "borne": "min (0-63) — jamais un produit de p-valeurs par modèle",
+       "frac_grappe_manquante": 1.0
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "bras A vide",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "statut": "SANS OBJET",
+       "raison": "un bras au moins n'a pas de domaine de definition (vivier apparié vide) ⇒ l'ordre n'a pas de domaine ; SANS OBJET, jamais 0"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Poids de bootstrap deux-voies (Q-M14 (b))",
+   "pass_case": "l'agrégation par couple de tiges ≡ la règle par paire lue",
+   "fail_case": "le produit appliqué aussi aux paires INTRA-tige",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "règle déjà dans le code au cycle précédent (l. 237-243) ; lab-math la confirme conservatrice.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "200 paires aléatoires",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "ecart_max": 0.0,
+       "n_paires": 200,
+       "n_couples_de_tiges": 54
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "m² sur une paire intra-tige",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "regle_declaree": [
+        3.0,
+        2.0
+       ],
+       "regle_produit_partout": [
+        9.0,
+        2.0
+       ],
+       "motif": "sur une paire intra-tige, le produit compte la tige DEUX fois et gonfle sa multiplicité"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Partitions §4.5 — exhaustives, exclusives, ordre gravé (D18)",
+   "pass_case": "les quatre partitions rendent la classe attendue sur chaque cas",
+   "fail_case": "Δ-nul évalué avant Δ-sansobjet",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "§14.4 : deux SANS OBJET ne se confondent jamais.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "grille énumérée",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "classes_B": [
+        "B-vide",
+        "B-haut",
+        "B-mort",
+        "B-ind"
+       ],
+       "classes_Delta": [
+        "Δ-sansobjet",
+        "Δ-anti",
+        "Δ-nul",
+        "Δ-priv",
+        "Δ-ind"
+       ],
+       "classes_R": [
+        "R-vide",
+        "R-moins",
+        "R-nul",
+        "R-plus",
+        "R-ind"
+       ],
+       "cardinal_formel": 500,
+       "regle": "complémentation EN DERNIER (D18)"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "ordre inversé",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "classe_dans_l_ordre_grave": "Δ-sansobjet",
+       "classe_si_ordre_inverse": "Δ-nul",
+       "motif": "« l'ordre n'a pas de domaine parce que RIEN NE BOUGE » contre « parce qu'UN TERME N'EXISTE PAS » — elles n'autorisent pas les mêmes suites (§14.4)"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Cardinaux comptés PAR ÉNUMÉRATION (§11.3)",
+   "pass_case": "U = 60, T = 6, paires par strate, vivier par strate — comptés",
+   "fail_case": "la clause gelée §4.5 prédit le vide en S3 : FALSIFIÉE",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "§14.3 : la clause n'est PAS corrigée ; elle est exécutée telle qu'écrite et la falsification est consignée.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "énumération complète",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "U_unites_decisionnelles": 60,
+       "T_cellules_de_capture": 6,
+       "cellules_decisionnelles": 12,
+       "paires_par_strate_et_par_cellule": {
+        "S3": 60,
+        "S2": 90,
+        "S1": 360,
+        "S0": 1260
+       },
+       "vivier_cardinaux_par_strate": {
+        "S3": [
+         1
+        ],
+        "S2": [
+         0
+        ],
+        "S0": [
+         24,
+         27,
+         30
+        ],
+        "S1": [
+         9
+        ]
+       },
+       "attendu_14_2": {
+        "S3": [
+         1,
+         1
+        ],
+        "S2": [
+         0,
+         0
+        ],
+        "S1": [
+         9,
+         9
+        ],
+        "S0": [
+         24,
+         30
+        ]
+       },
+       "unite_de_P": {
+        "S3": 360,
+        "S2": 540,
+        "S1": 2160,
+        "S0": 7560
+       }
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "prédiction d'adresse du §4.5",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "prediction_gelee_4_5": "vivier vide attendu possible en S3",
+       "enumere_S3": [
+        1
+       ],
+       "enumere_S2": [
+        0
+       ],
+       "constat": "adresse INVERSÉE — S3 n'est jamais vide, le vide certain est S2",
+       "traitement": "clause NON corrigée, exécutée telle qu'écrite ; Δ-sansobjet se déclenche sur la cellule vide QUELLE QU'ELLE SOIT ; la falsification est consignée (§14.3)"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Q-M13 — Σ-mort ATTEIGNABLE, NON MODALE",
+   "pass_case": "la frontière ρ_ic ≈ 0.26–0.38 est calculée et publiée",
+   "fail_case": "traiter 5083 trials comme indépendants donne « 12 à 15 σ »",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "0-170 : un écart en σ dont le N effectif est inconnu n'est pas un écart en σ. Rectification autorisée (P5, D30 al. 1).",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "frontières calculées",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "frontieres": {
+        "0.41": {
+         "rho_ic_frontiere": 0.26,
+         "DEFF": 44.68,
+         "N_effectif": 113.7645478961504,
+         "demi_largeur_IC_95": 0.09188034199828074,
+         "IC_contient_0.5": true
+        },
+        "0.392": {
+         "rho_ic_frontiere": 0.38,
+         "DEFF": 64.84,
+         "N_effectif": 78.39296730413325,
+         "demi_largeur_IC_95": 0.1106846825776208,
+         "IC_contient_0.5": true
+        }
+       },
+       "n_grappes": 60,
+       "statut": "Σ-mort ATTEIGNABLE, NON MODALE — ratifié §14.5",
+       "rho_ic": "aucun a priori neuro (interdit (xxiv)) ; V-grappe tranche"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "indépendance supposée",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "z_sous_independance": 15.399754803242809,
+       "N_suppose": 5083,
+       "motif": "la dépendance LOO est POSITIVE ⇒ N effectif ≪ 5083, jamais établi ; l'ampleur en σ est RECTIFIÉE (P5, D30 alinéa 1)"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-mu — formules relues, second chemin, majorant de fuite (§4.6)",
+   "pass_case": "les quatre formules ont une occurrence UNIQUE dans le source, les deux chemins de μ_global concordent, le majorant est publié",
+   "fail_case": "une formule sans occurrence unique ⇒ le chiffre serait RECOPIÉ, pas RELU ⇒ arrêt (§6.D)",
+   "expected": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL",
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL",
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "§6.D : V-mu échec ⇒ run INVALIDE. Porte de PROVENANCE : elle ne touche aucune mesure. Défaut 0-190 du tour de correction : la porte était déclarée « partielle » alors que RIEN n'avait été exécuté.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "citations + double chemin + majorant",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "citations_par_ligne_de_code": {
+        "_bloc_de_declaration_exclu": {
+         "lignes": [
+          3681,
+          3682,
+          3683,
+          3684,
+          3685,
+          3686,
+          3687,
+          3688
+         ],
+         "motif": "la déclaration porte les expressions ; l'inclure ferait mordre la porte sur son propre registre"
+        },
+        "mu_global": {
+         "expression_attendue": "mu_glob = Sh / n_global",
+         "lignes": [
+          4972
+         ],
+         "occurrence_unique": true,
+         "ligne_relue": "mu_glob = Sh / n_global",
+         "fichier": "support_overlap.py"
+        },
+        "mu_global_LOO_par_paire": {
+         "expression_attendue": "mu_h = (Sh[None, :] - Hc[a] - Hc[b]) / (n_global - 2)",
+         "lignes": [
+          5006
+         ],
+         "occurrence_unique": true,
+         "ligne_relue": "mu_h = (Sh[None, :] - Hc[a] - Hc[b]) / (n_global - 2)",
+         "fichier": "support_overlap.py"
+        },
+        "mu_type_LOO_par_paire": {
+         "expression_attendue": "mu_type_h = (sHc[None, :] - Hc[a] - Hc[b]) / (n_dec - 2)",
+         "lignes": [
+          5007
+         ],
+         "occurrence_unique": true,
+         "ligne_relue": "mu_type_h = (sHc[None, :] - Hc[a] - Hc[b]) / (n_dec - 2)",
+         "fichier": "support_overlap.py"
+        },
+        "top64_de_G_x": {
+         "expression_attendue": "def support_topk(z, k: int = K_TOPK):",
+         "lignes": [
+          324
+         ],
+         "occurrence_unique": true,
+         "ligne_relue": "def support_topk(z, k: int = K_TOPK):",
+         "fichier": "support_overlap.py"
+        }
+       },
+       "double_chemin_mu_global": {
+        "n_etats": 360,
+        "d": 48,
+        "cardinaux_par_cellule": {
+         "c0": 60,
+         "c1": 60,
+         "c2": 60,
+         "c3": 60,
+         "c4": 60,
+         "c5": 60
+        },
+        "cellules_equicardinales": true,
+        "norme_mu_global": 20.800670544671256,
+        "chemin_1_nominal": "numpy sum(axis=0)/n, ordre des cellules du matériau — c'est la ligne citée `mu_global`",
+        "chemin_2_independant": "math.fsum par coordonnée (arrondi correct), cellules parcourues dans l'ORDRE INVERSE",
+        "ecart_max_absolu_par_coordonnee": 3.9968028886505635e-15,
+        "ecart_relatif_en_norme": 5.30746480910341e-16,
+        "cosinus_des_deux_chemins": 0.9999999999999999,
+        "tolerance": 1e-12,
+        "chemins_concordants": true,
+        "chemin_3_descriptif_moyenne_des_moyennes": {
+         "ecart_relatif_en_norme": 5.392662304971973e-16,
+         "licite_parce_que": "cellules équi-cardinales (vérifié ci-dessus)"
+        }
+       },
+       "majorant_de_fuite": {
+        "identite": "μ^{LOO}(p) − μ = (2/(n−2))·(μ − (h_a+h_b)/2) — exacte",
+        "n": 360,
+        "facteur_2_sur_n_moins_2": 0.00558659217877095,
+        "majorant_ecart_relatif_de_norme": 0.0018382475258828857,
+        "majorant_ecart_absolu_sur_gamma": 0.0006104569577273233,
+        "gamma_moyen_non_LOO": 0.949962811056083,
+        "sensibilite_d_rho_chapeau_d_gamma_mesuree": 4.619728635587017,
+        "majorant_de_fuite_sur_rho_Base": 0.0028201454884062486,
+        "valeur_annoncee_au_3_2": 0.005,
+        "regle": "publié, jamais absorbé — c'est POURQUOI le LOO est principal et inconditionnel (P7)"
+       },
+       "majorant_rapporte_a_epsilon_B": null,
+       "majorant_rapporte_a_epsilon_R": null,
+       "regle": "V-mu / V-loo échec, ou chiffre cité de mémoire ⇒ run INVALIDE (§6.D)",
+       "motifs_d_echec": null
+      }
+     },
+     {
+      "cas": "identité μ^LOO − μ = (2/(n−2))(μ − h̄)",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "ecart_max_a_l_identite": 9.02923569245928e-16,
+       "identite": "μ^{LOO}(p) − μ = (2/(n−2))·(μ − (h_a+h_b)/2)"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "formule absente du source",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "citations_par_ligne_de_code": {
+        "_bloc_de_declaration_exclu": {
+         "lignes": [
+          3681,
+          3682,
+          3683,
+          3684,
+          3685,
+          3686,
+          3687,
+          3688
+         ],
+         "motif": "la déclaration porte les expressions ; l'inclure ferait mordre la porte sur son propre registre"
+        },
+        "mu_global": {
+         "expression_attendue": "mu_glob = Sh / n_global",
+         "lignes": [
+          4972
+         ],
+         "occurrence_unique": true,
+         "ligne_relue": "mu_glob = Sh / n_global",
+         "fichier": "support_overlap.py"
+        },
+        "formule_qui_n_existe_pas": {
+         "expression_attendue": "mu_glob = Sh / (n_global - 1)",
+         "lignes": [],
+         "occurrence_unique": false,
+         "ligne_relue": null,
+         "fichier": "support_overlap.py"
+        }
+       },
+       "double_chemin_mu_global": {
+        "n_etats": 360,
+        "d": 48,
+        "cardinaux_par_cellule": {
+         "c0": 60,
+         "c1": 60,
+         "c2": 60,
+         "c3": 60,
+         "c4": 60,
+         "c5": 60
+        },
+        "cellules_equicardinales": true,
+        "norme_mu_global": 20.800670544671256,
+        "chemin_1_nominal": "numpy sum(axis=0)/n, ordre des cellules du matériau — c'est la ligne citée `mu_global`",
+        "chemin_2_independant": "math.fsum par coordonnée (arrondi correct), cellules parcourues dans l'ORDRE INVERSE",
+        "ecart_max_absolu_par_coordonnee": 3.9968028886505635e-15,
+        "ecart_relatif_en_norme": 5.30746480910341e-16,
+        "cosinus_des_deux_chemins": 0.9999999999999999,
+        "tolerance": 1e-12,
+        "chemins_concordants": true,
+        "chemin_3_descriptif_moyenne_des_moyennes": {
+         "ecart_relatif_en_norme": 5.392662304971973e-16,
+         "licite_parce_que": "cellules équi-cardinales (vérifié ci-dessus)"
+        }
+       },
+       "majorant_de_fuite": {
+        "identite": "μ^{LOO}(p) − μ = (2/(n−2))·(μ − (h_a+h_b)/2) — exacte",
+        "n": 360,
+        "facteur_2_sur_n_moins_2": 0.00558659217877095,
+        "majorant_ecart_relatif_de_norme": 0.0018382475258828857,
+        "majorant_ecart_absolu_sur_gamma": 0.0006104569577273233,
+        "gamma_moyen_non_LOO": 0.949962811056083,
+        "sensibilite_d_rho_chapeau_d_gamma_mesuree": 4.619728635587017,
+        "majorant_de_fuite_sur_rho_Base": 0.0028201454884062486,
+        "valeur_annoncee_au_3_2": 0.005,
+        "regle": "publié, jamais absorbé — c'est POURQUOI le LOO est principal et inconditionnel (P7)"
+       },
+       "majorant_rapporte_a_epsilon_B": null,
+       "majorant_rapporte_a_epsilon_R": null,
+       "regle": "V-mu / V-loo échec, ou chiffre cité de mémoire ⇒ run INVALIDE (§6.D)",
+       "motifs_d_echec": [
+        "une formule n'a pas d'occurrence UNIQUE dans le source : le chiffre serait recopié, pas relu"
+       ]
+      }
+     },
+     {
+      "cas": "les deux chemins divergent",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "citations_par_ligne_de_code": {
+        "_bloc_de_declaration_exclu": {
+         "lignes": [
+          3681,
+          3682,
+          3683,
+          3684,
+          3685,
+          3686,
+          3687,
+          3688
+         ],
+         "motif": "la déclaration porte les expressions ; l'inclure ferait mordre la porte sur son propre registre"
+        },
+        "mu_global": {
+         "expression_attendue": "mu_glob = Sh / n_global",
+         "lignes": [
+          4972
+         ],
+         "occurrence_unique": true,
+         "ligne_relue": "mu_glob = Sh / n_global",
+         "fichier": "support_overlap.py"
+        },
+        "mu_global_LOO_par_paire": {
+         "expression_attendue": "mu_h = (Sh[None, :] - Hc[a] - Hc[b]) / (n_global - 2)",
+         "lignes": [
+          5006
+         ],
+         "occurrence_unique": true,
+         "ligne_relue": "mu_h = (Sh[None, :] - Hc[a] - Hc[b]) / (n_global - 2)",
+         "fichier": "support_overlap.py"
+        },
+        "mu_type_LOO_par_paire": {
+         "expression_attendue": "mu_type_h = (sHc[None, :] - Hc[a] - Hc[b]) / (n_dec - 2)",
+         "lignes": [
+          5007
+         ],
+         "occurrence_unique": true,
+         "ligne_relue": "mu_type_h = (sHc[None, :] - Hc[a] - Hc[b]) / (n_dec - 2)",
+         "fichier": "support_overlap.py"
+        },
+        "top64_de_G_x": {
+         "expression_attendue": "def support_topk(z, k: int = K_TOPK):",
+         "lignes": [
+          324
+         ],
+         "occurrence_unique": true,
+         "ligne_relue": "def support_topk(z, k: int = K_TOPK):",
+         "fichier": "support_overlap.py"
+        }
+       },
+       "double_chemin_mu_global": {
+        "n_etats": 360,
+        "d": 48,
+        "cardinaux_par_cellule": {
+         "c0": 60,
+         "c1": 60,
+         "c2": 60,
+         "c3": 60,
+         "c4": 60,
+         "c5": 60
+        },
+        "cellules_equicardinales": true,
+        "norme_mu_global": 20.800670544671256,
+        "chemin_1_nominal": "numpy sum(axis=0)/n, ordre des cellules du matériau — c'est la ligne citée `mu_global`",
+        "chemin_2_independant": "math.fsum par coordonnée (arrondi correct), cellules parcourues dans l'ORDRE INVERSE",
+        "ecart_max_absolu_par_coordonnee": 3.9968028886505635e-15,
+        "ecart_relatif_en_norme": 0.002785515320334262,
+        "cosinus_des_deux_chemins": 0.9999999999999999,
+        "tolerance": 1e-12,
+        "chemins_concordants": false,
+        "chemin_3_descriptif_moyenne_des_moyennes": {
+         "ecart_relatif_en_norme": 5.392662304971973e-16,
+         "licite_parce_que": "cellules équi-cardinales (vérifié ci-dessus)"
+        }
+       },
+       "majorant_de_fuite": {
+        "identite": "μ^{LOO}(p) − μ = (2/(n−2))·(μ − (h_a+h_b)/2) — exacte",
+        "n": 360,
+        "facteur_2_sur_n_moins_2": 0.00558659217877095,
+        "majorant_ecart_relatif_de_norme": 0.0018382475258828857,
+        "majorant_ecart_absolu_sur_gamma": 0.0006104569577273233,
+        "gamma_moyen_non_LOO": 0.949962811056083,
+        "sensibilite_d_rho_chapeau_d_gamma_mesuree": 4.619728635587017,
+        "majorant_de_fuite_sur_rho_Base": 0.0028201454884062486,
+        "valeur_annoncee_au_3_2": 0.005,
+        "regle": "publié, jamais absorbé — c'est POURQUOI le LOO est principal et inconditionnel (P7)"
+       },
+       "majorant_rapporte_a_epsilon_B": null,
+       "majorant_rapporte_a_epsilon_R": null,
+       "regle": "V-mu / V-loo échec, ou chiffre cité de mémoire ⇒ run INVALIDE (§6.D)",
+       "motifs_d_echec": [
+        "les deux chemins de μ_global divergent au-delà de 1e-12"
+       ]
+      }
+     },
+     {
+      "cas": "majorant de fuite non publié",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "citations_par_ligne_de_code": {
+        "_bloc_de_declaration_exclu": {
+         "lignes": [
+          3681,
+          3682,
+          3683,
+          3684,
+          3685,
+          3686,
+          3687,
+          3688
+         ],
+         "motif": "la déclaration porte les expressions ; l'inclure ferait mordre la porte sur son propre registre"
+        },
+        "mu_global": {
+         "expression_attendue": "mu_glob = Sh / n_global",
+         "lignes": [
+          4972
+         ],
+         "occurrence_unique": true,
+         "ligne_relue": "mu_glob = Sh / n_global",
+         "fichier": "support_overlap.py"
+        },
+        "mu_global_LOO_par_paire": {
+         "expression_attendue": "mu_h = (Sh[None, :] - Hc[a] - Hc[b]) / (n_global - 2)",
+         "lignes": [
+          5006
+         ],
+         "occurrence_unique": true,
+         "ligne_relue": "mu_h = (Sh[None, :] - Hc[a] - Hc[b]) / (n_global - 2)",
+         "fichier": "support_overlap.py"
+        },
+        "mu_type_LOO_par_paire": {
+         "expression_attendue": "mu_type_h = (sHc[None, :] - Hc[a] - Hc[b]) / (n_dec - 2)",
+         "lignes": [
+          5007
+         ],
+         "occurrence_unique": true,
+         "ligne_relue": "mu_type_h = (sHc[None, :] - Hc[a] - Hc[b]) / (n_dec - 2)",
+         "fichier": "support_overlap.py"
+        },
+        "top64_de_G_x": {
+         "expression_attendue": "def support_topk(z, k: int = K_TOPK):",
+         "lignes": [
+          324
+         ],
+         "occurrence_unique": true,
+         "ligne_relue": "def support_topk(z, k: int = K_TOPK):",
+         "fichier": "support_overlap.py"
+        }
+       },
+       "double_chemin_mu_global": {
+        "n_etats": 360,
+        "d": 48,
+        "cardinaux_par_cellule": {
+         "c0": 60,
+         "c1": 60,
+         "c2": 60,
+         "c3": 60,
+         "c4": 60,
+         "c5": 60
+        },
+        "cellules_equicardinales": true,
+        "norme_mu_global": 20.800670544671256,
+        "chemin_1_nominal": "numpy sum(axis=0)/n, ordre des cellules du matériau — c'est la ligne citée `mu_global`",
+        "chemin_2_independant": "math.fsum par coordonnée (arrondi correct), cellules parcourues dans l'ORDRE INVERSE",
+        "ecart_max_absolu_par_coordonnee": 3.9968028886505635e-15,
+        "ecart_relatif_en_norme": 5.30746480910341e-16,
+        "cosinus_des_deux_chemins": 0.9999999999999999,
+        "tolerance": 1e-12,
+        "chemins_concordants": true,
+        "chemin_3_descriptif_moyenne_des_moyennes": {
+         "ecart_relatif_en_norme": 5.392662304971973e-16,
+         "licite_parce_que": "cellules équi-cardinales (vérifié ci-dessus)"
+        }
+       },
+       "majorant_de_fuite": {
+        "identite": "μ^{LOO}(p) − μ = (2/(n−2))·(μ − (h_a+h_b)/2) — exacte",
+        "n": 360,
+        "facteur_2_sur_n_moins_2": 0.00558659217877095,
+        "majorant_ecart_relatif_de_norme": 0.0018382475258828857,
+        "majorant_ecart_absolu_sur_gamma": 0.0006104569577273233,
+        "gamma_moyen_non_LOO": 0.949962811056083,
+        "sensibilite_d_rho_chapeau_d_gamma_mesuree": 4.619728635587017,
+        "valeur_annoncee_au_3_2": 0.005,
+        "regle": "publié, jamais absorbé — c'est POURQUOI le LOO est principal et inconditionnel (P7)"
+       },
+       "majorant_rapporte_a_epsilon_B": null,
+       "majorant_rapporte_a_epsilon_R": null,
+       "regle": "V-mu / V-loo échec, ou chiffre cité de mémoire ⇒ run INVALIDE (§6.D)",
+       "motifs_d_echec": [
+        "majorant de fuite non publié"
+       ]
+      }
+     },
+     {
+      "cas": "facteur 1/(n−2) au lieu de 2/(n−2)",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "ecart_max_a_l_identite_fausse": 0.0040742400224019915,
+       "motif": "facteur 1/(n−2) au lieu de 2/(n−2)"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "cos_p de σ̂±_pool — les TROIS lectures publiées côte à côte",
+   "pass_case": "h (principale déclarée), z et tronqué φ, chacune avec son Ψ et sa classe",
+   "fail_case": "une seule lecture publiée sous un arbitrage OUVERT",
+   "expected": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "Critique 2 du tour de correction : sous la lecture TRONQUÉE, σ̂±_pool et Ψ changent et la classe Σ bascule. L'arbitrage est PI et il est EN COURS ⇒ toute classe Σ de ce run est CONDITIONNELLE.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "trois lectures",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "lectures_publiees": [
+        "h",
+        "tronque_phi",
+        "z"
+       ],
+       "Psi_par_lecture_b1": {
+        "h": -0.08088517702049242,
+        "z": -0.05808096716851513,
+        "tronque_phi": -0.5795324405892466
+       },
+       "sigma_hat_pool_par_lecture_b1": {
+        "h": 0.5008851770204924,
+        "z": 0.4780809671685151,
+        "tronque_phi": 0.9995324405892465
+       },
+       "principale_declaree": "h"
+      }
+     },
+     {
+      "cas": "trois lectures, cos_z décalé",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "lectures_publiees": [
+        "h",
+        "tronque_phi",
+        "z"
+       ],
+       "Psi_par_lecture_b1": {
+        "h": -0.08088517702049242,
+        "z": -0.5476017817507346,
+        "tronque_phi": -0.5795324405892466
+       },
+       "sigma_hat_pool_par_lecture_b1": {
+        "h": 0.5008851770204924,
+        "z": 0.9676017817507346,
+        "tronque_phi": 0.9995324405892465
+       },
+       "principale_declaree": "h"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "deux lectures SANS OBJET",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "lectures_publiees": [
+        "h",
+        "tronque_phi",
+        "z"
+       ],
+       "statuts": {
+        "h": null,
+        "z": "SANS OBJET",
+        "tronque_phi": "SANS OBJET"
+       },
+       "motif": "deux des trois lectures sont SANS OBJET ⇒ la classe Σ n'est pas auditable sous un arbitrage ouvert"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "couplage de ε_Ψ à la lecture de cos_p — les DEUX publiés",
+   "pass_case": "ε_Ψ recalculée sous la même lecture (A) ET ε_Ψ de la lecture principale (B), chacune avec sa classe",
+   "fail_case": "un seul couplage publié sous un arbitrage OUVERT",
+   "expected": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "ε_Ψ dépend de σ̂±_pool, donc de la lecture de cos_p. Le §4.4 ne départage pas les deux couplages ; AUCUN n'est promu. Conséquence : toute classe Σ de ce run est CONDITIONNELLE.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "les deux couplages",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "couplage_A_meme_lecture": {
+        "epsilon_Psi": [
+         0.1944,
+         0.1392,
+         0.1272,
+         0.1112
+        ],
+        "IC": [
+         [
+          -0.3042,
+          0.0846
+         ],
+         [
+          -0.2243,
+          0.0541
+         ],
+         [
+          -0.2142,
+          0.0402
+         ],
+         [
+          -0.1861,
+          0.0362
+         ]
+        ],
+        "classe": "Σ-epuise"
+       },
+       "couplage_B_lecture_principale": {
+        "epsilon_Psi": [
+         0.114,
+         0.0562,
+         0.042,
+         0.0512
+        ],
+        "IC": [
+         [
+          -0.2238,
+          0.004200000000000009
+         ],
+         [
+          -0.14129999999999998,
+          -0.028899999999999995
+         ],
+         [
+          -0.129,
+          -0.04499999999999999
+         ],
+         [
+          -0.1261,
+          -0.023699999999999992
+         ]
+        ],
+        "classe": "Σ-residu"
+       },
+       "les_deux_couplages_coincident": false,
+       "arbitrage": "PI — aucun n'est promu"
+      }
+     },
+     {
+      "cas": "couplages identiques",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "couplage_A_meme_lecture": {
+        "epsilon_Psi": [
+         0.1944,
+         0.1392,
+         0.1272,
+         0.1112
+        ],
+        "IC": [
+         [
+          -0.3042,
+          0.0846
+         ],
+         [
+          -0.2243,
+          0.0541
+         ],
+         [
+          -0.2142,
+          0.0402
+         ],
+         [
+          -0.1861,
+          0.0362
+         ]
+        ],
+        "classe": "Σ-epuise"
+       },
+       "couplage_B_lecture_principale": {
+        "epsilon_Psi": [
+         0.1944,
+         0.1392,
+         0.1272,
+         0.1112
+        ],
+        "IC": [
+         [
+          -0.30419999999999997,
+          0.0846
+         ],
+         [
+          -0.2243,
+          0.054099999999999995
+         ],
+         [
+          -0.2142,
+          0.040200000000000014
+         ],
+         [
+          -0.1861,
+          0.0363
+         ]
+        ],
+        "classe": "Σ-epuise"
+       },
+       "les_deux_couplages_coincident": true,
+       "arbitrage": "PI — aucun n'est promu"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "un seul couplage",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "publie": [
+        "couplage_A_meme_lecture"
+       ],
+       "classe_A": "Σ-epuise",
+       "classe_B_non_publiee": "Σ-residu",
+       "les_deux_coincident": false,
+       "motif": "publier un seul couplage sous un arbitrage ouvert rend la classe Σ non auditable"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "profil_conforme_a_la_loi — opérationnalisation DÉCLARÉE (0-192)",
+   "pass_case": "marge, rapport à ε_Ψ(b1) et monotonie COMPLÈTE par bucket publiés",
+   "fail_case": "la lecture à deux points déclare « conforme » un profil NON monotone",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "conjoint de Σ-epuise : la classe l'exige. ARBITRAGE PI RENDU le 2026-08-28 — la MONOTONIE COMPLÈTE est la complétion du conjoint (D30 alinéa 2 : monotone ⇒ deux points est une implication STRICTE, donc la lecture à deux points rendrait la prédiction plus facile). La comparaison à deux points reste publiée, DESCRIPTIVE, et ne classe rien.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "résolution publiée",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "sigma_par_bucket": [
+        0.3592,
+        0.3858,
+        0.3909,
+        0.4015
+       ],
+       "ecart_a_0_5_par_bucket": [
+        0.14079999999999998,
+        0.11420000000000002,
+        0.10909999999999997,
+        0.09849999999999998
+       ],
+       "differences_successives": [
+        -0.026599999999999957,
+        -0.005100000000000049,
+        -0.010599999999999998
+       ],
+       "monotone_decroissante_sur_TOUS_les_buckets": true,
+       "n_inversions_de_monotonie": 0,
+       "inversions_detaillees": [],
+       "marge_premier_moins_dernier": 0.042300000000000004,
+       "epsilon_Psi_b1": 0.0741,
+       "marge_rapportee_a_epsilon_Psi_b1": 0.5708502024291499,
+       "completion_PROMUE": "monotonie complète",
+       "conjoint_sous_completion_PROMUE_monotonie_complete": true,
+       "conjoint_sous_completion_DESCRIPTIVE_deux_points": true,
+       "implication_stricte": "monotone ⇒ conforme à deux points ; la réciproque est FAUSSE. La complétion à deux points rend la prédiction PLUS FACILE — D30 alinéa 2 la fait tomber.",
+       "arbitrage": "RENDU (PI, 2026-08-28) : la MONOTONIE COMPLÈTE est la complétion du conjoint. La comparaison à deux points est publiée, DESCRIPTIVE, et ne classe rien."
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "profil SmolLM2 non monotone",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "conforme_lecture_a_deux_points": true,
+       "monotone_sur_tous_les_buckets": false,
+       "n_inversions": 1,
+       "ecart_a_0_5_par_bucket": [
+        0.1629,
+        0.07729999999999998,
+        0.1068,
+        0.0877
+       ],
+       "motif": "la lecture gelée est réduite à deux points ; l'inversion interne lui échappe. Opérationnalisation DÉCLARÉE (0-192)."
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "N_eff / DEFF / ρ_ic — deux routes NOMMÉES, écart publié",
+   "pass_case": "route VARIANCE et route LARGEUR D'IC, avec leur écart et sa cause",
+   "fail_case": "un N_eff publié sans sa route, non reproductible depuis l'IC",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "D14-R : un chiffre dont la route n'est pas nommée n'a pas de provenance. L'écart entre les deux routes MESURE la non-normalité de la distribution bootstrap à 60 grappes. Correctif #3 du tour de correction : `ρ_ic` n'a de domaine que si `DEFF ≤ m̄` ; hors de là il sort SANS OBJET (D23). `m̄` est le MINIMUM des deux lectures dyadiques, donc `ρ_ic` publié est un MAJORANT.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "deux routes",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "n_trials": 5083.0,
+       "n_grappes": 60,
+       "m_barre_trials_par_grappe": 84.71666666666667,
+       "m_barre_lecture_dyadique_haute_2x": 169.43333333333334,
+       "m_barre_retenue": "MINIMUM des deux lectures dyadiques (trials/grappes) ⇒ ρ_ic publié est un MAJORANT : il ne peut pas monter",
+       "p": 0.4,
+       "p_fois_1_moins_p": 0.24,
+       "variance_des_repliques": 0.0008946642739341641,
+       "z_0975_utilise": 1.9599639845400536,
+       "diviseur_de_la_route_largeur": 3.919927969080107,
+       "largeur_IC": 0.11676829137448819,
+       "se_deduite_de_l_IC": 0.029788376800681443,
+       "N_eff_route_VARIANCE": 268.25705126754724,
+       "N_eff_route_LARGEUR_IC": 270.46904295918824,
+       "ecart_relatif_entre_les_deux_routes": 0.008245791419793341,
+       "DEFF_route_VARIANCE": 18.948243768363984,
+       "DEFF_route_LARGEUR_IC": 18.793278315282045,
+       "rho_ic_Kish_route_VARIANCE": 0.21439271871428212,
+       "rho_ic_Kish_route_LARGEUR_IC": 0.2125416482016569,
+       "rho_ic_hors_domaine": null,
+       "rho_ic_domaine_de_definition": "DEFF ≤ m̄ (⇔ ρ_ic ≤ 1) ; hors de ce domaine : SANS OBJET (D23), jamais un nombre",
+       "frontiere_Q_M13_du_14_5": 0.26,
+       "marge_a_la_frontiere_Q_M13": 0.04560728128571789,
+       "marge_a_la_frontiere_en_facteur": 1.2127277528790426,
+       "route_nominale": "VARIANCE",
+       "cause_nommee_de_l_ecart": "la route LARGEUR suppose l'IC percentile normal et symétrique ; à 60 grappes la distribution bootstrap ne l'est pas. L'écart est la mesure de cette non-normalité — il ne se corrige pas, il se publie.",
+       "formule_route_VARIANCE": "N_eff = p(1−p)/Var(répliques)",
+       "formule_route_LARGEUR_IC": "N_eff = p(1−p)/((hi−lo)/(2·z₀.₉₇₅))², z₀.₉₇₅ = ndtri(0.975)",
+       "formule_Kish": "DEFF = 1 + (m̄ − 1)·ρ_ic"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "une seule route",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "publie": {
+        "N_eff_route_VARIANCE": 337.1,
+        "N_eff_route_LARGEUR_IC": null,
+        "rho_ic_Kish_route_VARIANCE": null,
+        "cause_nommee_de_l_ecart": null
+       },
+       "motif": "une seule route publiée : l'écart de 5 % entre la route VARIANCE et la route LARGEUR D'IC reste invisible"
+      }
+     },
+     {
+      "cas": "DEFF > m̄ ⇒ ρ_ic > 1 : hors domaine",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "DEFF_route_VARIANCE": 79.68718456314183,
+       "m_barre": 24.116666666666667,
+       "rho_ic_publie": "SANS OBJET",
+       "drapeau_de_domaine": [
+        {
+         "route": "VARIANCE",
+         "DEFF": 79.68718456314183,
+         "m_barre": 24.116666666666667,
+         "rho_ic_hors_domaine_qui_aurait_ete_publie": 3.4039156984776566,
+         "raison": "DEFF > m̄ ⇒ ρ_ic > 1 : une corrélation intra-grappe > 1 n'existe pas. Le coefficient de Kish n'a PAS DE DOMAINE DE DÉFINITION ici."
+        },
+        {
+         "route": "LARGEUR_IC",
+         "DEFF": 76.34585490242827,
+         "m_barre": 24.116666666666667,
+         "rho_ic_hors_domaine_qui_aurait_ete_publie": 3.2593736799896873,
+         "raison": "DEFF > m̄ ⇒ ρ_ic > 1 : une corrélation intra-grappe > 1 n'existe pas. Le coefficient de Kish n'a PAS DE DOMAINE DE DÉFINITION ici."
+        }
+       ],
+       "motif": "D23 — une quantité sans domaine de définition se publie SANS OBJET, jamais un nombre"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "N-queue — l'une des deux branches du §13.1, jamais aucune (0-191)",
+   "pass_case": "erreur d'approximation seuil-vs-rang MESURÉE sur σ̂±_pool, par bucket, aux deux échelles",
+   "fail_case": "l'erreur AFFIRMÉE (« ~10⁻³ ») sans support de calcul",
+   "expected": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "§13.1 verbatim : « simulation exacte OU erreur d'approximation publiée — l'un des deux, jamais ni l'un ni l'autre ». La simulation sur états BRUTS rend σ±_sim = 1.0000, valeur FORCÉE par une identité ((xxv)) : poids probant NUL, et AUCUNE nulle pour la condition `type`.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "erreur mesurée sur poids à rang",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "lecture": "σ̂±_pool (seuil fixe) recalculée SUR la nulle à rang exact, mêmes poids, mêmes buckets",
+       "8_buckets": {
+        "niveau": "8 buckets de 8 rangs",
+        "n_buckets": 8,
+        "trials_par_bucket": [
+         3831.0,
+         4013.0,
+         3792.0,
+         4133.0,
+         3733.0,
+         3508.0,
+         3817.0,
+         3897.0
+        ],
+        "sigma_hat_pool_seuil_fixe": [
+         0.5458345550865265,
+         0.5447897374462439,
+         0.5216058424710843,
+         0.5167474841473221,
+         0.5390098611295135,
+         0.5318023766162543,
+         0.5449263144473853,
+         0.5345611972121533
+        ],
+        "sigma_pm_a_rang_exact": [
+         0.45,
+         0.45,
+         0.4499999999999999,
+         0.44999999999999996,
+         0.4499999999999999,
+         0.4500000000000001,
+         0.45000000000000007,
+         0.45
+        ],
+        "erreur_seuil_moins_rang": [
+         0.09583455508652644,
+         0.09478973744624392,
+         0.07160584247108442,
+         0.06674748414732212,
+         0.08900986112951365,
+         0.08180237661625417,
+         0.0949263144473852,
+         0.08456119721215333
+        ],
+        "erreur_absolue_max": 0.09583455508652644,
+        "global_sigma_hat_pool": 0.5348208364824639,
+        "global_sigma_pm_a_rang": 0.45
+       },
+       "4_buckets_fusion_dyadique": {
+        "niveau": "4 buckets de 16 rangs (échelle des données)",
+        "n_buckets": 4,
+        "trials_par_bucket": [
+         7844.0,
+         7925.0,
+         7241.0,
+         7714.0
+        ],
+        "sigma_hat_pool_seuil_fixe": [
+         0.5453000251030418,
+         0.5190721396380106,
+         0.5355180981585823,
+         0.5396900087868072
+        ],
+        "sigma_pm_a_rang_exact": [
+         0.44999999999999996,
+         0.45000000000000007,
+         0.44999999999999996,
+         0.45
+        ],
+        "erreur_seuil_moins_rang": [
+         0.09530002510304181,
+         0.06907213963801051,
+         0.08551809815858236,
+         0.08969000878680716
+        ],
+        "erreur_absolue_max": 0.09530002510304181,
+        "global_sigma_hat_pool": 0.5348208364824638,
+        "global_sigma_pm_a_rang": 0.4500000000000001
+       },
+       "branche_du_13_1_honoree": "les DEUX : simulation exacte à rang ET erreur d'approximation seuil-vs-rang publiée pour σ̂±_pool"
+      }
+     },
+     {
+      "cas": "Gram CENTRÉ : cos de paire effondrés",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "cos_moyen_absolu_bruts": 0.9429150812973996,
+       "cos_moyen_absolu_centres": 0.13833064841470177,
+       "lecture": "σ± ne vit QUE sous la condition `type` ; une nulle bâtie sur les bruts n'en fournit aucune"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "erreur affirmée",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "publie": {
+        "8_buckets": {
+         "erreur_absolue_max": null,
+         "source": "affirmée au §14.1 : « borné à ~10⁻³ »"
+        }
+       },
+       "motif": "aucune des deux branches du §13.1 n'est honorée : ni simulation à rang exact sur la condition où σ± vit, ni erreur d'approximation mesurée"
+      }
+     },
+     {
+      "cas": "Gram BRUT : σ̂± forcé à 1",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "cos_moyen_bruts": 0.9429150812973996,
+       "sigma_hat_force": 1.0,
+       "motif": "valeur forcée par une identité — poids probant NUL, à déclarer, jamais à lire"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "classe_Sigma — le classificateur des 24 cellules, GARDÉ",
+   "pass_case": "les cinq classes de la partition Σ sont atteintes dans l'ordre gravé, et le conjoint retient Σ-epuise quand il n'est pas satisfait",
+   "fail_case": "le conjoint ignoré : la complétion à DEUX POINTS licencie Σ-epuise là où la complétion PROMUE rend Σ-ind",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "trou de mordant du tour de correction : `so.classe_Sigma` forcée à rendre toujours Σ-epuise laissait E = 0. Le classificateur qui attribue les 24 classes n'était gardé par AUCUNE clause mordante. Il l'est ici, sur les deux cas.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "cinq branches énumérées",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "cas": [
+        {
+         "attendu": "Σ-mort",
+         "obtenu": "Σ-mort",
+         "ok": true
+        },
+        {
+         "attendu": "Σ-vide",
+         "obtenu": "Σ-vide",
+         "ok": true
+        },
+        {
+         "attendu": "Σ-epuise",
+         "obtenu": "Σ-epuise",
+         "ok": true
+        },
+        {
+         "attendu": "Σ-ind",
+         "obtenu": "Σ-ind",
+         "ok": true
+        },
+        {
+         "attendu": "Σ-residu",
+         "obtenu": "Σ-residu",
+         "ok": true
+        },
+        {
+         "attendu": "Σ-ind",
+         "obtenu": "Σ-ind",
+         "ok": true
+        }
+       ],
+       "ordre_grave": "Σ-mort → Σ-vide → Σ-epuise → Σ-residu → Σ-ind",
+       "conjoint": "le conjoint reçoit la complétion PROMUE (monotonie complète) — décision PI du 2026-08-28, D30 alinéa 2"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "conjoint ignoré — profil SmolLM2 non monotone",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "profil": [
+        0.3371,
+        0.4227,
+        0.3932,
+        0.4123
+       ],
+       "classe_sous_DEUX_POINTS_descriptive": "Σ-epuise",
+       "classe_sous_MONOTONIE_COMPLETE_promue": "Σ-ind",
+       "conforme_deux_points": true,
+       "monotone_complet": false,
+       "motif": "monotone ⇒ deux points est une implication STRICTE : la complétion à deux points rend la prédiction PLUS FACILE (D30 alinéa 2). ARBITRAGE PI RENDU : monotonie complète."
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "mu_deux_chemins — la divergence est CALCULÉE, jamais injectée",
+   "pass_case": "sur des données régulières les deux chemins concordent sous TOL_MU",
+   "fail_case": "sur une colonne à annulation catastrophique, numpy et math.fsum divergent RÉELLEMENT ⇒ V-mu doit tomber",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "trou de mordant : `so.mu_deux_chemins` forcée à `chemins_concordants=True` laissait E = 0, parce que le seul cas échouant existant INJECTAIT le champ au lieu de le faire produire par la fonction.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "données régulières",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "citations_par_ligne_de_code": {
+        "_bloc_de_declaration_exclu": {
+         "lignes": [
+          3681,
+          3682,
+          3683,
+          3684,
+          3685,
+          3686,
+          3687,
+          3688
+         ],
+         "motif": "la déclaration porte les expressions ; l'inclure ferait mordre la porte sur son propre registre"
+        },
+        "mu_global": {
+         "expression_attendue": "mu_glob = Sh / n_global",
+         "lignes": [
+          4972
+         ],
+         "occurrence_unique": true,
+         "ligne_relue": "mu_glob = Sh / n_global",
+         "fichier": "support_overlap.py"
+        },
+        "mu_global_LOO_par_paire": {
+         "expression_attendue": "mu_h = (Sh[None, :] - Hc[a] - Hc[b]) / (n_global - 2)",
+         "lignes": [
+          5006
+         ],
+         "occurrence_unique": true,
+         "ligne_relue": "mu_h = (Sh[None, :] - Hc[a] - Hc[b]) / (n_global - 2)",
+         "fichier": "support_overlap.py"
+        },
+        "mu_type_LOO_par_paire": {
+         "expression_attendue": "mu_type_h = (sHc[None, :] - Hc[a] - Hc[b]) / (n_dec - 2)",
+         "lignes": [
+          5007
+         ],
+         "occurrence_unique": true,
+         "ligne_relue": "mu_type_h = (sHc[None, :] - Hc[a] - Hc[b]) / (n_dec - 2)",
+         "fichier": "support_overlap.py"
+        },
+        "top64_de_G_x": {
+         "expression_attendue": "def support_topk(z, k: int = K_TOPK):",
+         "lignes": [
+          324
+         ],
+         "occurrence_unique": true,
+         "ligne_relue": "def support_topk(z, k: int = K_TOPK):",
+         "fichier": "support_overlap.py"
+        }
+       },
+       "double_chemin_mu_global": {
+        "n_etats": 360,
+        "d": 48,
+        "cardinaux_par_cellule": {
+         "c0": 60,
+         "c1": 60,
+         "c2": 60,
+         "c3": 60,
+         "c4": 60,
+         "c5": 60
+        },
+        "cellules_equicardinales": true,
+        "norme_mu_global": 20.800670544671256,
+        "chemin_1_nominal": "numpy sum(axis=0)/n, ordre des cellules du matériau — c'est la ligne citée `mu_global`",
+        "chemin_2_independant": "math.fsum par coordonnée (arrondi correct), cellules parcourues dans l'ORDRE INVERSE",
+        "ecart_max_absolu_par_coordonnee": 3.9968028886505635e-15,
+        "ecart_relatif_en_norme": 5.30746480910341e-16,
+        "cosinus_des_deux_chemins": 0.9999999999999999,
+        "tolerance": 1e-12,
+        "chemins_concordants": true,
+        "chemin_3_descriptif_moyenne_des_moyennes": {
+         "ecart_relatif_en_norme": 5.392662304971973e-16,
+         "licite_parce_que": "cellules équi-cardinales (vérifié ci-dessus)"
+        }
+       },
+       "majorant_de_fuite": {
+        "identite": "μ^{LOO}(p) − μ = (2/(n−2))·(μ − (h_a+h_b)/2) — exacte",
+        "n": 360,
+        "facteur_2_sur_n_moins_2": 0.00558659217877095,
+        "majorant_ecart_relatif_de_norme": 0.0018382475258828857,
+        "majorant_ecart_absolu_sur_gamma": 0.0006104569577273233,
+        "gamma_moyen_non_LOO": 0.949962811056083,
+        "sensibilite_d_rho_chapeau_d_gamma_mesuree": 4.619728635587017,
+        "majorant_de_fuite_sur_rho_Base": 0.0028201454884062486,
+        "valeur_annoncee_au_3_2": 0.005,
+        "regle": "publié, jamais absorbé — c'est POURQUOI le LOO est principal et inconditionnel (P7)"
+       },
+       "majorant_rapporte_a_epsilon_B": null,
+       "majorant_rapporte_a_epsilon_R": null,
+       "regle": "V-mu / V-loo échec, ou chiffre cité de mémoire ⇒ run INVALIDE (§6.D)",
+       "motifs_d_echec": null
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "annulation catastrophique 1e16",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "chemins_concordants": false,
+       "ecart_relatif_en_norme": 0.24253562503633297,
+       "ecart_max_absolu_par_coordonnee": 0.25,
+       "tolerance": 1e-12,
+       "motif": "annulation catastrophique sur la coordonnée 0 : la sommation par paires de numpy et `math.fsum` ne rendent pas le même nombre. La divergence n'est PAS injectée — elle est calculée par la fonction elle-même.",
+       "verdict_v_mu": "FAIL"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "majorant_de_fuite — recalculé par force brute, et STRICTEMENT > 0",
+   "pass_case": "le majorant publié est égal au recalcul indépendant sur toutes les paires, et il est strictement positif",
+   "fail_case": "un majorant forcé à 0.0 satisfait V-mu — seul le recalcul le tue",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "trou de mordant : `so.majorant_de_fuite` forcé à 0.0 laissait E = 0, parce que V-mu n'exige qu'un flottant FINI. Un majorant nul n'est pas un majorant mesuré.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "recalcul force brute",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "publie_norme": 0.019586728869421435,
+       "recalcul_force_brute_norme": 0.01958672886942144,
+       "publie_gamma": 0.0071201186124763005,
+       "recalcul_force_brute_gamma": 0.0071201186124763005,
+       "majorant_de_fuite_sur_rho_Base": 0.033335333365766426,
+       "n": 36,
+       "n_paires_recalculees": 198,
+       "exigence": "égalité au recalcul indépendant ET stricte positivité — un majorant nul n'est pas un majorant mesuré"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "majorant forcé à 0.0",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "majorant_reel": 0.033335333365766426,
+       "majorant_force": 0.0,
+       "verdict_de_V_mu_sur_le_majorant_force": "PASS",
+       "motif": "V-mu n'exige qu'un flottant fini : 0.0 la satisfait. Le recalcul indépendant est la seule clause qui morde."
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-perimetre — 0 GPU, aucun forward, M jamais instanciée",
+   "pass_case": "aucun motif GPU/forward/backprop dans le source du cycle",
+   "fail_case": "un motif GPU viole le périmètre gravé",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "lecture du source",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "motifs_interdits_trouves": [],
+       "M_instanciee": "FastWeightMemory est construite pour LIRE `G` seulement ; `M` n'est ni lue ni écrite (même chemin qu'au cycle précédent)",
+       "GPU": 0,
+       "forwards": 0,
+       "engram_modifie": false
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "motif cuda",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "extrait": "model.to(device=\"cuda\")",
+       "motif": "le périmètre grave 0 GPU, aucun forward ; V-cache divergent ⇒ ARRÊT, PAS de re-forward (P8)"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

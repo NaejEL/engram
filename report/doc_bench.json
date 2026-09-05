@@ -1,0 +1,870 @@
+{
+  "clauses": [
+    {
+      "clause": "C0",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 0,
+      "cas_exerces": 1
+    },
+    {
+      "clause": "C0b",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 252,
+      "cas_exerces": 252
+    },
+    {
+      "clause": "C1",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 0,
+      "cas_exerces": 1
+    },
+    {
+      "clause": "C1b",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 0,
+      "cas_exerces": 1
+    },
+    {
+      "clause": "C2",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 7,
+      "cas_exerces": 7
+    },
+    {
+      "clause": "C2b",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 0,
+      "cas_exerces": 1
+    },
+    {
+      "clause": "C2c",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 52,
+      "cas_exerces": 52
+    },
+    {
+      "clause": "C3",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 0,
+      "cas_exerces": 1
+    },
+    {
+      "clause": "C3b",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 0,
+      "cas_exerces": 1
+    },
+    {
+      "clause": "C4",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 5,
+      "cas_exerces": 5
+    },
+    {
+      "clause": "C5",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 0,
+      "cas_exerces": 1
+    },
+    {
+      "clause": "C5b",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 0,
+      "cas_exerces": 1
+    },
+    {
+      "clause": "C5c",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 0,
+      "cas_exerces": 1
+    },
+    {
+      "clause": "C6",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 0,
+      "cas_exerces": 1
+    },
+    {
+      "clause": "C7",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 0,
+      "cas_exerces": 1
+    },
+    {
+      "clause": "C8",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 0,
+      "cas_exerces": 1
+    },
+    {
+      "clause": "C9",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 0,
+      "cas_exerces": 1
+    },
+    {
+      "clause": "C10",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 0,
+      "cas_exerces": 1
+    },
+    {
+      "clause": "C11",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 0,
+      "cas_exerces": 1
+    },
+    {
+      "clause": "C12",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 0,
+      "cas_exerces": 1
+    },
+    {
+      "clause": "C13",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 52,
+      "cas_exerces": 52
+    },
+    {
+      "clause": "C14",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 0,
+      "cas_exerces": 1
+    },
+    {
+      "clause": "C15",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 0,
+      "cas_exerces": 1
+    },
+    {
+      "clause": "C15b",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 0,
+      "cas_exerces": 1
+    },
+    {
+      "clause": "C15c",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 0,
+      "cas_exerces": 1
+    },
+    {
+      "clause": "C16",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 52,
+      "cas_exerces": 52
+    },
+    {
+      "clause": "C16-ext",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 3,
+      "cas_exerces": 3
+    },
+    {
+      "clause": "C17",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 0,
+      "cas_exerces": 1
+    },
+    {
+      "clause": "C18",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 0,
+      "cas_exerces": 1
+    },
+    {
+      "clause": "C19",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 0,
+      "cas_exerces": 1
+    },
+    {
+      "clause": "C-obs",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 0,
+      "cas_exerces": 1
+    },
+    {
+      "clause": "C-relect",
+      "PASS": true,
+      "violations": [],
+      "cas_reels": 0,
+      "cas_exerces": 1
+    }
+  ],
+  "violations_totales": 0,
+  "violations_par_classe": {},
+  "clauses_PASS": 32,
+  "clauses_total": 32,
+  "force_pass": false,
+  "fermeture_table": [],
+  "N_manif": {
+    "familles_report": [],
+    "familles_manifeste": [
+      {
+        "famille": "autre",
+        "n_f": 23,
+        "K_f": 23,
+        "derangements_effectifs": 9510425471055777937262,
+        "I_f": 0.043478,
+        "degeneree": false,
+        "motif": "non degeneree"
+      },
+      {
+        "famille": "decimal",
+        "n_f": 11,
+        "K_f": 11,
+        "derangements_effectifs": 14684570,
+        "I_f": 0.090909,
+        "degeneree": false,
+        "motif": "non degeneree"
+      },
+      {
+        "famille": "entier",
+        "n_f": 6,
+        "K_f": 5,
+        "derangements_effectifs": 44,
+        "I_f": 0.233333,
+        "degeneree": false,
+        "motif": "non degeneree"
+      },
+      {
+        "famille": "exponentiel",
+        "n_f": 2,
+        "K_f": 2,
+        "derangements_effectifs": 1,
+        "I_f": 0.5,
+        "degeneree": true,
+        "motif": "inertie I_f = 0.5000 >= 0.3 (borne gelee, sens >=)"
+      },
+      {
+        "famille": "fraction",
+        "n_f": 4,
+        "K_f": 4,
+        "derangements_effectifs": 9,
+        "I_f": 0.25,
+        "degeneree": false,
+        "motif": "non degeneree"
+      },
+      {
+        "famille": "fraction-egale",
+        "n_f": 3,
+        "K_f": 3,
+        "derangements_effectifs": 2,
+        "I_f": 0.333333,
+        "degeneree": true,
+        "motif": "inertie I_f = 0.3333 >= 0.3 (borne gelee, sens >=)"
+      },
+      {
+        "famille": "pourcentage",
+        "n_f": 4,
+        "K_f": 4,
+        "derangements_effectifs": 9,
+        "I_f": 0.25,
+        "degeneree": false,
+        "motif": "non degeneree"
+      }
+    ],
+    "familles_degenerees": [
+      "exponentiel",
+      "fraction-egale"
+    ],
+    "borne_inertie": 0.3,
+    "graine": 0,
+    "generateur": "random.Random (Mersenne Twister, stdlib)"
+  },
+  "clauses_non_exercees_sur_le_corpus": [
+    "C0",
+    "C1",
+    "C1b",
+    "C2b",
+    "C3",
+    "C3b",
+    "C5",
+    "C5b",
+    "C5c",
+    "C6",
+    "C7",
+    "C8",
+    "C9",
+    "C10",
+    "C11",
+    "C12",
+    "C14",
+    "C15",
+    "C15b",
+    "C15c",
+    "C17",
+    "C18",
+    "C19",
+    "C-obs",
+    "C-relect"
+  ],
+  "consignes_de_redaction": [
+    "Ambiguite DECLAREE, non tranchee : un groupe unique de virgule est lu comme une DECIMALE (`1,234` -> 1.234) et deux groupes ou plus comme des MILLIERS (`20,000,000` -> 20000000). Non exercee par ce corpus : seule N-50 porte des separateurs. Et `1 234` a espace ASCII n'est PAS normalise — la table gelee T2 ne couvre que les espaces insecables. Ecrire les milliers en espace insecable.",
+    "Dates en ISO uniquement (2026-09-05). Une date ecrite 05/09/2026 n'est pas reconnue par la liste blanche : elle devient une grappe qui exige un id.",
+    "Aucune quantite prefixee par la lettre `v`. Le motif de version `v\\d{1,2}` est gele et exempte ; y coller un decimal (`v1.353`) est un abus de liste blanche.",
+    "Un intervalle de confiance ecrit `IC 95 % [0.56, 0.99]` fusionne en UNE grappe de TROIS tokens (95 %, 0.56, 0.99). La cellule du manifeste doit porter la SEQUENCE EXACTE, pas la seule borne. Idem pour `28/30 (93 %)`.",
+    "Le banc se rejoue APRES CHAQUE PASSE DE REDACTION : la prose elargit le domaine de la verification de fermeture, et une regle muette dont la paire n'est ni au plancher ni au domaine n'est rattrapee qu'une fois cette paire ecrite (residu borne de A-1).",
+    "Toute citation du signe d'incertitude du facteur 4.8 (id N-23) fait ECHOUER C1, Y COMPRIS A L'INTERIEUR d'un bloc AUTOPSIE : C1 ne connait pas les blocs d'autopsie, seule C4 les connait. Son source_fichier est vide par decision et le banc continue de le nommer ORPHELIN ; `INVALIDE-SOURCE` n'achete aucune exemption. La seule facon de le citer est de ne pas lui attacher d'id, donc de ne pas le citer comme un chiffre."
+  ],
+  "reserve_6_10": "Le §6.10 porte trois disjoints. Le banc applique les deux premiers (E != 0 ; clause non mordante). Le troisieme (Delta_banc <= 0 sur famille non degeneree) est CALCULE et PUBLIE, jamais applique : au gel, c'est une ADJUDICATION HUMAINE. Le §4.2 ne met pas Delta_banc dans le declencheur de PUB-instrument.",
+  "citabilite_du_manifeste": {
+    "citables": 49,
+    "hors_domaine_de_C1b": 2,
+    "non_resolues": 1,
+    "total": 52,
+    "ids_hors_domaine": [
+      "N-09",
+      "N-52"
+    ],
+    "ids_non_resolues": [
+      "N-23"
+    ],
+    "definition": "triplet (citables ; hors domaine de C1b ; non resolues) — JAMAIS un ratio unique : il melangerait teste et non teste"
+  },
+  "delta_banc": {
+    "support": "manifeste",
+    "E_reel": 0,
+    "graine": 0,
+    "par_famille": {
+      "autre": {
+        "delta_banc": 1,
+        "E_null": 1,
+        "E_reel": 0,
+        "cardinal_derangements": 9510425471055777937262,
+        "I_f": 0.043478
+      },
+      "decimal": {
+        "delta_banc": 2,
+        "E_null": 2,
+        "E_reel": 0,
+        "cardinal_derangements": 14684570,
+        "I_f": 0.090909
+      },
+      "entier": {
+        "delta_banc": 0,
+        "E_null": 0,
+        "E_reel": 0,
+        "cardinal_derangements": 44,
+        "I_f": 0.233333
+      },
+      "exponentiel": {
+        "delta_banc": "SANS OBJET",
+        "motif": "inertie I_f = 0.5000 >= 0.3 (borne gelee, sens >=)",
+        "E_null": "SANS OBJET"
+      },
+      "fraction": {
+        "delta_banc": 0,
+        "E_null": 0,
+        "E_reel": 0,
+        "cardinal_derangements": 9,
+        "I_f": 0.25
+      },
+      "fraction-egale": {
+        "delta_banc": "SANS OBJET",
+        "motif": "inertie I_f = 0.3333 >= 0.3 (borne gelee, sens >=)",
+        "E_null": "SANS OBJET"
+      },
+      "pourcentage": {
+        "delta_banc": 1,
+        "E_null": 1,
+        "E_reel": 0,
+        "cardinal_derangements": 9,
+        "I_f": 0.25
+      }
+    },
+    "interpretable": false,
+    "clauses_sensibles_a_la_valeur": [
+      "C1",
+      "C1b",
+      "C5",
+      "C10",
+      "C12"
+    ],
+    "lecture": "NON INTERPRETABLE tant que REPORT.md est absent : les clauses sensibles a une valeur (C1, C1b, C5, C10, C12) sont a 0 cas reel ; le critere §6.10 n'est evaluable qu'a la redaction"
+  },
+  "campagne": {
+    "E": 0,
+    "clauses_sans_les_deux": [],
+    "couverture_par_classe": {
+      "clauses_exercees": 32,
+      "clauses_declarees": 32
+    },
+    "detail": {
+      "C0": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C0.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "ORPHELIN",
+            "detail": "liste blanche abusee : 'D2.4' porte une quantite"
+          },
+          {
+            "classe": "ORPHELIN",
+            "detail": "liste blanche abusee : 'D2.437' colle une quantite a un prefixe alphabetique hors liste gelee"
+          }
+        ]
+      },
+      "C0b": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C0b.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "STRUCTURE",
+            "detail": "la table absorbe un desaccord : M-UNILAT declare equivalentes ['0.0156', '0.031']"
+          }
+        ]
+      },
+      "C1": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C1.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "ORPHELIN",
+            "detail": "'+0.509' sans marque d'identifiant"
+          }
+        ]
+      },
+      "C1b": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C1b.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "DESACCORD",
+            "detail": "M-EXC : texte ['+2.44'] != manifeste [['+2.437']]"
+          }
+        ]
+      },
+      "C2": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C2.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "ORPHELIN",
+            "detail": "M-AMP : ampleur sans N_eff"
+          }
+        ]
+      },
+      "C2b": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C2b.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "STRUCTURE",
+            "detail": "σ± qualifie"
+          },
+          {
+            "classe": "STRUCTURE",
+            "detail": "σ± mentionne sans rappel du retrait (0-170)"
+          }
+        ]
+      },
+      "C2c": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C2c.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "ORPHELIN",
+            "detail": "M-QUAD : N_eff = 5083 sans resolution"
+          }
+        ]
+      },
+      "C3": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C3.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "REGISTRE",
+            "detail": "(xiii) plafond lexical : \"Le modèle retrouve l'unité\""
+          },
+          {
+            "classe": "REGISTRE",
+            "detail": "(A-5) bin dur — adverbial compris : 'tendance'"
+          }
+        ]
+      },
+      "C3b": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C3b.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "REGISTRE",
+            "detail": "predication mentale : 'ne souffre'"
+          }
+        ]
+      },
+      "C4": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C4.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "STRUCTURE",
+            "detail": "run invalide 'V2-D(a) v2' cite hors AUTOPSIE"
+          }
+        ]
+      },
+      "C5": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C5.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "STRUCTURE",
+            "detail": "M-RN : rider RD-01 absent du meme bloc"
+          }
+        ]
+      },
+      "C5b": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C5b.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "REGISTRE",
+            "detail": "formulation fausse du +57 % : \"cinq cycles ne l'ont pas remis en cause\""
+          },
+          {
+            "classe": "STRUCTURE",
+            "detail": "+57 % sans son rider dans le meme bloc"
+          }
+        ]
+      },
+      "C5c": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C5c.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "STRUCTURE",
+            "detail": "citation D35 sans le rider M-7"
+          }
+        ]
+      },
+      "C6": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C6.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "STRUCTURE",
+            "detail": "rho_Base sans son rho_chapeau_Base"
+          }
+        ]
+      },
+      "C7": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C7.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "REGISTRE",
+            "detail": "plafond-en-succes : 'P-Base` est confirmée'"
+          }
+        ]
+      },
+      "C8": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C8.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "STRUCTURE",
+            "detail": "IC_inf / 0.0000 sans la formulation gelee d'equivalence"
+          }
+        ]
+      },
+      "C9": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C9.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "STRUCTURE",
+            "detail": "compte publie « 2 » la ou le couple (1 ; 3) est du"
+          }
+        ]
+      },
+      "C10": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C10.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "DESACCORD",
+            "detail": "M-P : 2 decimales au texte contre 4 a la source"
+          }
+        ]
+      },
+      "C11": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C11.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "STRUCTURE",
+            "detail": "table de budget sans les deux colonnes estime ET reel"
+          }
+        ]
+      },
+      "C12": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C12.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "STRUCTURE",
+            "detail": "M-O : partenaire apparie M-NUL absent du bloc"
+          }
+        ]
+      },
+      "C13": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C13.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "STRUCTURE",
+            "detail": "id M-A porte deux valeurs : '12' / '13'"
+          }
+        ]
+      },
+      "C14": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C14.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "STRUCTURE",
+            "detail": "anomalie sans la formulation gelee"
+          },
+          {
+            "classe": "ORPHELIN",
+            "detail": "anomalie sans artefact a ouvrir"
+          },
+          {
+            "classe": "REGISTRE",
+            "detail": "anomalie publiee avec explication speculative"
+          }
+        ]
+      },
+      "C15": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C15.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "STRUCTURE",
+            "detail": "borne (a) absente : couche 2 vs 6/16/14"
+          },
+          {
+            "classe": "STRUCTURE",
+            "detail": "borne (b) absente : portee exacte"
+          }
+        ]
+      },
+      "C15b": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C15b.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "ORPHELIN",
+            "detail": "section 6 : '2' non archive dans report/data/ => RETRAIT EN BLOC"
+          },
+          {
+            "classe": "ORPHELIN",
+            "detail": "section 6 : '6 16 14' non archive dans report/data/ => RETRAIT EN BLOC"
+          }
+        ]
+      },
+      "C15c": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C15c.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "REGISTRE",
+            "detail": "mutabilite affirmee la ou la source se tait : 'la table est figée'"
+          },
+          {
+            "classe": "STRUCTURE",
+            "detail": "table citee sans la formulation licite de mutabilite"
+          }
+        ]
+      },
+      "C16": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C16.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "SOURCE-ILLICITE",
+            "detail": "M-SO : etiquette interdite « recopie d'une analyse »"
+          },
+          {
+            "classe": "STRUCTURE",
+            "detail": "M-SO : « 0 » pour un support vide (D23)"
+          }
+        ]
+      },
+      "C16-ext": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C16_ext.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "SOURCE-ILLICITE",
+            "detail": "M-D : script non ouvrable 'inexistant.py'"
+          }
+        ]
+      },
+      "C17": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C17.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "STRUCTURE",
+            "detail": "table des fausses pistes sans la borne 1"
+          },
+          {
+            "classe": "STRUCTURE",
+            "detail": "table des fausses pistes sans la borne 2"
+          }
+        ]
+      },
+      "C18": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C18.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "SOURCE-ILLICITE",
+            "detail": "M-DEC : decisionnel source 'docs/JOURNAL.md'"
+          }
+        ]
+      },
+      "C19": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C19.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "REGISTRE",
+            "detail": "lecture ordinale : 'La relecture croisée trouve davantage'"
+          }
+        ]
+      },
+      "C-obs": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C_obs.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "STRUCTURE",
+            "detail": "triplet publie sans mention historique"
+          },
+          {
+            "classe": "STRUCTURE",
+            "detail": "triplet publie sans son instrument mort nomme"
+          },
+          {
+            "classe": "STRUCTURE",
+            "detail": "M-TRI : triplet perime sans statut HISTORIQUE-PERIME"
+          }
+        ]
+      },
+      "C-relect": {
+        "cas_passant": true,
+        "mutant_mordant": true,
+        "fixture": "C_relect.json",
+        "violations_du_cas_passant": [],
+        "violations_du_mutant": [
+          {
+            "classe": "STRUCTURE",
+            "detail": "section 3 : relecteur == auteur (lab-math)"
+          }
+        ]
+      }
+    }
+  },
+  "verification_sommes": {
+    "violations": [],
+    "concordant": true
+  }
+}

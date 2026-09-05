@@ -1,0 +1,501 @@
+{
+  "N_G": 200,
+  "n_vecteurs": 361,
+  "seed": 0,
+  "t": 2.6600674686174592,
+  "departage_ex_aequo": "par INDICE (argsort stable) — déclaré ; probabilité d'ex æquo nulle p.s.",
+  "par_strate": {
+    "S3": {
+      "rho_Base_sim_moyenne": 0.010555530562175152,
+      "rho_Base_sim_sd": 0.007694261525622944,
+      "rho_Base_sim_ratio_des_esperances": 0.010583948832696382,
+      "biais_ratio_moins_esperance": -2.8418270521229222e-05,
+      "sigma_pm_sim_par_bucket": [
+        0.9661870430432987,
+        0.9492723895822809,
+        0.9321863225623056,
+        0.9214860504271809,
+        0.9105622068713174,
+        0.9035999853391496,
+        0.9009221764899052,
+        0.8954388000646197
+      ],
+      "sigma_pm_sim_global": 0.913486861646304,
+      "trials_moyens_par_bucket": [
+        19.87,
+        38.095,
+        49.425,
+        60.675,
+        70.58,
+        80.085,
+        89.675,
+        96.605
+      ],
+      "N_queue_erreur_seuil_vs_rang": {
+        "lecture": "σ̂±_pool (seuil fixe) recalculée SUR la nulle à rang exact, mêmes poids, mêmes buckets",
+        "8_buckets": {
+          "niveau": "8 buckets de 8 rangs",
+          "n_buckets": 8,
+          "trials_par_bucket": [
+            3974.0,
+            7619.0,
+            9885.0,
+            12135.0,
+            14116.0,
+            16017.0,
+            17935.0,
+            19321.0
+          ],
+          "sigma_hat_pool_seuil_fixe": [
+            0.9597347914829885,
+            0.9426069989140858,
+            0.92855282349696,
+            0.9187861095830967,
+            0.912183235937284,
+            0.9040272705103546,
+            0.9020791294957663,
+            0.898133122363214
+          ],
+          "sigma_pm_a_rang_exact": [
+            0.967035732259688,
+            0.949337183357396,
+            0.9316135558927668,
+            0.9219612690564483,
+            0.9103145366959479,
+            0.9038521570830992,
+            0.9011987733482019,
+            0.8954505460379898
+          ],
+          "erreur_seuil_moins_rang": [
+            -0.007300940776699516,
+            -0.006730184443310194,
+            -0.003060732395806842,
+            -0.003175159473351563,
+            0.001868699241336147,
+            0.00017511342725540224,
+            0.0008803561475644317,
+            0.002682576325224173
+          ],
+          "erreur_absolue_max": 0.007300940776699516,
+          "global_sigma_hat_pool": 0.9129693024007388,
+          "global_sigma_pm_a_rang": 0.913486861646304
+        },
+        "4_buckets_fusion_dyadique": {
+          "niveau": "4 buckets de 16 rangs (échelle des données)",
+          "n_buckets": 4,
+          "trials_par_bucket": [
+            11593.0,
+            22020.0,
+            30133.0,
+            37256.0
+          ],
+          "sigma_hat_pool_seuil_fixe": [
+            0.9484782874217038,
+            0.9231704859245381,
+            0.9078479856056499,
+            0.9000327261296496
+          ],
+          "sigma_pm_a_rang_exact": [
+            0.9554041231777797,
+            0.9262942779291553,
+            0.9068795008794345,
+            0.8982177367403908
+          ],
+          "erreur_seuil_moins_rang": [
+            -0.00692583575607586,
+            -0.0031237920046172096,
+            0.0009684847262154683,
+            0.0018149893892587254
+          ],
+          "erreur_absolue_max": 0.00692583575607586,
+          "global_sigma_hat_pool": 0.9129693024007388,
+          "global_sigma_pm_a_rang": 0.913486861646304
+        },
+        "branche_du_13_1_honoree": "les DEUX : simulation exacte à rang ET erreur d'approximation seuil-vs-rang publiée pour σ̂±_pool",
+        "niveaux_publies": {
+          "4_buckets_fusion_dyadique": {
+            "erreur_absolue_max": 0.00692583575607586,
+            "niveau": "4 buckets de 16 rangs (échelle des données)"
+          },
+          "8_buckets": {
+            "erreur_absolue_max": 0.007300940776699516,
+            "niveau": "8 buckets de 8 rangs"
+          },
+          "rapport_8_sur_4": 1.0541602535541774,
+          "regle": "un |err|max se cite AVEC SON NIVEAU de bucketisation ; le chiffre à 8 buckets est le plus grand des deux"
+        }
+      }
+    },
+    "S2": {
+      "rho_Base_sim_moyenne": 0.010709429598863389,
+      "rho_Base_sim_sd": 0.008965133766867719,
+      "rho_Base_sim_ratio_des_esperances": 0.010626782131164855,
+      "biais_ratio_moins_esperance": 8.264746769853434e-05,
+      "sigma_pm_sim_par_bucket": [
+        0.28075153482138776,
+        0.30803435278286756,
+        0.3160243112014868,
+        0.32351306220264564,
+        0.3333708831518354,
+        0.331817526548093,
+        0.34590147625240647,
+        0.3449414887900144
+      ],
+      "sigma_pm_sim_global": 0.33290210159467737,
+      "trials_moyens_par_bucket": [
+        8.3,
+        21.38,
+        32.97,
+        43.375,
+        53.125,
+        63.69,
+        72.315,
+        83.605
+      ],
+      "N_queue_erreur_seuil_vs_rang": {
+        "lecture": "σ̂±_pool (seuil fixe) recalculée SUR la nulle à rang exact, mêmes poids, mêmes buckets",
+        "8_buckets": {
+          "niveau": "8 buckets de 8 rangs",
+          "n_buckets": 8,
+          "trials_par_bucket": [
+            1660.0,
+            4276.0,
+            6594.0,
+            8675.0,
+            10625.0,
+            12738.0,
+            14463.0,
+            16721.0
+          ],
+          "sigma_hat_pool_seuil_fixe": [
+            0.29228133040202076,
+            0.31176128457251456,
+            0.32372295963825776,
+            0.32968229644942415,
+            0.3334274301869588,
+            0.3341593812926653,
+            0.34437757700022387,
+            0.3424785359202129
+          ],
+          "sigma_pm_a_rang_exact": [
+            0.2885542168674699,
+            0.30636108512628624,
+            0.31574158325750684,
+            0.32426512968299714,
+            0.3331764705882353,
+            0.3314492070968755,
+            0.3457788840489525,
+            0.34513486035524193
+          ],
+          "erreur_seuil_moins_rang": [
+            0.003727113534550852,
+            0.0054001994462283265,
+            0.007981376380750915,
+            0.005417166766427006,
+            0.00025095959872351026,
+            0.0027101741957898384,
+            -0.0014013070487286505,
+            -0.002656324435029056
+          ],
+          "erreur_absolue_max": 0.007981376380750915,
+          "global_sigma_hat_pool": 0.33424076616817217,
+          "global_sigma_pm_a_rang": 0.33290210159467737
+        },
+        "4_buckets_fusion_dyadique": {
+          "niveau": "4 buckets de 16 rangs (échelle des données)",
+          "n_buckets": 4,
+          "trials_par_bucket": [
+            5936.0,
+            15269.0,
+            23363.0,
+            31184.0
+          ],
+          "sigma_hat_pool_seuil_fixe": [
+            0.30631372326472817,
+            0.32710872470714697,
+            0.33382650535643577,
+            0.34335930269613
+          ],
+          "sigma_pm_a_rang_exact": [
+            0.3013814016172507,
+            0.32058419018927237,
+            0.3322347301288362,
+            0.3454335556695741
+          ],
+          "erreur_seuil_moins_rang": [
+            0.004932321647477478,
+            0.006524534517874603,
+            0.0015917752275995678,
+            -0.0020742529734441018
+          ],
+          "erreur_absolue_max": 0.006524534517874603,
+          "global_sigma_hat_pool": 0.33424076616817217,
+          "global_sigma_pm_a_rang": 0.33290210159467737
+        },
+        "branche_du_13_1_honoree": "les DEUX : simulation exacte à rang ET erreur d'approximation seuil-vs-rang publiée pour σ̂±_pool",
+        "niveaux_publies": {
+          "4_buckets_fusion_dyadique": {
+            "erreur_absolue_max": 0.006524534517874603,
+            "niveau": "4 buckets de 16 rangs (échelle des données)"
+          },
+          "8_buckets": {
+            "erreur_absolue_max": 0.007981376380750915,
+            "niveau": "8 buckets de 8 rangs"
+          },
+          "rapport_8_sur_4": 1.223286712467403,
+          "regle": "un |err|max se cite AVEC SON NIVEAU de bucketisation ; le chiffre à 8 buckets est le plus grand des deux"
+        }
+      }
+    },
+    "S1": {
+      "rho_Base_sim_moyenne": 0.010426141763129965,
+      "rho_Base_sim_sd": 0.004719189373289382,
+      "rho_Base_sim_ratio_des_esperances": 0.010417777858477098,
+      "biais_ratio_moins_esperance": 8.363904652867321e-06,
+      "sigma_pm_sim_par_bucket": [
+        0.9192317982062783,
+        0.8957038770496959,
+        0.8780036092663491,
+        0.866830791860502,
+        0.8600002444244081,
+        0.847020799317694,
+        0.8417685778856432,
+        0.8342818378178367
+      ],
+      "sigma_pm_sim_global": 0.8560485527459583,
+      "trials_moyens_par_bucket": [
+        66.98,
+        143.94,
+        205.245,
+        258.83,
+        311.13,
+        358.475,
+        406.97,
+        451.395
+      ],
+      "N_queue_erreur_seuil_vs_rang": {
+        "lecture": "σ̂±_pool (seuil fixe) recalculée SUR la nulle à rang exact, mêmes poids, mêmes buckets",
+        "8_buckets": {
+          "niveau": "8 buckets de 8 rangs",
+          "n_buckets": 8,
+          "trials_par_bucket": [
+            13396.0,
+            28788.0,
+            41049.0,
+            51766.0,
+            62226.0,
+            71695.0,
+            81394.0,
+            90279.0
+          ],
+          "sigma_hat_pool_seuil_fixe": [
+            0.9091925936530851,
+            0.8864664948058759,
+            0.8722841247027916,
+            0.8621908534586746,
+            0.8576357062469115,
+            0.8501306285798724,
+            0.8451192203301832,
+            0.8403330459141874
+          ],
+          "sigma_pm_a_rang_exact": [
+            0.920498656315318,
+            0.8957551757676809,
+            0.8781212697020634,
+            0.8669976432407371,
+            0.8601709896184875,
+            0.8472278401562173,
+            0.8419048087082586,
+            0.8344243954851073
+          ],
+          "erreur_seuil_moins_rang": [
+            -0.011306062662232885,
+            -0.009288680961805018,
+            -0.005837144999271793,
+            -0.004806789782062504,
+            -0.002535283371575936,
+            0.0029027884236551005,
+            0.0032144116219245955,
+            0.005908650429080176
+          ],
+          "erreur_absolue_max": 0.011306062662232885,
+          "global_sigma_hat_pool": 0.8559081055230361,
+          "global_sigma_pm_a_rang": 0.8560485527459583
+        },
+        "4_buckets_fusion_dyadique": {
+          "niveau": "4 buckets de 16 rangs (échelle des données)",
+          "n_buckets": 4,
+          "trials_par_bucket": [
+            42184.0,
+            92815.0,
+            133921.0,
+            171673.0
+          ],
+          "sigma_hat_pool_seuil_fixe": [
+            0.8936834211323791,
+            0.8666547729899977,
+            0.8536178409133315,
+            0.8426022780031914
+          ],
+          "sigma_pm_a_rang_exact": [
+            0.9036127441684051,
+            0.8719172547540807,
+            0.8532418366051627,
+            0.8379710263116507
+          ],
+          "erreur_seuil_moins_rang": [
+            -0.009929323036026005,
+            -0.005262481764082949,
+            0.00037600430816875363,
+            0.004631251691540772
+          ],
+          "erreur_absolue_max": 0.009929323036026005,
+          "global_sigma_hat_pool": 0.8559081055230361,
+          "global_sigma_pm_a_rang": 0.8560485527459583
+        },
+        "branche_du_13_1_honoree": "les DEUX : simulation exacte à rang ET erreur d'approximation seuil-vs-rang publiée pour σ̂±_pool",
+        "niveaux_publies": {
+          "4_buckets_fusion_dyadique": {
+            "erreur_absolue_max": 0.009929323036026005,
+            "niveau": "4 buckets de 16 rangs (échelle des données)"
+          },
+          "8_buckets": {
+            "erreur_absolue_max": 0.011306062662232885,
+            "niveau": "8 buckets de 8 rangs"
+          },
+          "rapport_8_sur_4": 1.1386539264773372,
+          "regle": "un |err|max se cite AVEC SON NIVEAU de bucketisation ; le chiffre à 8 buckets est le plus grand des deux"
+        }
+      }
+    },
+    "S0": {
+      "rho_Base_sim_moyenne": 0.010914751241338951,
+      "rho_Base_sim_sd": 0.004575657408223521,
+      "rho_Base_sim_ratio_des_esperances": 0.010918037691762451,
+      "biais_ratio_moins_esperance": -3.286450423500495e-06,
+      "sigma_pm_sim_par_bucket": [
+        0.25117480918881613,
+        0.26206031349089653,
+        0.27455196096355394,
+        0.2777481397522969,
+        0.28650832313366237,
+        0.29148678965335284,
+        0.2981940685357597,
+        0.3024378064435168
+      ],
+      "sigma_pm_sim_global": 0.2888529337384373,
+      "trials_moyens_par_bucket": [
+        127.61,
+        322.66,
+        488.675,
+        643.835,
+        793.655,
+        936.93,
+        1081.575,
+        1220.08
+      ],
+      "N_queue_erreur_seuil_vs_rang": {
+        "lecture": "σ̂±_pool (seuil fixe) recalculée SUR la nulle à rang exact, mêmes poids, mêmes buckets",
+        "8_buckets": {
+          "niveau": "8 buckets de 8 rangs",
+          "n_buckets": 8,
+          "trials_par_bucket": [
+            25522.0,
+            64532.0,
+            97735.0,
+            128767.0,
+            158731.0,
+            187386.0,
+            216315.0,
+            244016.0
+          ],
+          "sigma_hat_pool_seuil_fixe": [
+            0.27329325477269156,
+            0.27707076820193816,
+            0.2832471289738337,
+            0.2833313772450817,
+            0.2880376906351902,
+            0.29001808267823376,
+            0.29266346132058196,
+            0.2949767063693814
+          ],
+          "sigma_pm_a_rang_exact": [
+            0.25162604811535144,
+            0.26225748465877396,
+            0.2745280605719548,
+            0.277780797875232,
+            0.286472081697967,
+            0.29162263989839154,
+            0.29820400804382496,
+            0.30249245951085174
+          ],
+          "erreur_seuil_moins_rang": [
+            0.02166720665734012,
+            0.01481328354316419,
+            0.008719068401878916,
+            0.005550579369849651,
+            0.001565608937223184,
+            -0.0016045572201577873,
+            -0.005540546723243001,
+            -0.007515753141470349
+          ],
+          "erreur_absolue_max": 0.02166720665734012,
+          "global_sigma_hat_pool": 0.2888450821153279,
+          "global_sigma_pm_a_rang": 0.2888529337384373
+        },
+        "4_buckets_fusion_dyadique": {
+          "niveau": "4 buckets de 16 rangs (échelle des données)",
+          "n_buckets": 4,
+          "trials_par_bucket": [
+            90054.0,
+            226502.0,
+            346117.0,
+            460331.0
+          ],
+          "sigma_hat_pool_seuil_fixe": [
+            0.27600019168405737,
+            0.28329502434404585,
+            0.28910986490972096,
+            0.2938896850679026
+          ],
+          "sigma_pm_a_rang_exact": [
+            0.2592444533280032,
+            0.2763772505320041,
+            0.2892605679582338,
+            0.30047726527216284
+          ],
+          "erreur_seuil_moins_rang": [
+            0.01675573835605415,
+            0.006917773812041728,
+            -0.00015070304851283467,
+            -0.006587580204260257
+          ],
+          "erreur_absolue_max": 0.01675573835605415,
+          "global_sigma_hat_pool": 0.2888450821153279,
+          "global_sigma_pm_a_rang": 0.2888529337384373
+        },
+        "branche_du_13_1_honoree": "les DEUX : simulation exacte à rang ET erreur d'approximation seuil-vs-rang publiée pour σ̂±_pool",
+        "niveaux_publies": {
+          "4_buckets_fusion_dyadique": {
+            "erreur_absolue_max": 0.01675573835605415,
+            "niveau": "4 buckets de 16 rangs (échelle des données)"
+          },
+          "8_buckets": {
+            "erreur_absolue_max": 0.02166720665734012,
+            "niveau": "8 buckets de 8 rangs"
+          },
+          "rapport_8_sur_4": 1.2931215680812638,
+          "regle": "un |err|max se cite AVEC SON NIVEAU de bucketisation ; le chiffre à 8 buckets est le plus grand des deux"
+        }
+      }
+    }
+  },
+  "duree_s": 124.81,
+  "centrage": "type (moyenne de cellule de capture)",
+  "ecart_rho_centrage_cellule_moins_LOO_par_paire": {
+    "moyen_absolu": 0.03351335099633862,
+    "max_absolu": 0.03914209680293532,
+    "declaration": "un Σ unique ne peut pas porter un centrage qui dépend de la paire ; l'écart est publié, jamais supposé négligeable"
+  },
+  "motif": "0-191 — la simulation sur états bruts ne fournit AUCUNE nulle à rang exact pour la condition `type`, la seule où σ± vit ; σ±_sim = 1.0000 y est une valeur FORCÉE par une identité ((xxv), poids probant nul)."
+}

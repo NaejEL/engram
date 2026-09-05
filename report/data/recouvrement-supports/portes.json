@@ -1,0 +1,1059 @@
+{
+  "V-P8": {
+    "verdict": "PASS",
+    "detail": {
+      "minimum": 8,
+      "cellules_exclues": {},
+      "cardinal_exclu": 0,
+      "n_cellules": 60,
+      "modeles_exclus": [],
+      "regle_modele": "> 2 strates touchées sur un modèle ⇒ modèle exclu (§6.F)",
+      "cellules_split_half_hors_porte": {
+        "gpt2|type_sh|S3": 120,
+        "gpt2|type_sh|S2": 240,
+        "gpt2|type_sh|S1": 1128,
+        "gpt2|type_sh|S0": 3732,
+        "gpt2|plac_sh|S3": 120,
+        "gpt2|plac_sh|S2": 240,
+        "gpt2|plac_sh|S1": 1128,
+        "gpt2|plac_sh|S0": 3732,
+        "gpt2|type_loo_sub|S3": 120,
+        "gpt2|type_loo_sub|S2": 240,
+        "gpt2|type_loo_sub|S1": 1128,
+        "gpt2|type_loo_sub|S0": 3732,
+        "gpt2|plac_loo_sub|S3": 120,
+        "gpt2|plac_loo_sub|S2": 240,
+        "gpt2|plac_loo_sub|S1": 1128,
+        "gpt2|plac_loo_sub|S0": 3732,
+        "HuggingFaceTB/SmolLM2-360M|type_sh|S3": 120,
+        "HuggingFaceTB/SmolLM2-360M|type_sh|S2": 240,
+        "HuggingFaceTB/SmolLM2-360M|type_sh|S1": 1128,
+        "HuggingFaceTB/SmolLM2-360M|type_sh|S0": 3732,
+        "HuggingFaceTB/SmolLM2-360M|plac_sh|S3": 120,
+        "HuggingFaceTB/SmolLM2-360M|plac_sh|S2": 240,
+        "HuggingFaceTB/SmolLM2-360M|plac_sh|S1": 1128,
+        "HuggingFaceTB/SmolLM2-360M|plac_sh|S0": 3732,
+        "HuggingFaceTB/SmolLM2-360M|type_loo_sub|S3": 120,
+        "HuggingFaceTB/SmolLM2-360M|type_loo_sub|S2": 240,
+        "HuggingFaceTB/SmolLM2-360M|type_loo_sub|S1": 1128,
+        "HuggingFaceTB/SmolLM2-360M|type_loo_sub|S0": 3732,
+        "HuggingFaceTB/SmolLM2-360M|plac_loo_sub|S3": 120,
+        "HuggingFaceTB/SmolLM2-360M|plac_loo_sub|S2": 240,
+        "HuggingFaceTB/SmolLM2-360M|plac_loo_sub|S1": 1128,
+        "HuggingFaceTB/SmolLM2-360M|plac_loo_sub|S0": 3732,
+        "Qwen/Qwen2.5-1.5B|type_sh|S3": 120,
+        "Qwen/Qwen2.5-1.5B|type_sh|S2": 240,
+        "Qwen/Qwen2.5-1.5B|type_sh|S1": 1128,
+        "Qwen/Qwen2.5-1.5B|type_sh|S0": 3732,
+        "Qwen/Qwen2.5-1.5B|plac_sh|S3": 120,
+        "Qwen/Qwen2.5-1.5B|plac_sh|S2": 240,
+        "Qwen/Qwen2.5-1.5B|plac_sh|S1": 1128,
+        "Qwen/Qwen2.5-1.5B|plac_sh|S0": 3732,
+        "Qwen/Qwen2.5-1.5B|type_loo_sub|S3": 120,
+        "Qwen/Qwen2.5-1.5B|type_loo_sub|S2": 240,
+        "Qwen/Qwen2.5-1.5B|type_loo_sub|S1": 1128,
+        "Qwen/Qwen2.5-1.5B|type_loo_sub|S0": 3732,
+        "Qwen/Qwen2.5-1.5B|plac_loo_sub|S3": 120,
+        "Qwen/Qwen2.5-1.5B|plac_loo_sub|S2": 240,
+        "Qwen/Qwen2.5-1.5B|plac_loo_sub|S1": 1128,
+        "Qwen/Qwen2.5-1.5B|plac_loo_sub|S0": 3732
+      }
+    }
+  },
+  "V-couverture": {
+    "verdict": "PASS",
+    "detail": {
+      "cardinal_cellules_decisionnelles_modele_x_strate": 12,
+      "unite_1": "cellule décisionnelle = (modèle × strate) — 3 × 4 = 12",
+      "cardinal_modele_x_strate_x_condition": 36,
+      "unite_2": "(modèle × strate × condition concernée) — 3 × 4 × 3 = 36, conditions `aucun`, `type`, `plac`",
+      "regles_eps_exigees": [
+        "min",
+        "produit"
+      ],
+      "mesures_exigees": [
+        "LOO",
+        "split-half"
+      ],
+      "manques": [],
+      "n_manques": 0,
+      "regle": "cardinal recompté PAR ÉNUMÉRATION, jamais par affirmation",
+      "ambiguite_declaree": "« 12 cellules × 3 modèles » et « 36 cellules » ne désignent pas le même objet ; les DEUX cardinaux sont comptés et publiés. Arbitrage dû."
+    }
+  },
+  "V-borne": {
+    "verdict": "PASS",
+    "detail": {
+      "membre_a_identite": "PASS",
+      "n_violations_p_sym": 0,
+      "n_paires_verifiees": 1232820,
+      "taux_conformite": 1.0,
+      "tolerance_ULP": 8,
+      "n_violations_sans_tolerance": 4,
+      "n_paires_decidees_par_la_tolerance": 4,
+      "note_tolerance": "l'identité est EXACTE en arithmétique réelle et atteinte AVEC ÉGALITÉ sur les paires à |A∩B| = 1 dont l'indice commun est la plus grande magnitude des deux clés ; la tolérance rend la comparaison fp64 fidèle à cette arithmétique. Le compteur ci-dessus dit combien de paires elle a séparées — sans lui, une tolérance serait un masque.",
+      "membre_b_encadrement": {
+        "statut": "PASS",
+        "par_cellule": {
+          "Qwen/Qwen2.5-1.5B|S0": {
+            "p_sym_theorique": [
+              7,
+              7
+            ],
+            "p_sym_realise": {
+              "min": 0,
+              "q1": 5,
+              "median": 7,
+              "q3": 9,
+              "max": 19
+            },
+            "lecture_A_mediane_dans_theorique": true,
+            "lecture_B_IQR_realise_rencontre_theorique": true,
+            "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+            "ecart_mediane_au_plus_proche": 0
+          },
+          "Qwen/Qwen2.5-1.5B|S2": {
+            "p_sym_theorique": [
+              8,
+              8
+            ],
+            "p_sym_realise": {
+              "min": 1,
+              "q1": 6,
+              "median": 7,
+              "q3": 10,
+              "max": 17
+            },
+            "lecture_A_mediane_dans_theorique": false,
+            "lecture_B_IQR_realise_rencontre_theorique": true,
+            "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+            "ecart_mediane_au_plus_proche": 1
+          },
+          "Qwen/Qwen2.5-1.5B|S1": {
+            "p_sym_theorique": [
+              9,
+              9
+            ],
+            "p_sym_realise": {
+              "min": 0,
+              "q1": 6,
+              "median": 9,
+              "q3": 11,
+              "max": 27
+            },
+            "lecture_A_mediane_dans_theorique": true,
+            "lecture_B_IQR_realise_rencontre_theorique": true,
+            "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+            "ecart_mediane_au_plus_proche": 0
+          },
+          "gpt2|S0": {
+            "p_sym_theorique": [
+              9,
+              9
+            ],
+            "p_sym_realise": {
+              "min": 1,
+              "q1": 7,
+              "median": 9,
+              "q3": 11,
+              "max": 23
+            },
+            "lecture_A_mediane_dans_theorique": true,
+            "lecture_B_IQR_realise_rencontre_theorique": true,
+            "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+            "ecart_mediane_au_plus_proche": 0
+          },
+          "gpt2|S2": {
+            "p_sym_theorique": [
+              10,
+              10
+            ],
+            "p_sym_realise": {
+              "min": 3,
+              "q1": 8,
+              "median": 10,
+              "q3": 13,
+              "max": 22
+            },
+            "lecture_A_mediane_dans_theorique": true,
+            "lecture_B_IQR_realise_rencontre_theorique": true,
+            "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+            "ecart_mediane_au_plus_proche": 0
+          },
+          "Qwen/Qwen2.5-1.5B|S3": {
+            "p_sym_theorique": [
+              11,
+              11
+            ],
+            "p_sym_realise": {
+              "min": 3,
+              "q1": 7,
+              "median": 10,
+              "q3": 14,
+              "max": 25
+            },
+            "lecture_A_mediane_dans_theorique": false,
+            "lecture_B_IQR_realise_rencontre_theorique": true,
+            "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+            "ecart_mediane_au_plus_proche": 1
+          },
+          "gpt2|S1": {
+            "p_sym_theorique": [
+              12,
+              13
+            ],
+            "p_sym_realise": {
+              "min": 2,
+              "q1": 10,
+              "median": 12,
+              "q3": 15,
+              "max": 29
+            },
+            "lecture_A_mediane_dans_theorique": true,
+            "lecture_B_IQR_realise_rencontre_theorique": true,
+            "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+            "ecart_mediane_au_plus_proche": 0
+          },
+          "HuggingFaceTB/SmolLM2-360M|S2": {
+            "p_sym_theorique": [
+              13,
+              13
+            ],
+            "p_sym_realise": {
+              "min": 2,
+              "q1": 11,
+              "median": 13,
+              "q3": 16,
+              "max": 28
+            },
+            "lecture_A_mediane_dans_theorique": true,
+            "lecture_B_IQR_realise_rencontre_theorique": true,
+            "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+            "ecart_mediane_au_plus_proche": 0
+          },
+          "HuggingFaceTB/SmolLM2-360M|S0": {
+            "p_sym_theorique": [
+              13,
+              13
+            ],
+            "p_sym_realise": {
+              "min": 0,
+              "q1": 11,
+              "median": 13,
+              "q3": 16,
+              "max": 30
+            },
+            "lecture_A_mediane_dans_theorique": true,
+            "lecture_B_IQR_realise_rencontre_theorique": true,
+            "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+            "ecart_mediane_au_plus_proche": 0
+          },
+          "gpt2|S3": {
+            "p_sym_theorique": [
+              14,
+              14
+            ],
+            "p_sym_realise": {
+              "min": 2,
+              "q1": 11,
+              "median": 14,
+              "q3": 17,
+              "max": 32
+            },
+            "lecture_A_mediane_dans_theorique": true,
+            "lecture_B_IQR_realise_rencontre_theorique": true,
+            "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+            "ecart_mediane_au_plus_proche": 0
+          },
+          "HuggingFaceTB/SmolLM2-360M|S1": {
+            "p_sym_theorique": [
+              16,
+              17
+            ],
+            "p_sym_realise": {
+              "min": 2,
+              "q1": 14,
+              "median": 17,
+              "q3": 20,
+              "max": 36
+            },
+            "lecture_A_mediane_dans_theorique": true,
+            "lecture_B_IQR_realise_rencontre_theorique": true,
+            "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+            "ecart_mediane_au_plus_proche": 0
+          },
+          "HuggingFaceTB/SmolLM2-360M|S3": {
+            "p_sym_theorique": [
+              18,
+              18
+            ],
+            "p_sym_realise": {
+              "min": 4,
+              "q1": 14,
+              "median": 18,
+              "q3": 21,
+              "max": 42
+            },
+            "lecture_A_mediane_dans_theorique": true,
+            "lecture_B_IQR_realise_rencontre_theorique": true,
+            "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+            "ecart_mediane_au_plus_proche": 0
+          }
+        },
+        "trois_lectures": {
+          "A_mediane_realisee_dans_l_intervalle_theorique": "10/12",
+          "B_IQR_realise_rencontre_l_intervalle_theorique": "12/12",
+          "C_contenance_stricte_q1_<=_p_theo_<=_q3": "12/12",
+          "note": "l'ambiguïté d'« encadrer » a été TRANCHÉE : « X encadre Y » signifie Y contenu dans X, ce qui désigne la lecture B (rôles syntaxiques respectés). La lecture C est la plus FORTE de B. Les trois sont publiées côte à côte ; la divergence entre elles est SANS EFFET sur le verdict, qui reste porté par B."
+        },
+        "lecture_retenue": "B — littérale : « la version RÉALISÉE doit ENCADRER la table théorique » (§16-1), donc l'intervalle théorique est contenu dans l'IQR réalisé (au sens : le rencontre)",
+        "ambiguite_declaree": "trois lectures licites, publiées côte à côte (A, B, C). La grammaire de la clause désigne B ; C en est la version la plus forte. Divergence SANS EFFET sur le verdict.",
+        "cellules_hors_encadrement_lecture_B": [],
+        "n_hors_B": 0,
+        "cellules_hors_encadrement_lecture_A": [
+          {
+            "cellule": [
+              "Qwen/Qwen2.5-1.5B",
+              "S2"
+            ],
+            "theorique": [
+              8,
+              8
+            ],
+            "realise_median": 7
+          },
+          {
+            "cellule": [
+              "Qwen/Qwen2.5-1.5B",
+              "S3"
+            ],
+            "theorique": [
+              11,
+              11
+            ],
+            "realise_median": 10
+          }
+        ],
+        "n_hors_A": 2,
+        "frontieres_franches": {
+          "gpt2|S1": "12-13 (0.04 %)",
+          "HuggingFaceTB/SmolLM2-360M|S1": "16-17 (0.08 %)",
+          "propriete_gravee": "chaque frontière basculerait vers le p INFÉRIEUR, donc dans le sens CONSERVATEUR ; aucune ne peut rendre la prédiction plus facile qu'annoncé"
+        }
+      },
+      "regle": "violation = BUG DE MESURE, jamais un résultat (§6.B)"
+    }
+  },
+  "V-ulp": {
+    "verdict": "PASS",
+    "detail": {
+      "conditions_attendues": [
+        "aucun",
+        "glob",
+        "type",
+        "auto",
+        "plac"
+      ],
+      "conditions_publiees": [
+        "aucun",
+        "auto",
+        "glob",
+        "plac",
+        "type"
+      ],
+      "conditions_manquantes": [],
+      "marges_non_finies": [],
+      "marges": {
+        "aucun": {
+          "marge_ulp_min": 182199655520.0,
+          "marge_ulp_mediane": 12269151726640.0,
+          "marge_ulp_max": 96134930653296.0,
+          "n_etats": 256,
+          "chemin_nominal": "fp64",
+          "seuil": "SANS OBJET"
+        },
+        "glob": {
+          "marge_ulp_min": 67720607495.0,
+          "marge_ulp_mediane": 4106343997234.0,
+          "marge_ulp_max": 35602047512006.0,
+          "n_etats": 256,
+          "chemin_nominal": "fp64",
+          "seuil": "SANS OBJET"
+        },
+        "type": {
+          "marge_ulp_min": 4358785763.0,
+          "marge_ulp_mediane": 7390602223956.0,
+          "marge_ulp_max": 61793021466871.0,
+          "n_etats": 256,
+          "chemin_nominal": "fp64",
+          "seuil": "SANS OBJET"
+        },
+        "auto": {
+          "marge_ulp_min": 315205783262.0,
+          "marge_ulp_mediane": 7923422786549.0,
+          "marge_ulp_max": 80040134490141.0,
+          "n_etats": 256,
+          "chemin_nominal": "fp64",
+          "seuil": "SANS OBJET"
+        },
+        "plac": {
+          "marge_ulp_min": 84031089648.0,
+          "marge_ulp_mediane": 13741827315827.5,
+          "marge_ulp_max": 61426961545239.0,
+          "n_etats": 256,
+          "chemin_nominal": "fp64",
+          "seuil": "SANS OBJET"
+        }
+      },
+      "chemin_nominal": "fp64",
+      "seuil": "SANS OBJET"
+    }
+  },
+  "V-t1": {
+    "verdict": "PASS",
+    "detail": {
+      "locus_du_cycle": "t",
+      "t_moins_1": "REFUSÉ (0-130, ratifié PI)",
+      "membre_i_aucune_quantite_a_t_moins_1": true,
+      "quantites_a_t_moins_1": [],
+      "fautes_intra_tige": [],
+      "membre_ii_Core_une_unite_par_tige": true,
+      "detail_Core": {
+        "n_unites": 10,
+        "n_tiges": 10
+      },
+      "membre_iii_cardinal_intra_tige_publie": true,
+      "cardinal_intra_tige": {
+        "gpt2": {
+          "S3": 60,
+          "S2": 90,
+          "S1": 0,
+          "S0": 0
+        },
+        "HuggingFaceTB/SmolLM2-360M": {
+          "S3": 60,
+          "S2": 90,
+          "S1": 0,
+          "S0": 0
+        },
+        "Qwen/Qwen2.5-1.5B": {
+          "S3": 60,
+          "S2": 90,
+          "S1": 0,
+          "S0": 0
+        }
+      },
+      "portee_corrigee": "0-143 — à `t`, les paires intra-tige ne sont PAS exclues ; S3 et S2 sont mesurées"
+    }
+  },
+  "V-core-S": {
+    "verdict": "PASS",
+    "detail": {
+      "taille_S": 10,
+      "taille_attendue": 10,
+      "appartenance": {
+        "0": "Iron",
+        "6": "Silver",
+        "12": "North",
+        "18": "River",
+        "24": "Storm",
+        "30": "Golden",
+        "36": "Copper",
+        "42": "Hollow",
+        "48": "Frost",
+        "54": "Shadow"
+      },
+      "tiges_distinctes": 10,
+      "tiges_en_double": []
+    }
+  },
+  "V-seed": {
+    "verdict": "PASS",
+    "detail": {
+      "champs_manquants": [],
+      "modeles_sans_cardinal": [],
+      "appariement_par_le_vecteur": false,
+      "spec": {
+        "seed": 0,
+        "generateur": "torch.randn(R, d, generator=manual_seed(seed))",
+        "regle_de_tirage": "normalisation L2 par ligne ; indices 0..R−1",
+        "indices": "0..16",
+        "cardinal_par_modele": {
+          "gpt2": 17,
+          "HuggingFaceTB/SmolLM2-360M": 17,
+          "Qwen/Qwen2.5-1.5B": 17
+        },
+        "appariement_inter_modeles": "par la NORME, jamais par le vecteur"
+      },
+      "regle": "appariement inter-modèles par la NORME, jamais par le VECTEUR"
+    }
+  },
+  "V-diag": {
+    "verdict": "PASS",
+    "detail": {
+      "quantites_requises": [
+        "f",
+        "sigma_pm",
+        "O_cos_conjoint"
+      ],
+      "manques": [],
+      "n_manques": 0,
+      "statut": "DIAGNOSTIQUE, jamais correctif (Arbitrage X-1)"
+    }
+  },
+  "V-diag-colonnes": {
+    "verdict": "PASS",
+    "detail": {
+      "cardinal_cellules_enumere": 60,
+      "cardinal_cellules_attendu": 60,
+      "decomposition_du_cardinal": "3 modèles × 5 conditions × 4 strates",
+      "colonnes_exigees": [
+        "O_en_indices",
+        "cos_moyen",
+        "f",
+        "sigma_pm",
+        "p_sym_cellule",
+        "exces_O_moins_p_sym"
+      ],
+      "cardinal_cellule_x_colonne": 360,
+      "cardinal_cellule_x_colonne_attendu": 360,
+      "n_sans_objet_publie": 0,
+      "sans_objet_publie": [],
+      "manques": [],
+      "n_manques": 0,
+      "regle": "cardinal recompté PAR ÉNUMÉRATION, jamais par affirmation ; SANS OBJET est une valeur publiée, pas un manque (D23)",
+      "statut": "DIAGNOSTIQUE, jamais correctif (Arbitrage X-1)"
+    }
+  },
+  "V-psym-conditions": {
+    "verdict": "PASS",
+    "detail": {
+      "conditions_exigees": [
+        "aucun",
+        "glob",
+        "type",
+        "auto",
+        "plac"
+      ],
+      "cardinal_conditions_exige": 5,
+      "cardinal_conditions_couvertes_enumere": 5,
+      "cardinal_par_condition": {
+        "aucun": 12,
+        "glob": 12,
+        "type": 12,
+        "auto": 12,
+        "plac": 12
+      },
+      "cardinal_par_condition_attendu": 12,
+      "unite": "cellules (modèle × strate) portant un p_sym de cellule",
+      "manques": [],
+      "n_manques": 0,
+      "regle": "cardinal COMPTÉ, jamais supposé (0-144)"
+    }
+  },
+  "V-identite-decomposition": {
+    "verdict": "PASS",
+    "detail": {
+      "n_cellules_verifiees": 12,
+      "n_echecs": 0,
+      "tolerance_ULP": 8,
+      "detail": {
+        "gpt2|S3": {
+          "par_paire": {
+            "verdict": "PASS",
+            "ecart_max_en_ULP": 0.0,
+            "tolerance_ULP": 8,
+            "n_paires": 360
+          },
+          "sur_les_estimes": {
+            "Delta_rem": 0.2248263888888889,
+            "Delta_add": 0.1504033905228758,
+            "Delta_etoile": 0.3752297794117647,
+            "somme_Delta_rem_plus_Delta_add": 0.3752297794117647,
+            "ecart_absolu": 0.0,
+            "echelle_ULP": 5.551115123125783e-17,
+            "ecart_en_ULP": 0.0,
+            "tolerance_ULP": 8,
+            "regle": "identité EXACTE en arithmétique réelle ; tout écart au-delà de la tolérance ULP déjà en vigueur est un BUG"
+          },
+          "verdict_estimes": "PASS",
+          "ecart_avec_la_primaire_gelee": 0.0
+        },
+        "gpt2|S2": {
+          "par_paire": {
+            "verdict": "PASS",
+            "ecart_max_en_ULP": 0.0,
+            "tolerance_ULP": 8,
+            "n_paires": 540
+          },
+          "sur_les_estimes": {
+            "Delta_rem": 0.1863136574074074,
+            "Delta_add": 0.15368157679738562,
+            "Delta_etoile": 0.339995234204793,
+            "somme_Delta_rem_plus_Delta_add": 0.33999523420479305,
+            "ecart_absolu": 5.551115123125783e-17,
+            "echelle_ULP": 5.551115123125783e-17,
+            "ecart_en_ULP": 1.0,
+            "tolerance_ULP": 8,
+            "regle": "identité EXACTE en arithmétique réelle ; tout écart au-delà de la tolérance ULP déjà en vigueur est un BUG"
+          },
+          "verdict_estimes": "PASS",
+          "ecart_avec_la_primaire_gelee": 0.0
+        },
+        "gpt2|S1": {
+          "par_paire": {
+            "verdict": "PASS",
+            "ecart_max_en_ULP": 0.0,
+            "tolerance_ULP": 8,
+            "n_paires": 2160
+          },
+          "sur_les_estimes": {
+            "Delta_rem": 0.21390335648148148,
+            "Delta_add": 0.1499919151688453,
+            "Delta_etoile": 0.3638952716503268,
+            "somme_Delta_rem_plus_Delta_add": 0.36389527165032676,
+            "ecart_absolu": 5.551115123125783e-17,
+            "echelle_ULP": 5.551115123125783e-17,
+            "ecart_en_ULP": 1.0,
+            "tolerance_ULP": 8,
+            "regle": "identité EXACTE en arithmétique réelle ; tout écart au-delà de la tolérance ULP déjà en vigueur est un BUG"
+          },
+          "verdict_estimes": "PASS",
+          "ecart_avec_la_primaire_gelee": 0.0
+        },
+        "gpt2|S0": {
+          "par_paire": {
+            "verdict": "PASS",
+            "ecart_max_en_ULP": 0.0,
+            "tolerance_ULP": 8,
+            "n_paires": 7560
+          },
+          "sur_les_estimes": {
+            "Delta_rem": 0.16813822751322752,
+            "Delta_add": 0.15181841833955806,
+            "Delta_etoile": 0.31995664585278555,
+            "somme_Delta_rem_plus_Delta_add": 0.3199566458527856,
+            "ecart_absolu": 5.551115123125783e-17,
+            "echelle_ULP": 5.551115123125783e-17,
+            "ecart_en_ULP": 1.0,
+            "tolerance_ULP": 8,
+            "regle": "identité EXACTE en arithmétique réelle ; tout écart au-delà de la tolérance ULP déjà en vigueur est un BUG"
+          },
+          "verdict_estimes": "PASS",
+          "ecart_avec_la_primaire_gelee": 0.0
+        },
+        "HuggingFaceTB/SmolLM2-360M|S3": {
+          "par_paire": {
+            "verdict": "PASS",
+            "ecart_max_en_ULP": 0.0,
+            "tolerance_ULP": 8,
+            "n_paires": 360
+          },
+          "sur_les_estimes": {
+            "Delta_rem": 0.29153645833333336,
+            "Delta_add": 0.14394148284313726,
+            "Delta_etoile": 0.4354779411764706,
+            "somme_Delta_rem_plus_Delta_add": 0.43547794117647065,
+            "ecart_absolu": 5.551115123125783e-17,
+            "echelle_ULP": 5.551115123125783e-17,
+            "ecart_en_ULP": 1.0,
+            "tolerance_ULP": 8,
+            "regle": "identité EXACTE en arithmétique réelle ; tout écart au-delà de la tolérance ULP déjà en vigueur est un BUG"
+          },
+          "verdict_estimes": "PASS",
+          "ecart_avec_la_primaire_gelee": 0.0
+        },
+        "HuggingFaceTB/SmolLM2-360M|S2": {
+          "par_paire": {
+            "verdict": "PASS",
+            "ecart_max_en_ULP": 0.0,
+            "tolerance_ULP": 8,
+            "n_paires": 540
+          },
+          "sur_les_estimes": {
+            "Delta_rem": 0.23203125,
+            "Delta_add": 0.15927457788671026,
+            "Delta_etoile": 0.39130582788671026,
+            "somme_Delta_rem_plus_Delta_add": 0.39130582788671026,
+            "ecart_absolu": 0.0,
+            "echelle_ULP": 5.551115123125783e-17,
+            "ecart_en_ULP": 0.0,
+            "tolerance_ULP": 8,
+            "regle": "identité EXACTE en arithmétique réelle ; tout écart au-delà de la tolérance ULP déjà en vigueur est un BUG"
+          },
+          "verdict_estimes": "PASS",
+          "ecart_avec_la_primaire_gelee": 0.0
+        },
+        "HuggingFaceTB/SmolLM2-360M|S1": {
+          "par_paire": {
+            "verdict": "PASS",
+            "ecart_max_en_ULP": 0.0,
+            "tolerance_ULP": 8,
+            "n_paires": 2160
+          },
+          "sur_les_estimes": {
+            "Delta_rem": 0.2802662037037037,
+            "Delta_add": 0.1460703465413943,
+            "Delta_etoile": 0.42633655024509803,
+            "somme_Delta_rem_plus_Delta_add": 0.426336550245098,
+            "ecart_absolu": 5.551115123125783e-17,
+            "echelle_ULP": 5.551115123125783e-17,
+            "ecart_en_ULP": 1.0,
+            "tolerance_ULP": 8,
+            "regle": "identité EXACTE en arithmétique réelle ; tout écart au-delà de la tolérance ULP déjà en vigueur est un BUG"
+          },
+          "verdict_estimes": "PASS",
+          "ecart_avec_la_primaire_gelee": 0.0
+        },
+        "HuggingFaceTB/SmolLM2-360M|S0": {
+          "par_paire": {
+            "verdict": "PASS",
+            "ecart_max_en_ULP": 0.0,
+            "tolerance_ULP": 8,
+            "n_paires": 7560
+          },
+          "sur_les_estimes": {
+            "Delta_rem": 0.23255621693121692,
+            "Delta_add": 0.15525185768751948,
+            "Delta_etoile": 0.38780807461873634,
+            "somme_Delta_rem_plus_Delta_add": 0.3878080746187364,
+            "ecart_absolu": 5.551115123125783e-17,
+            "echelle_ULP": 5.551115123125783e-17,
+            "ecart_en_ULP": 1.0,
+            "tolerance_ULP": 8,
+            "regle": "identité EXACTE en arithmétique réelle ; tout écart au-delà de la tolérance ULP déjà en vigueur est un BUG"
+          },
+          "verdict_estimes": "PASS",
+          "ecart_avec_la_primaire_gelee": 0.0
+        },
+        "Qwen/Qwen2.5-1.5B|S3": {
+          "par_paire": {
+            "verdict": "PASS",
+            "ecart_max_en_ULP": 0.0,
+            "tolerance_ULP": 8,
+            "n_paires": 360
+          },
+          "sur_les_estimes": {
+            "Delta_rem": 0.17335069444444445,
+            "Delta_add": 0.13119638480392157,
+            "Delta_etoile": 0.30454707924836605,
+            "somme_Delta_rem_plus_Delta_add": 0.304547079248366,
+            "ecart_absolu": 5.551115123125783e-17,
+            "echelle_ULP": 5.551115123125783e-17,
+            "ecart_en_ULP": 1.0,
+            "tolerance_ULP": 8,
+            "regle": "identité EXACTE en arithmétique réelle ; tout écart au-delà de la tolérance ULP déjà en vigueur est un BUG"
+          },
+          "verdict_estimes": "PASS",
+          "ecart_avec_la_primaire_gelee": 0.0
+        },
+        "Qwen/Qwen2.5-1.5B|S2": {
+          "par_paire": {
+            "verdict": "PASS",
+            "ecart_max_en_ULP": 0.0,
+            "tolerance_ULP": 8,
+            "n_paires": 540
+          },
+          "sur_les_estimes": {
+            "Delta_rem": 0.1384548611111111,
+            "Delta_add": 0.12998366013071894,
+            "Delta_etoile": 0.26843852124183004,
+            "somme_Delta_rem_plus_Delta_add": 0.26843852124183004,
+            "ecart_absolu": 0.0,
+            "echelle_ULP": 5.551115123125783e-17,
+            "ecart_en_ULP": 0.0,
+            "tolerance_ULP": 8,
+            "regle": "identité EXACTE en arithmétique réelle ; tout écart au-delà de la tolérance ULP déjà en vigueur est un BUG"
+          },
+          "verdict_estimes": "PASS",
+          "ecart_avec_la_primaire_gelee": 0.0
+        },
+        "Qwen/Qwen2.5-1.5B|S1": {
+          "par_paire": {
+            "verdict": "PASS",
+            "ecart_max_en_ULP": 0.0,
+            "tolerance_ULP": 8,
+            "n_paires": 2160
+          },
+          "sur_les_estimes": {
+            "Delta_rem": 0.15736400462962963,
+            "Delta_add": 0.13006791258169936,
+            "Delta_etoile": 0.28743191721132894,
+            "somme_Delta_rem_plus_Delta_add": 0.287431917211329,
+            "ecart_absolu": 5.551115123125783e-17,
+            "echelle_ULP": 5.551115123125783e-17,
+            "ecart_en_ULP": 1.0,
+            "tolerance_ULP": 8,
+            "regle": "identité EXACTE en arithmétique réelle ; tout écart au-delà de la tolérance ULP déjà en vigueur est un BUG"
+          },
+          "verdict_estimes": "PASS",
+          "ecart_avec_la_primaire_gelee": 0.0
+        },
+        "Qwen/Qwen2.5-1.5B|S0": {
+          "par_paire": {
+            "verdict": "PASS",
+            "ecart_max_en_ULP": 0.0,
+            "tolerance_ULP": 8,
+            "n_paires": 7560
+          },
+          "sur_les_estimes": {
+            "Delta_rem": 0.12530795304232803,
+            "Delta_add": 0.1264549048786181,
+            "Delta_etoile": 0.25176285792094616,
+            "somme_Delta_rem_plus_Delta_add": 0.2517628579209461,
+            "ecart_absolu": 5.551115123125783e-17,
+            "echelle_ULP": 5.551115123125783e-17,
+            "ecart_en_ULP": 1.0,
+            "tolerance_ULP": 8,
+            "regle": "identité EXACTE en arithmétique réelle ; tout écart au-delà de la tolérance ULP déjà en vigueur est un BUG"
+          },
+          "verdict_estimes": "PASS",
+          "ecart_avec_la_primaire_gelee": 0.0
+        }
+      },
+      "statut": "Δ_rem et Δ_add sont DESCRIPTIFS ; Δ* reste la primaire gelée. Cette porte ne vérifie qu'une IDENTITÉ.",
+      "regle": "tout écart au-delà de la tolérance ULP déjà en vigueur est un BUG, jamais un résultat"
+    }
+  },
+  "V-norm": {
+    "verdict": "PASS",
+    "detail": {
+      "modeles_manquants": [],
+      "sans_citation": [],
+      "normalisations_inconnues": [],
+      "configs": {
+        "gpt2": {
+          "model_type": "gpt2",
+          "normalisation": "LayerNorm",
+          "centre_t_il": true,
+          "champ": "layer_norm_epsilon",
+          "ligne_de_config": "\"layer_norm_epsilon\": 1e-05",
+          "reference": "Zhang & Sennrich 2019 — RMSNorm ne centre pas"
+        },
+        "HuggingFaceTB/SmolLM2-360M": {
+          "model_type": "llama",
+          "normalisation": "RMSNorm",
+          "centre_t_il": false,
+          "champ": "rms_norm_eps",
+          "ligne_de_config": "\"rms_norm_eps\": 1e-05",
+          "reference": "Zhang & Sennrich 2019 — RMSNorm ne centre pas"
+        },
+        "Qwen/Qwen2.5-1.5B": {
+          "model_type": "qwen2",
+          "normalisation": "RMSNorm",
+          "centre_t_il": false,
+          "champ": "rms_norm_eps",
+          "ligne_de_config": "\"rms_norm_eps\": 1e-06",
+          "reference": "Zhang & Sennrich 2019 — RMSNorm ne centre pas"
+        }
+      },
+      "regle": "citée par ligne de config, jamais par croyance"
+    }
+  },
+  "V-vacuite": {
+    "verdict": "PASS",
+    "detail": {
+      "cellules_a_classe_informative_inatteignable_par_regle": {
+        "min": "6/12",
+        "produit": "6/12"
+      },
+      "n_cellules": 12,
+      "detail": {
+        "gpt2|S3|min": {
+          "plancher_structurel_relatif": 0.8,
+          "epsilon_etoile": 0.30417024101307183,
+          "rapport_eps_sur_Delta": 0.8106239368578619,
+          "IC_inf_Delta": 0.36526143790849674,
+          "classe_informative_inatteignable": false,
+          "classe_C": "c-cent"
+        },
+        "gpt2|S2|min": {
+          "plancher_structurel_relatif": 0.8,
+          "epsilon_etoile": 0.2764253131808279,
+          "rapport_eps_sur_Delta": 0.8130270232385837,
+          "IC_inf_Delta": 0.32853847528594765,
+          "classe_informative_inatteignable": false,
+          "classe_C": "c-cent"
+        },
+        "gpt2|S1|min": {
+          "plancher_structurel_relatif": 1.0,
+          "epsilon_etoile": 0.3616099099919807,
+          "rapport_eps_sur_Delta": 0.9937197269753422,
+          "IC_inf_Delta": 0.3543430500883013,
+          "classe_informative_inatteignable": true,
+          "classe_C": "ind_Δ"
+        },
+        "gpt2|S0|min": {
+          "plancher_structurel_relatif": 1.0,
+          "epsilon_etoile": 0.31371411655960757,
+          "rapport_eps_sur_Delta": 0.9804894526364981,
+          "IC_inf_Delta": 0.3120854119996509,
+          "classe_informative_inatteignable": true,
+          "classe_C": "ind_Δ"
+        },
+        "HuggingFaceTB/SmolLM2-360M|S3|min": {
+          "plancher_structurel_relatif": 0.8,
+          "epsilon_etoile": 0.3520710784313726,
+          "rapport_eps_sur_Delta": 0.8084705220205431,
+          "IC_inf_Delta": 0.42653441584967317,
+          "classe_informative_inatteignable": false,
+          "classe_C": "c-cent"
+        },
+        "HuggingFaceTB/SmolLM2-360M|S2|min": {
+          "plancher_structurel_relatif": 0.8,
+          "epsilon_etoile": 0.3176252723311546,
+          "rapport_eps_sur_Delta": 0.8117059591126575,
+          "IC_inf_Delta": 0.3792822797521787,
+          "classe_informative_inatteignable": false,
+          "classe_C": "c-cent"
+        },
+        "HuggingFaceTB/SmolLM2-360M|S1|min": {
+          "plancher_structurel_relatif": 1.0,
+          "epsilon_etoile": 0.42453802156755943,
+          "rapport_eps_sur_Delta": 0.9957814344641466,
+          "IC_inf_Delta": 0.41598270022116857,
+          "classe_informative_inatteignable": true,
+          "classe_C": "ind_Δ"
+        },
+        "HuggingFaceTB/SmolLM2-360M|S0|min": {
+          "plancher_structurel_relatif": 1.0,
+          "epsilon_etoile": 0.38326193775925316,
+          "rapport_eps_sur_Delta": 0.9882773537813708,
+          "IC_inf_Delta": 0.38209434450603896,
+          "classe_informative_inatteignable": true,
+          "classe_C": "ind_Δ"
+        },
+        "Qwen/Qwen2.5-1.5B|S3|min": {
+          "plancher_structurel_relatif": 0.8,
+          "epsilon_etoile": 0.24684359681372547,
+          "rapport_eps_sur_Delta": 0.810526889382571,
+          "IC_inf_Delta": 0.2963184232026144,
+          "classe_informative_inatteignable": false,
+          "classe_C": "c-cent"
+        },
+        "Qwen/Qwen2.5-1.5B|S2|min": {
+          "plancher_structurel_relatif": 0.8,
+          "epsilon_etoile": 0.2188525497004357,
+          "rapport_eps_sur_Delta": 0.8152799705794702,
+          "IC_inf_Delta": 0.25941746663943366,
+          "classe_informative_inatteignable": false,
+          "classe_C": "c-cent"
+        },
+        "Qwen/Qwen2.5-1.5B|S1|min": {
+          "plancher_structurel_relatif": 1.0,
+          "epsilon_etoile": 0.2846530371407822,
+          "rapport_eps_sur_Delta": 0.9903320407228693,
+          "IC_inf_Delta": 0.2784312333111736,
+          "classe_informative_inatteignable": true,
+          "classe_C": "ind_Δ"
+        },
+        "Qwen/Qwen2.5-1.5B|S0|min": {
+          "plancher_structurel_relatif": 1.0,
+          "epsilon_etoile": 0.24657983934045194,
+          "rapport_eps_sur_Delta": 0.9794130928473902,
+          "IC_inf_Delta": 0.24579714919069937,
+          "classe_informative_inatteignable": true,
+          "classe_C": "ind_Δ"
+        },
+        "gpt2|S3|produit": {
+          "plancher_structurel_relatif": 1.0,
+          "epsilon_etoile": 0.3837524254493465,
+          "rapport_eps_sur_Delta": 1.0227131387357966,
+          "IC_inf_Delta": 0.36526143790849674,
+          "classe_informative_inatteignable": true,
+          "classe_C": "ind_Δ"
+        },
+        "gpt2|S2|produit": {
+          "plancher_structurel_relatif": 1.0,
+          "epsilon_etoile": 0.3497688589324619,
+          "rapport_eps_sur_Delta": 1.0287463580203653,
+          "IC_inf_Delta": 0.32853847528594765,
+          "classe_informative_inatteignable": true,
+          "classe_C": "ind_Δ"
+        },
+        "gpt2|S1|produit": {
+          "plancher_structurel_relatif": 0.6216216216216216,
+          "epsilon_etoile": 0.2271189650990604,
+          "rapport_eps_sur_Delta": 0.6241327733362331,
+          "IC_inf_Delta": 0.3543430500883013,
+          "classe_informative_inatteignable": false,
+          "classe_C": "c-cent"
+        },
+        "gpt2|S0|produit": {
+          "plancher_structurel_relatif": 0.5773213521608889,
+          "epsilon_etoile": 0.18533983503333995,
+          "rapport_eps_sur_Delta": 0.5792654643548683,
+          "IC_inf_Delta": 0.3120854119996509,
+          "classe_informative_inatteignable": false,
+          "classe_C": "c-cent"
+        },
+        "HuggingFaceTB/SmolLM2-360M|S3|produit": {
+          "plancher_structurel_relatif": 1.0,
+          "epsilon_etoile": 0.4422412428513072,
+          "rapport_eps_sur_Delta": 1.0155307560620985,
+          "IC_inf_Delta": 0.42653441584967317,
+          "classe_informative_inatteignable": true,
+          "classe_C": "ind_Δ"
+        },
+        "HuggingFaceTB/SmolLM2-360M|S2|produit": {
+          "plancher_structurel_relatif": 1.0,
+          "epsilon_etoile": 0.40197993259803916,
+          "rapport_eps_sur_Delta": 1.0272781644193125,
+          "IC_inf_Delta": 0.3792822797521787,
+          "classe_informative_inatteignable": true,
+          "classe_C": "ind_Δ"
+        },
+        "HuggingFaceTB/SmolLM2-360M|S1|produit": {
+          "plancher_structurel_relatif": 0.6216216216216216,
+          "epsilon_etoile": 0.26533114367332206,
+          "rapport_eps_sur_Delta": 0.6223513877024734,
+          "IC_inf_Delta": 0.41598270022116857,
+          "classe_informative_inatteignable": false,
+          "classe_C": "c-cent"
+        },
+        "HuggingFaceTB/SmolLM2-360M|S0|produit": {
+          "plancher_structurel_relatif": 0.5773213521608889,
+          "epsilon_etoile": 0.22441742566368109,
+          "rapport_eps_sur_Delta": 0.5786816736198992,
+          "IC_inf_Delta": 0.38209434450603896,
+          "classe_informative_inatteignable": false,
+          "classe_C": "c-cent"
+        },
+        "Qwen/Qwen2.5-1.5B|S3|produit": {
+          "plancher_structurel_relatif": 1.0,
+          "epsilon_etoile": 0.3116984528186275,
+          "rapport_eps_sur_Delta": 1.0234819968981852,
+          "IC_inf_Delta": 0.2963184232026144,
+          "classe_informative_inatteignable": true,
+          "classe_C": "ind_Δ"
+        },
+        "Qwen/Qwen2.5-1.5B|S2|produit": {
+          "plancher_structurel_relatif": 1.0,
+          "epsilon_etoile": 0.2759855834694989,
+          "rapport_eps_sur_Delta": 1.028114676659502,
+          "IC_inf_Delta": 0.25941746663943366,
+          "classe_informative_inatteignable": true,
+          "classe_C": "ind_Δ"
+        },
+        "Qwen/Qwen2.5-1.5B|S1|produit": {
+          "plancher_structurel_relatif": 0.6216216216216216,
+          "epsilon_etoile": 0.17845439022442117,
+          "rapport_eps_sur_Delta": 0.6208579477038937,
+          "IC_inf_Delta": 0.2784312333111736,
+          "classe_informative_inatteignable": false,
+          "classe_C": "c-cent"
+        },
+        "Qwen/Qwen2.5-1.5B|S0|produit": {
+          "plancher_structurel_relatif": 0.5773213521608889,
+          "epsilon_etoile": 0.14518817226963743,
+          "rapport_eps_sur_Delta": 0.5766862255560615,
+          "IC_inf_Delta": 0.24579714919069937,
+          "classe_informative_inatteignable": false,
+          "classe_C": "c-cent"
+        }
+      },
+      "definition": "c-cent exige IC_inf(Δ*) > ε* ; le plancher structurel est la valeur MINIMALE que ε* peut prendre à effet constant. Quand IC_inf ne le franchit pas, la classe informative est vide sur cette cellule quelle que soit la donnée",
+      "statut": "COMPTEUR PUBLIÉ — descriptif, ne modifie aucune classe ; la vacuité se publie, elle ne se découvre pas après coup (0-47 / 0-66)"
+    }
+  }
+}

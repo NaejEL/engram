@@ -1,0 +1,5548 @@
+{
+ "protocole": "experiments/EXP-2026-08-23-recouvrement-supports.md",
+ "statut_protocole": "PRE-ENREGISTRE (correction de provenance §15, 2026-08-26)",
+ "banc": "D14-S — satisfiabilité dgov, CPU seul, aucune mesure, aucun GPU",
+ "E": 0,
+ "n_clauses": 47,
+ "couverture": {
+  "clauses_avec_les_deux_contre_exemples": 47,
+  "total": 47,
+  "pct": 100.0
+ },
+ "n_cas": 119,
+ "cellules_decisionnelles": {
+  "cardinal": 12,
+  "cellules": [
+   [
+    "HAUT",
+    "c-mec"
+   ],
+   [
+    "HAUT",
+    "c-cent"
+   ],
+   [
+    "HAUT",
+    "ind_Δ"
+   ],
+   [
+    "−",
+    "c-mec"
+   ],
+   [
+    "−",
+    "c-cent"
+   ],
+   [
+    "−",
+    "ind_Δ"
+   ],
+   [
+    "BAS",
+    "c-mec"
+   ],
+   [
+    "BAS",
+    "c-cent"
+   ],
+   [
+    "BAS",
+    "ind_Δ"
+   ],
+   [
+    "ind_L",
+    "c-mec"
+   ],
+   [
+    "ind_L",
+    "c-cent"
+   ],
+   [
+    "ind_L",
+    "ind_Δ"
+   ]
+  ]
+ },
+ "objets_simules": {
+  "cardinal": 10,
+  "objets": [
+   [
+    "N",
+    "HAUT"
+   ],
+   [
+    "N",
+    "−"
+   ],
+   [
+    "N",
+    "BAS"
+   ],
+   [
+    "N",
+    "ind_L"
+   ],
+   [
+    "C",
+    "c-anti"
+   ],
+   [
+    "C",
+    "c-mec"
+   ],
+   [
+    "C",
+    "c-cent"
+   ],
+   [
+    "C",
+    "ind_Δ"
+   ],
+   [
+    "Core",
+    "vide"
+   ],
+   [
+    "Core",
+    "non vide"
+   ]
+  ]
+ },
+ "cas_echouants_obligatoires": [
+  "V-borne",
+  "V-P8 (7 paires)",
+  "V-core-S (deux unités d'une tige)",
+  "V-ulp (états centrés et placebo)",
+  "V-seed",
+  "V-t1"
+ ],
+ "constantes": {
+  "n": "1/128",
+  "2n": "1/64",
+  "k": 64,
+  "D": 8192,
+  "K_eff": 10,
+  "P_min_par_cellule": 8,
+  "B_boot": 10000,
+  "B_perm": 10000,
+  "R_plafond": 300
+ },
+ "borne_decisionnelle": "p_sym (serrée, §16, D30 alinéa 2) ; p_pair (lâche) publiée en DESCRIPTIF",
+ "table_cum": {
+  "j_max": 20,
+  "source_des_valeurs": "RECALCUL fp64 au banc (gravure)",
+  "gravure": "fp64, Φ⁻¹ = AS 241 (Wichura 1988), substitution déclarée à scipy.special.ndtri (scipy hors requirements.txt)",
+  "verification_de_l_inverse": {
+   "residu_max_|Phi(ndtri(p))-p|": 0.0,
+   "methode": "aller-retour par math.erfc, indépendant de _ndtri"
+  },
+  "controle": {
+   "fichier": "C:\\Users\\fuzzz\\engram\\experiments\\results\\recouvrement-supports\\cum_table_QM6.json",
+   "source": "lab-math, Q-M6, 2026-08-26",
+   "statut_du_fichier": "TABLE DE CONTROLE — PAS LA GRAVURE",
+   "tolerance": 0.00015,
+   "ecart_max_gravure_moins_controle": 1.228197958447197e-06,
+   "conforme": true,
+   "ecarts": {
+    "1": -3.212917816519667e-07,
+    "2": 3.9736004193990926e-07,
+    "3": 7.633122320743757e-07,
+    "4": -1.0636309848155445e-07,
+    "5": 1.1141922905966162e-06,
+    "6": 1.3819564298467313e-07,
+    "7": -1.978953110826076e-07,
+    "8": -2.5214701243614357e-08,
+    "9": -5.631019765195422e-07,
+    "10": -5.811290504365019e-09,
+    "11": 6.309087326739071e-07,
+    "12": 5.605855872281573e-07,
+    "13": 6.174728199859203e-07,
+    "14": 2.3397540332981137e-07,
+    "15": 1.473944927776749e-07,
+    "16": 9.236282820790365e-07,
+    "17": -6.465159614332805e-07,
+    "18": 7.581124081279533e-07,
+    "19": 1.228197958447197e-06,
+    "20": 8.139389598427194e-07
+   },
+   "ecart_max_vs_ancres_verifieur": 4.36309087326614e-05,
+   "ecarts_vs_ancres_verifieur": {
+    "1": 1.3678708218348157e-05,
+    "4": -2.210636309848968e-05,
+    "7": 3.980210468892964e-05,
+    "8": 2.5974785298754632e-05,
+    "9": 2.9436898023482705e-05,
+    "10": -9.00581129048561e-06,
+    "11": 4.36309087326614e-05
+   }
+  },
+  "hybride_563_9": {
+   "statut": "HYBRIDE DÉCLARÉ — profil d'ordre THÉORIQUE × masse totale RÉALISÉE ; la vraie table réalisée est PAR CLÉ et se calcule au banc ; cette colonne n'en est pas un substitut",
+   "non_utilisee_pour_decider": true
+  },
+  "Q-M6": "RENDUE",
+  "contigue_depuis_1": true,
+  "concave": true,
+  "croissante": true,
+  "regle": "aucune valeur de cum n'est jamais interpolée (Q-M5)"
+ },
+ "Q-M6": {
+  "statut": "RENDUE",
+  "du": "table cum(j) exacte pour j = 1..20 (fp64, double normalisation 569.6 / 563.9) et les douze p_sym",
+  "gravure": "recalcul fp64 au banc ; la table livrée est le CONTRÔLE, comparé à ±1.5e−4"
+ },
+ "clauses_sous_specifiees": {
+  "cellule d'estimation de `μ_type`": "§8 grave « h − μ_type (LOO par paire) » sans dire ce qu'est un type. Déclaré : la cellule d'estimation est la CELLULE DE CAPTURE du matériau v4 (T1-A, T1-B, T2-A, T2-B, T3-A, T3-B) ; ses membres sont les 60 unités décisionnelles de cette cellule, d'où n_cell = 60. Mélanger les variantes mélangerait deux positions de capture.",
+  "paire → tige, pour le bootstrap et la permutation": "§5-6 grave « bootstrap de TIGES » et §4.5 « permutation intra-tige », or une paire S1/S0 a DEUX tiges. Déclaré : (a) poids d'une paire dans un rééchantillon de multiplicités m — m[t_a]·m[t_b] si t_a ≠ t_b, m[t_a] sinon ; (b) pour la permutation des étiquettes {plac, type}, une paire est affectée à la tige min(t_a, t_b) et le tirage de l'étiquette est CONSTANT dans une tige.",
+  "unité de paire": "une paire est un couple d'unités décisionnelles DANS UNE MÊME CELLULE de capture : les supports sont des ENSEMBLES et ne se moyennent pas entre cellules comme le cosinus d'A3 le faisait.",
+  "ensemble `S` de `Core`": "`V-core-S` exige |S| = 10, une unité par tige, sans dire laquelle. Déclaré : la PREMIÈRE unité décisionnelle de chaque tige dans l'ordre du matériau — règle déterministe, sans aléa, publiée avec l'appartenance.",
+  "règle de tirage des `R` directions": "`V-seed` exige seed, générateur et règle gelés. Déclaré : torch.randn(R, d, generator=manual_seed(seed_dir)) puis normalisation L2 par ligne ; indices 0..R−1 ; les directions NE SONT PAS transportables entre modèles (d = 768/960/1536, 0-133) — l'appariement inter-modèles se fait par la NORME, jamais par le vecteur ; cardinal publié PAR MODÈLE.",
+  "affectation du signe de permutation pour une paire INTER-tige": "§4.5 grave « permutation intra-tige des étiquettes {plac, type} » mais une paire S1/S0 a DEUX tiges. DEUX opérationnalisations sont compatibles avec la clause : (a) `min` — signe s_{min(t_a,t_b)}, IMPLÉMENTÉE au premier tour ; (b) `produit` — signe s_{t_a}·s_{t_b}, ALTERNATIVE. Les deux sont calculées et publiées côte à côte avec leurs classes C ; AUCUNE n'est promue — l'arbitrage est PI. Propriété factuelle à lire avec elles : sous la règle `produit`, une paire INTRA-tige a s_t·s_t = +1 quel que soit le tirage — son signe ne peut pas se retourner ; la fraction de paires à signe non retournable est publiée par cellule et par règle.",
+  "partition du split-half et sort des paires à cheval": "§5-7 et §4.8 exigent « LOO ET split-half publiés côte à côte » sans définir la partition. Déclaré : moitiés par PARITÉ de l'index de l'unité dans sa cellule de capture ; pour une paire dont les deux membres sont dans la même moitié h, μ_type est estimée sur la moitié 1−h (qui ne contient ni a ni b : fuite nulle par construction) ; les paires À CHEVAL n'ont aucune moitié disjointe et sont EXCLUES de la mesure split-half, cardinal publié. Le contrôle apparié `type_loo_sub` / `plac_loo_sub` refait le LOO sur EXACTEMENT le même sous-ensemble, pour que l'écart LOO↔split-half ne soit pas confondu avec l'écart entre deux jeux de paires.",
+  "marge de `V-ulp`": "§4.7 exige la marge à la coupure PUBLIÉE pour les cinq conditions ; il ne fixe aucun seuil. Déclaré : la porte est une porte de COUVERTURE — elle échoue si l'une des cinq conditions n'a pas sa marge. Les marges elles-mêmes sont publiées en ULP, en descriptif. Poser un seuil non pré-enregistré serait 0-52."
+ },
+ "duree_s": 3.24,
+ "clauses": [
+  {
+   "clause": "V-cache",
+   "pass_case": "les trois `.npz` de v4 sont lisibles, hash publié",
+   "fail_case": "un modèle absent du cache ⇒ re-forward, jamais un repli silencieux",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "échec ⇒ re-forward autorisé (§14-4) : 53,82 s, VRAM ≤ 4,688 Gio en RÉSERVÉ (0-142).",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "cache v4 complet",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "repertoire": "C:\\Users\\fuzzz\\engram\\experiments\\results\\v4-materiel\\raw",
+       "fichiers": {
+        "gpt2": {
+         "present": true,
+         "chemin": "C:\\Users\\fuzzz\\engram\\experiments\\results\\v4-materiel\\raw\\etats-gpt2.npz",
+         "taille_octets": 23461342,
+         "sha256": "5ac90c5b49b1c072dfbded36baade788f07c5195d80b1e85a3777cab354c6ed6",
+         "n_cles": 18,
+         "dtype_etats": "float32",
+         "forme_etats": [
+          13,
+          132,
+          768
+         ],
+         "cle_exemple": "T1-A|t"
+        },
+        "HuggingFaceTB/SmolLM2-360M": {
+         "present": true,
+         "chemin": "C:\\Users\\fuzzz\\engram\\experiments\\results\\v4-materiel\\raw\\etats-HuggingFaceTB_SmolLM2-360M.npz",
+         "taille_octets": 74635393,
+         "sha256": "6553621b4d0be03b90b8efc000bd5e62486fec9a1eda6bdbbf8ab6ae7d2104f5",
+         "n_cles": 18,
+         "dtype_etats": "float32",
+         "forme_etats": [
+          33,
+          132,
+          960
+         ],
+         "cle_exemple": "T1-A|t"
+        },
+        "Qwen/Qwen2.5-1.5B": {
+         "present": true,
+         "chemin": "C:\\Users\\fuzzz\\engram\\experiments\\results\\v4-materiel\\raw\\etats-Qwen_Qwen2.5-1.5B.npz",
+         "taille_octets": 104260274,
+         "sha256": "f3792daebf611d957acb44d95861546b084253c4ab70ad3821d8833cf5c4d7dd",
+         "n_cles": 18,
+         "dtype_etats": "float32",
+         "forme_etats": [
+          29,
+          132,
+          1536
+         ],
+         "cle_exemple": "T1-A|t"
+        }
+       },
+       "limite_nommee": "le hash des `.npz` de v4 n'a jamais été pré-enregistré : il est gravé ici pour la suite, ce qui est une LIMITE, pas une vérification (§3)",
+       "poste_gpu_si_echec": {
+        "duree_s": 53.82,
+        "vram_gio_max_reservee": 4.688,
+        "vram_gio_max_allouee": 4.188,
+        "unite": "RÉSERVÉ (§7, 0-142)",
+        "statut": "non déclenché tant que V-cache PASS"
+       },
+       "fichiers_manquants": []
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "modèle inexistant",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "repertoire": "C:\\Users\\fuzzz\\engram\\experiments\\results\\v4-materiel\\raw",
+       "fichiers": {
+        "modele/qui-n-existe-pas": {
+         "present": false,
+         "chemin": "C:\\Users\\fuzzz\\engram\\experiments\\results\\v4-materiel\\raw\\etats-modele_qui-n-existe-pas.npz"
+        }
+       },
+       "limite_nommee": "le hash des `.npz` de v4 n'a jamais été pré-enregistré : il est gravé ici pour la suite, ce qui est une LIMITE, pas une vérification (§3)",
+       "poste_gpu_si_echec": {
+        "duree_s": 53.82,
+        "vram_gio_max_reservee": 4.688,
+        "vram_gio_max_allouee": 4.188,
+        "unite": "RÉSERVÉ (§7, 0-142)",
+        "statut": "non déclenché tant que V-cache PASS"
+       },
+       "fichiers_manquants": [
+        "C:\\Users\\fuzzz\\engram\\experiments\\results\\v4-materiel\\raw\\etats-modele_qui-n-existe-pas.npz"
+       ]
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-G (v2)",
+   "pass_case": "G du projet instanciée et hashée ; cos fp32/fp64 sous 1e−6 ; divergence avec A3 publiée",
+   "fail_case": "divergence fp32/fp64 au-dessus de la tolérance ⇒ arrêt de provenance (D14-R)",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "v1 (« reproduire A3 bit-à-bit ») était INEXÉCUTABLE PAR CONSTRUCTION : A3 n'a jamais été calculé avec la G du projet (0-135). Aucune reproduction d'A3 n'est exigée ni possible.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "tolérance 1e−6",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "version": "v2 (§15, 2026-08-26)",
+       "cfg": "model=gpt2 layer=6 lam=2.0 eta=0.2 decay=0.001 thr=4.0 prune=512/0.1 hebb_only=False dg=8192/64 gate=keysim",
+       "tolerance_fp32_fp64": 1e-06,
+       "modeles": {
+        "gpt2": {
+         "couche": 6,
+         "d": 768,
+         "G_du_projet": {
+          "generateur": "torch.randn(dg_dim, d, generator=manual_seed(seed))",
+          "seed": 0,
+          "forme": [
+           8192,
+           768
+          ],
+          "dtype": "torch.float32",
+          "echelle": "aucune (pas de 1/√d)",
+          "sha256": "681252f3beca09826ac3be75a271ef46461ab4bb989bfd66767958d2ffb219ad",
+          "portee": "pour cette G, seed 0 (D9)"
+         },
+         "cos_phi_par_strate_fp32": {
+          "S3": 0.2765880627764596,
+          "S2": 0.20695693966139247,
+          "S1": 0.24789006826122875,
+          "S0": 0.18864584040961097
+         },
+         "cos_phi_par_strate_fp64": {
+          "S3": 0.27658806387056156,
+          "S2": 0.20695694009610738,
+          "S1": 0.24789006929315519,
+          "S0": 0.18864584100542842
+         },
+         "ecart_fp64_moins_fp32": {
+          "S3": 1.0941019756849357e-09,
+          "S2": 4.3471490296376203e-10,
+          "S1": 1.0319264331926092e-09,
+          "S0": 5.95817450932401e-10
+         },
+         "ecart_max_de_precision": 1.0941019756849357e-09,
+         "V-iid": {
+          "verdict": "PASS",
+          "detail": {
+           "moyenne": -0.0032650546209091295,
+           "ecart_type": 1.000476575056003,
+           "forme": [
+            512,
+            768
+           ],
+           "preuve": "par provenance (torch.randn, lignes iid) — M3",
+           "residuel": "sanité de moments ; PAS de KS",
+           "tolerances": {
+            "|moyenne|": 0.02,
+            "|σ−1|": 0.02
+           }
+          }
+         },
+         "divergence_avec_A3": {
+          "A3_publie": {
+           "cos_projection_A3": {
+            "S3": 0.283819903826548,
+            "S2": 0.21455342597155655,
+            "S1": 0.25728208728962476,
+            "S0": 0.19266583529195042
+           },
+           "cos_brut": {
+            "S3": 0.7434180575940343,
+            "S2": 0.6804045050232498,
+            "S1": 0.7177266161474917,
+            "S0": 0.6555543941322458
+           },
+           "compression": {
+            "S3": 0.45959815376748636,
+            "S2": 0.4658510790516932,
+            "S1": 0.4604445288578669,
+            "S0": 0.4628885588402954
+           },
+           "n_paires": {
+            "S3": 60,
+            "S2": 90,
+            "S1": 360,
+            "S0": 1260
+           },
+           "amplitude_de_compression": 0.006252925284206845,
+           "source": "C:\\Users\\fuzzz\\engram\\experiments\\results\\v4-materiel\\mesure-gpt2-seed0.json",
+           "avertissement": "A3 porte sur une AUTRE projection : sa `G` est tirée par numpy.default_rng(0), pas par torch.randn(generator=manual_seed(0)) — 0-135"
+          },
+          "ecart_cos_fp32_moins_A3": {
+           "S3": -0.0072318410500883945,
+           "S2": -0.0075964863101640745,
+           "S1": -0.00939201902839601,
+           "S0": -0.0040199948823394505
+          },
+          "corrcoef_G_projet_vs_G_A3": -0.0008436993989740638,
+          "mention_obligatoire": "A3 porte sur une AUTRE projection (G tirée par numpy, 0-135) : aucune reproduction d'A3 n'est exigée ni possible"
+         },
+         "verdict": "PASS",
+         "duree_s": 0.62
+        }
+       },
+       "verdict_porte": "G du projet instanciée et hashée ; cos publiés en fp32 et fp64 ; divergence avec A3 publiée"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "tolérance 0 — aucune divergence tolérée",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "version": "v2 (§15, 2026-08-26)",
+       "cfg": "model=gpt2 layer=6 lam=2.0 eta=0.2 decay=0.001 thr=4.0 prune=512/0.1 hebb_only=False dg=8192/64 gate=keysim",
+       "tolerance_fp32_fp64": 0.0,
+       "modeles": {
+        "gpt2": {
+         "couche": 6,
+         "d": 768,
+         "G_du_projet": {
+          "generateur": "torch.randn(dg_dim, d, generator=manual_seed(seed))",
+          "seed": 0,
+          "forme": [
+           8192,
+           768
+          ],
+          "dtype": "torch.float32",
+          "echelle": "aucune (pas de 1/√d)",
+          "sha256": "681252f3beca09826ac3be75a271ef46461ab4bb989bfd66767958d2ffb219ad",
+          "portee": "pour cette G, seed 0 (D9)"
+         },
+         "cos_phi_par_strate_fp32": {
+          "S3": 0.2765880627764596,
+          "S2": 0.20695693966139247,
+          "S1": 0.24789006826122875,
+          "S0": 0.18864584040961097
+         },
+         "cos_phi_par_strate_fp64": {
+          "S3": 0.27658806387056156,
+          "S2": 0.20695694009610738,
+          "S1": 0.24789006929315519,
+          "S0": 0.18864584100542842
+         },
+         "ecart_fp64_moins_fp32": {
+          "S3": 1.0941019756849357e-09,
+          "S2": 4.3471490296376203e-10,
+          "S1": 1.0319264331926092e-09,
+          "S0": 5.95817450932401e-10
+         },
+         "ecart_max_de_precision": 1.0941019756849357e-09,
+         "V-iid": {
+          "verdict": "PASS",
+          "detail": {
+           "moyenne": -0.0032650546209091295,
+           "ecart_type": 1.000476575056003,
+           "forme": [
+            512,
+            768
+           ],
+           "preuve": "par provenance (torch.randn, lignes iid) — M3",
+           "residuel": "sanité de moments ; PAS de KS",
+           "tolerances": {
+            "|moyenne|": 0.02,
+            "|σ−1|": 0.02
+           }
+          }
+         },
+         "divergence_avec_A3": {
+          "A3_publie": {
+           "cos_projection_A3": {
+            "S3": 0.283819903826548,
+            "S2": 0.21455342597155655,
+            "S1": 0.25728208728962476,
+            "S0": 0.19266583529195042
+           },
+           "cos_brut": {
+            "S3": 0.7434180575940343,
+            "S2": 0.6804045050232498,
+            "S1": 0.7177266161474917,
+            "S0": 0.6555543941322458
+           },
+           "compression": {
+            "S3": 0.45959815376748636,
+            "S2": 0.4658510790516932,
+            "S1": 0.4604445288578669,
+            "S0": 0.4628885588402954
+           },
+           "n_paires": {
+            "S3": 60,
+            "S2": 90,
+            "S1": 360,
+            "S0": 1260
+           },
+           "amplitude_de_compression": 0.006252925284206845,
+           "source": "C:\\Users\\fuzzz\\engram\\experiments\\results\\v4-materiel\\mesure-gpt2-seed0.json",
+           "avertissement": "A3 porte sur une AUTRE projection : sa `G` est tirée par numpy.default_rng(0), pas par torch.randn(generator=manual_seed(0)) — 0-135"
+          },
+          "ecart_cos_fp32_moins_A3": {
+           "S3": -0.0072318410500883945,
+           "S2": -0.0075964863101640745,
+           "S1": -0.00939201902839601,
+           "S0": -0.0040199948823394505
+          },
+          "corrcoef_G_projet_vs_G_A3": -0.0008436993989740638,
+          "mention_obligatoire": "A3 porte sur une AUTRE projection (G tirée par numpy, 0-135) : aucune reproduction d'A3 n'est exigée ni possible"
+         },
+         "verdict": "FAIL",
+         "duree_s": 0.63
+        }
+       },
+       "verdict_porte": "hash absent, G non instanciable, ou divergence fp32/fp64 > tolérance ⇒ arrêt de provenance (D14-R)"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-iid",
+   "pass_case": "sanité de moments de G (prouvée par provenance, M3)",
+   "fail_case": "une matrice non gaussienne ⇒ FAIL ; PAS de KS",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "G du projet, 512 lignes",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "moyenne": 0.0004108023386847886,
+       "ecart_type": 1.0014236971787063,
+       "forme": [
+        512,
+        768
+       ],
+       "preuve": "par provenance (torch.randn, lignes iid) — M3",
+       "residuel": "sanité de moments ; PAS de KS",
+       "tolerances": {
+        "|moyenne|": 0.02,
+        "|σ−1|": 0.02
+       }
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "matrice uniforme [0,1]",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "moyenne": 0.4999055340178427,
+       "ecart_type": 0.28873580614568883,
+       "forme": [
+        512,
+        768
+       ],
+       "preuve": "par provenance (torch.randn, lignes iid) — M3",
+       "residuel": "sanité de moments ; PAS de KS",
+       "tolerances": {
+        "|moyenne|": 0.02,
+        "|σ−1|": 0.02
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-borne",
+   "pass_case": "|A∩B| ≥ p_sym (borne SERRÉE, §16) sur 100 % des paires",
+   "fail_case": "une paire à |A∩B| < p_sym ⇒ BUG DE MESURE, jamais un résultat",
+   "expected": {
+    "pass_case": [
+     "PASS",
+     "EN-ATTENTE"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS",
+     "EN-ATTENTE"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "§16, D30 alinéa 2 : la borne gelée n'était pas fausse, elle était CORRECTE ET LÂCHE — majorer m_ψ ≤ 1 jette un facteur cos. Le seuil est ≥ cos, pas ≥ cos². membre (b) « la réalisée encadre la théorique » = EN-ATTENTE de Q-M6 ; poser un seuil ici serait 0-52, troisième occurrence.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "40 paires + encadrement conforme aux douze p_sym",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "borne_decisionnelle": "p_sym (serrée, §16, D30 alinéa 2)",
+       "membre_a_identite": "PASS",
+       "n_paires": 40,
+       "violations_p_sym": [],
+       "n_violations": 0,
+       "taux_conformite": 1.0,
+       "descriptif_p_pair": {
+        "statut": "DESCRIPTIF (borne lâche, ce que le gel portait, §16-3)",
+        "n_violations": 0,
+        "ecart_p_sym_moins_p_pair": {
+         "min": 6,
+         "max": 12,
+         "moyen": 8.525
+        }
+       },
+       "membre_b_encadrement": {
+        "statut": "PASS",
+        "par_cellule": {
+         "Qwen/Qwen2.5-1.5B|S0": {
+          "p_sym_theorique": [
+           7,
+           7
+          ],
+          "p_sym_realise": {
+           "min": 4,
+           "q1": 6,
+           "median": 7,
+           "q3": 8,
+           "max": 10
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "Qwen/Qwen2.5-1.5B|S2": {
+          "p_sym_theorique": [
+           8,
+           8
+          ],
+          "p_sym_realise": {
+           "min": 5,
+           "q1": 7,
+           "median": 8,
+           "q3": 9,
+           "max": 11
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "Qwen/Qwen2.5-1.5B|S1": {
+          "p_sym_theorique": [
+           9,
+           9
+          ],
+          "p_sym_realise": {
+           "min": 6,
+           "q1": 8,
+           "median": 9,
+           "q3": 10,
+           "max": 12
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "gpt2|S0": {
+          "p_sym_theorique": [
+           9,
+           9
+          ],
+          "p_sym_realise": {
+           "min": 6,
+           "q1": 8,
+           "median": 9,
+           "q3": 10,
+           "max": 12
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "gpt2|S2": {
+          "p_sym_theorique": [
+           10,
+           10
+          ],
+          "p_sym_realise": {
+           "min": 7,
+           "q1": 9,
+           "median": 10,
+           "q3": 11,
+           "max": 13
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "Qwen/Qwen2.5-1.5B|S3": {
+          "p_sym_theorique": [
+           11,
+           11
+          ],
+          "p_sym_realise": {
+           "min": 8,
+           "q1": 10,
+           "median": 11,
+           "q3": 12,
+           "max": 14
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "gpt2|S1": {
+          "p_sym_theorique": [
+           12,
+           13
+          ],
+          "p_sym_realise": {
+           "min": 9,
+           "q1": 11,
+           "median": 12,
+           "q3": 14,
+           "max": 16
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "HuggingFaceTB/SmolLM2-360M|S2": {
+          "p_sym_theorique": [
+           13,
+           13
+          ],
+          "p_sym_realise": {
+           "min": 10,
+           "q1": 12,
+           "median": 13,
+           "q3": 14,
+           "max": 16
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "HuggingFaceTB/SmolLM2-360M|S0": {
+          "p_sym_theorique": [
+           13,
+           13
+          ],
+          "p_sym_realise": {
+           "min": 10,
+           "q1": 12,
+           "median": 13,
+           "q3": 14,
+           "max": 16
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "gpt2|S3": {
+          "p_sym_theorique": [
+           14,
+           14
+          ],
+          "p_sym_realise": {
+           "min": 11,
+           "q1": 13,
+           "median": 14,
+           "q3": 15,
+           "max": 17
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "HuggingFaceTB/SmolLM2-360M|S1": {
+          "p_sym_theorique": [
+           16,
+           17
+          ],
+          "p_sym_realise": {
+           "min": 13,
+           "q1": 15,
+           "median": 16,
+           "q3": 18,
+           "max": 20
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "HuggingFaceTB/SmolLM2-360M|S3": {
+          "p_sym_theorique": [
+           18,
+           18
+          ],
+          "p_sym_realise": {
+           "min": 15,
+           "q1": 17,
+           "median": 18,
+           "q3": 19,
+           "max": 21
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         }
+        },
+        "trois_lectures": {
+         "A_mediane_realisee_dans_l_intervalle_theorique": "12/12",
+         "B_IQR_realise_rencontre_l_intervalle_theorique": "12/12",
+         "C_contenance_stricte_q1_<=_p_theo_<=_q3": "12/12",
+         "note": "l'ambiguïté d'« encadrer » a été TRANCHÉE : « X encadre Y » signifie Y contenu dans X, ce qui désigne la lecture B (rôles syntaxiques respectés). La lecture C est la plus FORTE de B. Les trois sont publiées côte à côte ; la divergence entre elles est SANS EFFET sur le verdict, qui reste porté par B."
+        },
+        "lecture_retenue": "B — littérale : « la version RÉALISÉE doit ENCADRER la table théorique » (§16-1), donc l'intervalle théorique est contenu dans l'IQR réalisé (au sens : le rencontre)",
+        "ambiguite_declaree": "trois lectures licites, publiées côte à côte (A, B, C). La grammaire de la clause désigne B ; C en est la version la plus forte. Divergence SANS EFFET sur le verdict.",
+        "cellules_hors_encadrement_lecture_B": [],
+        "n_hors_B": 0,
+        "cellules_hors_encadrement_lecture_A": [],
+        "n_hors_A": 0,
+        "frontieres_franches": {
+         "gpt2|S1": "12-13 (0.04 %)",
+         "HuggingFaceTB/SmolLM2-360M|S1": "16-17 (0.08 %)",
+         "propriete_gravee": "chaque frontière basculerait vers le p INFÉRIEUR, donc dans le sens CONSERVATEUR ; aucune ne peut rendre la prédiction plus facile qu'annoncé"
+        }
+       },
+       "regle": "violation = BUG DE MESURE, jamais un résultat (§6.B)"
+      }
+     },
+     {
+      "cas": "40 paires, réalisée non encore mesurée",
+      "attendu": "EN-ATTENTE",
+      "observé": "EN-ATTENTE",
+      "ok": true,
+      "détail": {
+       "borne_decisionnelle": "p_sym (serrée, §16, D30 alinéa 2)",
+       "membre_a_identite": "PASS",
+       "n_paires": 40,
+       "violations_p_sym": [],
+       "n_violations": 0,
+       "taux_conformite": 1.0,
+       "descriptif_p_pair": {
+        "statut": "DESCRIPTIF (borne lâche, ce que le gel portait, §16-3)",
+        "n_violations": 0,
+        "ecart_p_sym_moins_p_pair": {
+         "min": 6,
+         "max": 12,
+         "moyen": 8.525
+        }
+       },
+       "membre_b_encadrement": {
+        "statut": "EN-ATTENTE",
+        "raison": "version réalisée non encore mesurée"
+       },
+       "regle": "violation = BUG DE MESURE, jamais un résultat (§6.B)"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "paire fabriquée inter=2 < p_sym=9",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "borne_decisionnelle": "p_sym (serrée, §16, D30 alinéa 2)",
+       "membre_a_identite": "FAIL",
+       "n_paires": 1,
+       "violations_p_sym": [
+        {
+         "i": 0,
+         "inter": 2,
+         "p_sym": 9,
+         "cos": 0.42
+        }
+       ],
+       "n_violations": 1,
+       "taux_conformite": 0.0,
+       "descriptif_p_pair": {
+        "statut": "DESCRIPTIF (borne lâche, ce que le gel portait, §16-3)",
+        "n_violations": 1,
+        "ecart_p_sym_moins_p_pair": {
+         "min": 4,
+         "max": 4,
+         "moyen": 4.0
+        }
+       },
+       "membre_b_encadrement": {
+        "statut": "PASS",
+        "par_cellule": {
+         "Qwen/Qwen2.5-1.5B|S0": {
+          "p_sym_theorique": [
+           7,
+           7
+          ],
+          "p_sym_realise": {
+           "min": 4,
+           "q1": 6,
+           "median": 7,
+           "q3": 8,
+           "max": 10
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "Qwen/Qwen2.5-1.5B|S2": {
+          "p_sym_theorique": [
+           8,
+           8
+          ],
+          "p_sym_realise": {
+           "min": 5,
+           "q1": 7,
+           "median": 8,
+           "q3": 9,
+           "max": 11
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "Qwen/Qwen2.5-1.5B|S1": {
+          "p_sym_theorique": [
+           9,
+           9
+          ],
+          "p_sym_realise": {
+           "min": 6,
+           "q1": 8,
+           "median": 9,
+           "q3": 10,
+           "max": 12
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "gpt2|S0": {
+          "p_sym_theorique": [
+           9,
+           9
+          ],
+          "p_sym_realise": {
+           "min": 6,
+           "q1": 8,
+           "median": 9,
+           "q3": 10,
+           "max": 12
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "gpt2|S2": {
+          "p_sym_theorique": [
+           10,
+           10
+          ],
+          "p_sym_realise": {
+           "min": 7,
+           "q1": 9,
+           "median": 10,
+           "q3": 11,
+           "max": 13
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "Qwen/Qwen2.5-1.5B|S3": {
+          "p_sym_theorique": [
+           11,
+           11
+          ],
+          "p_sym_realise": {
+           "min": 8,
+           "q1": 10,
+           "median": 11,
+           "q3": 12,
+           "max": 14
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "gpt2|S1": {
+          "p_sym_theorique": [
+           12,
+           13
+          ],
+          "p_sym_realise": {
+           "min": 9,
+           "q1": 11,
+           "median": 12,
+           "q3": 14,
+           "max": 16
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "HuggingFaceTB/SmolLM2-360M|S2": {
+          "p_sym_theorique": [
+           13,
+           13
+          ],
+          "p_sym_realise": {
+           "min": 10,
+           "q1": 12,
+           "median": 13,
+           "q3": 14,
+           "max": 16
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "HuggingFaceTB/SmolLM2-360M|S0": {
+          "p_sym_theorique": [
+           13,
+           13
+          ],
+          "p_sym_realise": {
+           "min": 10,
+           "q1": 12,
+           "median": 13,
+           "q3": 14,
+           "max": 16
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "gpt2|S3": {
+          "p_sym_theorique": [
+           14,
+           14
+          ],
+          "p_sym_realise": {
+           "min": 11,
+           "q1": 13,
+           "median": 14,
+           "q3": 15,
+           "max": 17
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "HuggingFaceTB/SmolLM2-360M|S1": {
+          "p_sym_theorique": [
+           16,
+           17
+          ],
+          "p_sym_realise": {
+           "min": 13,
+           "q1": 15,
+           "median": 16,
+           "q3": 18,
+           "max": 20
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "HuggingFaceTB/SmolLM2-360M|S3": {
+          "p_sym_theorique": [
+           18,
+           18
+          ],
+          "p_sym_realise": {
+           "min": 15,
+           "q1": 17,
+           "median": 18,
+           "q3": 19,
+           "max": 21
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         }
+        },
+        "trois_lectures": {
+         "A_mediane_realisee_dans_l_intervalle_theorique": "12/12",
+         "B_IQR_realise_rencontre_l_intervalle_theorique": "12/12",
+         "C_contenance_stricte_q1_<=_p_theo_<=_q3": "12/12",
+         "note": "l'ambiguïté d'« encadrer » a été TRANCHÉE : « X encadre Y » signifie Y contenu dans X, ce qui désigne la lecture B (rôles syntaxiques respectés). La lecture C est la plus FORTE de B. Les trois sont publiées côte à côte ; la divergence entre elles est SANS EFFET sur le verdict, qui reste porté par B."
+        },
+        "lecture_retenue": "B — littérale : « la version RÉALISÉE doit ENCADRER la table théorique » (§16-1), donc l'intervalle théorique est contenu dans l'IQR réalisé (au sens : le rencontre)",
+        "ambiguite_declaree": "trois lectures licites, publiées côte à côte (A, B, C). La grammaire de la clause désigne B ; C en est la version la plus forte. Divergence SANS EFFET sur le verdict.",
+        "cellules_hors_encadrement_lecture_B": [],
+        "n_hors_B": 0,
+        "cellules_hors_encadrement_lecture_A": [],
+        "n_hors_A": 0,
+        "frontieres_franches": {
+         "gpt2|S1": "12-13 (0.04 %)",
+         "HuggingFaceTB/SmolLM2-360M|S1": "16-17 (0.08 %)",
+         "propriete_gravee": "chaque frontière basculerait vers le p INFÉRIEUR, donc dans le sens CONSERVATEUR ; aucune ne peut rendre la prédiction plus facile qu'annoncé"
+        }
+       },
+       "regle": "violation = BUG DE MESURE, jamais un résultat (§6.B)"
+      }
+     },
+     {
+      "cas": "une cellule hors encadrement théorique",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "borne_decisionnelle": "p_sym (serrée, §16, D30 alinéa 2)",
+       "membre_a_identite": "PASS",
+       "n_paires": 40,
+       "violations_p_sym": [],
+       "n_violations": 0,
+       "taux_conformite": 1.0,
+       "descriptif_p_pair": {
+        "statut": "DESCRIPTIF (borne lâche, ce que le gel portait, §16-3)",
+        "n_violations": 0,
+        "ecart_p_sym_moins_p_pair": {
+         "min": 6,
+         "max": 12,
+         "moyen": 8.525
+        }
+       },
+       "membre_b_encadrement": {
+        "statut": "FAIL",
+        "par_cellule": {
+         "Qwen/Qwen2.5-1.5B|S0": {
+          "p_sym_theorique": [
+           7,
+           7
+          ],
+          "p_sym_realise": {
+           "min": 4,
+           "q1": 6,
+           "median": 7,
+           "q3": 8,
+           "max": 10
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "Qwen/Qwen2.5-1.5B|S2": {
+          "p_sym_theorique": [
+           8,
+           8
+          ],
+          "p_sym_realise": {
+           "min": 5,
+           "q1": 7,
+           "median": 8,
+           "q3": 9,
+           "max": 11
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "Qwen/Qwen2.5-1.5B|S1": {
+          "p_sym_theorique": [
+           9,
+           9
+          ],
+          "p_sym_realise": {
+           "min": 6,
+           "q1": 8,
+           "median": 9,
+           "q3": 10,
+           "max": 12
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "gpt2|S0": {
+          "p_sym_theorique": [
+           9,
+           9
+          ],
+          "p_sym_realise": {
+           "min": 6,
+           "q1": 8,
+           "median": 9,
+           "q3": 10,
+           "max": 12
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "gpt2|S2": {
+          "p_sym_theorique": [
+           10,
+           10
+          ],
+          "p_sym_realise": {
+           "min": 7,
+           "q1": 9,
+           "median": 10,
+           "q3": 11,
+           "max": 13
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "Qwen/Qwen2.5-1.5B|S3": {
+          "p_sym_theorique": [
+           11,
+           11
+          ],
+          "p_sym_realise": {
+           "min": 8,
+           "q1": 10,
+           "median": 11,
+           "q3": 12,
+           "max": 14
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "gpt2|S1": {
+          "p_sym_theorique": [
+           12,
+           13
+          ],
+          "p_sym_realise": {
+           "min": 9,
+           "q1": 11,
+           "median": 12,
+           "q3": 14,
+           "max": 16
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "HuggingFaceTB/SmolLM2-360M|S2": {
+          "p_sym_theorique": [
+           13,
+           13
+          ],
+          "p_sym_realise": {
+           "min": 10,
+           "q1": 12,
+           "median": 13,
+           "q3": 14,
+           "max": 16
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "HuggingFaceTB/SmolLM2-360M|S0": {
+          "p_sym_theorique": [
+           13,
+           13
+          ],
+          "p_sym_realise": {
+           "min": 10,
+           "q1": 12,
+           "median": 13,
+           "q3": 14,
+           "max": 16
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "gpt2|S3": {
+          "p_sym_theorique": [
+           14,
+           14
+          ],
+          "p_sym_realise": {
+           "min": 1,
+           "q1": 1,
+           "median": 2,
+           "q3": 3,
+           "max": 4
+          },
+          "lecture_A_mediane_dans_theorique": false,
+          "lecture_B_IQR_realise_rencontre_theorique": false,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": false,
+          "ecart_mediane_au_plus_proche": 12
+         },
+         "HuggingFaceTB/SmolLM2-360M|S1": {
+          "p_sym_theorique": [
+           16,
+           17
+          ],
+          "p_sym_realise": {
+           "min": 13,
+           "q1": 15,
+           "median": 16,
+           "q3": 18,
+           "max": 20
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         },
+         "HuggingFaceTB/SmolLM2-360M|S3": {
+          "p_sym_theorique": [
+           18,
+           18
+          ],
+          "p_sym_realise": {
+           "min": 15,
+           "q1": 17,
+           "median": 18,
+           "q3": 19,
+           "max": 21
+          },
+          "lecture_A_mediane_dans_theorique": true,
+          "lecture_B_IQR_realise_rencontre_theorique": true,
+          "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+          "ecart_mediane_au_plus_proche": 0
+         }
+        },
+        "trois_lectures": {
+         "A_mediane_realisee_dans_l_intervalle_theorique": "11/12",
+         "B_IQR_realise_rencontre_l_intervalle_theorique": "11/12",
+         "C_contenance_stricte_q1_<=_p_theo_<=_q3": "11/12",
+         "note": "l'ambiguïté d'« encadrer » a été TRANCHÉE : « X encadre Y » signifie Y contenu dans X, ce qui désigne la lecture B (rôles syntaxiques respectés). La lecture C est la plus FORTE de B. Les trois sont publiées côte à côte ; la divergence entre elles est SANS EFFET sur le verdict, qui reste porté par B."
+        },
+        "lecture_retenue": "B — littérale : « la version RÉALISÉE doit ENCADRER la table théorique » (§16-1), donc l'intervalle théorique est contenu dans l'IQR réalisé (au sens : le rencontre)",
+        "ambiguite_declaree": "trois lectures licites, publiées côte à côte (A, B, C). La grammaire de la clause désigne B ; C en est la version la plus forte. Divergence SANS EFFET sur le verdict.",
+        "cellules_hors_encadrement_lecture_B": [
+         {
+          "cellule": [
+           "gpt2",
+           "S3"
+          ],
+          "theorique": [
+           14,
+           14
+          ],
+          "IQR_realise": [
+           1,
+           3
+          ]
+         }
+        ],
+        "n_hors_B": 1,
+        "cellules_hors_encadrement_lecture_A": [
+         {
+          "cellule": [
+           "gpt2",
+           "S3"
+          ],
+          "theorique": [
+           14,
+           14
+          ],
+          "realise_median": 2
+         }
+        ],
+        "n_hors_A": 1,
+        "frontieres_franches": {
+         "gpt2|S1": "12-13 (0.04 %)",
+         "HuggingFaceTB/SmolLM2-360M|S1": "16-17 (0.08 %)",
+         "propriete_gravee": "chaque frontière basculerait vers le p INFÉRIEUR, donc dans le sens CONSERVATEUR ; aucune ne peut rendre la prédiction plus facile qu'annoncé"
+        }
+       },
+       "regle": "violation = BUG DE MESURE, jamais un résultat (§6.B)"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "p_sym vs p_pair (double mesure D26)",
+   "pass_case": "p_sym ≥ p_pair sur 100 % des paires ; p_pair reste DESCRIPTIF",
+   "fail_case": "p_pair traité comme décisionnel ⇒ la borne lâche décide",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "40 paires réelles synthétiques",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "n": 40,
+       "ecart_min_max": [
+        6,
+        12
+       ],
+       "p_sym_min_max": [
+        7,
+        18
+       ],
+       "p_pair_min_max": [
+        1,
+        6
+       ]
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "borne lâche décisionnelle ⇒ prédiction plus FACILE",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "motif": "D30 alinéa 2 n'autorise le resserrement que parce qu'il rend la prédiction plus DURE (O ≥ 7 à 18 au lieu de 1 à 5) ; revenir à la lâche inverserait le critère de direction"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "cum : gravure fp64 vs table de contrôle (§16.1)",
+   "pass_case": "recalcul fp64 conforme au contrôle de lab-math à ±1.5e−4",
+   "fail_case": "un contrôle décalé au-delà de la tolérance ⇒ défaut à publier",
+   "expected": {
+    "pass_case": [
+     "PASS",
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS",
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "scipy n'est PAS une dépendance du projet (requirements.txt : torch, transformers, pytest) : Φ⁻¹ est implémentée en fp64 (AS 241, Wichura 1988) et vérifiée par un aller-retour à travers math.erfc, qui ne partage aucune ligne avec elle. Substitution DÉCLARÉE à scipy.special.ndtri.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "écart gravure − contrôle ≤ 1.5e−4",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "fichier": "C:\\Users\\fuzzz\\engram\\experiments\\results\\recouvrement-supports\\cum_table_QM6.json",
+       "source": "lab-math, Q-M6, 2026-08-26",
+       "statut_du_fichier": "TABLE DE CONTROLE — PAS LA GRAVURE",
+       "tolerance": 0.00015,
+       "ecart_max_gravure_moins_controle": 1.228197958447197e-06,
+       "conforme": true,
+       "ecart_max_vs_ancres_verifieur": 4.36309087326614e-05,
+       "ecarts_vs_ancres_verifieur": {
+        "1": 1.3678708218348157e-05,
+        "4": -2.210636309848968e-05,
+        "7": 3.980210468892964e-05,
+        "8": 2.5974785298754632e-05,
+        "9": 2.9436898023482705e-05,
+        "10": -9.00581129048561e-06,
+        "11": 4.36309087326614e-05
+       }
+      }
+     },
+     {
+      "cas": "croissante, concave, contiguë depuis 1, j_max = 20",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "j_max": 20,
+       "source_des_valeurs": "RECALCUL fp64 au banc (gravure)",
+       "gravure": "fp64, Φ⁻¹ = AS 241 (Wichura 1988), substitution déclarée à scipy.special.ndtri (scipy hors requirements.txt)",
+       "verification_de_l_inverse": {
+        "residu_max_|Phi(ndtri(p))-p|": 0.0,
+        "methode": "aller-retour par math.erfc, indépendant de _ndtri"
+       },
+       "hybride_563_9": {
+        "statut": "HYBRIDE DÉCLARÉ — profil d'ordre THÉORIQUE × masse totale RÉALISÉE ; la vraie table réalisée est PAR CLÉ et se calcule au banc ; cette colonne n'en est pas un substitut",
+        "non_utilisee_pour_decider": true
+       },
+       "Q-M6": "RENDUE",
+       "contigue_depuis_1": true,
+       "concave": true,
+       "croissante": true,
+       "regle": "aucune valeur de cum n'est jamais interpolée (Q-M5)"
+      }
+     },
+     {
+      "cas": "inverse vérifié par aller-retour math.erfc",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "residu_max_|Phi(ndtri(p))-p|": 0.0,
+       "methode": "aller-retour par math.erfc, indépendant de _ndtri"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "contrôle décalé de 1e−3",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "ecart_max": 0.0010000000000000009,
+       "tolerance": 0.00015,
+       "regle": "un écart au-dessus de la tolérance est un DÉFAUT À PUBLIER, pas un ajustement"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Les douze p_sym (§16.1)",
+   "pass_case": "la gravure fp64 reproduit les douze p_sym pré-enregistrés",
+   "fail_case": "une valeur de cum extrapolée au lieu d'être calculée",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "les deux frontières franches (gpt2 S1 à 0.04 %, SmolLM2 S1 à 0.08 %) sont sous le plancher numérique : elles s'écrivent 12-13 et 16-17, et basculeraient vers le p INFÉRIEUR — sens CONSERVATEUR, jamais plus facile qu'annoncé.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "douze cellules, frontières franches comprises",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "par_cellule": {
+        "Qwen/Qwen2.5-1.5B|S0": {
+         "cos": 0.1471,
+         "p_sym_grave": 7,
+         "attendu": [
+          7,
+          7
+         ],
+         "conforme": true
+        },
+        "Qwen/Qwen2.5-1.5B|S2": {
+         "cos": 0.1636,
+         "p_sym_grave": 8,
+         "attendu": [
+          8,
+          8
+         ],
+         "conforme": true
+        },
+        "Qwen/Qwen2.5-1.5B|S1": {
+         "cos": 0.1883,
+         "p_sym_grave": 9,
+         "attendu": [
+          9,
+          9
+         ],
+         "conforme": true
+        },
+        "gpt2|S0": {
+         "cos": 0.1886,
+         "p_sym_grave": 9,
+         "attendu": [
+          9,
+          9
+         ],
+         "conforme": true
+        },
+        "gpt2|S2": {
+         "cos": 0.207,
+         "p_sym_grave": 10,
+         "attendu": [
+          10,
+          10
+         ],
+         "conforme": true
+        },
+        "Qwen/Qwen2.5-1.5B|S3": {
+         "cos": 0.2184,
+         "p_sym_grave": 11,
+         "attendu": [
+          11,
+          11
+         ],
+         "conforme": true
+        },
+        "gpt2|S1": {
+         "cos": 0.2479,
+         "p_sym_grave": 13,
+         "attendu": [
+          12,
+          13
+         ],
+         "conforme": true
+        },
+        "HuggingFaceTB/SmolLM2-360M|S2": {
+         "cos": 0.2566,
+         "p_sym_grave": 13,
+         "attendu": [
+          13,
+          13
+         ],
+         "conforme": true
+        },
+        "HuggingFaceTB/SmolLM2-360M|S0": {
+         "cos": 0.2568,
+         "p_sym_grave": 13,
+         "attendu": [
+          13,
+          13
+         ],
+         "conforme": true
+        },
+        "gpt2|S3": {
+         "cos": 0.2766,
+         "p_sym_grave": 14,
+         "attendu": [
+          14,
+          14
+         ],
+         "conforme": true
+        },
+        "HuggingFaceTB/SmolLM2-360M|S1": {
+         "cos": 0.3174,
+         "p_sym_grave": 17,
+         "attendu": [
+          16,
+          17
+         ],
+         "conforme": true
+        },
+        "HuggingFaceTB/SmolLM2-360M|S3": {
+         "cos": 0.3368,
+         "p_sym_grave": 18,
+         "attendu": [
+          18,
+          18
+         ],
+         "conforme": true
+        }
+       },
+       "hors": [],
+       "prediction": "O ≥ 7 à 18 indices sur 64, soit 14 à 36 × la nulle"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "extrapolation linéaire de cum(8)",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "cum_7": 0.15332,
+       "extrapolation_lineaire": 0.17285,
+       "cum_8_grave": 0.172426,
+       "motif": "cum est CONCAVE : l'interpolation linéaire SOUS-ESTIME toujours, et elle a déjà déplacé une cellule"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "p_sym réalisé : |cos| et moyenne géométrique",
+   "pass_case": "|cos_pair| et moyenne géométrique des masses top-p des DEUX clés",
+   "fail_case": "la table MOYENNE des deux clés au lieu de la géométrique",
+   "expected": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "40 paires, borne exacte vérifiée",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "n": 40,
+       "regle": "|cos| et moyenne géométrique PAR CLÉ",
+       "n_violations": 0
+      }
+     },
+     {
+      "cas": "cos négatif traité par sa valeur absolue",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "cos": -0.9704878903498784,
+       "p_sym_avec_cos_signe": 37,
+       "p_sym_avec_valeur_absolue": 37
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "table moyenne au lieu de géométrique",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "motif": "la dérivation borne CHAQUE masse séparément ; la moyenne arithmétique des deux tables n'est pas √(T_φ·T_ψ) et n'est pas une borne"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "p_sym à intersection vide",
+   "pass_case": "|A∩B| = 0 ⇒ p_sym = 0 (scalaire, batché et théorique)",
+   "fail_case": "un plancher p_sym ≥ 1 fabrique une violation sur chaque paire vide",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "défaut trouvé PAR LA PORTE V-borne SUR LES DONNÉES RÉELLES : 30 516 violations sur 669 060 paires, concentrées dans `glob` et `type`. Une borne plus forte que vraie aurait fait déclarer BUG un run sain — mode inverse du faux PASS.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "supports disjoints, cos = 0",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "inter": 0,
+       "p_sym_scalaire": 0,
+       "p_sym_batche": 0,
+       "p_pair": 0,
+       "p_sym_theorique_a_cos_0": 0,
+       "regle": "|A∩B| ≥ p_sym doit rester satisfiable à q = 0 : g(0) = 0 appartient à la recherche"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "plancher à 1 sur intersection vide",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "q": 0,
+       "p_sym_avec_plancher": 1,
+       "violation": "0 < 1",
+       "n_violations_au_premier_passage": 30516,
+       "n_paires_verifiees": 669060,
+       "motif": "une borne plus forte que vraie fabrique des violations et ferait déclarer BUG un run sain"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-borne : tolérance ULP à l'égalité exacte",
+   "pass_case": "|cos| = g(1) exactement ⇒ p_sym = 1, et le compteur de paires décidées par la tolérance est publié",
+   "fail_case": "un écart réel (1e−6, soit ~10⁹ ULP) absorbé par la tolérance",
+   "expected": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "mesuré : 2 paires sur 669 060 tombaient du mauvais côté au dernier bit (0.0 et −1.0 ULP), sur des paires à |A∩B| = 1 où la borne est atteinte AVEC ÉGALITÉ. La tolérance ne desserre pas la borne : elle rend la comparaison fidèle à l'arithmétique réelle que la borne suppose.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "égalité exacte, |A∩B| = 1 sur la plus grande magnitude",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "inter": 1,
+       "p_sym_scalaire": 1,
+       "p_sym_batche": 1,
+       "p_sym_sans_tolerance": 1,
+       "decidee_par_la_tolerance": false,
+       "cos": 0.5219249647428611,
+       "tolerance_ULP": 8
+      }
+     },
+     {
+      "cas": "compteur de paires décidées par la tolérance exposé",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "tolerance_ULP": 8,
+       "regle": "sans compteur publié, une tolérance est un masque"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "écart de 1e−6 absorbé",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "ecart_teste": 1e-06,
+       "ulp_a_cette_echelle": 3.469446951953614e-18,
+       "ecart_en_ulp": 288230376151.71173,
+       "tolerance_ULP": 8,
+       "absorbe": false,
+       "motif": "une tolérance qui absorberait un écart réel serait un masque, pas une correction de comparaison"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Encadrement : les TROIS lectures publiées",
+   "pass_case": "l'IQR réalisé rencontre l'intervalle théorique (lecture B) ; A et C publiées à côté, avec leurs compteurs",
+   "fail_case": "un IQR réalisé entièrement au-dessous du théorique",
+   "expected": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "ambiguïté TRANCHÉE au tour de correction : « X encadre Y » = Y contenu dans X, ce qui désigne la lecture B (rôles syntaxiques respectés) ; la lecture C est la contenance STRICTE, version la plus forte de B. Les TROIS sont publiées côte à côte ; leur divergence est SANS EFFET sur le verdict.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "douze cellules synthétiques conformes",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "statut": "PASS",
+       "par_cellule": {
+        "Qwen/Qwen2.5-1.5B|S0": {
+         "p_sym_theorique": [
+          7,
+          7
+         ],
+         "p_sym_realise": {
+          "min": 4,
+          "q1": 6,
+          "median": 7,
+          "q3": 8,
+          "max": 10
+         },
+         "lecture_A_mediane_dans_theorique": true,
+         "lecture_B_IQR_realise_rencontre_theorique": true,
+         "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+         "ecart_mediane_au_plus_proche": 0
+        },
+        "Qwen/Qwen2.5-1.5B|S2": {
+         "p_sym_theorique": [
+          8,
+          8
+         ],
+         "p_sym_realise": {
+          "min": 5,
+          "q1": 7,
+          "median": 8,
+          "q3": 9,
+          "max": 11
+         },
+         "lecture_A_mediane_dans_theorique": true,
+         "lecture_B_IQR_realise_rencontre_theorique": true,
+         "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+         "ecart_mediane_au_plus_proche": 0
+        },
+        "Qwen/Qwen2.5-1.5B|S1": {
+         "p_sym_theorique": [
+          9,
+          9
+         ],
+         "p_sym_realise": {
+          "min": 6,
+          "q1": 8,
+          "median": 9,
+          "q3": 10,
+          "max": 12
+         },
+         "lecture_A_mediane_dans_theorique": true,
+         "lecture_B_IQR_realise_rencontre_theorique": true,
+         "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+         "ecart_mediane_au_plus_proche": 0
+        },
+        "gpt2|S0": {
+         "p_sym_theorique": [
+          9,
+          9
+         ],
+         "p_sym_realise": {
+          "min": 6,
+          "q1": 8,
+          "median": 9,
+          "q3": 10,
+          "max": 12
+         },
+         "lecture_A_mediane_dans_theorique": true,
+         "lecture_B_IQR_realise_rencontre_theorique": true,
+         "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+         "ecart_mediane_au_plus_proche": 0
+        },
+        "gpt2|S2": {
+         "p_sym_theorique": [
+          10,
+          10
+         ],
+         "p_sym_realise": {
+          "min": 7,
+          "q1": 9,
+          "median": 10,
+          "q3": 11,
+          "max": 13
+         },
+         "lecture_A_mediane_dans_theorique": true,
+         "lecture_B_IQR_realise_rencontre_theorique": true,
+         "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+         "ecart_mediane_au_plus_proche": 0
+        },
+        "Qwen/Qwen2.5-1.5B|S3": {
+         "p_sym_theorique": [
+          11,
+          11
+         ],
+         "p_sym_realise": {
+          "min": 8,
+          "q1": 10,
+          "median": 11,
+          "q3": 12,
+          "max": 14
+         },
+         "lecture_A_mediane_dans_theorique": true,
+         "lecture_B_IQR_realise_rencontre_theorique": true,
+         "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+         "ecart_mediane_au_plus_proche": 0
+        },
+        "gpt2|S1": {
+         "p_sym_theorique": [
+          12,
+          13
+         ],
+         "p_sym_realise": {
+          "min": 9,
+          "q1": 11,
+          "median": 12,
+          "q3": 14,
+          "max": 16
+         },
+         "lecture_A_mediane_dans_theorique": true,
+         "lecture_B_IQR_realise_rencontre_theorique": true,
+         "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+         "ecart_mediane_au_plus_proche": 0
+        },
+        "HuggingFaceTB/SmolLM2-360M|S2": {
+         "p_sym_theorique": [
+          13,
+          13
+         ],
+         "p_sym_realise": {
+          "min": 10,
+          "q1": 12,
+          "median": 13,
+          "q3": 14,
+          "max": 16
+         },
+         "lecture_A_mediane_dans_theorique": true,
+         "lecture_B_IQR_realise_rencontre_theorique": true,
+         "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+         "ecart_mediane_au_plus_proche": 0
+        },
+        "HuggingFaceTB/SmolLM2-360M|S0": {
+         "p_sym_theorique": [
+          13,
+          13
+         ],
+         "p_sym_realise": {
+          "min": 10,
+          "q1": 12,
+          "median": 13,
+          "q3": 14,
+          "max": 16
+         },
+         "lecture_A_mediane_dans_theorique": true,
+         "lecture_B_IQR_realise_rencontre_theorique": true,
+         "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+         "ecart_mediane_au_plus_proche": 0
+        },
+        "gpt2|S3": {
+         "p_sym_theorique": [
+          14,
+          14
+         ],
+         "p_sym_realise": {
+          "min": 11,
+          "q1": 13,
+          "median": 14,
+          "q3": 15,
+          "max": 17
+         },
+         "lecture_A_mediane_dans_theorique": true,
+         "lecture_B_IQR_realise_rencontre_theorique": true,
+         "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+         "ecart_mediane_au_plus_proche": 0
+        },
+        "HuggingFaceTB/SmolLM2-360M|S1": {
+         "p_sym_theorique": [
+          16,
+          17
+         ],
+         "p_sym_realise": {
+          "min": 13,
+          "q1": 15,
+          "median": 16,
+          "q3": 18,
+          "max": 20
+         },
+         "lecture_A_mediane_dans_theorique": true,
+         "lecture_B_IQR_realise_rencontre_theorique": true,
+         "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+         "ecart_mediane_au_plus_proche": 0
+        },
+        "HuggingFaceTB/SmolLM2-360M|S3": {
+         "p_sym_theorique": [
+          18,
+          18
+         ],
+         "p_sym_realise": {
+          "min": 15,
+          "q1": 17,
+          "median": 18,
+          "q3": 19,
+          "max": 21
+         },
+         "lecture_A_mediane_dans_theorique": true,
+         "lecture_B_IQR_realise_rencontre_theorique": true,
+         "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+         "ecart_mediane_au_plus_proche": 0
+        }
+       },
+       "trois_lectures": {
+        "A_mediane_realisee_dans_l_intervalle_theorique": "12/12",
+        "B_IQR_realise_rencontre_l_intervalle_theorique": "12/12",
+        "C_contenance_stricte_q1_<=_p_theo_<=_q3": "12/12",
+        "note": "l'ambiguïté d'« encadrer » a été TRANCHÉE : « X encadre Y » signifie Y contenu dans X, ce qui désigne la lecture B (rôles syntaxiques respectés). La lecture C est la plus FORTE de B. Les trois sont publiées côte à côte ; la divergence entre elles est SANS EFFET sur le verdict, qui reste porté par B."
+       },
+       "lecture_retenue": "B — littérale : « la version RÉALISÉE doit ENCADRER la table théorique » (§16-1), donc l'intervalle théorique est contenu dans l'IQR réalisé (au sens : le rencontre)",
+       "ambiguite_declaree": "trois lectures licites, publiées côte à côte (A, B, C). La grammaire de la clause désigne B ; C en est la version la plus forte. Divergence SANS EFFET sur le verdict.",
+       "cellules_hors_encadrement_lecture_B": [],
+       "n_hors_B": 0,
+       "cellules_hors_encadrement_lecture_A": [],
+       "n_hors_A": 0,
+       "frontieres_franches": {
+        "gpt2|S1": "12-13 (0.04 %)",
+        "HuggingFaceTB/SmolLM2-360M|S1": "16-17 (0.08 %)",
+        "propriete_gravee": "chaque frontière basculerait vers le p INFÉRIEUR, donc dans le sens CONSERVATEUR ; aucune ne peut rendre la prédiction plus facile qu'annoncé"
+       }
+      }
+     },
+     {
+      "cas": "les trois lectures publiées par cellule et comptées",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "A_mediane_realisee_dans_l_intervalle_theorique": "12/12",
+       "B_IQR_realise_rencontre_l_intervalle_theorique": "12/12",
+       "C_contenance_stricte_q1_<=_p_theo_<=_q3": "12/12",
+       "note": "l'ambiguïté d'« encadrer » a été TRANCHÉE : « X encadre Y » signifie Y contenu dans X, ce qui désigne la lecture B (rôles syntaxiques respectés). La lecture C est la plus FORTE de B. Les trois sont publiées côte à côte ; la divergence entre elles est SANS EFFET sur le verdict, qui reste porté par B."
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "IQR réalisé [1,3] contre théorique [14,14]",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "statut": "FAIL",
+       "par_cellule": {
+        "Qwen/Qwen2.5-1.5B|S0": {
+         "p_sym_theorique": [
+          7,
+          7
+         ],
+         "p_sym_realise": {
+          "min": 4,
+          "q1": 6,
+          "median": 7,
+          "q3": 8,
+          "max": 10
+         },
+         "lecture_A_mediane_dans_theorique": true,
+         "lecture_B_IQR_realise_rencontre_theorique": true,
+         "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+         "ecart_mediane_au_plus_proche": 0
+        },
+        "Qwen/Qwen2.5-1.5B|S2": {
+         "p_sym_theorique": [
+          8,
+          8
+         ],
+         "p_sym_realise": {
+          "min": 5,
+          "q1": 7,
+          "median": 8,
+          "q3": 9,
+          "max": 11
+         },
+         "lecture_A_mediane_dans_theorique": true,
+         "lecture_B_IQR_realise_rencontre_theorique": true,
+         "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+         "ecart_mediane_au_plus_proche": 0
+        },
+        "Qwen/Qwen2.5-1.5B|S1": {
+         "p_sym_theorique": [
+          9,
+          9
+         ],
+         "p_sym_realise": {
+          "min": 6,
+          "q1": 8,
+          "median": 9,
+          "q3": 10,
+          "max": 12
+         },
+         "lecture_A_mediane_dans_theorique": true,
+         "lecture_B_IQR_realise_rencontre_theorique": true,
+         "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+         "ecart_mediane_au_plus_proche": 0
+        },
+        "gpt2|S0": {
+         "p_sym_theorique": [
+          9,
+          9
+         ],
+         "p_sym_realise": {
+          "min": 6,
+          "q1": 8,
+          "median": 9,
+          "q3": 10,
+          "max": 12
+         },
+         "lecture_A_mediane_dans_theorique": true,
+         "lecture_B_IQR_realise_rencontre_theorique": true,
+         "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+         "ecart_mediane_au_plus_proche": 0
+        },
+        "gpt2|S2": {
+         "p_sym_theorique": [
+          10,
+          10
+         ],
+         "p_sym_realise": {
+          "min": 7,
+          "q1": 9,
+          "median": 10,
+          "q3": 11,
+          "max": 13
+         },
+         "lecture_A_mediane_dans_theorique": true,
+         "lecture_B_IQR_realise_rencontre_theorique": true,
+         "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+         "ecart_mediane_au_plus_proche": 0
+        },
+        "Qwen/Qwen2.5-1.5B|S3": {
+         "p_sym_theorique": [
+          11,
+          11
+         ],
+         "p_sym_realise": {
+          "min": 8,
+          "q1": 10,
+          "median": 11,
+          "q3": 12,
+          "max": 14
+         },
+         "lecture_A_mediane_dans_theorique": true,
+         "lecture_B_IQR_realise_rencontre_theorique": true,
+         "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+         "ecart_mediane_au_plus_proche": 0
+        },
+        "gpt2|S1": {
+         "p_sym_theorique": [
+          12,
+          13
+         ],
+         "p_sym_realise": {
+          "min": 9,
+          "q1": 11,
+          "median": 12,
+          "q3": 14,
+          "max": 16
+         },
+         "lecture_A_mediane_dans_theorique": true,
+         "lecture_B_IQR_realise_rencontre_theorique": true,
+         "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+         "ecart_mediane_au_plus_proche": 0
+        },
+        "HuggingFaceTB/SmolLM2-360M|S2": {
+         "p_sym_theorique": [
+          13,
+          13
+         ],
+         "p_sym_realise": {
+          "min": 10,
+          "q1": 12,
+          "median": 13,
+          "q3": 14,
+          "max": 16
+         },
+         "lecture_A_mediane_dans_theorique": true,
+         "lecture_B_IQR_realise_rencontre_theorique": true,
+         "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+         "ecart_mediane_au_plus_proche": 0
+        },
+        "HuggingFaceTB/SmolLM2-360M|S0": {
+         "p_sym_theorique": [
+          13,
+          13
+         ],
+         "p_sym_realise": {
+          "min": 10,
+          "q1": 12,
+          "median": 13,
+          "q3": 14,
+          "max": 16
+         },
+         "lecture_A_mediane_dans_theorique": true,
+         "lecture_B_IQR_realise_rencontre_theorique": true,
+         "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+         "ecart_mediane_au_plus_proche": 0
+        },
+        "gpt2|S3": {
+         "p_sym_theorique": [
+          14,
+          14
+         ],
+         "p_sym_realise": {
+          "min": 1,
+          "q1": 1,
+          "median": 2,
+          "q3": 3,
+          "max": 4
+         },
+         "lecture_A_mediane_dans_theorique": false,
+         "lecture_B_IQR_realise_rencontre_theorique": false,
+         "lecture_C_contenance_stricte_q1_lo_hi_q3": false,
+         "ecart_mediane_au_plus_proche": 12
+        },
+        "HuggingFaceTB/SmolLM2-360M|S1": {
+         "p_sym_theorique": [
+          16,
+          17
+         ],
+         "p_sym_realise": {
+          "min": 13,
+          "q1": 15,
+          "median": 16,
+          "q3": 18,
+          "max": 20
+         },
+         "lecture_A_mediane_dans_theorique": true,
+         "lecture_B_IQR_realise_rencontre_theorique": true,
+         "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+         "ecart_mediane_au_plus_proche": 0
+        },
+        "HuggingFaceTB/SmolLM2-360M|S3": {
+         "p_sym_theorique": [
+          18,
+          18
+         ],
+         "p_sym_realise": {
+          "min": 15,
+          "q1": 17,
+          "median": 18,
+          "q3": 19,
+          "max": 21
+         },
+         "lecture_A_mediane_dans_theorique": true,
+         "lecture_B_IQR_realise_rencontre_theorique": true,
+         "lecture_C_contenance_stricte_q1_lo_hi_q3": true,
+         "ecart_mediane_au_plus_proche": 0
+        }
+       },
+       "trois_lectures": {
+        "A_mediane_realisee_dans_l_intervalle_theorique": "11/12",
+        "B_IQR_realise_rencontre_l_intervalle_theorique": "11/12",
+        "C_contenance_stricte_q1_<=_p_theo_<=_q3": "11/12",
+        "note": "l'ambiguïté d'« encadrer » a été TRANCHÉE : « X encadre Y » signifie Y contenu dans X, ce qui désigne la lecture B (rôles syntaxiques respectés). La lecture C est la plus FORTE de B. Les trois sont publiées côte à côte ; la divergence entre elles est SANS EFFET sur le verdict, qui reste porté par B."
+       },
+       "lecture_retenue": "B — littérale : « la version RÉALISÉE doit ENCADRER la table théorique » (§16-1), donc l'intervalle théorique est contenu dans l'IQR réalisé (au sens : le rencontre)",
+       "ambiguite_declaree": "trois lectures licites, publiées côte à côte (A, B, C). La grammaire de la clause désigne B ; C en est la version la plus forte. Divergence SANS EFFET sur le verdict.",
+       "cellules_hors_encadrement_lecture_B": [
+        {
+         "cellule": [
+          "gpt2",
+          "S3"
+         ],
+         "theorique": [
+          14,
+          14
+         ],
+         "IQR_realise": [
+          1,
+          3
+         ]
+        }
+       ],
+       "n_hors_B": 1,
+       "cellules_hors_encadrement_lecture_A": [
+        {
+         "cellule": [
+          "gpt2",
+          "S3"
+         ],
+         "theorique": [
+          14,
+          14
+         ],
+         "realise_median": 2
+        }
+       ],
+       "n_hors_A": 1,
+       "frontieres_franches": {
+        "gpt2|S1": "12-13 (0.04 %)",
+        "HuggingFaceTB/SmolLM2-360M|S1": "16-17 (0.08 %)",
+        "propriete_gravee": "chaque frontière basculerait vers le p INFÉRIEUR, donc dans le sens CONSERVATEUR ; aucune ne peut rendre la prédiction plus facile qu'annoncé"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Noyaux batchés ≡ noyaux scalaires",
+   "pass_case": "quantites_batch et support_topk batché coïncident avec les lus",
+   "fail_case": "une version rapide qui diverge de la version lue",
+   "expected": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "la mesure passe par les noyaux batchés ; le banc n'exerce que les noyaux lus. Sans cette clause, tout le banc porterait sur un code que la mesure n'exécute pas.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "32 paires aléatoires",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "n_paires": 32,
+       "ecarts_max": {
+        "inter": 0,
+        "cos": 5.551115123125783e-17,
+        "f": 2.7755575615628914e-17,
+        "p_sym": 0,
+        "p_pair": 0,
+        "support": 0,
+        "sigma": 0
+       }
+      }
+     },
+     {
+      "cas": "poids vectorisés ≡ poids_bootstrap",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "n_paires": 210,
+       "ecart_max": 0.0,
+       "n_paires_intra_tige": 28
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "divergence d'un indice sur le support",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "motif": "une optimisation qui change le résultat est un défaut, pas une optimisation"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-P8",
+   "pass_case": "toute cellule a ≥ 8 paires",
+   "fail_case": "une cellule à 7 paires ⇒ exclue, cardinal publié (CAS OBLIGATOIRE)",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "0-119 : q95 par paire = 2 indices = le DOUBLE du corridor ; une paire isolée le dépasse 7.6 % du temps sous la nulle.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "4 cellules à 40, 90, 360, 1260 paires",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "minimum": 8,
+       "cellules_exclues": {},
+       "cardinal_exclu": 0,
+       "n_cellules": 4,
+       "modeles_exclus": [],
+       "regle_modele": "> 2 strates touchées sur un modèle ⇒ modèle exclu (§6.F)"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "une cellule à 7 paires",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "minimum": 8,
+       "cellules_exclues": {
+        "gpt2|S3": 7
+       },
+       "cardinal_exclu": 1,
+       "n_cellules": 4,
+       "modeles_exclus": [],
+       "regle_modele": "> 2 strates touchées sur un modèle ⇒ modèle exclu (§6.F)"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-t1",
+   "pass_case": "aucune quantité n'est calculée à t−1 ; cardinal intra-tige publié",
+   "fail_case": "une quantité à t−1 dont l'ensemble contient deux unités d'une même tige (CAS OBLIGATOIRE)",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "0-143 (critique) : la clause d'origine VIDAIT S3 et S2, qui sont DÉFINIES par le partage de tige. Son motif était doublement faux — les états bit-identiques valent à t−1, pas à t (à t le suffixe EST le token de capture) ; et le bootstrap PAR TIGE ABSORBE la corrélation intra-tige au lieu d'en souffrir (0-50).",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "registre t−1 vide, Core 1/tige, cardinal publié",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "locus_du_cycle": "t",
+       "t_moins_1": "REFUSÉ (0-130, ratifié PI)",
+       "membre_i_aucune_quantite_a_t_moins_1": true,
+       "quantites_a_t_moins_1": [],
+       "fautes_intra_tige": [],
+       "membre_ii_Core_une_unite_par_tige": true,
+       "detail_Core": {
+        "n_unites": 10,
+        "n_tiges": 10
+       },
+       "membre_iii_cardinal_intra_tige_publie": true,
+       "cardinal_intra_tige": {
+        "S3": 360,
+        "S2": 540,
+        "S1": 0,
+        "S0": 0
+       },
+       "portee_corrigee": "0-143 — à `t`, les paires intra-tige ne sont PAS exclues ; S3 et S2 sont mesurées"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "quantité à t−1 avec paires intra-tige (membre i)",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "locus_du_cycle": "t",
+       "t_moins_1": "REFUSÉ (0-130, ratifié PI)",
+       "membre_i_aucune_quantite_a_t_moins_1": false,
+       "quantites_a_t_moins_1": [
+        {
+         "nom": "profil à t−1",
+         "intra_tige": true,
+         "n_paires_intra_tige": 360
+        }
+       ],
+       "fautes_intra_tige": [
+        {
+         "nom": "profil à t−1",
+         "intra_tige": true,
+         "n_paires_intra_tige": 360
+        }
+       ],
+       "membre_ii_Core_une_unite_par_tige": true,
+       "detail_Core": {
+        "n_unites": 10,
+        "n_tiges": 10
+       },
+       "membre_iii_cardinal_intra_tige_publie": true,
+       "cardinal_intra_tige": {
+        "S3": 360
+       },
+       "portee_corrigee": "0-143 — à `t`, les paires intra-tige ne sont PAS exclues ; S3 et S2 sont mesurées"
+      }
+     },
+     {
+      "cas": "Core avec deux unités d'une même tige (membre ii)",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "locus_du_cycle": "t",
+       "t_moins_1": "REFUSÉ (0-130, ratifié PI)",
+       "membre_i_aucune_quantite_a_t_moins_1": true,
+       "quantites_a_t_moins_1": [],
+       "fautes_intra_tige": [],
+       "membre_ii_Core_une_unite_par_tige": false,
+       "detail_Core": {
+        "n_unites": 10,
+        "n_tiges": 9
+       },
+       "membre_iii_cardinal_intra_tige_publie": true,
+       "cardinal_intra_tige": {
+        "S3": 360
+       },
+       "portee_corrigee": "0-143 — à `t`, les paires intra-tige ne sont PAS exclues ; S3 et S2 sont mesurées"
+      }
+     },
+     {
+      "cas": "cardinal intra-tige non publié (membre iii)",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "locus_du_cycle": "t",
+       "t_moins_1": "REFUSÉ (0-130, ratifié PI)",
+       "membre_i_aucune_quantite_a_t_moins_1": true,
+       "quantites_a_t_moins_1": [],
+       "fautes_intra_tige": [],
+       "membre_ii_Core_une_unite_par_tige": true,
+       "detail_Core": {
+        "n_unites": 10,
+        "n_tiges": 10
+       },
+       "membre_iii_cardinal_intra_tige_publie": false,
+       "cardinal_intra_tige": "SANS OBJET",
+       "portee_corrigee": "0-143 — à `t`, les paires intra-tige ne sont PAS exclues ; S3 et S2 sont mesurées"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-t1 — S3 et S2 mesurées à `t`",
+   "pass_case": "les paires intra-tige ne sont PAS exclues à t ; cardinal publié",
+   "fail_case": "exclure les paires intra-tige vide S3 et S2 (0-143)",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "cardinal intra-tige > 0 et strates non vides",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "S3_et_S2_definies_par_le_partage_de_tige": true,
+       "portee": "à t, les paires intra-tige ne sont PAS exclues"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "exclusion à t ⇒ S3 et S2 vides",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "S3_apres_exclusion": 0,
+       "S2_apres_exclusion": 0,
+       "motif": "auto-contradictoire avec le §7 et le §4.2, qui mesurent et chiffrent les quatre strates"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-core-S",
+   "pass_case": "|S| = 10, une unité par tige, appartenance publiée",
+   "fail_case": "deux unités d'une même tige dans S (CAS OBLIGATOIRE)",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "0-124 : la signature de Core vaut p < 1e-13 SOUS INDÉPENDANCE ; deux états d'une même tige rendent Core > 0 ATTENDU.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "10 unités, 10 tiges",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "taille_S": 10,
+       "taille_attendue": 10,
+       "appartenance": {
+        "0": "T0",
+        "1": "T1",
+        "2": "T2",
+        "3": "T3",
+        "4": "T4",
+        "5": "T5",
+        "6": "T6",
+        "7": "T7",
+        "8": "T8",
+        "9": "T9"
+       },
+       "tiges_distinctes": 10,
+       "tiges_en_double": []
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "deux unités de la tige T0",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "taille_S": 10,
+       "taille_attendue": 10,
+       "appartenance": {
+        "0": "T0",
+        "1": "T1",
+        "2": "T2",
+        "3": "T3",
+        "4": "T4",
+        "5": "T5",
+        "6": "T6",
+        "7": "T7",
+        "8": "T8",
+        "9": "T0"
+       },
+       "tiges_distinctes": 9,
+       "tiges_en_double": [
+        "T0"
+       ]
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-ulp",
+   "pass_case": "marge à la coupure publiée pour les CINQ conditions",
+   "fail_case": "les états centrés et placebo sans marge (CAS OBLIGATOIRE)",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "0-125 : les états centrés et placebo sont ceux dont les coordonnées sont RAPPROCHÉES DE ZÉRO par soustraction — les plus exposés au basculement de rang. La porte manquait exactement là où le risque est maximal.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "cinq conditions",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "conditions_attendues": [
+        "aucun",
+        "glob",
+        "type",
+        "auto",
+        "plac"
+       ],
+       "conditions_publiees": [
+        "aucun",
+        "auto",
+        "glob",
+        "plac",
+        "type"
+       ],
+       "conditions_manquantes": [],
+       "marges_non_finies": [],
+       "marges": {
+        "aucun": {
+         "marge_ulp_min": 12.0
+        },
+        "glob": {
+         "marge_ulp_min": 13.0
+        },
+        "type": {
+         "marge_ulp_min": 14.0
+        },
+        "auto": {
+         "marge_ulp_min": 15.0
+        },
+        "plac": {
+         "marge_ulp_min": 16.0
+        }
+       },
+       "chemin_nominal": "fp64",
+       "seuil": "SANS OBJET"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "états bruts seuls (0-125)",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "conditions_attendues": [
+        "aucun",
+        "glob",
+        "type",
+        "auto",
+        "plac"
+       ],
+       "conditions_publiees": [
+        "aucun"
+       ],
+       "conditions_manquantes": [
+        "glob",
+        "type",
+        "auto",
+        "plac"
+       ],
+       "marges_non_finies": [],
+       "marges": {
+        "aucun": {
+         "marge_ulp_min": 12.0
+        },
+        "glob": null,
+        "type": null,
+        "auto": null,
+        "plac": null
+       },
+       "chemin_nominal": "fp64",
+       "seuil": "SANS OBJET"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-seed",
+   "pass_case": "seed, générateur, règle de tirage gelés ; cardinal par modèle ; appariement par la NORME",
+   "fail_case": "appariement par le VECTEUR et cardinal partiel (CAS OBLIGATOIRE)",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "0-133 : d vaut 768 / 960 / 1536 — un vecteur de ℝ⁷⁶⁸ n'est pas un vecteur de ℝ¹⁵³⁶. Cinquième occurrence de la famille « cardinal périmé ».",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "spécification complète, seed = 0",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "champs_manquants": [],
+       "modeles_sans_cardinal": [],
+       "appariement_par_le_vecteur": false,
+       "spec": {
+        "seed": 0,
+        "generateur": "torch.randn(R, d, generator=manual_seed(seed))",
+        "regle_de_tirage": "normalisation L2 par ligne ; indices 0..R−1",
+        "indices": "0..R−1",
+        "cardinal_par_modele": {
+         "gpt2": 20,
+         "HuggingFaceTB/SmolLM2-360M": 20,
+         "Qwen/Qwen2.5-1.5B": 20
+        },
+        "appariement_inter_modeles": "par la NORME, jamais par le vecteur"
+       },
+       "regle": "appariement inter-modèles par la NORME, jamais par le VECTEUR"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "« mêmes vecteurs sur les trois modèles »",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "champs_manquants": [],
+       "modeles_sans_cardinal": [
+        "HuggingFaceTB/SmolLM2-360M",
+        "Qwen/Qwen2.5-1.5B"
+       ],
+       "appariement_par_le_vecteur": true,
+       "spec": {
+        "seed": 0,
+        "generateur": "torch.randn(R, d, generator=manual_seed(seed))",
+        "regle_de_tirage": "normalisation L2 par ligne ; indices 0..R−1",
+        "indices": "0..R−1",
+        "cardinal_par_modele": {
+         "gpt2": 20
+        },
+        "appariement_inter_modeles": "mêmes vecteurs sur les trois modèles"
+       },
+       "regle": "appariement inter-modèles par la NORME, jamais par le VECTEUR"
+      }
+     },
+     {
+      "cas": "champ `seed` absent (distinct de seed = 0)",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "champs_manquants": [
+        "seed"
+       ],
+       "modeles_sans_cardinal": [],
+       "appariement_par_le_vecteur": false,
+       "spec": {
+        "generateur": "torch.randn(R, d, generator=manual_seed(seed))",
+        "regle_de_tirage": "normalisation L2 par ligne ; indices 0..R−1",
+        "indices": "0..R−1",
+        "cardinal_par_modele": {
+         "gpt2": 20,
+         "HuggingFaceTB/SmolLM2-360M": 20,
+         "Qwen/Qwen2.5-1.5B": 20
+        },
+        "appariement_inter_modeles": "par la NORME, jamais par le vecteur"
+       },
+       "regle": "appariement inter-modèles par la NORME, jamais par le VECTEUR"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-norm",
+   "pass_case": "LayerNorm vs RMSNorm cité par ligne de config des trois modèles",
+   "fail_case": "une normalisation affirmée sans ligne de config",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "0-123 : sans `auto`, C-mod était une classe SANS CAUSE CANDIDATE — une classe qui se consigne et ne s'explique jamais.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "trois config.json en cache",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "modeles_manquants": [],
+       "sans_citation": [],
+       "normalisations_inconnues": [],
+       "configs": {
+        "gpt2": {
+         "model_type": "gpt2",
+         "normalisation": "LayerNorm",
+         "centre_t_il": true,
+         "champ": "layer_norm_epsilon",
+         "ligne_de_config": "\"layer_norm_epsilon\": 1e-05",
+         "reference": "Zhang & Sennrich 2019 — RMSNorm ne centre pas"
+        },
+        "HuggingFaceTB/SmolLM2-360M": {
+         "model_type": "llama",
+         "normalisation": "RMSNorm",
+         "centre_t_il": false,
+         "champ": "rms_norm_eps",
+         "ligne_de_config": "\"rms_norm_eps\": 1e-05",
+         "reference": "Zhang & Sennrich 2019 — RMSNorm ne centre pas"
+        },
+        "Qwen/Qwen2.5-1.5B": {
+         "model_type": "qwen2",
+         "normalisation": "RMSNorm",
+         "centre_t_il": false,
+         "champ": "rms_norm_eps",
+         "ligne_de_config": "\"rms_norm_eps\": 1e-06",
+         "reference": "Zhang & Sennrich 2019 — RMSNorm ne centre pas"
+        }
+       },
+       "regle": "citée par ligne de config, jamais par croyance"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "normalisation par croyance",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "modeles_manquants": [],
+       "sans_citation": [
+        "gpt2",
+        "HuggingFaceTB/SmolLM2-360M",
+        "Qwen/Qwen2.5-1.5B"
+       ],
+       "normalisations_inconnues": [],
+       "configs": {
+        "gpt2": {
+         "normalisation": "LayerNorm",
+         "ligne_de_config": null
+        },
+        "HuggingFaceTB/SmolLM2-360M": {
+         "normalisation": "LayerNorm",
+         "ligne_de_config": null
+        },
+        "Qwen/Qwen2.5-1.5B": {
+         "normalisation": "LayerNorm",
+         "ligne_de_config": null
+        }
+       },
+       "regle": "citée par ligne de config, jamais par croyance"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-diag",
+   "pass_case": "f, σ± et (O, cos) conjoint publiés par strate, condition et modèle",
+   "fail_case": "une cellule sans `f` ⇒ le rapport ne peut pas être écrit (§6.D)",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "0-120 : sans `f`, « les supports coïncident » et « quelques coordonnées géantes portent tout le cosinus » rendent le MÊME O — et le second est la branche de tort de Neuro (N7).",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "schéma complet, 60 cellules",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "quantites_requises": [
+        "f",
+        "sigma_pm",
+        "O_cos_conjoint"
+       ],
+       "manques": [],
+       "n_manques": 0,
+       "statut": "DIAGNOSTIQUE, jamais correctif (Arbitrage X-1)"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "une cellule sans f",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "quantites_requises": [
+        "f",
+        "sigma_pm",
+        "O_cos_conjoint"
+       ],
+       "manques": [
+        "gpt2|aucun|S3 : f absent"
+       ],
+       "n_manques": 1,
+       "statut": "DIAGNOSTIQUE, jamais correctif (Arbitrage X-1)"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-diag-colonnes",
+   "pass_case": "les 60 cellules (3 × 5 × 4) portent TOUTES les colonnes de V-diag — cardinal ÉNUMÉRÉ, jamais supposé",
+   "fail_case": "une cellule sans excès `O − p_sym`, ou une condition manquante au cardinal (CAS OBLIGATOIRES)",
+   "expected": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "V-diag (l. 383) exige f, σ± et le couple (O, cos) conjoint par strate, par condition et par modèle. La quantité EXISTAIT ; elle n'était pas TABULÉE — le compte rendu ne portait `cos` que sous `aucun`. Cette clause compte les cellules × colonnes au lieu de les supposer (0-144).",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "60 cellules complètes",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "cardinal_cellules_enumere": 60,
+       "cardinal_cellules_attendu": 60,
+       "decomposition_du_cardinal": "3 modèles × 5 conditions × 4 strates",
+       "colonnes_exigees": [
+        "O_en_indices",
+        "cos_moyen",
+        "f",
+        "sigma_pm",
+        "p_sym_cellule",
+        "exces_O_moins_p_sym"
+       ],
+       "cardinal_cellule_x_colonne": 360,
+       "cardinal_cellule_x_colonne_attendu": 360,
+       "n_sans_objet_publie": 0,
+       "sans_objet_publie": [],
+       "manques": [],
+       "n_manques": 0,
+       "regle": "cardinal recompté PAR ÉNUMÉRATION, jamais par affirmation ; SANS OBJET est une valeur publiée, pas un manque (D23)",
+       "statut": "DIAGNOSTIQUE, jamais correctif (Arbitrage X-1)"
+      }
+     },
+     {
+      "cas": "SANS OBJET publié sur σ± — valeur, pas manque (D23)",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "cardinal_cellules_enumere": 60,
+       "cardinal_cellules_attendu": 60,
+       "decomposition_du_cardinal": "3 modèles × 5 conditions × 4 strates",
+       "colonnes_exigees": [
+        "O_en_indices",
+        "cos_moyen",
+        "f",
+        "sigma_pm",
+        "p_sym_cellule",
+        "exces_O_moins_p_sym"
+       ],
+       "cardinal_cellule_x_colonne": 360,
+       "cardinal_cellule_x_colonne_attendu": 360,
+       "n_sans_objet_publie": 1,
+       "sans_objet_publie": [
+        "gpt2|aucun|S3 : `sigma_pm`"
+       ],
+       "manques": [],
+       "n_manques": 0,
+       "regle": "cardinal recompté PAR ÉNUMÉRATION, jamais par affirmation ; SANS OBJET est une valeur publiée, pas un manque (D23)",
+       "statut": "DIAGNOSTIQUE, jamais correctif (Arbitrage X-1)"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "une cellule sans excès O − p_sym",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "cardinal_cellules_enumere": 60,
+       "cardinal_cellules_attendu": 60,
+       "decomposition_du_cardinal": "3 modèles × 5 conditions × 4 strates",
+       "colonnes_exigees": [
+        "O_en_indices",
+        "cos_moyen",
+        "f",
+        "sigma_pm",
+        "p_sym_cellule",
+        "exces_O_moins_p_sym"
+       ],
+       "cardinal_cellule_x_colonne": 360,
+       "cardinal_cellule_x_colonne_attendu": 360,
+       "n_sans_objet_publie": 0,
+       "sans_objet_publie": [],
+       "manques": [
+        "gpt2|aucun|S3 : colonne `exces_O_moins_p_sym` absente"
+       ],
+       "n_manques": 1,
+       "regle": "cardinal recompté PAR ÉNUMÉRATION, jamais par affirmation ; SANS OBJET est une valeur publiée, pas un manque (D23)",
+       "statut": "DIAGNOSTIQUE, jamais correctif (Arbitrage X-1)"
+      }
+     },
+     {
+      "cas": "48 cellules au lieu de 60 (condition `plac` absente)",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "cardinal_cellules_enumere": 48,
+       "cardinal_cellules_attendu": 60,
+       "decomposition_du_cardinal": "3 modèles × 5 conditions × 4 strates",
+       "colonnes_exigees": [
+        "O_en_indices",
+        "cos_moyen",
+        "f",
+        "sigma_pm",
+        "p_sym_cellule",
+        "exces_O_moins_p_sym"
+       ],
+       "cardinal_cellule_x_colonne": 288,
+       "cardinal_cellule_x_colonne_attendu": 360,
+       "n_sans_objet_publie": 0,
+       "sans_objet_publie": [],
+       "manques": [
+        "gpt2|plac|S3 : cellule absente",
+        "gpt2|plac|S2 : cellule absente",
+        "gpt2|plac|S1 : cellule absente",
+        "gpt2|plac|S0 : cellule absente",
+        "HuggingFaceTB/SmolLM2-360M|plac|S3 : cellule absente",
+        "HuggingFaceTB/SmolLM2-360M|plac|S2 : cellule absente",
+        "HuggingFaceTB/SmolLM2-360M|plac|S1 : cellule absente",
+        "HuggingFaceTB/SmolLM2-360M|plac|S0 : cellule absente",
+        "Qwen/Qwen2.5-1.5B|plac|S3 : cellule absente",
+        "Qwen/Qwen2.5-1.5B|plac|S2 : cellule absente",
+        "Qwen/Qwen2.5-1.5B|plac|S1 : cellule absente",
+        "Qwen/Qwen2.5-1.5B|plac|S0 : cellule absente"
+       ],
+       "n_manques": 12,
+       "regle": "cardinal recompté PAR ÉNUMÉRATION, jamais par affirmation ; SANS OBJET est une valeur publiée, pas un manque (D23)",
+       "statut": "DIAGNOSTIQUE, jamais correctif (Arbitrage X-1)"
+      }
+     },
+     {
+      "cas": "une cellule sans `f`",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "cardinal_cellules_enumere": 60,
+       "cardinal_cellules_attendu": 60,
+       "decomposition_du_cardinal": "3 modèles × 5 conditions × 4 strates",
+       "colonnes_exigees": [
+        "O_en_indices",
+        "cos_moyen",
+        "f",
+        "sigma_pm",
+        "p_sym_cellule",
+        "exces_O_moins_p_sym"
+       ],
+       "cardinal_cellule_x_colonne": 360,
+       "cardinal_cellule_x_colonne_attendu": 360,
+       "n_sans_objet_publie": 0,
+       "sans_objet_publie": [],
+       "manques": [
+        "gpt2|aucun|S3 : colonne `f` absente"
+       ],
+       "n_manques": 1,
+       "regle": "cardinal recompté PAR ÉNUMÉRATION, jamais par affirmation ; SANS OBJET est une valeur publiée, pas un manque (D23)",
+       "statut": "DIAGNOSTIQUE, jamais correctif (Arbitrage X-1)"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-psym-conditions",
+   "pass_case": "p_sym de cellule défini sur les CINQ conditions du §8 — cardinal COMPTÉ par condition",
+   "fail_case": "quatre conditions au lieu de cinq, ou une cellule sans p_sym (CAS OBLIGATOIRES)",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "La demande écrit « p_sym défini sur les 5 conditions, cardinal compté, jamais supposé ». Le cardinal par condition est publié.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "5 conditions × 12 cellules",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "conditions_exigees": [
+        "aucun",
+        "glob",
+        "type",
+        "auto",
+        "plac"
+       ],
+       "cardinal_conditions_exige": 5,
+       "cardinal_conditions_couvertes_enumere": 5,
+       "cardinal_par_condition": {
+        "aucun": 12,
+        "glob": 12,
+        "type": 12,
+        "auto": 12,
+        "plac": 12
+       },
+       "cardinal_par_condition_attendu": 12,
+       "unite": "cellules (modèle × strate) portant un p_sym de cellule",
+       "manques": [],
+       "n_manques": 0,
+       "regle": "cardinal COMPTÉ, jamais supposé (0-144)"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "condition `type` absente ⇒ 4/5",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "conditions_exigees": [
+        "aucun",
+        "glob",
+        "type",
+        "auto",
+        "plac"
+       ],
+       "cardinal_conditions_exige": 5,
+       "cardinal_conditions_couvertes_enumere": 4,
+       "cardinal_par_condition": {
+        "aucun": 12,
+        "glob": 12,
+        "type": 0,
+        "auto": 12,
+        "plac": 12
+       },
+       "cardinal_par_condition_attendu": 12,
+       "unite": "cellules (modèle × strate) portant un p_sym de cellule",
+       "manques": [
+        "gpt2|type|S3 : p_sym de cellule absent",
+        "gpt2|type|S2 : p_sym de cellule absent",
+        "gpt2|type|S1 : p_sym de cellule absent",
+        "gpt2|type|S0 : p_sym de cellule absent",
+        "HuggingFaceTB/SmolLM2-360M|type|S3 : p_sym de cellule absent",
+        "HuggingFaceTB/SmolLM2-360M|type|S2 : p_sym de cellule absent",
+        "HuggingFaceTB/SmolLM2-360M|type|S1 : p_sym de cellule absent",
+        "HuggingFaceTB/SmolLM2-360M|type|S0 : p_sym de cellule absent",
+        "Qwen/Qwen2.5-1.5B|type|S3 : p_sym de cellule absent",
+        "Qwen/Qwen2.5-1.5B|type|S2 : p_sym de cellule absent",
+        "Qwen/Qwen2.5-1.5B|type|S1 : p_sym de cellule absent",
+        "Qwen/Qwen2.5-1.5B|type|S0 : p_sym de cellule absent"
+       ],
+       "n_manques": 12,
+       "regle": "cardinal COMPTÉ, jamais supposé (0-144)"
+      }
+     },
+     {
+      "cas": "une cellule sans p_sym de cellule",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "conditions_exigees": [
+        "aucun",
+        "glob",
+        "type",
+        "auto",
+        "plac"
+       ],
+       "cardinal_conditions_exige": 5,
+       "cardinal_conditions_couvertes_enumere": 4,
+       "cardinal_par_condition": {
+        "aucun": 11,
+        "glob": 12,
+        "type": 12,
+        "auto": 12,
+        "plac": 12
+       },
+       "cardinal_par_condition_attendu": 12,
+       "unite": "cellules (modèle × strate) portant un p_sym de cellule",
+       "manques": [
+        "gpt2|aucun|S3 : p_sym de cellule absent"
+       ],
+       "n_manques": 1,
+       "regle": "cardinal COMPTÉ, jamais supposé (0-144)"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-identite-decomposition",
+   "pass_case": "Δ_rem + Δ_add = Δ* à la tolérance ULP DÉJÀ EN VIGUEUR (TOL_ULP_BORNE), par paire ET sur les estimés",
+   "fail_case": "un Δ* déplacé de 1e−9 ⇒ FAIL (CAS OBLIGATOIRE)",
+   "expected": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL",
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "Δ_rem = O_aucun − O_type (cran RETIRÉ), Δ_add = O_plac − O_aucun (cran AJOUTÉ). DESCRIPTIFS : ils ne modifient aucune classe, aucun seuil, aucune borne. Δ* reste la primaire gelée ; cette clause ne vérifie qu'une IDENTITÉ.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "360 paires synthétiques, bootstrap de tiges",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "identite_sur_les_estimes": {
+        "Delta_rem": 0.22571476433771515,
+        "Delta_add": 0.15124899125150904,
+        "Delta_etoile": 0.37696375558922424,
+        "somme_Delta_rem_plus_Delta_add": 0.3769637555892242,
+        "ecart_absolu": 5.551115123125783e-17,
+        "echelle_ULP": 5.551115123125783e-17,
+        "ecart_en_ULP": 1.0,
+        "tolerance_ULP": 8,
+        "regle": "identité EXACTE en arithmétique réelle ; tout écart au-delà de la tolérance ULP déjà en vigueur est un BUG"
+       },
+       "identite_par_paire": {
+        "verdict": "PASS",
+        "ecart_max_en_ULP": 0.0,
+        "tolerance_ULP": 8,
+        "n_paires": 180
+       },
+       "Delta_rem_indices": 14.44574491761377,
+       "Delta_add_indices": 9.679935440096578,
+       "Delta_etoile_indices": 24.12568035771035,
+       "IC_rem": [
+        0.2204986512548988,
+        0.2303125381370132
+       ],
+       "IC_add": [
+        0.1483552663911241,
+        0.15352931626415503
+       ],
+       "IC_Delta_etoile": [
+        0.37219102255433967,
+        0.38072327894885805
+       ],
+       "statut": "DESCRIPTIF — Δ_rem et Δ_add ne modifient aucune classe, aucun seuil, aucune borne ; Δ* reste la primaire gelée",
+       "perturbation_injectee": 0.0
+      }
+     },
+     {
+      "cas": "identité sur trois scalaires publiés",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "Delta_rem": 0.22481284722222222,
+       "Delta_add": 0.15038715277777776,
+       "Delta_etoile": 0.3752,
+       "somme_Delta_rem_plus_Delta_add": 0.3752,
+       "ecart_absolu": 0.0,
+       "echelle_ULP": 5.551115123125783e-17,
+       "ecart_en_ULP": 0.0,
+       "tolerance_ULP": 8,
+       "regle": "identité EXACTE en arithmétique réelle ; tout écart au-delà de la tolérance ULP déjà en vigueur est un BUG"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "Δ* déplacé de 1e−9 sans toucher aux crans",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "identite_sur_les_estimes": {
+        "Delta_rem": 0.22571476433771515,
+        "Delta_add": 0.15124899125150904,
+        "Delta_etoile": 0.37696375658922426,
+        "somme_Delta_rem_plus_Delta_add": 0.3769637555892242,
+        "ecart_absolu": 1.000000082740371e-09,
+        "echelle_ULP": 5.551115123125783e-17,
+        "ecart_en_ULP": 18014400.0,
+        "tolerance_ULP": 8,
+        "regle": "identité EXACTE en arithmétique réelle ; tout écart au-delà de la tolérance ULP déjà en vigueur est un BUG"
+       },
+       "identite_par_paire": {
+        "verdict": "PASS",
+        "ecart_max_en_ULP": 0.0,
+        "tolerance_ULP": 8,
+        "n_paires": 180
+       },
+       "Delta_rem_indices": 14.44574491761377,
+       "Delta_add_indices": 9.679935440096578,
+       "Delta_etoile_indices": 24.12568035771035,
+       "IC_rem": [
+        0.2204986512548988,
+        0.2303125381370132
+       ],
+       "IC_add": [
+        0.1483552663911241,
+        0.15352931626415503
+       ],
+       "IC_Delta_etoile": [
+        0.37219102255433967,
+        0.38072327894885805
+       ],
+       "statut": "DESCRIPTIF — Δ_rem et Δ_add ne modifient aucune classe, aucun seuil, aucune borne ; Δ* reste la primaire gelée",
+       "perturbation_injectee": 1e-09
+      }
+     },
+     {
+      "cas": "Δ* déplacé de 1e−6",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "Delta_rem": 0.2248,
+       "Delta_add": 0.1504,
+       "Delta_etoile": 0.37520099999999995,
+       "somme_Delta_rem_plus_Delta_add": 0.3752,
+       "ecart_absolu": 9.999999999732445e-07,
+       "echelle_ULP": 5.551115123125783e-17,
+       "ecart_en_ULP": 18014398509.0,
+       "tolerance_ULP": 8,
+       "regle": "identité EXACTE en arithmétique réelle ; tout écart au-delà de la tolérance ULP déjà en vigueur est un BUG"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-perimetre",
+   "pass_case": "les trois éléments du §4.9 présents",
+   "fail_case": "le successeur désigné manquant",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "bloc complet",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "elements_manquants": []
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "sans successeur désigné",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "elements_manquants": [
+        "successeur_designe"
+       ]
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "V-schéma",
+   "pass_case": "aucun terme interdit ; O en fraction exacte ; phrase gravée (xvi) verbatim",
+   "fail_case": "un terme du vocabulaire interdit dans le schéma de sortie",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "la phrase gravée (xvi) contient elle-même un terme proscrit (« chemin d'écriture ») : elle NOMME la limite et est retirée du balayage — sinon la porte échouerait sur la formulation que le protocole rend obligatoire.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "schéma conforme",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "termes_interdits_detectes": [],
+       "champs_manquants": []
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "« séparation de patterns » dans le schéma",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "termes_interdits_detectes": [
+        "séparation de patterns"
+       ],
+       "champs_manquants": []
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Cellules décisionnelles",
+   "pass_case": "12 cellules, chacune atteinte par un IC, recomptées par énumération",
+   "fail_case": "un cardinal AFFIRMÉ au lieu d'être recompté",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "famille 0-76(i) / 0-86 / 0-94 / 0-101 / 0-133 — cinq occurrences de « cardinal périmé ».",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "énumération exécutée",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "cardinal_enumere": 12,
+       "cardinal_attendu": 12,
+       "cellules_produites": [
+        [
+         "BAS",
+         "c-cent"
+        ],
+        [
+         "BAS",
+         "c-mec"
+        ],
+        [
+         "BAS",
+         "ind_Δ"
+        ],
+        [
+         "HAUT",
+         "c-cent"
+        ],
+        [
+         "HAUT",
+         "c-mec"
+        ],
+        [
+         "HAUT",
+         "ind_Δ"
+        ],
+        [
+         "ind_L",
+         "c-cent"
+        ],
+        [
+         "ind_L",
+         "c-mec"
+        ],
+        [
+         "ind_L",
+         "ind_Δ"
+        ],
+        [
+         "−",
+         "c-cent"
+        ],
+        [
+         "−",
+         "c-mec"
+        ],
+        [
+         "−",
+         "ind_Δ"
+        ]
+       ],
+       "cellules_enumerees_par_le_noyau": [
+        [
+         "HAUT",
+         "c-mec"
+        ],
+        [
+         "HAUT",
+         "c-cent"
+        ],
+        [
+         "HAUT",
+         "ind_Δ"
+        ],
+        [
+         "−",
+         "c-mec"
+        ],
+        [
+         "−",
+         "c-cent"
+        ],
+        [
+         "−",
+         "ind_Δ"
+        ],
+        [
+         "BAS",
+         "c-mec"
+        ],
+        [
+         "BAS",
+         "c-cent"
+        ],
+        [
+         "BAS",
+         "ind_Δ"
+        ],
+        [
+         "ind_L",
+         "c-mec"
+        ],
+        [
+         "ind_L",
+         "c-cent"
+        ],
+        [
+         "ind_L",
+         "ind_Δ"
+        ]
+       ],
+       "chaque_cellule_atteinte_par_un_IC": true,
+       "n_hasard": "1/128",
+       "corridor_2n": "1/64",
+       "n_flottant": 0.0078125,
+       "regle": "cardinal recompté PAR ÉNUMÉRATION, jamais par affirmation"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "cardinal affirmé à 16 (4 × 4, c-anti comptée)",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "cardinal_affirme": 16,
+       "cardinal_enumere": 12,
+       "motif": "c-anti est court-circuitante : elle ne croise pas N"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Unité de `n` et du corridor",
+   "pass_case": "n = 1/128 et 2n = 1/64 dans l'unité de publication de O (p/64)",
+   "fail_case": "le corridor pris en INDICES classe BAS 32 indices partagés sur 64",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "défaut trouvé PAR CE BANC, sur quatre clauses à la fois : le corridor était 64 × trop large ⇒ BAS et c-mec vraies presque partout. Aucune donnée du run n'a été nécessaire pour le voir.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "échelle p/64",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "O_de_32_indices": "1/2",
+       "n_fraction": "1/128",
+       "corridor_2n": "1/64",
+       "n_indices": "1/2",
+       "classe_sous_l_unite_juste": "ind_L",
+       "regle": "O est une fraction p/64 (0-132) : n et 2n le sont aussi"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "échelle en indices (n = 1/2, 2n = 1)",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "classe_sous_l_unite_fausse": "BAS",
+       "O_de_32_indices": "1/2",
+       "corridor_faux": "1",
+       "motif": "32 indices sur 64 déclarés « bornés par 2 × le hasard »"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "ε_Λ dérivé de l'enveloppe nulle (§4.3)",
+   "pass_case": "ε_Λ = 1.96 × 0.01097/√P, décroissant en P ; corridor 2n ABSOLU",
+   "fail_case": "ε_Λ posé à 0, ou réglé sur l'enveloppe de son propre estimateur",
+   "expected": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "§4.3 pré-enregistre l'enveloppe ; ε_Λ n'a jamais été laissé au choix de l'implémentation.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "P = 8, 360, 7560",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "eps_P8": 0.0076016824765579825,
+       "eps_P360": 0.00113319191739684,
+       "eps_P7560": 0.0002472827494468174,
+       "sd_nulle_par_paire": 0.01097,
+       "corridor_2n": "1/64"
+      }
+     },
+     {
+      "cas": "le corridor reste 2n, indépendant de P",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "corridor": "1/64",
+       "regle": "couloir d'équivalence ABSOLU (0-81 / D28)"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "ε_Λ = 0 ⇒ HAUT dès que IC_inf(Λ) > 0",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "motif": "sans marge 1×, une significativité de 10⁻⁹ suffirait à prononcer HAUT",
+       "eps_lambda_correct_P360": 0.00113319191739684
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Objets du banc",
+   "pass_case": "10 objets, chacun ATTEINT par une entrée synthétique",
+   "fail_case": "un objet inatteignable ⇒ classe vide par construction",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "énumération exécutée",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "objets_atteints": [
+        [
+         "N",
+         "HAUT"
+        ],
+        [
+         "N",
+         "−"
+        ],
+        [
+         "N",
+         "BAS"
+        ],
+        [
+         "N",
+         "ind_L"
+        ],
+        [
+         "C",
+         "c-anti"
+        ],
+        [
+         "C",
+         "c-mec"
+        ],
+        [
+         "C",
+         "c-cent"
+        ],
+        [
+         "C",
+         "ind_Δ"
+        ],
+        [
+         "Core",
+         "vide"
+        ],
+        [
+         "Core",
+         "non vide"
+        ]
+       ],
+       "objets_enumeres_par_le_noyau": [
+        [
+         "N",
+         "HAUT"
+        ],
+        [
+         "N",
+         "−"
+        ],
+        [
+         "N",
+         "BAS"
+        ],
+        [
+         "N",
+         "ind_L"
+        ],
+        [
+         "C",
+         "c-anti"
+        ],
+        [
+         "C",
+         "c-mec"
+        ],
+        [
+         "C",
+         "c-cent"
+        ],
+        [
+         "C",
+         "ind_Δ"
+        ],
+        [
+         "Core",
+         "vide"
+        ],
+        [
+         "Core",
+         "non vide"
+        ]
+       ],
+       "cardinal_enumere": 10,
+       "cardinal_attendu": 10,
+       "Core_vide": 0,
+       "Core_non_vide": 7,
+       "regle": "cardinal recompté PAR ÉNUMÉRATION, jamais par affirmation"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "cardinal affirmé à 8",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "cardinal_affirme": 8,
+       "cardinal_enumere": 10
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Ordres gravés (D18)",
+   "pass_case": "HAUT prime sur BAS ; c-anti court-circuitante ; ind par complémentation EN DERNIER",
+   "fail_case": "une entrée doublement satisfaite classée par la seconde clause",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "priorités exécutées",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "HAUT_prime_sur_BAS": "HAUT",
+       "c_anti_court_circuitante": "c-anti",
+       "ind_L_par_complementation": "ind_L",
+       "ind_delta_par_complementation": "ind_Δ",
+       "ordre_N": [
+        "HAUT",
+        "−",
+        "BAS",
+        "ind_L"
+       ],
+       "ordre_C": [
+        "c-anti",
+        "c-mec",
+        "c-cent",
+        "ind_Δ"
+       ]
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "ordre inversé : BAS avant HAUT",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "observe": "HAUT",
+       "attendu_du_cas_faux": "BAS"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Deux écritures obligatoires (§4.6)",
+   "pass_case": "ε* ≥ 2n ⇒ recouvrement VIDE déclaré ; ε* < 2n ⇒ région masquée publiée",
+   "fail_case": "une région masquée passée sous silence",
+   "expected": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "0-131 : sous l'alternative, un effet entre ε* et 2n est SIGNIFICATIF et classé NÉGLIGEABLE — étouffement assumé, jamais silencieux.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "ε* = 0.05 ≥ 2n",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "cas": 1,
+       "epsilon_etoile": 0.05,
+       "deux_n": 0.015625,
+       "declaration": "ε* ≥ 2n : le recouvrement des conditions `c-mec` et `c-cent` est VIDE et l'ordre est SANS OBJET",
+       "region_masquee": "SANS OBJET"
+      }
+     },
+     {
+      "cas": "ε* = 0.002 < 2n, région publiée",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "cas": 2,
+       "epsilon_etoile": 0.002,
+       "deux_n": 0.015625,
+       "declaration": "ε* < 2n : la région masquée est publiée — détection étouffée assumée, jamais silencieuse",
+       "region_masquee": 0.11
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "ε* < 2n sans région publiée",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "cas": 2,
+       "epsilon_etoile": 0.002,
+       "deux_n": 0.015625,
+       "declaration": "ε* < 2n : la région masquée est publiée — détection étouffée assumée, jamais silencieuse",
+       "region_masquee": "SANS OBJET"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "R dérivé (§4.5)",
+   "pass_case": "R = ⌈10·σ̂_dir²/σ̂_Δ²⌉, plafond 300 ; dépassement PUBLIÉ",
+   "fail_case": "un R tronqué en silence au plafond",
+   "expected": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "0-126-iii / 0-52 : R choisi à la main est 0-52 rejoué.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "σ_dir = 0.02, σ_Δ = 0.015 ⇒ R sous plafond",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "R_formule": 18,
+       "R": 18,
+       "plafond": 300,
+       "sigma_dir": 0.02,
+       "sigma_delta": 0.015,
+       "depassement": false,
+       "statut": "sous plafond",
+       "formule": "R = ceil(10·σ̂_dir²/σ̂_Δ²), pilote R₀ = 20"
+      }
+     },
+     {
+      "cas": "σ_dir = 0.30, σ_Δ = 0.015 ⇒ dépassement publié",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "R_formule": 4000,
+       "R": 300,
+       "plafond": 300,
+       "sigma_dir": 0.3,
+       "sigma_delta": 0.015,
+       "depassement": true,
+       "statut": "DÉPASSEMENT PUBLIÉ — remonté au PI, non absorbé",
+       "formule": "R = ceil(10·σ̂_dir²/σ̂_Δ²), pilote R₀ = 20"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "σ_Δ = 0 ⇒ SANS OBJET, jamais un R inventé",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "R": null,
+       "statut": "SANS OBJET",
+       "raison": "σ̂_Δ nulle ou non finie : la formule n'a pas de domaine de définition"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "support_topk",
+   "pass_case": "exactement k indices, ex æquo départagés par indice",
+   "fail_case": "une coupure par SEUIL rend plus de k indices sur ex æquo",
+   "expected": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "0-135, quatrième différence — la seule INERTE : à G égale, seuil et topk donnent 0.0 EXACT sur 4/4 (aucun ex æquo dans le matériau réel).",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "z gaussien, k = 64",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "k": 64
+      }
+     },
+     {
+      "cas": "z avec 70 ex æquo à la coupure",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "ex_aequo": 70,
+       "k": 64
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "coupure par seuil |z| ≥ q sur 70 ex æquo",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "n_indices_rendus_par_le_seuil": 70,
+       "k_attendu": 64,
+       "motif": "le seuil `|z| >= q_(k)` du chemin d'A3 peut dépasser k ; `topk` ne le peut pas"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "σ± sur intersection vide",
+   "pass_case": "σ± SANS OBJET quand |A∩B| = 0 — jamais 0",
+   "fail_case": "σ± publié à 0 sur une intersection vide",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "deux supports disjoints",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "regle": "SANS OBJET, jamais 0"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "σ± = 0 sur intersection vide",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "motif": "une quantité sans domaine de définition se publie SANS OBJET, jamais 0"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "O en fraction exacte",
+   "pass_case": "O agrégé en p/64 exact ; cellule vide ⇒ SANS OBJET",
+   "fail_case": "O publié en flottant tronqué (0-132)",
+   "expected": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "128 intersections sur 40 paires",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "O": "1/20"
+      }
+     },
+     {
+      "cas": "cellule vide",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "regle": "SANS OBJET, jamais 0"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "flottant tronqué à 4 décimales",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "valeur_tronquee": 0.05,
+       "valeur_exacte": "1/20",
+       "motif": "détruit l'exactitude dont dépendent V-borne et Core"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "p_pair réalisé",
+   "pass_case": "p_pair = max(p_a, p_b) ; |A∩B| ≥ p_pair sur des paires réelles",
+   "fail_case": "p_pair calculé sur un seul membre (borne plus faible)",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "40 paires synthétiques",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "n": 40,
+       "p_pair_min_max": [
+        1,
+        6
+       ],
+       "inter_min_max": [
+        8,
+        20
+       ]
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "max(p_a,p_b) ignoré ⇒ borne desserrée",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "motif": "la dérivation vaut pour CHAQUE membre : |A∩B| ≥ max(p_a, p_b) est exact"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Bascule split-half (§14-2)",
+   "pass_case": "n_cell = 60 ⇒ LOO principal ; n_cell = 20 ⇒ split-half principal",
+   "fail_case": "une bascule décidée APRÈS lecture des données",
+   "expected": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "n_cell = 60",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "n_cell_min": 60,
+       "seuil": 30,
+       "bascule": false,
+       "mesure_principale": "LOO",
+       "controle": "split-half",
+       "majorant_du_biais_residuel": 0.017241379310344827,
+       "statut": "pré-enregistrée (§14-2) — jamais un choix après lecture"
+      }
+     },
+     {
+      "cas": "n_cell = 20",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "n_cell_min": 20,
+       "seuil": 30,
+       "bascule": true,
+       "mesure_principale": "split-half",
+       "controle": "LOO",
+       "majorant_du_biais_residuel": 0.05555555555555555,
+       "statut": "pré-enregistrée (§14-2) — jamais un choix après lecture"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "bascule à n_cell = 20 refusée",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "motif": "0-117 : le biais résiduel +1/(n_cell−2) ≈ 0.05 est DE LA TAILLE de la quantité décidée — il fabriquerait c-cent"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Core / Core-G",
+   "pass_case": "Core non vide ⇒ Core-G en fraction ; Core vide ⇒ SANS OBJET",
+   "fail_case": "Core-G publié à 0 sur un Core vide",
+   "expected": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": null,
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "7 indices communs sur 10 unités",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "Core": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+       ],
+       "taille": 7,
+       "n_unites": 10,
+       "seuil": 9,
+       "distribution_adjacente": {
+        ">=1": 547,
+        ">=2": 36,
+        ">=3": 8,
+        ">=4": 7,
+        ">=5": 7,
+        ">=6": 7,
+        ">=7": 7,
+        ">=8": 7,
+        ">=9": 7,
+        ">=10": 7
+       },
+       "compte_max_sur_S": 10,
+       "statut_de_la_distribution": "DESCRIPTIVE — le seuil ≥ 9 reste pré-enregistré et inchangé ; la distribution est publiée pour qu'un |Core| = 0 ne se lise pas en zéro plat",
+       "nulle": "Bin(10, 64/8192) par indice ; P(≥9) ≈ 1.1e-18 ; un seul indice = signature, p < 1e-13, aucun IC",
+       "portee": "pour cette G, seed 0 (D9) — Core est G-spécifique"
+      }
+     },
+     {
+      "cas": "Core vide ⇒ Core-G SANS OBJET",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "Core_G": "SANS OBJET",
+       "taille_Core": 0,
+       "raison": "Core vide : la fraction n'a pas de domaine de définition"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "Core-G = 0 sur Core vide",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "motif": "support vide ≠ zéro : la fraction n'a pas de domaine de définition"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "ε* : les DEUX règles de signe, publiées côte à côte",
+   "pass_case": "règles `min` (implémentée) et `produit` (alternative) calculées et publiées avec leur statut ; AUCUNE promue",
+   "fail_case": "une troisième règle inventée à l'exécution, ou une règle promue",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "le §4.5 ne dit pas ce que devient une paire à DEUX tiges (S1, S0). L'affectation à min(t_a, t_b) N'EST PAS pré-enregistrée : c'est une opérationnalisation déclarée. La règle `produit` est aussi naturelle et donne d'autres ε*. Les deux sont publiées ; l'arbitrage est PI. Publication de SENSIBILITÉ — ne dépend d'aucun résultat, ne peut que durcir la lecture (D30 alinéa 2).",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "deux règles sur un jeu inter-tige",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "cardinal_des_regles_enumere": 2,
+       "par_regle": {
+        "min": {
+         "epsilon_etoile": 0.2945952189819243,
+         "statut": "IMPLÉMENTÉE (opérationnalisation déclarée, non pré-enregistrée)",
+         "fraction_signe_non_retournable": 0.0
+        },
+        "produit": {
+         "epsilon_etoile": 0.1731971240532177,
+         "statut": "ALTERNATIVE (publiée, NON promue)",
+         "fraction_signe_non_retournable": 0.0
+        }
+       },
+       "regle": "les deux sont publiées ; AUCUNE n'est promue — arbitrage PI"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "règle non déclarée `mediane`",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "exception": "règle de signe inconnue : mediane",
+       "motif": "poser une règle non déclarée à l'exécution serait 0-52 ; le noyau la refuse"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Plancher structurel de ε* (puissance maximale du test)",
+   "pass_case": "plancher calculé par simulation à effet CONSTANT ; vaut EXACTEMENT 1 quand aucun signe ne peut se retourner",
+   "fail_case": "un plancher supposé nul ⇒ c-cent atteignable partout",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "D28 : le couloir d'équivalence est ABSOLU (2n) et ne se règle jamais sur l'enveloppe nulle de son propre estimateur. Le plancher dit la puissance MAXIMALE disponible du test, indépendamment de la donnée ; il se publie par cellule et par règle.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "K_eff = 10, règles min et produit, structure dégénérée",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "plancher_relatif_min": 1.0,
+       "plancher_relatif_produit": 0.5714285714285714,
+       "plancher_structure_degeneree_100pct_intra_regle_produit": 1.0,
+       "fraction_signe_non_retournable_degeneree": 1.0,
+       "definition": "q₀.₉₅ de |Δ*| simulé sous effet CONSTANT = 1 ; c'est la puissance maximale du test, indépendante de la donnée",
+       "regle": "sur une structure où AUCUN signe ne peut se retourner, le plancher vaut EXACTEMENT 1 : la nulle de permutation est l'observation elle-même"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "ε* supposé nul sur une structure dégénérée",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "classe_avec_epsilon_suppose_nul": "c-cent",
+       "motif": "sans plancher publié, un couloir réglé sur l'enveloppe nulle de son propre estimateur (D28) ne se voit pas"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Puissance / vacuité de la partition C",
+   "pass_case": "Δ* constant non nul ⇒ c-cent atteignable ; Δ* = 0 ⇒ c-cent ne sort pas ; bruit centré large ⇒ ind_Δ atteignable",
+   "fail_case": "structure où AUCUN signe ne se retourne ⇒ classe informative INATTEIGNABLE même à Δ* constant (CAS OBLIGATOIRE)",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "mode de vacuité 0-47 / 0-66 : une classe vide PAR CONSTRUCTION du test se publie, elle ne se découvre pas après coup. Ambiguïté DÉCLARÉE : la demande écrit « ind_Δ atteignable » à effet constant, où la classe attendue est c-cent ; les DEUX lectures sont vérifiées. Arbitrage dû.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "trois jeux à réponse connue par construction",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "detecteur_d_inatteignabilite": {
+        "structure": "100 % INTER-tige sous la règle `min`",
+        "plancher_relatif": 1.0,
+        "IC_inf_a_effet_constant": 0.2999999999999999,
+        "classe_informative_inatteignable": true,
+        "structure_saine": "100 % INTRA-tige sous la règle `min`",
+        "plancher_relatif_sain": 0.8
+       },
+       "effet_constant_non_nul": {
+        "Delta": 0.3,
+        "epsilon_etoile": 0.24000000000000002,
+        "IC": [
+         0.2999999999999998,
+         0.3000000000000001
+        ],
+        "classe": "c-cent",
+        "attendu": "c-cent (classe informative)"
+       },
+       "effet_nul_par_construction": {
+        "epsilon_etoile": 0.0,
+        "IC": [
+         0.0,
+         0.0
+        ],
+        "classe": "c-mec",
+        "attendu": "PAS c-cent"
+       },
+       "bruit_centre_large": {
+        "epsilon_etoile": 0.03310187126996775,
+        "IC": [
+         -0.04714760161434511,
+         -0.015078179277747074
+        ],
+        "classe": "ind_Δ",
+        "attendu": "ind_Δ"
+       },
+       "ambiguite_declaree": "la demande écrit « ind_Δ atteignable » à effet CONSTANT ; à effet constant la classe attendue est c-cent. LES DEUX lectures sont vérifiées. Arbitrage dû."
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "100 % intra-tige sous la règle `produit`",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "fraction_signe_non_retournable": 1.0,
+       "epsilon_etoile": 0.3000000000000001,
+       "Delta": 0.3,
+       "IC": [
+        0.2999999999999998,
+        0.3000000000000001
+       ],
+       "classe_obtenue": "ind_Δ",
+       "motif": "ε* ≥ Δ* par construction du test : la classe informative de la partition C est VIDE sur cette structure, quel que soit l'effet. Vacuité 0-47 / 0-66, publiée et non masquée."
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Couverture énumérée : deux règles ε* × deux mesures",
+   "pass_case": "sur chaque cellule, les deux règles ε* ET les deux mesures (LOO, split-half) sont présentes ; cardinal COMPTÉ",
+   "fail_case": "une règle ou une mesure manquante sur une cellule",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "ambiguïté DÉCLARÉE : « 12 cellules × 3 modèles » et « 36 cellules » ne désignent pas le même objet. Les DEUX cardinaux sont comptés et publiés avec leur unité nommée. Arbitrage dû. Famille « cardinal périmé », sixième occurrence évitée par comptage.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "36 = 3 modèles × 4 strates × 3 conditions ; 12 cellules décisionnelles",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "cardinal_cellules_decisionnelles_modele_x_strate": 12,
+       "unite_1": "cellule décisionnelle = (modèle × strate) — 3 × 4 = 12",
+       "cardinal_modele_x_strate_x_condition": 36,
+       "unite_2": "(modèle × strate × condition concernée) — 3 × 4 × 3 = 36, conditions `aucun`, `type`, `plac`",
+       "regles_eps_exigees": [
+        "min",
+        "produit"
+       ],
+       "mesures_exigees": [
+        "LOO",
+        "split-half"
+       ],
+       "manques": [],
+       "n_manques": 0,
+       "regle": "cardinal recompté PAR ÉNUMÉRATION, jamais par affirmation",
+       "ambiguite_declaree": "« 12 cellules × 3 modèles » et « 36 cellules » ne désignent pas le même objet ; les DEUX cardinaux sont comptés et publiés. Arbitrage dû."
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "règle `produit` et mesure split-half retirées",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "cardinal_cellules_decisionnelles_modele_x_strate": 12,
+       "unite_1": "cellule décisionnelle = (modèle × strate) — 3 × 4 = 12",
+       "cardinal_modele_x_strate_x_condition": 36,
+       "unite_2": "(modèle × strate × condition concernée) — 3 × 4 × 3 = 36, conditions `aucun`, `type`, `plac`",
+       "regles_eps_exigees": [
+        "min",
+        "produit"
+       ],
+       "mesures_exigees": [
+        "LOO",
+        "split-half"
+       ],
+       "manques": [
+        "gpt2|S3 : règle ε* `produit` absente",
+        "HuggingFaceTB/SmolLM2-360M|S0 : mesure `split-half` absente"
+       ],
+       "n_manques": 2,
+       "regle": "cardinal recompté PAR ÉNUMÉRATION, jamais par affirmation",
+       "ambiguite_declaree": "« 12 cellules × 3 modèles » et « 36 cellules » ne désignent pas le même objet ; les DEUX cardinaux sont comptés et publiés. Arbitrage dû."
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Split-half : partition sans fuite (§5-7, D26)",
+   "pass_case": "μ estimée sur la moitié qui ne contient NI a NI b ; paires à cheval exclues, cardinal publié",
+   "fail_case": "μ estimée sur la moitié qui CONTIENT la paire (CAS OBLIGATOIRE)",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "le §5-7 grave « double mesure (D26) : LOO ET split-half, publiés côte à côte » et le §4.8 le liste. Le premier tour n'avait implémenté QUE la bascule (§14-2) : annoncé et absent. Le LOO reste PRINCIPAL (n_cell = 60 ≥ 30) ; le split-half est le CONTRÔLE, avec un LOO refait sur le même sous-ensemble pour que l'écart ne se confonde pas avec un changement de jeu de paires.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "60 unités, 1770 paires énumérées",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "n_unites": 60,
+       "paires_totales": 1770,
+       "paires_retenues": 870,
+       "paires_a_cheval_exclues": 900,
+       "fuites": 0,
+       "tailles_des_moities": [
+        30,
+        30
+       ],
+       "regle": "μ estimée sur la moitié 1−h : elle ne contient ni a ni b"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "estimation sur la moitié contenant a et b",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "a_dans_l_ensemble_d_estimation": true,
+       "b_dans_l_ensemble_d_estimation": true,
+       "motif": "une estimation sur la moitié qui contient la paire n'est ni un split-half ni un LOO : c'est une fuite"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Core : distribution adjacente des comptes",
+   "pass_case": "|Core| et la distribution ≥1..≥10 et le max publiés",
+   "fail_case": "|Core| = 0 publié en zéro plat, sans sa distribution",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "le seuil ≥ 9/10 est PRÉ-ENREGISTRÉ et NE BOUGE PAS ; seule la publication s'enrichit. Un indice à 8/10 annule déjà la nulle Bin(10, 1/128) — publier « 0 » sans la distribution le masque.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "Core vide, distribution complète",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "taille_Core": 0,
+       "distribution_adjacente": {
+        ">=1": 628,
+        ">=2": 12,
+        ">=3": 0,
+        ">=4": 0,
+        ">=5": 0,
+        ">=6": 0,
+        ">=7": 0,
+        ">=8": 0,
+        ">=9": 0,
+        ">=10": 0
+       },
+       "compte_max_sur_S": 2,
+       "seuil": 9,
+       "regle": "le seuil ≥ 9 est PRÉ-ENREGISTRÉ et ne bouge pas ; seule la publication s'enrichit"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "zéro plat",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "Core": 0,
+       "distribution_adjacente": null,
+       "motif": "un indice à 8/10 annule déjà la nulle Bin(10, 1/128) ; publier « 0 » sans la distribution le masque"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Cardinal intra-tige : unité NOMMÉE",
+   "pass_case": "publié dans les deux unités — par cellule de capture ET dans l'unité de P (× 6 cellules)",
+   "fail_case": "un cardinal publié sans son unité",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "150 par cellule de capture, mais P est agrégé sur 6 cellules : 900 au total, S3 360 et S2 540 — soit 100 % des paires S3 et S2. Les deux nombres sont vrais, dans deux unités.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "150 par cellule = 900 dans l'unité de P",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "cardinal_par_cellule_de_capture": 150,
+       "n_cellules_de_capture": 6,
+       "cardinal_total_unite_de_P": 900,
+       "par_strate_unite_de_P": {
+        "S3": 360,
+        "S2": 540,
+        "S1": 0,
+        "S0": 0
+       },
+       "regle": "P est agrégé sur les 6 cellules : un cardinal PAR CELLULE n'est pas dans l'unité de P"
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "« 150 » sans unité",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "cardinal_publie": 150,
+       "unite": null,
+       "motif": "150 par cellule ou 150 au total ? Sans unité nommée, le lecteur ne peut pas le savoir — et 150/900 n'est pas 100 % des paires S3 et S2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Anomalie σ± ≪ 0.5 : consignée NON EXPLIQUÉE",
+   "pass_case": "statut NON EXPLIQUÉ, nature diagnostique non décisionnelle, aucun mécanisme proposé",
+   "fail_case": "un mécanisme nommé à la place de l'inconnu",
+   "expected": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "σ± = 0.392288 (gpt2|type|S0, 1994/5083) et 0.4945 (SmolLM2|type|S2) : ~15 σ sous la nulle 0.5, UNIFORME en |A∩B|, et la dépendance LOO est POSITIVE donc ne peut pas le produire. Quantité V-diag, non décisionnelle. Nommer l'inconnu EST le livrable (D23 / 0-71 : la cause doit être nommée avant toute suite, et elle ne l'est pas).",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "bloc d'anomalie sur une cellule à ~15 σ",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "statut": "NON EXPLIQUÉ",
+       "nature": "DIAGNOSTIQUE (V-diag) — non décisionnelle : ne modifie aucune borne, aucun seuil, aucune classe",
+       "n_cellules_signalees": 1,
+       "cellules": [
+        {
+         "cellule": "gpt2|type|S0",
+         "sigma_pm": "1994/5083",
+         "sigma_pm_flottant": 0.39228801888648435,
+         "accord": "1994/5083",
+         "ecarts_types_sous_0.5": -15.36,
+         "sigma_pm_par_taille_d_intersection": {
+          "|A∩B|=1": 0.387
+         }
+        }
+       ],
+       "termes_de_mecanisme_detectes": []
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "« s'explique par la dépendance LOO »",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "redaction_refusee": "σ± < 0.5 s'explique par la dépendance LOO entre les deux membres de la paire",
+       "motif": "la dépendance LOO est POSITIVE (Cov = σ²/58) et ne peut pas produire cet écart ; nommer un mécanisme faux est pire que nommer l'inconnu"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "clause": "Bootstrap de tiges / ε*",
+   "pass_case": "IC bootstrap de TIGES (K_eff = 10) ; ε* par permutation intra-tige",
+   "fail_case": "un bootstrap d'UNITÉS (K_eff = 60) au lieu de tiges",
+   "expected": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "observed": {
+    "pass_case": [
+     "PASS",
+     "PASS"
+    ],
+    "fail_case": [
+     "FAIL"
+    ]
+   },
+   "ok": true,
+   "compte_dans_E": false,
+   "raisons_E": [],
+   "note": "opérationnalisation déclarée : poids m[t_a]·m[t_b] hors tige, m[t_a] intra-tige ; permutation constante DANS une tige.",
+   "cas": {
+    "pass_case": [
+     {
+      "cas": "40 paires, 10 tiges",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "K_eff": 10
+      }
+     },
+     {
+      "cas": "ε* gelé avant lecture",
+      "attendu": "PASS",
+      "observé": "PASS",
+      "ok": true,
+      "détail": {
+       "epsilon_etoile": 0.01147448568677666,
+       "sigma_delta": 0.019519127625400964,
+       "K_eff": 10
+      }
+     }
+    ],
+    "fail_case": [
+     {
+      "cas": "K_eff = 60 (unités, pas tiges)",
+      "attendu": "FAIL",
+      "observé": "FAIL",
+      "ok": true,
+      "détail": {
+       "K_eff_faux": 60,
+       "K_eff_grave": 10,
+       "motif": "l'unité d'échange est la TIGE (0-50)"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

@@ -2147,6 +2147,127 @@ tout ce qu'un rédacteur aurait spontanément écrit.
 touchés par cette clôture.** **Successeur immédiat, priorité absolue : le cycle de rédaction
 (`REPORT.md`).** *Rien d'autre ne s'ouvre avant le gel du plan du rapport.*
 
+## 2026-09-05 — Cycle de rédaction, phase INSTRUMENT : le banc `doc_bench` déclaré NON GELABLE EN L'ÉTAT (§14) — aucune mesure dans ce cycle
+
+- **Commit** : e7d8cf3 + travail commité **non gelé** (`tools/doc_bench.py`,
+  `tests/test_doc_bench.py`, `tests/fixtures/doc_bench/`, `report/**`)
+- **Config** : `EngramConfig` **SANS OBJET, nommé** (cycle documentaire, §7 du protocole) ; aucun
+  forward, `M` jamais instanciée, `engram/` non modifié ; **0 GPU**, VRAM `SANS OBJET`.
+  E1, E2, `E3 ≤ +0.05`, « 0 write », D7, NaN/inf : **`SANS OBJET`, nommés**.
+- **Run** : `.venv\Scripts\python -m pytest tests/ -q` ·
+  `.venv\Scripts\python tools/doc_bench.py --campagne --sommes` ·
+  `.venv\Scripts\python tools/doc_bench.py --campagne --force-pass` (contrôle `C-mut`)
+- **Protocole pré-enregistré** : `experiments/EXP-2026-09-04-rapport-sous-banc.md`
+  (§4 et §6 **GELÉS** le 2026-09-04 ; §14 gravé le 2026-09-05). Ce cycle **n'atteint pas** les
+  prédictions du §4 : la phase mesurée par le §4 (brin `PUB`, classes `PUB-net` / `PUB-amputé` /
+  `PUB-bloqué` / `PUB-instrument`) **n'a jamais été ouverte** — aucune ligne de prose n'existe,
+  `REPORT.md` n'existe pas. La clause qui tranche ici est le **§14**, dernière phrase :
+  ***« si le quatrième tour ne rend pas `APPROVED`, le banc est déclaré non gelable en l'état et la
+  rédaction ne s'ouvre pas »***.
+
+### Verdict
+
+**`INCONCLUSIF` — cycle invalidé par le §14 du protocole ; autopsie ci-dessous.** Ce n'est pas un
+résultat sur le corpus ni sur `H-pub` : **c'est la phase de construction d'un instrument qui est
+close sans gel.** Aucune mesure n'a été conduite, aucun chiffre du rapport n'a été produit ;
+**aucune ligne n'est due au tableau des poids (`docs/EXTENSIONS.md` §4)**, et il faut le déclarer.
+
+Le Verifier a rendu « non » **en citant lui-même la borne du §14**. Le PI applique le §14 tel
+qu'écrit : la borne avait été posée **avant** le tour, pour ce cas exactement. Le Verifier chiffre
+les trois correctifs restants à **~30 lignes, moins d'une heure, 0 GPU** — *cela ne change pas la
+décision : **une borne qui cède devant un correctif bon marché n'est pas une borne**, et l'aurait
+rendue rétroactivement décorative.* La levée du plafond de la boucle Verify, motivée au §14 par
+l'**absence de mesure**, **expire ici**.
+
+### Autopsie — quatre tours, une seule classe de défaut
+
+Quatre tours Builder/Verifier. **Chacun a rendu `CHANGES_REQUESTED` avec `tests_passed`,
+`protocol_followed` et `rerun_consistent` à `true`** — les trois indicateurs de conformité étaient
+verts à chaque tour, et à chaque tour un défaut réel restait. **Les quatre défauts appartiennent à
+une seule classe : *une garantie publiée plus forte que la garantie réelle*.**
+
+**Défauts numérotés de ce cycle : `0-243`, `0-253`, `0-261`, plus trois ouverts au tour 4** — chacun
+avec sa source ; **aucun n'a été fermé avant qu'un octet de livrable n'existe**, ce qui est
+précisément la donnée de méthode de ce cycle. *(Un compte de défauts est une donnée de méthode,
+jamais une performance.)*
+
+| Tour | Défaut | Source | Contenu |
+| --- | --- | --- | --- |
+| 1-2 | **`0-243`** | `lab-verifier` | `cas_exerces = max(n, 1)` planchait **16 clauses sur 32** ⇒ l'artefact publiait **5** clauses non exercées là où il y en avait **21**. |
+| 3 | **`0-253`** | `lab-verifier` | Le correctif avait fermé **la forme** `max(n, 1)`, **pas la classe**. Sonde sur **corpus vide** : `C3` rendait **24** (elle comptait les entrées du registre des formulations interdites), `C7` rendait **3** (motifs constants), `C15`/`C15b` portaient un **plancher littéral** `return [], 1`. Compte vrai : **25**. *`C3` et `C7` sont les deux clauses les plus décisionnelles pour la prose.* |
+| 3 | **`0-261`** | **auto-attribué par `lab-builder`** | Son garde-fou contre `0-243` était **un grep sur deux chaînes littérales**, et son test **gelait la liste fausse dans une assertion**. |
+| 4 | *(CRITIQUE)* | `lab-verifier`, **re-vérifié à l'octet par le coordinateur** | `report/SHA256SUMS` et les **six livrables** sont en **CRLF** : `sha256sum -c` échoue **55/55**. `verifier_sommes()` ne le voit pas — son `splitlines()` absorbe le `\r` : ***le seul outil capable de vérifier nos sommes est celui qui les a écrites.*** Et `core.autocrlf = input` **sans** `.gitattributes` ⇒ **git stocke la version LF** : dès le commit, les **55 hashes publiés sont faux**. Constat à l'octet : **55 CR / 55 LF** ; `report/doc_bench.json` publié `3694b2d3…0c1544`, valant `43d6b059…5b34a59a` après clone. |
+| 4 | *(MAJEUR)* | `lab-verifier` | **Aucun des tests n'appelle jamais `main()`.** Les deux verrous protégeant le livrable n'y vivent que gardés par des `assert '…' in src`. Le Verifier a **inséré une ligne** en bac à sable et **ressuscité `0-254` intégralement** : l'artefact publié écrasé par un rapport `force_pass=True` **32/32 `PASS`**, **la console affichant *« l'artefact publié n'est PAS écrit »* pendant qu'elle le détruit**, et **les deux gardes passant**. *Le mode `0-261` reproduit sur le correctif de `0-261`.* |
+| 4 | *(MAJEUR)* | `lab-verifier` | `normaliser_typographie` traite les apostrophes **mais pas les accents**, alors que **sa propre docstring porte l'argument exact**. Sur les 32 mutants dé-accentués : `C3` 2→1, `C15c` 2→1, et **`C7`, `C9`, `C19` tombent à ZÉRO** ⇒ *« P-Base est confirmee »*, *« semantique »*, *« Le modele retrouve l'unite »* **passent en silence**. |
+
+### Ce qui tient — vérifié à l'exécution par `lab-verifier` (D14-R)
+
+L'instrument **n'est pas détruit : il est non gelable en l'état.** Établi, avec sa provenance :
+
+- **450 tests, exit 0** ; **`E = 0`, 32/32 `PASS`** sur la campagne de fixtures.
+- **Fermeture 0/0** (33 sondes, 165 valeurs).
+- **Porte sans données sur les 32 clauses** : sur corpus vide, **un seul compte non nul, `C0b = 33`**,
+  **exemption bornée et motivée**.
+- **Liste des 25 recomptée à la main** : **25 + 7 = 32**.
+- **`C3` et `C7` mordent sur de la prose adverse réelle** (cas échouants du §10, écrits par le
+  Verifier) ; **un témoin neutre ne déclenche rien**.
+- **Rejeu bit-à-bit ×2.**
+- **`C-mut`** : **48 failed / 174 passed, exit 1**, **artefact intact**.
+- **§4, §6, §10 du protocole hashés identiques à `HEAD` par plage** — le gel tient.
+- **Verrou (a)** effectif à l'exécution normale ; **verrou (b)** détectant **un octet ajouté**.
+- **Budget mesuré : 2,71 s** contre **~10 s** estimés (§8) — la colonne « estimé » est conservée,
+  estimation fausse incluse.
+
+**Aucun taux de détection du banc n'est publié, sous aucune formulation** ((xxxvii)) : les mutants
+sont choisis par leur auteur ; ce qui précède est une **couverture par classe**, avec le nombre de
+clauses exercées. Et rien de ce qui précède **ne prouve** quoi que ce soit : ce sont des **citations
+d'artefacts** ((xxx)).
+
+### Acquis de méthode — la régularité des portes sans données, et le fait neuf
+
+**Quatre fois de suite, la porte qui a trouvé le défaut est celle qui n'avait besoin d'aucune
+donnée.** Avec les **deux occurrences antérieures déjà enregistrées** (`V-slot` tuant l'ancienne
+para1, `V-ident` tuant `fact_pairs(30)`, cycle D14-ext, `CLAUDE.md`), **six occurrences** sont
+consignées. Aucune n'a exigé de corpus, de fixture ni de mesure.
+
+**Le fait neuf de ce cycle : la porte gagnante a changé d'étage.** Aux tours 1-3, les portes sans
+données inspectaient **la logique du banc** (sonde sur corpus vide). Au tour 4, les deux portes
+gagnantes étaient **lire les octets du livrable** et **lancer l'outil standard de vérification** —
+elles n'inspectaient plus la logique, mais **le format de ce que le banc publie**, étage que
+**quatre tours avaient entièrement ignoré**. *C'est l'acquis réutilisable : la porte la moins chère
+n'est pas seulement « sans données », elle est **d'un étage que le constructeur n'a pas regardé**.*
+
+### Ce qui manque exactement, pour un futur pré-enregistrement — trois items chiffrés
+
+1. **Fins de ligne.** Les **55 lignes** de `report/SHA256SUMS` et les **six livrables** en **LF** ;
+   un `.gitattributes` fixant l'encodage des livrables ; `verifier_sommes()` cessant d'absorber le
+   `\r`. **Porte** : `sha256sum -c report/SHA256SUMS` rendant **55/55 OK** **depuis un clone frais**,
+   par l'**outil standard**, jamais par le lecteur maison.
+2. **Point d'entrée testé.** ≥ 1 test appelant **`main()`** de bout en bout, dont un sous
+   `--force-pass`, assertant sur **l'état du fichier `report/doc_bench.json`** (hash avant = hash
+   après) et non sur le texte du source ; **retrait des deux `assert '…' in src`**. **Porte** : la
+   ligne insérée par le Verifier en bac à sable doit faire **échouer** les tests.
+3. **Normalisation des diacritiques.** `normaliser_typographie` étendue aux accents. **Porte** : les
+   **32 mutants dé-accentués** rendent, clause par clause, **les mêmes comptes** que les 32
+   accentués — en particulier **`C7`, `C9`, `C19` ≥ 1** et **`C3` = 2, `C15c` = 2**.
+
+- **Conclusion** : `INCONCLUSIF`, cause nommée — **cycle invalidé par le §14** ; le banc
+  `tools/doc_bench.py` est **non gelable en l'état** et **la rédaction de `REPORT.md` ne s'ouvre
+  pas**. Le cycle n'a produit **aucune mesure** : il ne dit **rien** sur `H-pub`, rien sur la
+  publiabilité du corpus, rien sur aucun résultat du laboratoire. Ce qu'il produit est une **donnée
+  de méthode** : quatre tours conformes sur trois indicateurs verts ont laissé passer **une seule
+  classe de défaut** — *une garantie publiée plus forte que la garantie réelle* — et **la porte qui
+  l'a fermée, chaque fois, était celle qui n'avait besoin d'aucune donnée**, la dernière étant à un
+  **étage jamais regardé**, celui du **format du livrable**.
+- **Suite** : nouveau pré-enregistrement `experiments/EXP-2026-09-05-doc-bench-gel.md`, phase
+  instrument uniquement, **les trois portes sans données ci-dessus passées AVANT toute reprise de la
+  boucle Builder/Verifier**, plafond de la boucle Verify **rétabli à trois itérations** (la levée du
+  §14 est expirée). Le §4 et le §6 de `EXP-2026-09-04-rapport-sous-banc.md` **restent gelés et
+  s'appliquent inchangés** au cycle de rédaction, qui reprendra derrière le gel du banc. La file
+  (`V2-D(b)` → `Q-N3` → `Q-quant` → `I3-sous-P11` → canal suffixe) **reste gelée dans son ordre**.
+
+*Modèles : director.interpretation opus, builder opus, verifier opus ; math et neuro non sollicités — aucune mesure dans ce cycle.*
+
 ## 2026-08-20 — v0 : squelette posé
 
 - **Commit** : (initial)

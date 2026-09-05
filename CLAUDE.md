@@ -36,7 +36,26 @@ Ce n'est PAS un produit — c'est une expérience falsifiable sur un laptop RTX 
   grep) — recalculé avec incertitude le 2026-08-21 (COR-02) : IC 95 % [0.56,
   0.99], médiane par secret 0.59 [0.45, 0.75] ; à citer « ~0.6–0.7, N=10 ».
 
-## État du projet (2026-09-04)
+## État du projet (2026-09-05)
+
+- **Cycle de rédaction, phase INSTRUMENT — `INCONCLUSIF`, cycle invalidé par le §14 le
+  2026-09-05 : le banc `tools/doc_bench.py` est NON GELABLE EN L'ÉTAT, et la rédaction de
+  `REPORT.md` NE S'OUVRE PAS.** Aucune mesure dans ce cycle ; aucune ligne due au tableau des
+  poids. **Quatre tours Builder/Verifier, tous `CHANGES_REQUESTED` avec `tests_passed`,
+  `protocol_followed` et `rerun_consistent` à `true`** — trois indicateurs verts, et à chaque tour
+  un défaut réel de **la même classe** : *une garantie publiée plus forte que la garantie réelle*
+  (`0-243` → `0-253` → `0-261`, puis trois au tour 4). Bloquants restants, chiffrés à ~30 lignes :
+  **(i)** les six livrables et `report/SHA256SUMS` sont en **CRLF** ⇒ `sha256sum -c` échoue
+  **55/55** et les hashes deviennent **faux dès le commit** (`core.autocrlf = input`, pas de
+  `.gitattributes`) ; **(ii)** **aucun test n'appelle `main()`** — les deux verrous du livrable ne
+  sont gardés que par des greps, et **une ligne insérée ressuscite `0-254`** pendant que la console
+  affiche l'inverse ; **(iii)** la **dé-accentuation** aveugle `C7`, `C9`, `C19` (tombées à zéro).
+  L'instrument **tient par ailleurs** : 450 tests exit 0, `E = 0`, 32/32 `PASS`, porte sans données
+  à `{C0b: 33}` seul, `C3`/`C7` mordant sur prose adverse réelle, rejeu bit-à-bit. **Suite :
+  `EXP-2026-09-05-doc-bench-gel.md`**, phase instrument seule, **les trois portes passées AVANT
+  toute reprise de la boucle**, plafond Verify **rétabli à trois** (la levée du §14 a expiré). Les
+  **§4 et §6** du protocole de rédaction **restent gelés** et s'appliqueront inchangés derrière le
+  gel du banc. Détail : entrée du 2026-09-05 au JOURNAL.
 
 - Squelette v1 posé et **validé sur GPU** (torch 2.13+cu126 ; GPT-2, SmolLM2 et
   Qwen2.5-1.5B en cache). Parcours complet dans JOURNAL.md : X0 → X1 (gyrus
@@ -145,7 +164,7 @@ Ce n'est PAS un produit — c'est une expérience falsifiable sur un laptop RTX 
   prédit). **Dette D20/D32 (ii) ACQUITTÉE en COUPLE (D34)** : (0.67–0.75 ; 0.61–0.78).
   **`σ±` clos sur gpt2 SEUL** ; `Σ-ind` sur SmolLM2 et Qwen (**non-monotonie du profil par
   rang**) ⇒ **`NON EXPLIQUÉ`, anomalie publiée**. **Deux clauses gelées falsifiées**, consignées
-  non réparées. **`P-Base` confirmée » est interdit d'écriture.** 0 GPU.
+  non réparées. **« `P-Base` confirmée » est interdit d'écriture.** 0 GPU.
 - **Cycle « recouvrement des supports de `topk(G·h)` » — TERMINÉ le 2026-08-26.
   Verdict `REJETE` ; maillon centrage `NON ATTRIBUÉ` (0-155).**
   (`experiments/EXP-2026-08-23-recouvrement-supports.md`.)
@@ -177,7 +196,8 @@ Ce n'est PAS un produit — c'est une expérience falsifiable sur un laptop RTX 
   établi. Aucune phrase qualifiant l'ampleur avant la porte `V-grappe`.* Le **+57 % d'E2 de X1 reste acquis et intact** (0-75) ; son
   **attribution** ne s'instruira **pas** par des mesures de support à ce locus. **Suite priorité 1 :
   Étape A CPU pure (`P-Base` + `P-σ`).**
-- **File d'attente — ORDRE REMPLACÉ le 2026-09-04 par la clôture d'arc.** Priorité absolue :
+- **File d'attente — ORDRE REMPLACÉ le 2026-09-04 par la clôture d'arc ; PRÉCÉDÉE depuis le 2026-09-05 par le gel du banc.** Rien ne s'ouvre avant
+  **`EXP-2026-09-05-doc-bench-gel.md`** (trois portes sans données). Puis, priorité absolue :
   **`REPORT.md`** (cycle de rédaction, plan pré-enregistré, relecture par qui n'a pas écrit la
   section, banc de cohérence documentaire D14-R sur chaque chiffre cité). Puis la file gelée,
   inchangée dans son ordre : **`V2-D(b)` → `Q-N3` → `Q-quant` → `I3-sous-P11` → canal suffixe**.
@@ -297,6 +317,15 @@ de cohérence documentaire.*
   ⟨date⟩ sous ⟨instrument⟩, instrument remplacé le ⟨date⟩ par ⟨nom⟩ ; mention historique »***. *Cas
   générateur : un déficit calculé **avant** mesure, relayé comme s'il avait survécu à la mesure — c'est
   la forme la plus discrète de la générosité rétrospective.*
+
+- **Garantie d'instrument (xxxix, §14, 2026-09-05)** — les mots **« vérifié », « exercé »,
+  « protégé », « garanti »** sont **interdits** pour une propriété établie par **inspection de
+  source** ou par un **lecteur écrit par le même auteur que l'artefact**. Licite : ***« vérifié par
+  ⟨outil standard externe⟩ sur ⟨artefact, hash⟩ »*** ou ***« établi par inspection de source, non
+  exécuté »***. Motif : quatre tours conformes (`tests_passed`, `protocol_followed`,
+  `rerun_consistent` à `true`) ont publié quatre fois **une garantie plus forte que la garantie
+  réelle** — `0-243`, `0-253`, `0-261`, et `sha256sum -c` échouant 55/55 sous un `verifier_sommes()`
+  qui rendait OK. **Un compte de clauses exercées EST une garantie : il tombe sous cette entrée.**
 
 ## Environnement
 

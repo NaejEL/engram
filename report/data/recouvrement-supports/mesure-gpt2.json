@@ -1,0 +1,3721 @@
+{
+  "cellules": {
+    "gpt2|aucun|S3": {
+      "P": 360,
+      "n_dir": 1,
+      "O": "5993/23040",
+      "O_flottant": 0.2601128472222222,
+      "O_en_indices": 16.647222222222222,
+      "mediane_indices": "16/1",
+      "IQR_indices": [
+        "13/1",
+        "20/1"
+      ],
+      "f": 0.27908792495472207,
+      "sigma_pm": "1/1",
+      "sigma_pm_flottant": 1.0,
+      "n_paires_avec_intersection": 360,
+      "accord_numerateur": 5993,
+      "accord_denominateur": 5993,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": "SANS OBJET",
+        "|A∩B|=2": "SANS OBJET",
+        "|A∩B|=3": 1.0,
+        "|A∩B|=4": 1.0,
+        "|A∩B|=5": "SANS OBJET",
+        "|A∩B|>=6": 1.0
+      },
+      "cos_moyen": 0.27658806387056156,
+      "O_cos_conjoint": {
+        "O_moyen": 0.2601128472222222,
+        "cos_moyen": 0.27658806387056156,
+        "corr_O_cos": 0.9954355385830933
+      },
+      "p_sym_median": 14,
+      "p_sym_distribution": {
+        "min": 2,
+        "q1": 11,
+        "median": 14,
+        "q3": 17,
+        "max": 32
+      },
+      "p_pair_median": 4,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 360,
+      "p_sym_cellule": {
+        "O_en_indices": 16.647222222222222,
+        "cos_de_la_cellule": 0.27658806387056156,
+        "p_sym_realise_median": 14,
+        "exces_O_moins_p_sym_realise_median": 2.647222222222222,
+        "p_sym_theorique_du_cos_de_cellule": 14,
+        "statut_p_sym_theorique": "PASS",
+        "cum_p_theorique": 0.2800992339754033,
+        "exces_O_moins_p_sym_theorique": 2.647222222222222,
+        "raison_theorique_indisponible": null,
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|aucun|S2": {
+      "P": 540,
+      "n_dir": 1,
+      "O": "3389/17280",
+      "O_flottant": 0.1961226851851852,
+      "O_en_indices": 12.551851851851852,
+      "mediane_indices": "12/1",
+      "IQR_indices": [
+        "10/1",
+        "15/1"
+      ],
+      "f": 0.2089505944075394,
+      "sigma_pm": "1/1",
+      "sigma_pm_flottant": 1.0,
+      "n_paires_avec_intersection": 540,
+      "accord_numerateur": 6778,
+      "accord_denominateur": 6778,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": "SANS OBJET",
+        "|A∩B|=2": "SANS OBJET",
+        "|A∩B|=3": "SANS OBJET",
+        "|A∩B|=4": 1.0,
+        "|A∩B|=5": 1.0,
+        "|A∩B|>=6": 1.0
+      },
+      "cos_moyen": 0.20695694009610735,
+      "O_cos_conjoint": {
+        "O_moyen": 0.1961226851851852,
+        "cos_moyen": 0.20695694009610735,
+        "corr_O_cos": 0.9916873256570635
+      },
+      "p_sym_median": 10,
+      "p_sym_distribution": {
+        "min": 3,
+        "q1": 8,
+        "median": 10,
+        "q3": 13,
+        "max": 22
+      },
+      "p_pair_median": 2,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 540,
+      "p_sym_cellule": {
+        "O_en_indices": 12.551851851851852,
+        "cos_de_la_cellule": 0.20695694009610735,
+        "p_sym_realise_median": 10,
+        "exces_O_moins_p_sym_realise_median": 2.5518518518518523,
+        "p_sym_theorique_du_cos_de_cellule": 10,
+        "statut_p_sym_theorique": "PASS",
+        "cum_p_theorique": 0.2094909941887095,
+        "exces_O_moins_p_sym_theorique": 2.5518518518518523,
+        "raison_theorique_indisponible": null,
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|aucun|S1": {
+      "P": 2160,
+      "n_dir": 1,
+      "O": "32251/138240",
+      "O_flottant": 0.23329716435185185,
+      "O_en_indices": 14.931018518518519,
+      "mediane_indices": "14/1",
+      "IQR_indices": [
+        "12/1",
+        "18/1"
+      ],
+      "f": 0.2502159476127415,
+      "sigma_pm": "1/1",
+      "sigma_pm_flottant": 1.0,
+      "n_paires_avec_intersection": 2160,
+      "accord_numerateur": 32251,
+      "accord_denominateur": 32251,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": "SANS OBJET",
+        "|A∩B|=2": "SANS OBJET",
+        "|A∩B|=3": 1.0,
+        "|A∩B|=4": 1.0,
+        "|A∩B|=5": 1.0,
+        "|A∩B|>=6": 1.0
+      },
+      "cos_moyen": 0.24789006929315516,
+      "O_cos_conjoint": {
+        "O_moyen": 0.23329716435185185,
+        "cos_moyen": 0.24789006929315516,
+        "corr_O_cos": 0.9936460703807242
+      },
+      "p_sym_median": 12,
+      "p_sym_distribution": {
+        "min": 2,
+        "q1": 10,
+        "median": 12,
+        "q3": 15,
+        "max": 29
+      },
+      "p_pair_median": 3,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 2160,
+      "p_sym_cellule": {
+        "O_en_indices": 14.931018518518519,
+        "cos_de_la_cellule": 0.24789006929315516,
+        "p_sym_realise_median": 12,
+        "exces_O_moins_p_sym_realise_median": 2.9310185185185187,
+        "p_sym_theorique_du_cos_de_cellule": 13,
+        "statut_p_sym_theorique": "PASS",
+        "cum_p_theorique": 0.26282661747282,
+        "exces_O_moins_p_sym_theorique": 1.9310185185185187,
+        "raison_theorique_indisponible": null,
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|aucun|S0": {
+      "P": 7560,
+      "n_dir": 1,
+      "O": "17287/96768",
+      "O_flottant": 0.17864376653439154,
+      "O_en_indices": 11.433201058201059,
+      "mediane_indices": "11/1",
+      "IQR_indices": [
+        "9/1",
+        "14/1"
+      ],
+      "f": 0.19052066619654967,
+      "sigma_pm": "1/1",
+      "sigma_pm_flottant": 1.0,
+      "n_paires_avec_intersection": 7560,
+      "accord_numerateur": 86435,
+      "accord_denominateur": 86435,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": 1.0,
+        "|A∩B|=2": 1.0,
+        "|A∩B|=3": 1.0,
+        "|A∩B|=4": 1.0,
+        "|A∩B|=5": 1.0,
+        "|A∩B|>=6": 1.0
+      },
+      "cos_moyen": 0.18864584100542842,
+      "O_cos_conjoint": {
+        "O_moyen": 0.17864376653439154,
+        "cos_moyen": 0.18864584100542842,
+        "corr_O_cos": 0.9918916496986513
+      },
+      "p_sym_median": 9,
+      "p_sym_distribution": {
+        "min": 1,
+        "q1": 7,
+        "median": 9,
+        "q3": 11,
+        "max": 23
+      },
+      "p_pair_median": 2,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 7560,
+      "p_sym_cellule": {
+        "O_en_indices": 11.433201058201059,
+        "cos_de_la_cellule": 0.18864584100542842,
+        "p_sym_realise_median": 9,
+        "exces_O_moins_p_sym_realise_median": 2.4332010582010586,
+        "p_sym_theorique_du_cos_de_cellule": 9,
+        "statut_p_sym_theorique": "PASS",
+        "cum_p_theorique": 0.19112943689802347,
+        "exces_O_moins_p_sym_theorique": 2.4332010582010586,
+        "raison_theorique_indisponible": null,
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|glob|S3": {
+      "P": 360,
+      "n_dir": 1,
+      "O": "109/2880",
+      "O_flottant": 0.03784722222222222,
+      "O_en_indices": 2.422222222222222,
+      "mediane_indices": "2/1",
+      "IQR_indices": [
+        "1/1",
+        "3/1"
+      ],
+      "f": 0.040510071156296436,
+      "sigma_pm": "106/109",
+      "sigma_pm_flottant": 0.9724770642201835,
+      "n_paires_avec_intersection": 275,
+      "accord_numerateur": 848,
+      "accord_denominateur": 872,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": 0.858696,
+        "|A∩B|=2": 0.9375,
+        "|A∩B|=3": 0.982906,
+        "|A∩B|=4": 0.990741,
+        "|A∩B|=5": 1.0,
+        "|A∩B|>=6": 0.996951
+      },
+      "cos_moyen": 0.03810219533322234,
+      "O_cos_conjoint": {
+        "O_moyen": 0.03784722222222222,
+        "cos_moyen": 0.03810219533322234,
+        "corr_O_cos": 0.9807278864500983
+      },
+      "p_sym_median": 1,
+      "p_sym_distribution": {
+        "min": 0,
+        "q1": 1,
+        "median": 1,
+        "q3": 3,
+        "max": 12
+      },
+      "p_pair_median": 1,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 360,
+      "p_sym_cellule": {
+        "O_en_indices": 2.422222222222222,
+        "cos_de_la_cellule": 0.03810219533322234,
+        "p_sym_realise_median": 1,
+        "exces_O_moins_p_sym_realise_median": 1.422222222222222,
+        "p_sym_theorique_du_cos_de_cellule": 2,
+        "statut_p_sym_theorique": "PASS",
+        "cum_p_theorique": 0.04953839736004194,
+        "exces_O_moins_p_sym_theorique": 0.42222222222222205,
+        "raison_theorique_indisponible": null,
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|glob|S2": {
+      "P": 540,
+      "n_dir": 1,
+      "O": "137/11520",
+      "O_flottant": 0.01189236111111111,
+      "O_en_indices": 0.7611111111111111,
+      "mediane_indices": "1/1",
+      "IQR_indices": [
+        "0/1",
+        "1/1"
+      ],
+      "f": 0.011990551808236586,
+      "sigma_pm": "329/411",
+      "sigma_pm_flottant": 0.8004866180048662,
+      "n_paires_avec_intersection": 289,
+      "accord_numerateur": 329,
+      "accord_denominateur": 411,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": 0.756345,
+        "|A∩B|=2": 0.852941,
+        "|A∩B|=3": 0.824561,
+        "|A∩B|=4": 0.75,
+        "|A∩B|=5": 1.0,
+        "|A∩B|>=6": "SANS OBJET"
+      },
+      "cos_moyen": 0.007281069807139689,
+      "O_cos_conjoint": {
+        "O_moyen": 0.01189236111111111,
+        "cos_moyen": 0.007281069807139689,
+        "corr_O_cos": 0.5939354259922913
+      },
+      "p_sym_median": 1,
+      "p_sym_distribution": {
+        "min": 0,
+        "q1": 0,
+        "median": 1,
+        "q3": 1,
+        "max": 4
+      },
+      "p_pair_median": 1,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 540,
+      "p_sym_cellule": {
+        "O_en_indices": 0.7611111111111111,
+        "cos_de_la_cellule": 0.007281069807139689,
+        "p_sym_realise_median": 1,
+        "exces_O_moins_p_sym_realise_median": -0.23888888888888893,
+        "p_sym_theorique_du_cos_de_cellule": 1,
+        "statut_p_sym_theorique": "PASS",
+        "cum_p_theorique": 0.025913678708218348,
+        "exces_O_moins_p_sym_theorique": -0.23888888888888893,
+        "raison_theorique_indisponible": null,
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|glob|S1": {
+      "P": 2160,
+      "n_dir": 1,
+      "O": "155/6912",
+      "O_flottant": 0.022424768518518517,
+      "O_en_indices": 1.4351851851851851,
+      "mediane_indices": "1/1",
+      "IQR_indices": [
+        "0/1",
+        "2/1"
+      ],
+      "f": 0.023551274228176575,
+      "sigma_pm": "747/775",
+      "sigma_pm_flottant": 0.9638709677419355,
+      "n_paires_avec_intersection": 1429,
+      "accord_numerateur": 2988,
+      "accord_denominateur": 3100,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": 0.902477,
+        "|A∩B|=2": 0.962141,
+        "|A∩B|=3": 0.978654,
+        "|A∩B|=4": 0.985294,
+        "|A∩B|=5": 0.988,
+        "|A∩B|>=6": 1.0
+      },
+      "cos_moyen": 0.02171946652211784,
+      "O_cos_conjoint": {
+        "O_moyen": 0.022424768518518517,
+        "cos_moyen": 0.02171946652211784,
+        "corr_O_cos": 0.9619417066172987
+      },
+      "p_sym_median": 1,
+      "p_sym_distribution": {
+        "min": 0,
+        "q1": 0,
+        "median": 1,
+        "q3": 2,
+        "max": 10
+      },
+      "p_pair_median": 1,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 2160,
+      "p_sym_cellule": {
+        "O_en_indices": 1.4351851851851851,
+        "cos_de_la_cellule": 0.02171946652211784,
+        "p_sym_realise_median": 1,
+        "exces_O_moins_p_sym_realise_median": 0.4351851851851851,
+        "p_sym_theorique_du_cos_de_cellule": 1,
+        "statut_p_sym_theorique": "PASS",
+        "cum_p_theorique": 0.025913678708218348,
+        "exces_O_moins_p_sym_theorique": 0.4351851851851851,
+        "raison_theorique_indisponible": null,
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|glob|S0": {
+      "P": 7560,
+      "n_dir": 1,
+      "O": "2431/241920",
+      "O_flottant": 0.010048776455026455,
+      "O_en_indices": 0.6431216931216931,
+      "mediane_indices": "0/1",
+      "IQR_indices": [
+        "0/1",
+        "1/1"
+      ],
+      "f": 0.010154454962535149,
+      "sigma_pm": "2715/4862",
+      "sigma_pm_flottant": 0.5584121760592349,
+      "n_paires_avec_intersection": 3472,
+      "accord_numerateur": 2715,
+      "accord_denominateur": 4862,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": 0.523135,
+        "|A∩B|=2": 0.548585,
+        "|A∩B|=3": 0.655608,
+        "|A∩B|=4": 0.784884,
+        "|A∩B|=5": 0.44,
+        "|A∩B|>=6": 1.0
+      },
+      "cos_moyen": 0.001214332056532445,
+      "O_cos_conjoint": {
+        "O_moyen": 0.010048776455026455,
+        "cos_moyen": 0.001214332056532445,
+        "corr_O_cos": 0.182331342237463
+      },
+      "p_sym_median": 0,
+      "p_sym_distribution": {
+        "min": 0,
+        "q1": 0,
+        "median": 0,
+        "q3": 1,
+        "max": 5
+      },
+      "p_pair_median": 0,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 7560,
+      "p_sym_cellule": {
+        "O_en_indices": 0.6431216931216931,
+        "cos_de_la_cellule": 0.001214332056532445,
+        "p_sym_realise_median": 0,
+        "exces_O_moins_p_sym_realise_median": 0.6431216931216931,
+        "p_sym_theorique_du_cos_de_cellule": 1,
+        "statut_p_sym_theorique": "PASS",
+        "cum_p_theorique": 0.025913678708218348,
+        "exces_O_moins_p_sym_theorique": -0.3568783068783069,
+        "raison_theorique_indisponible": null,
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|type|S3": {
+      "P": 360,
+      "n_dir": 1,
+      "O": "271/7680",
+      "O_flottant": 0.03528645833333333,
+      "O_en_indices": 2.2583333333333333,
+      "mediane_indices": "1/1",
+      "IQR_indices": [
+        "0/1",
+        "3/1"
+      ],
+      "f": 0.037642034735214616,
+      "sigma_pm": "262/271",
+      "sigma_pm_flottant": 0.966789667896679,
+      "n_paires_avec_intersection": 264,
+      "accord_numerateur": 786,
+      "accord_denominateur": 813,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": 0.87234,
+        "|A∩B|=2": 0.918033,
+        "|A∩B|=3": 1.0,
+        "|A∩B|=4": 0.965909,
+        "|A∩B|=5": 0.988889,
+        "|A∩B|>=6": 0.997041
+      },
+      "cos_moyen": 0.03492922481884796,
+      "O_cos_conjoint": {
+        "O_moyen": 0.03528645833333333,
+        "cos_moyen": 0.03492922481884796,
+        "corr_O_cos": 0.9766417659899872
+      },
+      "p_sym_median": 1,
+      "p_sym_distribution": {
+        "min": 0,
+        "q1": 0,
+        "median": 1,
+        "q3": 2,
+        "max": 11
+      },
+      "p_pair_median": 1,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 360,
+      "p_sym_cellule": {
+        "O_en_indices": 2.2583333333333333,
+        "cos_de_la_cellule": 0.03492922481884796,
+        "p_sym_realise_median": 1,
+        "exces_O_moins_p_sym_realise_median": 1.2583333333333333,
+        "p_sym_theorique_du_cos_de_cellule": 2,
+        "statut_p_sym_theorique": "PASS",
+        "cum_p_theorique": 0.04953839736004194,
+        "exces_O_moins_p_sym_theorique": 0.2583333333333333,
+        "raison_theorique_indisponible": null,
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|type|S2": {
+      "P": 540,
+      "n_dir": 1,
+      "O": "113/11520",
+      "O_flottant": 0.009809027777777778,
+      "O_en_indices": 0.6277777777777778,
+      "mediane_indices": "0/1",
+      "IQR_indices": [
+        "0/1",
+        "1/1"
+      ],
+      "f": 0.00979576664714869,
+      "sigma_pm": "223/339",
+      "sigma_pm_flottant": 0.6578171091445427,
+      "n_paires_avec_intersection": 257,
+      "accord_numerateur": 223,
+      "accord_denominateur": 339,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": 0.663265,
+        "|A∩B|=2": 0.663043,
+        "|A∩B|=3": 0.592593,
+        "|A∩B|=4": 0.666667,
+        "|A∩B|=5": "SANS OBJET",
+        "|A∩B|>=6": "SANS OBJET"
+      },
+      "cos_moyen": 0.003091446496355356,
+      "O_cos_conjoint": {
+        "O_moyen": 0.009809027777777778,
+        "cos_moyen": 0.003091446496355356,
+        "corr_O_cos": 0.27710912582421887
+      },
+      "p_sym_median": 0,
+      "p_sym_distribution": {
+        "min": 0,
+        "q1": 0,
+        "median": 0,
+        "q3": 1,
+        "max": 3
+      },
+      "p_pair_median": 0,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 540,
+      "p_sym_cellule": {
+        "O_en_indices": 0.6277777777777778,
+        "cos_de_la_cellule": 0.003091446496355356,
+        "p_sym_realise_median": 0,
+        "exces_O_moins_p_sym_realise_median": 0.6277777777777778,
+        "p_sym_theorique_du_cos_de_cellule": 1,
+        "statut_p_sym_theorique": "PASS",
+        "cum_p_theorique": 0.025913678708218348,
+        "exces_O_moins_p_sym_theorique": -0.37222222222222223,
+        "raison_theorique_indisponible": null,
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|type|S1": {
+      "P": 2160,
+      "n_dir": 1,
+      "O": "2681/138240",
+      "O_flottant": 0.019393807870370372,
+      "O_en_indices": 1.2412037037037038,
+      "mediane_indices": "1/1",
+      "IQR_indices": [
+        "0/1",
+        "2/1"
+      ],
+      "f": 0.020321968359023574,
+      "sigma_pm": "2525/2681",
+      "sigma_pm_flottant": 0.9418127564341664,
+      "n_paires_avec_intersection": 1319,
+      "accord_numerateur": 2525,
+      "accord_denominateur": 2681,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": 0.850837,
+        "|A∩B|=2": 0.937879,
+        "|A∩B|=3": 0.978304,
+        "|A∩B|=4": 0.981343,
+        "|A∩B|=5": 1.0,
+        "|A∩B|>=6": 0.997361
+      },
+      "cos_moyen": 0.017901620410795016,
+      "O_cos_conjoint": {
+        "O_moyen": 0.019393807870370372,
+        "cos_moyen": 0.017901620410795016,
+        "corr_O_cos": 0.9402798686728416
+      },
+      "p_sym_median": 1,
+      "p_sym_distribution": {
+        "min": 0,
+        "q1": 0,
+        "median": 1,
+        "q3": 2,
+        "max": 8
+      },
+      "p_pair_median": 1,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 2160,
+      "p_sym_cellule": {
+        "O_en_indices": 1.2412037037037038,
+        "cos_de_la_cellule": 0.017901620410795016,
+        "p_sym_realise_median": 1,
+        "exces_O_moins_p_sym_realise_median": 0.2412037037037038,
+        "p_sym_theorique_du_cos_de_cellule": 1,
+        "statut_p_sym_theorique": "PASS",
+        "cum_p_theorique": 0.025913678708218348,
+        "exces_O_moins_p_sym_theorique": 0.2412037037037038,
+        "raison_theorique_indisponible": null,
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|type|S0": {
+      "P": 7560,
+      "n_dir": 1,
+      "O": "5083/483840",
+      "O_flottant": 0.010505539021164021,
+      "O_en_indices": 0.6723544973544974,
+      "mediane_indices": "0/1",
+      "IQR_indices": [
+        "0/1",
+        "1/1"
+      ],
+      "f": 0.01059710318506097,
+      "sigma_pm": "1994/5083",
+      "sigma_pm_flottant": 0.39228801888648435,
+      "n_paires_avec_intersection": 3605,
+      "accord_numerateur": 1994,
+      "accord_denominateur": 5083,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": 0.386861,
+        "|A∩B|=2": 0.395713,
+        "|A∩B|=3": 0.393393,
+        "|A∩B|=4": 0.411111,
+        "|A∩B|=5": 0.466667,
+        "|A∩B|>=6": "SANS OBJET"
+      },
+      "cos_moyen": -0.002299031614417366,
+      "O_cos_conjoint": {
+        "O_moyen": 0.010505539021164021,
+        "cos_moyen": -0.002299031614417366,
+        "corr_O_cos": -0.18276197398611388
+      },
+      "p_sym_median": 0,
+      "p_sym_distribution": {
+        "min": 0,
+        "q1": 0,
+        "median": 0,
+        "q3": 1,
+        "max": 4
+      },
+      "p_pair_median": 0,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 1,
+      "n_decidees_par_la_tolerance": 1,
+      "paires_verifiees": 7560,
+      "p_sym_cellule": {
+        "O_en_indices": 0.6723544973544974,
+        "cos_de_la_cellule": -0.002299031614417366,
+        "p_sym_realise_median": 0,
+        "exces_O_moins_p_sym_realise_median": 0.6723544973544974,
+        "p_sym_theorique_du_cos_de_cellule": 0,
+        "statut_p_sym_theorique": "PASS",
+        "cum_p_theorique": 0.0,
+        "exces_O_moins_p_sym_theorique": 0.6723544973544974,
+        "raison_theorique_indisponible": null,
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|auto|S3": {
+      "P": 360,
+      "n_dir": 1,
+      "O": "2999/11520",
+      "O_flottant": 0.2603298611111111,
+      "O_en_indices": 16.66111111111111,
+      "mediane_indices": "16/1",
+      "IQR_indices": [
+        "13/1",
+        "20/1"
+      ],
+      "f": 0.27934317243235607,
+      "sigma_pm": "1/1",
+      "sigma_pm_flottant": 1.0,
+      "n_paires_avec_intersection": 360,
+      "accord_numerateur": 5998,
+      "accord_denominateur": 5998,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": "SANS OBJET",
+        "|A∩B|=2": "SANS OBJET",
+        "|A∩B|=3": 1.0,
+        "|A∩B|=4": 1.0,
+        "|A∩B|=5": 1.0,
+        "|A∩B|>=6": 1.0
+      },
+      "cos_moyen": 0.2768285532043604,
+      "O_cos_conjoint": {
+        "O_moyen": 0.2603298611111111,
+        "cos_moyen": 0.2768285532043604,
+        "corr_O_cos": 0.9955947297599791
+      },
+      "p_sym_median": 14,
+      "p_sym_distribution": {
+        "min": 2,
+        "q1": 11,
+        "median": 14,
+        "q3": 17,
+        "max": 32
+      },
+      "p_pair_median": 4,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 360,
+      "p_sym_cellule": {
+        "O_en_indices": 16.66111111111111,
+        "cos_de_la_cellule": 0.2768285532043604,
+        "p_sym_realise_median": 14,
+        "exces_O_moins_p_sym_realise_median": 2.6611111111111114,
+        "p_sym_theorique_du_cos_de_cellule": 14,
+        "statut_p_sym_theorique": "PASS",
+        "cum_p_theorique": 0.2800992339754033,
+        "exces_O_moins_p_sym_theorique": 2.6611111111111114,
+        "raison_theorique_indisponible": null,
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|auto|S2": {
+      "P": 540,
+      "n_dir": 1,
+      "O": "6781/34560",
+      "O_flottant": 0.19620949074074073,
+      "O_en_indices": 12.557407407407407,
+      "mediane_indices": "12/1",
+      "IQR_indices": [
+        "10/1",
+        "15/1"
+      ],
+      "f": 0.20903563829991906,
+      "sigma_pm": "1/1",
+      "sigma_pm_flottant": 1.0,
+      "n_paires_avec_intersection": 540,
+      "accord_numerateur": 6781,
+      "accord_denominateur": 6781,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": "SANS OBJET",
+        "|A∩B|=2": "SANS OBJET",
+        "|A∩B|=3": "SANS OBJET",
+        "|A∩B|=4": 1.0,
+        "|A∩B|=5": 1.0,
+        "|A∩B|>=6": 1.0
+      },
+      "cos_moyen": 0.20703817870150285,
+      "O_cos_conjoint": {
+        "O_moyen": 0.19620949074074073,
+        "cos_moyen": 0.20703817870150285,
+        "corr_O_cos": 0.9915807681784201
+      },
+      "p_sym_median": 10,
+      "p_sym_distribution": {
+        "min": 3,
+        "q1": 8,
+        "median": 10,
+        "q3": 13,
+        "max": 21
+      },
+      "p_pair_median": 2,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 540,
+      "p_sym_cellule": {
+        "O_en_indices": 12.557407407407407,
+        "cos_de_la_cellule": 0.20703817870150285,
+        "p_sym_realise_median": 10,
+        "exces_O_moins_p_sym_realise_median": 2.557407407407407,
+        "p_sym_theorique_du_cos_de_cellule": 10,
+        "statut_p_sym_theorique": "PASS",
+        "cum_p_theorique": 0.2094909941887095,
+        "exces_O_moins_p_sym_theorique": 2.557407407407407,
+        "raison_theorique_indisponible": null,
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|auto|S1": {
+      "P": 2160,
+      "n_dir": 1,
+      "O": "32309/138240",
+      "O_flottant": 0.23371672453703704,
+      "O_en_indices": 14.95787037037037,
+      "mediane_indices": "14/1",
+      "IQR_indices": [
+        "12/1",
+        "18/1"
+      ],
+      "f": 0.250544561888639,
+      "sigma_pm": "1/1",
+      "sigma_pm_flottant": 1.0,
+      "n_paires_avec_intersection": 2160,
+      "accord_numerateur": 32309,
+      "accord_denominateur": 32309,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": "SANS OBJET",
+        "|A∩B|=2": "SANS OBJET",
+        "|A∩B|=3": 1.0,
+        "|A∩B|=4": 1.0,
+        "|A∩B|=5": 1.0,
+        "|A∩B|>=6": 1.0
+      },
+      "cos_moyen": 0.24821695743476938,
+      "O_cos_conjoint": {
+        "O_moyen": 0.23371672453703704,
+        "cos_moyen": 0.24821695743476938,
+        "corr_O_cos": 0.9935092001004513
+      },
+      "p_sym_median": 12,
+      "p_sym_distribution": {
+        "min": 2,
+        "q1": 10,
+        "median": 12,
+        "q3": 15,
+        "max": 29
+      },
+      "p_pair_median": 3,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 2160,
+      "p_sym_cellule": {
+        "O_en_indices": 14.95787037037037,
+        "cos_de_la_cellule": 0.24821695743476938,
+        "p_sym_realise_median": 12,
+        "exces_O_moins_p_sym_realise_median": 2.9578703703703706,
+        "p_sym_theorique_du_cos_de_cellule": 13,
+        "statut_p_sym_theorique": "PASS",
+        "cum_p_theorique": 0.26282661747282,
+        "exces_O_moins_p_sym_theorique": 1.9578703703703706,
+        "raison_theorique_indisponible": null,
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|auto|S0": {
+      "P": 7560,
+      "n_dir": 1,
+      "O": "86399/483840",
+      "O_flottant": 0.17856936177248678,
+      "O_en_indices": 11.428439153439154,
+      "mediane_indices": "11/1",
+      "IQR_indices": [
+        "9/1",
+        "14/1"
+      ],
+      "f": 0.19040888728669017,
+      "sigma_pm": "1/1",
+      "sigma_pm_flottant": 1.0,
+      "n_paires_avec_intersection": 7560,
+      "accord_numerateur": 86399,
+      "accord_denominateur": 86399,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": 1.0,
+        "|A∩B|=2": 1.0,
+        "|A∩B|=3": 1.0,
+        "|A∩B|=4": 1.0,
+        "|A∩B|=5": 1.0,
+        "|A∩B|>=6": 1.0
+      },
+      "cos_moyen": 0.18853640924311854,
+      "O_cos_conjoint": {
+        "O_moyen": 0.17856936177248678,
+        "cos_moyen": 0.18853640924311854,
+        "corr_O_cos": 0.9918777049501984
+      },
+      "p_sym_median": 9,
+      "p_sym_distribution": {
+        "min": 1,
+        "q1": 7,
+        "median": 9,
+        "q3": 11,
+        "max": 23
+      },
+      "p_pair_median": 2,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 7560,
+      "p_sym_cellule": {
+        "O_en_indices": 11.428439153439154,
+        "cos_de_la_cellule": 0.18853640924311854,
+        "p_sym_realise_median": 9,
+        "exces_O_moins_p_sym_realise_median": 2.428439153439154,
+        "p_sym_theorique_du_cos_de_cellule": 9,
+        "statut_p_sym_theorique": "PASS",
+        "cum_p_theorique": 0.19112943689802347,
+        "exces_O_moins_p_sym_theorique": 2.428439153439154,
+        "raison_theorique_indisponible": null,
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|plac|S3": {
+      "P": 360,
+      "n_dir": 17,
+      "O": "53597/130560",
+      "O_flottant": 0.41051623774509804,
+      "O_en_indices": 26.273039215686275,
+      "mediane_indices": "445/17",
+      "IQR_indices": [
+        "392/17",
+        "29/1"
+      ],
+      "f": 0.6344336054518722,
+      "sigma_pm": "1/1",
+      "sigma_pm_flottant": 1.0,
+      "n_paires_avec_intersection": 360,
+      "accord_numerateur": 160791,
+      "accord_denominateur": 160791,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": "SANS OBJET",
+        "|A∩B|=2": "SANS OBJET",
+        "|A∩B|=3": "SANS OBJET",
+        "|A∩B|=4": "SANS OBJET",
+        "|A∩B|=5": "SANS OBJET",
+        "|A∩B|>=6": 1.0
+      },
+      "cos_moyen": 0.6322036834329571,
+      "O_cos_conjoint": {
+        "O_moyen": 0.41051623774509804,
+        "cos_moyen": 0.6322036834329571,
+        "corr_O_cos": 0.9900272126290488
+      },
+      "p_sym_median": 23,
+      "p_sym_distribution": {
+        "min": 9,
+        "q1": 19,
+        "median": 23,
+        "q3": 27,
+        "max": 41
+      },
+      "p_pair_median": 4,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 6120,
+      "p_sym_cellule": {
+        "O_en_indices": 26.273039215686275,
+        "cos_de_la_cellule": 0.6322036834329571,
+        "p_sym_realise_median": 23,
+        "exces_O_moins_p_sym_realise_median": 3.273039215686275,
+        "p_sym_theorique_du_cos_de_cellule": null,
+        "statut_p_sym_theorique": "EN-ATTENTE",
+        "cum_p_theorique": null,
+        "exces_O_moins_p_sym_theorique": null,
+        "raison_theorique_indisponible": "cos = 0.63220 dépasse cum(20) = 0.37951 : la valeur exige la table j = 8..20 de Q-M6. Aucune interpolation, aucune extrapolation (règle Q-M5).",
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|plac|S2": {
+      "P": 540,
+      "n_dir": 17,
+      "O": "205517/587520",
+      "O_flottant": 0.3498042619825708,
+      "O_en_indices": 22.38747276688453,
+      "mediane_indices": "379/17",
+      "IQR_indices": [
+        "353/17",
+        "406/17"
+      ],
+      "f": 0.5921746534756475,
+      "sigma_pm": "1/1",
+      "sigma_pm_flottant": 1.0,
+      "n_paires_avec_intersection": 540,
+      "accord_numerateur": 205517,
+      "accord_denominateur": 205517,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": "SANS OBJET",
+        "|A∩B|=2": "SANS OBJET",
+        "|A∩B|=3": "SANS OBJET",
+        "|A∩B|=4": "SANS OBJET",
+        "|A∩B|=5": "SANS OBJET",
+        "|A∩B|>=6": 1.0
+      },
+      "cos_moyen": 0.5900147661150362,
+      "O_cos_conjoint": {
+        "O_moyen": 0.3498042619825708,
+        "cos_moyen": 0.5900147661150362,
+        "corr_O_cos": 0.9657157734511073
+      },
+      "p_sym_median": 19,
+      "p_sym_distribution": {
+        "min": 11,
+        "q1": 16,
+        "median": 19,
+        "q3": 22,
+        "max": 32
+      },
+      "p_pair_median": 1,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 9180,
+      "p_sym_cellule": {
+        "O_en_indices": 22.38747276688453,
+        "cos_de_la_cellule": 0.5900147661150362,
+        "p_sym_realise_median": 19,
+        "exces_O_moins_p_sym_realise_median": 3.3874727668845317,
+        "p_sym_theorique_du_cos_de_cellule": null,
+        "statut_p_sym_theorique": "EN-ATTENTE",
+        "cum_p_theorique": null,
+        "exces_O_moins_p_sym_theorique": null,
+        "raison_theorique_indisponible": "cos = 0.59001 dépasse cum(20) = 0.37951 : la valeur exige la table j = 8..20 de Q-M6. Aucune interpolation, aucune extrapolation (règle Q-M5).",
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|plac|S1": {
+      "P": 2160,
+      "n_dir": 17,
+      "O": "22519/58752",
+      "O_flottant": 0.3832890795206972,
+      "O_en_indices": 24.53050108932462,
+      "mediane_indices": "411/17",
+      "IQR_indices": [
+        "378/17",
+        "452/17"
+      ],
+      "f": 0.6157337950488699,
+      "sigma_pm": "1/1",
+      "sigma_pm_flottant": 1.0,
+      "n_paires_avec_intersection": 2160,
+      "accord_numerateur": 900760,
+      "accord_denominateur": 900760,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": "SANS OBJET",
+        "|A∩B|=2": "SANS OBJET",
+        "|A∩B|=3": "SANS OBJET",
+        "|A∩B|=4": "SANS OBJET",
+        "|A∩B|=5": "SANS OBJET",
+        "|A∩B|>=6": 1.0
+      },
+      "cos_moyen": 0.613509107294475,
+      "O_cos_conjoint": {
+        "O_moyen": 0.3832890795206972,
+        "cos_moyen": 0.613509107294475,
+        "corr_O_cos": 0.983927971553683
+      },
+      "p_sym_median": 21,
+      "p_sym_distribution": {
+        "min": 9,
+        "q1": 18,
+        "median": 21,
+        "q3": 24,
+        "max": 35
+      },
+      "p_pair_median": 2,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 36720,
+      "p_sym_cellule": {
+        "O_en_indices": 24.53050108932462,
+        "cos_de_la_cellule": 0.613509107294475,
+        "p_sym_realise_median": 21,
+        "exces_O_moins_p_sym_realise_median": 3.53050108932462,
+        "p_sym_theorique_du_cos_de_cellule": null,
+        "statut_p_sym_theorique": "EN-ATTENTE",
+        "cum_p_theorique": null,
+        "exces_O_moins_p_sym_theorique": null,
+        "raison_theorique_indisponible": "cos = 0.61351 dépasse cum(20) = 0.37951 : la valeur exige la table j = 8..20 de Q-M6. Aucune interpolation, aucune extrapolation (règle Q-M5).",
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|plac|S0": {
+      "P": 7560,
+      "n_dir": 17,
+      "O": "1573/4760",
+      "O_flottant": 0.33046218487394957,
+      "O_en_indices": 21.149579831932773,
+      "mediane_indices": "358/17",
+      "IQR_indices": [
+        "331/17",
+        "386/17"
+      ],
+      "f": 0.5787230313780154,
+      "sigma_pm": "1/1",
+      "sigma_pm_flottant": 1.0,
+      "n_paires_avec_intersection": 7560,
+      "accord_numerateur": 2718144,
+      "accord_denominateur": 2718144,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": "SANS OBJET",
+        "|A∩B|=2": "SANS OBJET",
+        "|A∩B|=3": "SANS OBJET",
+        "|A∩B|=4": "SANS OBJET",
+        "|A∩B|=5": "SANS OBJET",
+        "|A∩B|>=6": 1.0
+      },
+      "cos_moyen": 0.5765569695057887,
+      "O_cos_conjoint": {
+        "O_moyen": 0.33046218487394957,
+        "cos_moyen": 0.5765569695057887,
+        "corr_O_cos": 0.9674969376899938
+      },
+      "p_sym_median": 17,
+      "p_sym_distribution": {
+        "min": 6,
+        "q1": 15,
+        "median": 17,
+        "q3": 20,
+        "max": 33
+      },
+      "p_pair_median": 1,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 128520,
+      "p_sym_cellule": {
+        "O_en_indices": 21.149579831932773,
+        "cos_de_la_cellule": 0.5765569695057887,
+        "p_sym_realise_median": 17,
+        "exces_O_moins_p_sym_realise_median": 4.149579831932773,
+        "p_sym_theorique_du_cos_de_cellule": null,
+        "statut_p_sym_theorique": "EN-ATTENTE",
+        "cum_p_theorique": null,
+        "exces_O_moins_p_sym_theorique": null,
+        "raison_theorique_indisponible": "cos = 0.57656 dépasse cum(20) = 0.37951 : la valeur exige la table j = 8..20 de Q-M6. Aucune interpolation, aucune extrapolation (règle Q-M5).",
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|type_sh|S3": {
+      "P": 120,
+      "n_dir": 1,
+      "O": "79/1920",
+      "O_flottant": 0.04114583333333333,
+      "O_en_indices": 2.6333333333333333,
+      "mediane_indices": "2/1",
+      "IQR_indices": [
+        "0/1",
+        "4/1"
+      ],
+      "f": 0.04365391816529184,
+      "sigma_pm": "311/316",
+      "sigma_pm_flottant": 0.9841772151898734,
+      "n_paires_avec_intersection": 86,
+      "accord_numerateur": 311,
+      "accord_denominateur": 316,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": 0.863636,
+        "|A∩B|=2": 1.0,
+        "|A∩B|=3": 1.0,
+        "|A∩B|=4": 0.954545,
+        "|A∩B|=5": 1.0,
+        "|A∩B|>=6": 1.0
+      },
+      "cos_moyen": 0.04178692048320372,
+      "O_cos_conjoint": {
+        "O_moyen": 0.04114583333333333,
+        "cos_moyen": 0.04178692048320372,
+        "corr_O_cos": 0.9842024468772614
+      },
+      "p_sym_median": 1,
+      "p_sym_distribution": {
+        "min": 0,
+        "q1": 0,
+        "median": 1,
+        "q3": 3,
+        "max": 11
+      },
+      "p_pair_median": 1,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 120,
+      "p_sym_cellule": {
+        "O_en_indices": 2.6333333333333333,
+        "cos_de_la_cellule": 0.04178692048320372,
+        "p_sym_realise_median": 1,
+        "exces_O_moins_p_sym_realise_median": 1.6333333333333333,
+        "p_sym_theorique_du_cos_de_cellule": 2,
+        "statut_p_sym_theorique": "PASS",
+        "cum_p_theorique": 0.04953839736004194,
+        "exces_O_moins_p_sym_theorique": 0.6333333333333333,
+        "raison_theorique_indisponible": null,
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|type_sh|S2": {
+      "P": 240,
+      "n_dir": 1,
+      "O": "149/15360",
+      "O_flottant": 0.009700520833333334,
+      "O_en_indices": 0.6208333333333333,
+      "mediane_indices": "0/1",
+      "IQR_indices": [
+        "0/1",
+        "1/1"
+      ],
+      "f": 0.00956606681200624,
+      "sigma_pm": "109/149",
+      "sigma_pm_flottant": 0.7315436241610739,
+      "n_paires_avec_intersection": 108,
+      "accord_numerateur": 109,
+      "accord_denominateur": 149,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": 0.710526,
+        "|A∩B|=2": 0.826087,
+        "|A∩B|=3": 0.62963,
+        "|A∩B|=4": "SANS OBJET",
+        "|A∩B|=5": "SANS OBJET",
+        "|A∩B|>=6": "SANS OBJET"
+      },
+      "cos_moyen": 0.004546816736984008,
+      "O_cos_conjoint": {
+        "O_moyen": 0.009700520833333334,
+        "cos_moyen": 0.004546816736984008,
+        "corr_O_cos": 0.4050851752451274
+      },
+      "p_sym_median": 0,
+      "p_sym_distribution": {
+        "min": 0,
+        "q1": 0,
+        "median": 0,
+        "q3": 1,
+        "max": 2
+      },
+      "p_pair_median": 0,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 240,
+      "p_sym_cellule": {
+        "O_en_indices": 0.6208333333333333,
+        "cos_de_la_cellule": 0.004546816736984008,
+        "p_sym_realise_median": 0,
+        "exces_O_moins_p_sym_realise_median": 0.6208333333333333,
+        "p_sym_theorique_du_cos_de_cellule": 1,
+        "statut_p_sym_theorique": "PASS",
+        "cum_p_theorique": 0.025913678708218348,
+        "exces_O_moins_p_sym_theorique": -0.37916666666666665,
+        "raison_theorique_indisponible": null,
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|type_sh|S1": {
+      "P": 1128,
+      "n_dir": 1,
+      "O": "33/1504",
+      "O_flottant": 0.021941489361702128,
+      "O_en_indices": 1.4042553191489362,
+      "mediane_indices": "1/1",
+      "IQR_indices": [
+        "0/1",
+        "2/1"
+      ],
+      "f": 0.02299348035800577,
+      "sigma_pm": "1513/1584",
+      "sigma_pm_flottant": 0.9551767676767676,
+      "n_paires_avec_intersection": 722,
+      "accord_numerateur": 1513,
+      "accord_denominateur": 1584,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": 0.882006,
+        "|A∩B|=2": 0.931953,
+        "|A∩B|=3": 0.982993,
+        "|A∩B|=4": 0.994565,
+        "|A∩B|=5": 0.992308,
+        "|A∩B|>=6": 0.996656
+      },
+      "cos_moyen": 0.020823560192186688,
+      "O_cos_conjoint": {
+        "O_moyen": 0.021941489361702128,
+        "cos_moyen": 0.020823560192186688,
+        "corr_O_cos": 0.9568585372942361
+      },
+      "p_sym_median": 1,
+      "p_sym_distribution": {
+        "min": 0,
+        "q1": 0,
+        "median": 1,
+        "q3": 2,
+        "max": 7
+      },
+      "p_pair_median": 1,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 1128,
+      "p_sym_cellule": {
+        "O_en_indices": 1.4042553191489362,
+        "cos_de_la_cellule": 0.020823560192186688,
+        "p_sym_realise_median": 1,
+        "exces_O_moins_p_sym_realise_median": 0.4042553191489362,
+        "p_sym_theorique_du_cos_de_cellule": 1,
+        "statut_p_sym_theorique": "PASS",
+        "cum_p_theorique": 0.025913678708218348,
+        "exces_O_moins_p_sym_theorique": 0.4042553191489362,
+        "raison_theorique_indisponible": null,
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|type_sh|S0": {
+      "P": 3732,
+      "n_dir": 1,
+      "O": "631/59712",
+      "O_flottant": 0.010567390139335477,
+      "O_en_indices": 0.6763129689174705,
+      "mediane_indices": "0/1",
+      "IQR_indices": [
+        "0/1",
+        "1/1"
+      ],
+      "f": 0.010776261220116781,
+      "sigma_pm": "611/1262",
+      "sigma_pm_flottant": 0.48415213946117275,
+      "n_paires_avec_intersection": 1761,
+      "accord_numerateur": 1222,
+      "accord_denominateur": 2524,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": 0.437552,
+        "|A∩B|=2": 0.46778,
+        "|A∩B|=3": 0.567797,
+        "|A∩B|=4": 0.578947,
+        "|A∩B|=5": 1.0,
+        "|A∩B|>=6": 1.0
+      },
+      "cos_moyen": -0.00031909384742323375,
+      "O_cos_conjoint": {
+        "O_moyen": 0.010567390139335477,
+        "cos_moyen": -0.00031909384742323375,
+        "corr_O_cos": 0.09941506140090113
+      },
+      "p_sym_median": 0,
+      "p_sym_distribution": {
+        "min": 0,
+        "q1": 0,
+        "median": 0,
+        "q3": 1,
+        "max": 5
+      },
+      "p_pair_median": 0,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 1,
+      "n_decidees_par_la_tolerance": 1,
+      "paires_verifiees": 3732,
+      "p_sym_cellule": {
+        "O_en_indices": 0.6763129689174705,
+        "cos_de_la_cellule": -0.00031909384742323375,
+        "p_sym_realise_median": 0,
+        "exces_O_moins_p_sym_realise_median": 0.6763129689174705,
+        "p_sym_theorique_du_cos_de_cellule": 0,
+        "statut_p_sym_theorique": "PASS",
+        "cum_p_theorique": 0.0,
+        "exces_O_moins_p_sym_theorique": 0.6763129689174705,
+        "raison_theorique_indisponible": null,
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|plac_sh|S3": {
+      "P": 120,
+      "n_dir": 17,
+      "O": "1607/3840",
+      "O_flottant": 0.41848958333333336,
+      "O_en_indices": 26.783333333333335,
+      "mediane_indices": "27/1",
+      "IQR_indices": [
+        "398/17",
+        "503/17"
+      ],
+      "f": 0.6409333788256666,
+      "sigma_pm": "1/1",
+      "sigma_pm_flottant": 1.0,
+      "n_paires_avec_intersection": 120,
+      "accord_numerateur": 54638,
+      "accord_denominateur": 54638,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": "SANS OBJET",
+        "|A∩B|=2": "SANS OBJET",
+        "|A∩B|=3": "SANS OBJET",
+        "|A∩B|=4": "SANS OBJET",
+        "|A∩B|=5": "SANS OBJET",
+        "|A∩B|>=6": 1.0
+      },
+      "cos_moyen": 0.6386709742344875,
+      "O_cos_conjoint": {
+        "O_moyen": 0.41848958333333336,
+        "cos_moyen": 0.6386709742344875,
+        "corr_O_cos": 0.9890303390185434
+      },
+      "p_sym_median": 23,
+      "p_sym_distribution": {
+        "min": 14,
+        "q1": 19,
+        "median": 23,
+        "q3": 27,
+        "max": 33
+      },
+      "p_pair_median": 4,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 2040,
+      "p_sym_cellule": {
+        "O_en_indices": 26.783333333333335,
+        "cos_de_la_cellule": 0.6386709742344875,
+        "p_sym_realise_median": 23,
+        "exces_O_moins_p_sym_realise_median": 3.783333333333335,
+        "p_sym_theorique_du_cos_de_cellule": null,
+        "statut_p_sym_theorique": "EN-ATTENTE",
+        "cum_p_theorique": null,
+        "exces_O_moins_p_sym_theorique": null,
+        "raison_theorique_indisponible": "cos = 0.63867 dépasse cum(20) = 0.37951 : la valeur exige la table j = 8..20 de Q-M6. Aucune interpolation, aucune extrapolation (règle Q-M5).",
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|plac_sh|S2": {
+      "P": 240,
+      "n_dir": 17,
+      "O": "46181/130560",
+      "O_flottant": 0.35371476715686273,
+      "O_en_indices": 22.637745098039215,
+      "mediane_indices": "387/17",
+      "IQR_indices": [
+        "355/17",
+        "412/17"
+      ],
+      "f": 0.5952336590699276,
+      "sigma_pm": "1/1",
+      "sigma_pm_flottant": 1.0,
+      "n_paires_avec_intersection": 240,
+      "accord_numerateur": 92362,
+      "accord_denominateur": 92362,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": "SANS OBJET",
+        "|A∩B|=2": "SANS OBJET",
+        "|A∩B|=3": "SANS OBJET",
+        "|A∩B|=4": "SANS OBJET",
+        "|A∩B|=5": "SANS OBJET",
+        "|A∩B|>=6": 1.0
+      },
+      "cos_moyen": 0.5930788084742408,
+      "O_cos_conjoint": {
+        "O_moyen": 0.35371476715686273,
+        "cos_moyen": 0.5930788084742408,
+        "corr_O_cos": 0.9718162922673348
+      },
+      "p_sym_median": 19,
+      "p_sym_distribution": {
+        "min": 10,
+        "q1": 17,
+        "median": 19,
+        "q3": 22,
+        "max": 32
+      },
+      "p_pair_median": 1,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 4080,
+      "p_sym_cellule": {
+        "O_en_indices": 22.637745098039215,
+        "cos_de_la_cellule": 0.5930788084742408,
+        "p_sym_realise_median": 19,
+        "exces_O_moins_p_sym_realise_median": 3.6377450980392148,
+        "p_sym_theorique_du_cos_de_cellule": null,
+        "statut_p_sym_theorique": "EN-ATTENTE",
+        "cum_p_theorique": null,
+        "exces_O_moins_p_sym_theorique": null,
+        "raison_theorique_indisponible": "cos = 0.59308 dépasse cum(20) = 0.37951 : la valeur exige la table j = 8..20 de Q-M6. Aucune interpolation, aucune extrapolation (règle Q-M5).",
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|plac_sh|S1": {
+      "P": 1128,
+      "n_dir": 17,
+      "O": "236659/613632",
+      "O_flottant": 0.38566926105548605,
+      "O_en_indices": 24.682832707551107,
+      "mediane_indices": "414/17",
+      "IQR_indices": [
+        "379/17",
+        "453/17"
+      ],
+      "f": 0.618346479318903,
+      "sigma_pm": "1/1",
+      "sigma_pm_flottant": 1.0,
+      "n_paires_avec_intersection": 1128,
+      "accord_numerateur": 473318,
+      "accord_denominateur": 473318,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": "SANS OBJET",
+        "|A∩B|=2": "SANS OBJET",
+        "|A∩B|=3": "SANS OBJET",
+        "|A∩B|=4": "SANS OBJET",
+        "|A∩B|=5": "SANS OBJET",
+        "|A∩B|>=6": 1.0
+      },
+      "cos_moyen": 0.616134830111906,
+      "O_cos_conjoint": {
+        "O_moyen": 0.38566926105548605,
+        "cos_moyen": 0.616134830111906,
+        "corr_O_cos": 0.9855610678337263
+      },
+      "p_sym_median": 21,
+      "p_sym_distribution": {
+        "min": 10,
+        "q1": 18,
+        "median": 21,
+        "q3": 25,
+        "max": 35
+      },
+      "p_pair_median": 2,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 19176,
+      "p_sym_cellule": {
+        "O_en_indices": 24.682832707551107,
+        "cos_de_la_cellule": 0.616134830111906,
+        "p_sym_realise_median": 21,
+        "exces_O_moins_p_sym_realise_median": 3.682832707551107,
+        "p_sym_theorique_du_cos_de_cellule": null,
+        "statut_p_sym_theorique": "EN-ATTENTE",
+        "cum_p_theorique": null,
+        "exces_O_moins_p_sym_theorique": null,
+        "raison_theorique_indisponible": "cos = 0.61613 dépasse cum(20) = 0.37951 : la valeur exige la table j = 8..20 de Q-M6. Aucune interpolation, aucune extrapolation (règle Q-M5).",
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|plac_sh|S0": {
+      "P": 3732,
+      "n_dir": 17,
+      "O": "1345519/4060416",
+      "O_flottant": 0.3313746670291911,
+      "O_en_indices": 21.20797868986823,
+      "mediane_indices": "358/17",
+      "IQR_indices": [
+        "331/17",
+        "387/17"
+      ],
+      "f": 0.5799180867249261,
+      "sigma_pm": "1/1",
+      "sigma_pm_flottant": 1.0,
+      "n_paires_avec_intersection": 3732,
+      "accord_numerateur": 1345519,
+      "accord_denominateur": 1345519,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": "SANS OBJET",
+        "|A∩B|=2": "SANS OBJET",
+        "|A∩B|=3": "SANS OBJET",
+        "|A∩B|=4": "SANS OBJET",
+        "|A∩B|=5": "SANS OBJET",
+        "|A∩B|>=6": 1.0
+      },
+      "cos_moyen": 0.577750198598855,
+      "O_cos_conjoint": {
+        "O_moyen": 0.3313746670291911,
+        "cos_moyen": 0.577750198598855,
+        "corr_O_cos": 0.9693180168823052
+      },
+      "p_sym_median": 17,
+      "p_sym_distribution": {
+        "min": 7,
+        "q1": 15,
+        "median": 17,
+        "q3": 20,
+        "max": 32
+      },
+      "p_pair_median": 1,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 63444,
+      "p_sym_cellule": {
+        "O_en_indices": 21.20797868986823,
+        "cos_de_la_cellule": 0.577750198598855,
+        "p_sym_realise_median": 17,
+        "exces_O_moins_p_sym_realise_median": 4.207978689868231,
+        "p_sym_theorique_du_cos_de_cellule": null,
+        "statut_p_sym_theorique": "EN-ATTENTE",
+        "cum_p_theorique": null,
+        "exces_O_moins_p_sym_theorique": null,
+        "raison_theorique_indisponible": "cos = 0.57775 dépasse cum(20) = 0.37951 : la valeur exige la table j = 8..20 de Q-M6. Aucune interpolation, aucune extrapolation (règle Q-M5).",
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|type_loo_sub|S3": {
+      "P": 120,
+      "n_dir": 1,
+      "O": "283/7680",
+      "O_flottant": 0.036848958333333334,
+      "O_en_indices": 2.3583333333333334,
+      "mediane_indices": "1/1",
+      "IQR_indices": [
+        "0/1",
+        "4/1"
+      ],
+      "f": 0.038481421262146834,
+      "sigma_pm": "273/283",
+      "sigma_pm_flottant": 0.9646643109540636,
+      "n_paires_avec_intersection": 85,
+      "accord_numerateur": 273,
+      "accord_denominateur": 283,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": 0.84,
+        "|A∩B|=2": 0.866667,
+        "|A∩B|=3": 1.0,
+        "|A∩B|=4": 0.95,
+        "|A∩B|=5": 1.0,
+        "|A∩B|>=6": 1.0
+      },
+      "cos_moyen": 0.03555377135799872,
+      "O_cos_conjoint": {
+        "O_moyen": 0.036848958333333334,
+        "cos_moyen": 0.03555377135799872,
+        "corr_O_cos": 0.9708194486834184
+      },
+      "p_sym_median": 1,
+      "p_sym_distribution": {
+        "min": 0,
+        "q1": 0,
+        "median": 1,
+        "q3": 3,
+        "max": 11
+      },
+      "p_pair_median": 1,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 120,
+      "p_sym_cellule": {
+        "O_en_indices": 2.3583333333333334,
+        "cos_de_la_cellule": 0.03555377135799872,
+        "p_sym_realise_median": 1,
+        "exces_O_moins_p_sym_realise_median": 1.3583333333333334,
+        "p_sym_theorique_du_cos_de_cellule": 2,
+        "statut_p_sym_theorique": "PASS",
+        "cum_p_theorique": 0.04953839736004194,
+        "exces_O_moins_p_sym_theorique": 0.3583333333333334,
+        "raison_theorique_indisponible": null,
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|type_loo_sub|S2": {
+      "P": 240,
+      "n_dir": 1,
+      "O": "133/15360",
+      "O_flottant": 0.008658854166666667,
+      "O_en_indices": 0.5541666666666667,
+      "mediane_indices": "0/1",
+      "IQR_indices": [
+        "0/1",
+        "1/1"
+      ],
+      "f": 0.008612669481006868,
+      "sigma_pm": "94/133",
+      "sigma_pm_flottant": 0.706766917293233,
+      "n_paires_avec_intersection": 107,
+      "accord_numerateur": 94,
+      "accord_denominateur": 133,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": 0.717647,
+        "|A∩B|=2": 0.666667,
+        "|A∩B|=3": 0.75,
+        "|A∩B|=4": "SANS OBJET",
+        "|A∩B|=5": "SANS OBJET",
+        "|A∩B|>=6": "SANS OBJET"
+      },
+      "cos_moyen": 0.0035945838811918098,
+      "O_cos_conjoint": {
+        "O_moyen": 0.008658854166666667,
+        "cos_moyen": 0.0035945838811918098,
+        "corr_O_cos": 0.3556313770751169
+      },
+      "p_sym_median": 0,
+      "p_sym_distribution": {
+        "min": 0,
+        "q1": 0,
+        "median": 0,
+        "q3": 1,
+        "max": 2
+      },
+      "p_pair_median": 0,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 240,
+      "p_sym_cellule": {
+        "O_en_indices": 0.5541666666666667,
+        "cos_de_la_cellule": 0.0035945838811918098,
+        "p_sym_realise_median": 0,
+        "exces_O_moins_p_sym_realise_median": 0.5541666666666667,
+        "p_sym_theorique_du_cos_de_cellule": 1,
+        "statut_p_sym_theorique": "PASS",
+        "cum_p_theorique": 0.025913678708218348,
+        "exces_O_moins_p_sym_theorique": -0.4458333333333333,
+        "raison_theorique_indisponible": null,
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|type_loo_sub|S1": {
+      "P": 1128,
+      "n_dir": 1,
+      "O": "709/36096",
+      "O_flottant": 0.019642065602836878,
+      "O_en_indices": 1.2570921985815602,
+      "mediane_indices": "1/1",
+      "IQR_indices": [
+        "0/1",
+        "2/1"
+      ],
+      "f": 0.020629955593431712,
+      "sigma_pm": "1341/1418",
+      "sigma_pm_flottant": 0.9456981664315938,
+      "n_paires_avec_intersection": 676,
+      "accord_numerateur": 1341,
+      "accord_denominateur": 1418,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": 0.859281,
+        "|A∩B|=2": 0.948485,
+        "|A∩B|=3": 0.966245,
+        "|A∩B|=4": 0.973684,
+        "|A∩B|=5": 1.0,
+        "|A∩B|>=6": 0.995745
+      },
+      "cos_moyen": 0.01829753885133241,
+      "O_cos_conjoint": {
+        "O_moyen": 0.019642065602836878,
+        "cos_moyen": 0.01829753885133241,
+        "corr_O_cos": 0.9460822255851127
+      },
+      "p_sym_median": 1,
+      "p_sym_distribution": {
+        "min": 0,
+        "q1": 0,
+        "median": 1,
+        "q3": 2,
+        "max": 8
+      },
+      "p_pair_median": 1,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 1128,
+      "p_sym_cellule": {
+        "O_en_indices": 1.2570921985815602,
+        "cos_de_la_cellule": 0.01829753885133241,
+        "p_sym_realise_median": 1,
+        "exces_O_moins_p_sym_realise_median": 0.2570921985815602,
+        "p_sym_theorique_du_cos_de_cellule": 1,
+        "statut_p_sym_theorique": "PASS",
+        "cum_p_theorique": 0.025913678708218348,
+        "exces_O_moins_p_sym_theorique": 0.2570921985815602,
+        "raison_theorique_indisponible": null,
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|type_loo_sub|S0": {
+      "P": 3732,
+      "n_dir": 1,
+      "O": "1283/119424",
+      "O_flottant": 0.010743234190782422,
+      "O_en_indices": 0.687566988210075,
+      "mediane_indices": "0/1",
+      "IQR_indices": [
+        "0/1",
+        "1/1"
+      ],
+      "f": 0.010884173214457773,
+      "sigma_pm": "1117/2566",
+      "sigma_pm_flottant": 0.4353078721745908,
+      "n_paires_avec_intersection": 1797,
+      "accord_numerateur": 1117,
+      "accord_denominateur": 2566,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": 0.419008,
+        "|A∩B|=2": 0.41629,
+        "|A∩B|=3": 0.467836,
+        "|A∩B|=4": 0.61,
+        "|A∩B|=5": 0.7,
+        "|A∩B|>=6": "SANS OBJET"
+      },
+      "cos_moyen": -0.0014192224426033038,
+      "O_cos_conjoint": {
+        "O_moyen": 0.010743234190782422,
+        "cos_moyen": -0.0014192224426033038,
+        "corr_O_cos": -0.05667275644697286
+      },
+      "p_sym_median": 0,
+      "p_sym_distribution": {
+        "min": 0,
+        "q1": 0,
+        "median": 0,
+        "q3": 1,
+        "max": 4
+      },
+      "p_pair_median": 0,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 1,
+      "n_decidees_par_la_tolerance": 1,
+      "paires_verifiees": 3732,
+      "p_sym_cellule": {
+        "O_en_indices": 0.687566988210075,
+        "cos_de_la_cellule": -0.0014192224426033038,
+        "p_sym_realise_median": 0,
+        "exces_O_moins_p_sym_realise_median": 0.687566988210075,
+        "p_sym_theorique_du_cos_de_cellule": 0,
+        "statut_p_sym_theorique": "PASS",
+        "cum_p_theorique": 0.0,
+        "exces_O_moins_p_sym_theorique": 0.687566988210075,
+        "raison_theorique_indisponible": null,
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|plac_loo_sub|S3": {
+      "P": 120,
+      "n_dir": 17,
+      "O": "54521/130560",
+      "O_flottant": 0.417593443627451,
+      "O_en_indices": 26.725980392156863,
+      "mediane_indices": "458/17",
+      "IQR_indices": [
+        "397/17",
+        "501/17"
+      ],
+      "f": 0.6397594761572567,
+      "sigma_pm": "1/1",
+      "sigma_pm_flottant": 1.0,
+      "n_paires_avec_intersection": 120,
+      "accord_numerateur": 54521,
+      "accord_denominateur": 54521,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": "SANS OBJET",
+        "|A∩B|=2": "SANS OBJET",
+        "|A∩B|=3": "SANS OBJET",
+        "|A∩B|=4": "SANS OBJET",
+        "|A∩B|=5": "SANS OBJET",
+        "|A∩B|>=6": 1.0
+      },
+      "cos_moyen": 0.6374957360821815,
+      "O_cos_conjoint": {
+        "O_moyen": 0.417593443627451,
+        "cos_moyen": 0.6374957360821815,
+        "corr_O_cos": 0.9884678835757883
+      },
+      "p_sym_median": 23,
+      "p_sym_distribution": {
+        "min": 14,
+        "q1": 19,
+        "median": 23,
+        "q3": 27,
+        "max": 34
+      },
+      "p_pair_median": 4,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 2040,
+      "p_sym_cellule": {
+        "O_en_indices": 26.725980392156863,
+        "cos_de_la_cellule": 0.6374957360821815,
+        "p_sym_realise_median": 23,
+        "exces_O_moins_p_sym_realise_median": 3.7259803921568633,
+        "p_sym_theorique_du_cos_de_cellule": null,
+        "statut_p_sym_theorique": "EN-ATTENTE",
+        "cum_p_theorique": null,
+        "exces_O_moins_p_sym_theorique": null,
+        "raison_theorique_indisponible": "cos = 0.63750 dépasse cum(20) = 0.37951 : la valeur exige la table j = 8..20 de Q-M6. Aucune interpolation, aucune extrapolation (règle Q-M5).",
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|plac_loo_sub|S2": {
+      "P": 240,
+      "n_dir": 17,
+      "O": "3839/10880",
+      "O_flottant": 0.35284926470588235,
+      "O_en_indices": 22.58235294117647,
+      "mediane_indices": "386/17",
+      "IQR_indices": [
+        "355/17",
+        "410/17"
+      ],
+      "f": 0.5939446288598494,
+      "sigma_pm": "1/1",
+      "sigma_pm_flottant": 1.0,
+      "n_paires_avec_intersection": 240,
+      "accord_numerateur": 92136,
+      "accord_denominateur": 92136,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": "SANS OBJET",
+        "|A∩B|=2": "SANS OBJET",
+        "|A∩B|=3": "SANS OBJET",
+        "|A∩B|=4": "SANS OBJET",
+        "|A∩B|=5": "SANS OBJET",
+        "|A∩B|>=6": 1.0
+      },
+      "cos_moyen": 0.5917879745331405,
+      "O_cos_conjoint": {
+        "O_moyen": 0.35284926470588235,
+        "cos_moyen": 0.5917879745331405,
+        "corr_O_cos": 0.9715669526366412
+      },
+      "p_sym_median": 19,
+      "p_sym_distribution": {
+        "min": 11,
+        "q1": 17,
+        "median": 19,
+        "q3": 22,
+        "max": 32
+      },
+      "p_pair_median": 1,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 4080,
+      "p_sym_cellule": {
+        "O_en_indices": 22.58235294117647,
+        "cos_de_la_cellule": 0.5917879745331405,
+        "p_sym_realise_median": 19,
+        "exces_O_moins_p_sym_realise_median": 3.5823529411764703,
+        "p_sym_theorique_du_cos_de_cellule": null,
+        "statut_p_sym_theorique": "EN-ATTENTE",
+        "cum_p_theorique": null,
+        "exces_O_moins_p_sym_theorique": null,
+        "raison_theorique_indisponible": "cos = 0.59179 dépasse cum(20) = 0.37951 : la valeur exige la table j = 8..20 de Q-M6. Aucune interpolation, aucune extrapolation (règle Q-M5).",
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|plac_loo_sub|S1": {
+      "P": 1128,
+      "n_dir": 17,
+      "O": "157385/409088",
+      "O_flottant": 0.3847216246871089,
+      "O_en_indices": 24.62218397997497,
+      "mediane_indices": "413/17",
+      "IQR_indices": [
+        "377/17",
+        "452/17"
+      ],
+      "f": 0.6170822758929136,
+      "sigma_pm": "1/1",
+      "sigma_pm_flottant": 1.0,
+      "n_paires_avec_intersection": 1128,
+      "accord_numerateur": 472155,
+      "accord_denominateur": 472155,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": "SANS OBJET",
+        "|A∩B|=2": "SANS OBJET",
+        "|A∩B|=3": "SANS OBJET",
+        "|A∩B|=4": "SANS OBJET",
+        "|A∩B|=5": "SANS OBJET",
+        "|A∩B|>=6": 1.0
+      },
+      "cos_moyen": 0.614868554107339,
+      "O_cos_conjoint": {
+        "O_moyen": 0.3847216246871089,
+        "cos_moyen": 0.614868554107339,
+        "corr_O_cos": 0.9850979953286353
+      },
+      "p_sym_median": 21,
+      "p_sym_distribution": {
+        "min": 9,
+        "q1": 18,
+        "median": 21,
+        "q3": 25,
+        "max": 35
+      },
+      "p_pair_median": 2,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 19176,
+      "p_sym_cellule": {
+        "O_en_indices": 24.62218397997497,
+        "cos_de_la_cellule": 0.614868554107339,
+        "p_sym_realise_median": 21,
+        "exces_O_moins_p_sym_realise_median": 3.62218397997497,
+        "p_sym_theorique_du_cos_de_cellule": null,
+        "statut_p_sym_theorique": "EN-ATTENTE",
+        "cum_p_theorique": null,
+        "exces_O_moins_p_sym_theorique": null,
+        "raison_theorique_indisponible": "cos = 0.61487 dépasse cum(20) = 0.37951 : la valeur exige la table j = 8..20 de Q-M6. Aucune interpolation, aucune extrapolation (règle Q-M5).",
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    },
+    "gpt2|plac_loo_sub|S0": {
+      "P": 3732,
+      "n_dir": 17,
+      "O": "1341785/4060416",
+      "O_flottant": 0.33045505682176407,
+      "O_en_indices": 21.1491236365929,
+      "mediane_indices": "21/1",
+      "IQR_indices": [
+        "330/17",
+        "386/17"
+      ],
+      "f": 0.578575138303372,
+      "sigma_pm": "1/1",
+      "sigma_pm_flottant": 1.0,
+      "n_paires_avec_intersection": 3732,
+      "accord_numerateur": 1341785,
+      "accord_denominateur": 1341785,
+      "sigma_pm_par_intersection": {
+        "|A∩B|=1": "SANS OBJET",
+        "|A∩B|=2": "SANS OBJET",
+        "|A∩B|=3": "SANS OBJET",
+        "|A∩B|=4": "SANS OBJET",
+        "|A∩B|=5": "SANS OBJET",
+        "|A∩B|>=6": 1.0
+      },
+      "cos_moyen": 0.5764057592082149,
+      "O_cos_conjoint": {
+        "O_moyen": 0.33045505682176407,
+        "cos_moyen": 0.5764057592082149,
+        "corr_O_cos": 0.9686977156360457
+      },
+      "p_sym_median": 17,
+      "p_sym_distribution": {
+        "min": 7,
+        "q1": 15,
+        "median": 17,
+        "q3": 20,
+        "max": 32
+      },
+      "p_pair_median": 1,
+      "violations_p_sym": 0,
+      "violations_p_sym_sans_tolerance": 0,
+      "n_decidees_par_la_tolerance": 0,
+      "paires_verifiees": 63444,
+      "p_sym_cellule": {
+        "O_en_indices": 21.1491236365929,
+        "cos_de_la_cellule": 0.5764057592082149,
+        "p_sym_realise_median": 17,
+        "exces_O_moins_p_sym_realise_median": 4.1491236365929005,
+        "p_sym_theorique_du_cos_de_cellule": null,
+        "statut_p_sym_theorique": "EN-ATTENTE",
+        "cum_p_theorique": null,
+        "exces_O_moins_p_sym_theorique": null,
+        "raison_theorique_indisponible": "cos = 0.57641 dépasse cum(20) = 0.37951 : la valeur exige la table j = 8..20 de Q-M6. Aucune interpolation, aucune extrapolation (règle Q-M5).",
+        "unite": "indices sur 64",
+        "statut": "DESCRIPTIF — ne modifie aucune classe, aucun seuil, aucune borne (L2, tour additif)",
+        "definitions": {
+          "p_sym_realise_median": "médiane, sur les paires de la cellule, de p_sym = min{p : √(T_φ(p)·T_ψ(p)) ≥ |cos_paire|} calculé sur les φ_i² OBSERVÉS des deux clés (§16-1)",
+          "p_sym_theorique_du_cos_de_cellule": "min{p : cum(p) ≥ cos_moyen de la cellule}, table cum théorique du §16.1 — aucune interpolation (Q-M5)"
+        },
+        "ambiguite_declaree": "les deux lectures ne désignent pas le même objet ; les DEUX sont publiées, AUCUNE n'est promue. Arbitrage dû."
+      }
+    }
+  },
+  "n_paires_par_cellule": {
+    "gpt2|aucun|S3": 360,
+    "gpt2|aucun|S2": 540,
+    "gpt2|aucun|S1": 2160,
+    "gpt2|aucun|S0": 7560,
+    "gpt2|glob|S3": 360,
+    "gpt2|glob|S2": 540,
+    "gpt2|glob|S1": 2160,
+    "gpt2|glob|S0": 7560,
+    "gpt2|type|S3": 360,
+    "gpt2|type|S2": 540,
+    "gpt2|type|S1": 2160,
+    "gpt2|type|S0": 7560,
+    "gpt2|auto|S3": 360,
+    "gpt2|auto|S2": 540,
+    "gpt2|auto|S1": 2160,
+    "gpt2|auto|S0": 7560,
+    "gpt2|plac|S3": 360,
+    "gpt2|plac|S2": 540,
+    "gpt2|plac|S1": 2160,
+    "gpt2|plac|S0": 7560,
+    "gpt2|type_sh|S3": 120,
+    "gpt2|type_sh|S2": 240,
+    "gpt2|type_sh|S1": 1128,
+    "gpt2|type_sh|S0": 3732,
+    "gpt2|plac_sh|S3": 120,
+    "gpt2|plac_sh|S2": 240,
+    "gpt2|plac_sh|S1": 1128,
+    "gpt2|plac_sh|S0": 3732,
+    "gpt2|type_loo_sub|S3": 120,
+    "gpt2|type_loo_sub|S2": 240,
+    "gpt2|type_loo_sub|S1": 1128,
+    "gpt2|type_loo_sub|S0": 3732,
+    "gpt2|plac_loo_sub|S3": 120,
+    "gpt2|plac_loo_sub|S2": 240,
+    "gpt2|plac_loo_sub|S1": 1128,
+    "gpt2|plac_loo_sub|S0": 3732
+  },
+  "modele": "gpt2",
+  "couche": 6,
+  "inference": {
+    "gpt2|aucun|S3": {
+      "IC_O_moins_n": [
+        0.23168294270833334,
+        0.2724392361111111
+      ],
+      "estime_O_moins_n": 0.2523003472222222,
+      "K_eff": 10
+    },
+    "gpt2|aucun|S2": {
+      "IC_O_moins_n": [
+        0.17809534143518518,
+        0.1986111111111111
+      ],
+      "estime_O_moins_n": 0.1883101851851852,
+      "K_eff": 10
+    },
+    "gpt2|aucun|S1": {
+      "IC_O_moins_n": [
+        0.21118336109547048,
+        0.24695867742742741
+      ],
+      "estime_O_moins_n": 0.22548466435185185,
+      "K_eff": 10
+    },
+    "gpt2|aucun|S0": {
+      "IC_O_moins_n": [
+        0.16316705300856085,
+        0.17978470608649125
+      ],
+      "estime_O_moins_n": 0.17083126653439154,
+      "K_eff": 10
+    },
+    "gpt2|glob|S3": {
+      "IC_O_moins_n": [
+        0.018618706597222222,
+        0.04192708333333333
+      ],
+      "estime_O_moins_n": 0.030034722222222223,
+      "K_eff": 10
+    },
+    "gpt2|glob|S2": {
+      "IC_O_moins_n": [
+        0.001707175925925926,
+        0.006278935185185185
+      ],
+      "estime_O_moins_n": 0.004079861111111111,
+      "K_eff": 10
+    },
+    "gpt2|glob|S1": {
+      "IC_O_moins_n": [
+        0.01063134707287933,
+        0.020589302507027115
+      ],
+      "estime_O_moins_n": 0.01461226851851852,
+      "K_eff": 10
+    },
+    "gpt2|glob|S0": {
+      "IC_O_moins_n": [
+        0.0011358538295445507,
+        0.0032868766617795823
+      ],
+      "estime_O_moins_n": 0.002236276455026455,
+      "K_eff": 10
+    },
+    "gpt2|type|S3": {
+      "IC_O_moins_n": [
+        0.016145833333333335,
+        0.03888997395833332
+      ],
+      "estime_O_moins_n": 0.027473958333333333,
+      "K_eff": 10
+    },
+    "gpt2|type|S2": {
+      "IC_O_moins_n": [
+        -0.00028935185185185184,
+        0.0040516493055555445
+      ],
+      "estime_O_moins_n": 0.0019965277777777776,
+      "K_eff": 10
+    },
+    "gpt2|type|S1": {
+      "IC_O_moins_n": [
+        0.007887501837154615,
+        0.016575760848694318
+      ],
+      "estime_O_moins_n": 0.01158130787037037,
+      "K_eff": 10
+    },
+    "gpt2|type|S0": {
+      "IC_O_moins_n": [
+        0.0014589143672515304,
+        0.0040194227980999905
+      ],
+      "estime_O_moins_n": 0.002693039021164021,
+      "K_eff": 10
+    },
+    "gpt2|auto|S3": {
+      "IC_O_moins_n": [
+        0.23172634548611112,
+        0.2730902777777778
+      ],
+      "estime_O_moins_n": 0.2525173611111111,
+      "K_eff": 10
+    },
+    "gpt2|auto|S2": {
+      "IC_O_moins_n": [
+        0.17847222222222223,
+        0.1984664351851852
+      ],
+      "estime_O_moins_n": 0.18839699074074073,
+      "K_eff": 10
+    },
+    "gpt2|auto|S1": {
+      "IC_O_moins_n": [
+        0.21117291801248925,
+        0.24782568993506493
+      ],
+      "estime_O_moins_n": 0.22590422453703704,
+      "K_eff": 10
+    },
+    "gpt2|auto|S0": {
+      "IC_O_moins_n": [
+        0.16321229589828581,
+        0.1797965708388014
+      ],
+      "estime_O_moins_n": 0.17075686177248678,
+      "K_eff": 10
+    },
+    "gpt2|plac|S3": {
+      "IC_O_moins_n": [
+        0.3829210069444444,
+        0.42259989021650324
+      ],
+      "estime_O_moins_n": 0.40270373774509804,
+      "K_eff": 10
+    },
+    "gpt2|plac|S2": {
+      "IC_O_moins_n": [
+        0.33162777437363833,
+        0.3527471830746188
+      ],
+      "estime_O_moins_n": 0.3419917619825708,
+      "K_eff": 10
+    },
+    "gpt2|plac|S1": {
+      "IC_O_moins_n": [
+        0.3635803507530273,
+        0.39105180999557826
+      ],
+      "estime_O_moins_n": 0.37547657952069713,
+      "K_eff": 10
+    },
+    "gpt2|plac|S0": {
+      "IC_O_moins_n": [
+        0.31474522125080284,
+        0.3311882763329097
+      ],
+      "estime_O_moins_n": 0.32264968487394957,
+      "K_eff": 10
+    },
+    "gpt2|type_sh|S3": {
+      "IC_O_moins_n": [
+        0.016015625,
+        0.05534179687499995
+      ],
+      "estime_O_moins_n": 0.03333333333333333,
+      "K_eff": 10
+    },
+    "gpt2|type_sh|S2": {
+      "IC_O_moins_n": [
+        -0.0010416666666666667,
+        0.005013020833333334
+      ],
+      "estime_O_moins_n": 0.0018880208333333333,
+      "K_eff": 10
+    },
+    "gpt2|type_sh|S1": {
+      "IC_O_moins_n": [
+        0.0092169381122155,
+        0.020050599772566683
+      ],
+      "estime_O_moins_n": 0.014128989361702128,
+      "K_eff": 10
+    },
+    "gpt2|type_sh|S0": {
+      "IC_O_moins_n": [
+        0.000999381346960046,
+        0.00436004086398132
+      ],
+      "estime_O_moins_n": 0.002754890139335477,
+      "K_eff": 10
+    },
+    "gpt2|plac_sh|S3": {
+      "IC_O_moins_n": [
+        0.38651903339460786,
+        0.4375631893382353
+      ],
+      "estime_O_moins_n": 0.41067708333333336,
+      "K_eff": 10
+    },
+    "gpt2|plac_sh|S2": {
+      "IC_O_moins_n": [
+        0.3342713120404412,
+        0.3589425359987745
+      ],
+      "estime_O_moins_n": 0.34590226715686273,
+      "K_eff": 10
+    },
+    "gpt2|plac_sh|S1": {
+      "IC_O_moins_n": [
+        0.3621023518340843,
+        0.3949697412092775
+      ],
+      "estime_O_moins_n": 0.37785676105548605,
+      "K_eff": 10
+    },
+    "gpt2|plac_sh|S0": {
+      "IC_O_moins_n": [
+        0.3150344244994443,
+        0.33249831770499416
+      ],
+      "estime_O_moins_n": 0.32356216702919105,
+      "K_eff": 10
+    },
+    "gpt2|type_loo_sub|S3": {
+      "IC_O_moins_n": [
+        0.013671875,
+        0.050130208333333336
+      ],
+      "estime_O_moins_n": 0.029036458333333334,
+      "K_eff": 10
+    },
+    "gpt2|type_loo_sub|S2": {
+      "IC_O_moins_n": [
+        -0.0017578125,
+        0.0035807291666666665
+      ],
+      "estime_O_moins_n": 0.0008463541666666667,
+      "K_eff": 10
+    },
+    "gpt2|type_loo_sub|S1": {
+      "IC_O_moins_n": [
+        0.006948398431894821,
+        0.017338709677419354
+      ],
+      "estime_O_moins_n": 0.01182956560283688,
+      "K_eff": 10
+    },
+    "gpt2|type_loo_sub|S0": {
+      "IC_O_moins_n": [
+        0.00140594295839589,
+        0.004415760869565217
+      ],
+      "estime_O_moins_n": 0.0029307341907824224,
+      "K_eff": 10
+    },
+    "gpt2|plac_loo_sub|S3": {
+      "IC_O_moins_n": [
+        0.38556889552696083,
+        0.4367432598039216
+      ],
+      "estime_O_moins_n": 0.409780943627451,
+      "K_eff": 10
+    },
+    "gpt2|plac_loo_sub|S2": {
+      "IC_O_moins_n": [
+        0.3333748851102941,
+        0.35807329963235296
+      ],
+      "estime_O_moins_n": 0.34503676470588235,
+      "K_eff": 10
+    },
+    "gpt2|plac_loo_sub|S1": {
+      "IC_O_moins_n": [
+        0.3611398121939527,
+        0.3940901858494345
+      ],
+      "estime_O_moins_n": 0.3769091246871089,
+      "K_eff": 10
+    },
+    "gpt2|plac_loo_sub|S0": {
+      "IC_O_moins_n": [
+        0.31416716521864624,
+        0.3315367341179061
+      ],
+      "estime_O_moins_n": 0.32264255682176407,
+      "K_eff": 10
+    }
+  },
+  "classes_par_strate": {
+    "S3": {
+      "Lambda_estime": 0.019661458333333333,
+      "IC_Lambda": [
+        0.008333333333333333,
+        0.031077473958333317
+      ],
+      "epsilon_Lambda": 0.00113319191739684,
+      "classe_N": "HAUT",
+      "Delta_etoile_estime": 0.3752297794117647,
+      "IC_Delta_etoile": [
+        0.36526143790849674,
+        0.3852559487336601
+      ],
+      "epsilon_etoile": 0.30417024101307183,
+      "sigma_Delta": 0.04375289520762188,
+      "P": 360,
+      "classe_C": "c-cent",
+      "epsilon_etoile_par_regle": {
+        "min": {
+          "epsilon_etoile": 0.30417024101307183,
+          "statut_de_la_regle": "IMPLÉMENTÉE (opérationnalisation déclarée, non pré-enregistrée)",
+          "classe_C": "c-cent",
+          "rapport_eps_sur_Delta": 0.8106239368578619,
+          "fraction_de_paires_a_signe_non_retournable": 0.0,
+          "plancher_structurel_relatif": 0.8,
+          "plancher_structurel_absolu": 0.3001838235294118,
+          "classe_informative_atteignable": true,
+          "classe_informative_inatteignable": false,
+          "ecritures_obligatoires": {
+            "cas": 1,
+            "epsilon_etoile": 0.30417024101307183,
+            "deux_n": 0.015625,
+            "declaration": "ε* ≥ 2n : le recouvrement des conditions `c-mec` et `c-cent` est VIDE et l'ordre est SANS OBJET",
+            "region_masquee": "SANS OBJET"
+          }
+        },
+        "produit": {
+          "epsilon_etoile": 0.3837524254493465,
+          "statut_de_la_regle": "ALTERNATIVE (publiée, NON promue)",
+          "classe_C": "ind_Δ",
+          "rapport_eps_sur_Delta": 1.0227131387357966,
+          "fraction_de_paires_a_signe_non_retournable": 1.0,
+          "plancher_structurel_relatif": 1.0,
+          "plancher_structurel_absolu": 0.3752297794117647,
+          "classe_informative_atteignable": false,
+          "classe_informative_inatteignable": true,
+          "ecritures_obligatoires": {
+            "cas": 1,
+            "epsilon_etoile": 0.3837524254493465,
+            "deux_n": 0.015625,
+            "declaration": "ε* ≥ 2n : le recouvrement des conditions `c-mec` et `c-cent` est VIDE et l'ordre est SANS OBJET",
+            "region_masquee": "SANS OBJET"
+          }
+        }
+      },
+      "classe_C_par_regle": {
+        "min": "c-cent",
+        "produit": "ind_Δ"
+      },
+      "regle_publiee_en_classe_C": "min",
+      "arbitrage": "les deux règles sont publiées côte à côte ; AUCUNE n'est promue — l'arbitrage est PI",
+      "ecritures_obligatoires": {
+        "cas": 1,
+        "epsilon_etoile": 0.30417024101307183,
+        "deux_n": 0.015625,
+        "declaration": "ε* ≥ 2n : le recouvrement des conditions `c-mec` et `c-cent` est VIDE et l'ordre est SANS OBJET",
+        "region_masquee": "SANS OBJET"
+      },
+      "resolution_demi_largeur": 0.011372070312499993
+    },
+    "S2": {
+      "Lambda_estime": -0.005815972222222222,
+      "IC_Lambda": [
+        -0.008101851851851851,
+        -0.0037608506944444547
+      ],
+      "epsilon_Lambda": 0.0009252473260894541,
+      "classe_N": "BAS",
+      "Delta_etoile_estime": 0.339995234204793,
+      "IC_Delta_etoile": [
+        0.32853847528594765,
+        0.35159335001361663
+      ],
+      "epsilon_etoile": 0.2764253131808279,
+      "sigma_Delta": 0.03900876505379205,
+      "P": 540,
+      "classe_C": "c-cent",
+      "epsilon_etoile_par_regle": {
+        "min": {
+          "epsilon_etoile": 0.2764253131808279,
+          "statut_de_la_regle": "IMPLÉMENTÉE (opérationnalisation déclarée, non pré-enregistrée)",
+          "classe_C": "c-cent",
+          "rapport_eps_sur_Delta": 0.8130270232385837,
+          "fraction_de_paires_a_signe_non_retournable": 0.0,
+          "plancher_structurel_relatif": 0.8,
+          "plancher_structurel_absolu": 0.2719961873638344,
+          "classe_informative_atteignable": true,
+          "classe_informative_inatteignable": false,
+          "ecritures_obligatoires": {
+            "cas": 1,
+            "epsilon_etoile": 0.2764253131808279,
+            "deux_n": 0.015625,
+            "declaration": "ε* ≥ 2n : le recouvrement des conditions `c-mec` et `c-cent` est VIDE et l'ordre est SANS OBJET",
+            "region_masquee": "SANS OBJET"
+          }
+        },
+        "produit": {
+          "epsilon_etoile": 0.3497688589324619,
+          "statut_de_la_regle": "ALTERNATIVE (publiée, NON promue)",
+          "classe_C": "ind_Δ",
+          "rapport_eps_sur_Delta": 1.0287463580203653,
+          "fraction_de_paires_a_signe_non_retournable": 1.0,
+          "plancher_structurel_relatif": 1.0,
+          "plancher_structurel_absolu": 0.339995234204793,
+          "classe_informative_atteignable": false,
+          "classe_informative_inatteignable": true,
+          "ecritures_obligatoires": {
+            "cas": 1,
+            "epsilon_etoile": 0.3497688589324619,
+            "deux_n": 0.015625,
+            "declaration": "ε* ≥ 2n : le recouvrement des conditions `c-mec` et `c-cent` est VIDE et l'ordre est SANS OBJET",
+            "region_masquee": "SANS OBJET"
+          }
+        }
+      },
+      "classe_C_par_regle": {
+        "min": "c-cent",
+        "produit": "ind_Δ"
+      },
+      "regle_publiee_en_classe_C": "min",
+      "arbitrage": "les deux règles sont publiées côte à côte ; AUCUNE n'est promue — l'arbitrage est PI",
+      "ecritures_obligatoires": {
+        "cas": 1,
+        "epsilon_etoile": 0.2764253131808279,
+        "deux_n": 0.015625,
+        "declaration": "ε* ≥ 2n : le recouvrement des conditions `c-mec` et `c-cent` est VIDE et l'ordre est SANS OBJET",
+        "region_masquee": "SANS OBJET"
+      },
+      "resolution_demi_largeur": 0.0021705005787036984
+    },
+    "S1": {
+      "Lambda_estime": 0.0037688078703703703,
+      "IC_Lambda": [
+        7.500183715461495e-05,
+        0.008763260848694315
+      ],
+      "epsilon_Lambda": 0.00046262366304472704,
+      "classe_N": "ind_L",
+      "Delta_etoile_estime": 0.3638952716503268,
+      "IC_Delta_etoile": [
+        0.3543430500883013,
+        0.3750886656746032
+      ],
+      "epsilon_etoile": 0.3616099099919807,
+      "sigma_Delta": 0.04299352562687427,
+      "P": 2160,
+      "classe_C": "ind_Δ",
+      "epsilon_etoile_par_regle": {
+        "min": {
+          "epsilon_etoile": 0.3616099099919807,
+          "statut_de_la_regle": "IMPLÉMENTÉE (opérationnalisation déclarée, non pré-enregistrée)",
+          "classe_C": "ind_Δ",
+          "rapport_eps_sur_Delta": 0.9937197269753422,
+          "fraction_de_paires_a_signe_non_retournable": 0.0,
+          "plancher_structurel_relatif": 1.0,
+          "plancher_structurel_absolu": 0.3638952716503268,
+          "classe_informative_atteignable": false,
+          "classe_informative_inatteignable": true,
+          "ecritures_obligatoires": {
+            "cas": 1,
+            "epsilon_etoile": 0.3616099099919807,
+            "deux_n": 0.015625,
+            "declaration": "ε* ≥ 2n : le recouvrement des conditions `c-mec` et `c-cent` est VIDE et l'ordre est SANS OBJET",
+            "region_masquee": "SANS OBJET"
+          }
+        },
+        "produit": {
+          "epsilon_etoile": 0.2271189650990604,
+          "statut_de_la_regle": "ALTERNATIVE (publiée, NON promue)",
+          "classe_C": "c-cent",
+          "rapport_eps_sur_Delta": 0.6241327733362331,
+          "fraction_de_paires_a_signe_non_retournable": 0.0,
+          "plancher_structurel_relatif": 0.6216216216216216,
+          "plancher_structurel_absolu": 0.22620516886371667,
+          "classe_informative_atteignable": true,
+          "classe_informative_inatteignable": false,
+          "ecritures_obligatoires": {
+            "cas": 1,
+            "epsilon_etoile": 0.2271189650990604,
+            "deux_n": 0.015625,
+            "declaration": "ε* ≥ 2n : le recouvrement des conditions `c-mec` et `c-cent` est VIDE et l'ordre est SANS OBJET",
+            "region_masquee": "SANS OBJET"
+          }
+        }
+      },
+      "classe_C_par_regle": {
+        "min": "ind_Δ",
+        "produit": "c-cent"
+      },
+      "regle_publiee_en_classe_C": "min",
+      "arbitrage": "les deux règles sont publiées côte à côte ; AUCUNE n'est promue — l'arbitrage est PI",
+      "ecritures_obligatoires": {
+        "cas": 1,
+        "epsilon_etoile": 0.3616099099919807,
+        "deux_n": 0.015625,
+        "declaration": "ε* ≥ 2n : le recouvrement des conditions `c-mec` et `c-cent` est VIDE et l'ordre est SANS OBJET",
+        "region_masquee": "SANS OBJET"
+      },
+      "resolution_demi_largeur": 0.00434412950576985
+    },
+    "S0": {
+      "Lambda_estime": -0.005119460978835979,
+      "IC_Lambda": [
+        -0.00635358563274847,
+        -0.003793077201900009
+      ],
+      "epsilon_Lambda": 0.0002472827494468174,
+      "classe_N": "BAS",
+      "Delta_etoile_estime": 0.31995664585278555,
+      "IC_Delta_etoile": [
+        0.3120854119996509,
+        0.32828042874889557
+      ],
+      "epsilon_etoile": 0.31371411655960757,
+      "sigma_Delta": 0.03923818089334279,
+      "P": 7560,
+      "classe_C": "ind_Δ",
+      "epsilon_etoile_par_regle": {
+        "min": {
+          "epsilon_etoile": 0.31371411655960757,
+          "statut_de_la_regle": "IMPLÉMENTÉE (opérationnalisation déclarée, non pré-enregistrée)",
+          "classe_C": "ind_Δ",
+          "rapport_eps_sur_Delta": 0.9804894526364981,
+          "fraction_de_paires_a_signe_non_retournable": 0.0,
+          "plancher_structurel_relatif": 1.0,
+          "plancher_structurel_absolu": 0.31995664585278555,
+          "classe_informative_atteignable": false,
+          "classe_informative_inatteignable": true,
+          "ecritures_obligatoires": {
+            "cas": 1,
+            "epsilon_etoile": 0.31371411655960757,
+            "deux_n": 0.015625,
+            "declaration": "ε* ≥ 2n : le recouvrement des conditions `c-mec` et `c-cent` est VIDE et l'ordre est SANS OBJET",
+            "region_masquee": "SANS OBJET"
+          }
+        },
+        "produit": {
+          "epsilon_etoile": 0.18533983503333995,
+          "statut_de_la_regle": "ALTERNATIVE (publiée, NON promue)",
+          "classe_C": "c-cent",
+          "rapport_eps_sur_Delta": 0.5792654643548683,
+          "fraction_de_paires_a_signe_non_retournable": 0.0,
+          "plancher_structurel_relatif": 0.5773213521608889,
+          "plancher_structurel_absolu": 0.1847178034165928,
+          "classe_informative_atteignable": true,
+          "classe_informative_inatteignable": false,
+          "ecritures_obligatoires": {
+            "cas": 1,
+            "epsilon_etoile": 0.18533983503333995,
+            "deux_n": 0.015625,
+            "declaration": "ε* ≥ 2n : le recouvrement des conditions `c-mec` et `c-cent` est VIDE et l'ordre est SANS OBJET",
+            "region_masquee": "SANS OBJET"
+          }
+        }
+      },
+      "classe_C_par_regle": {
+        "min": "ind_Δ",
+        "produit": "c-cent"
+      },
+      "regle_publiee_en_classe_C": "min",
+      "arbitrage": "les deux règles sont publiées côte à côte ; AUCUNE n'est promue — l'arbitrage est PI",
+      "ecritures_obligatoires": {
+        "cas": 1,
+        "epsilon_etoile": 0.31371411655960757,
+        "deux_n": 0.015625,
+        "declaration": "ε* ≥ 2n : le recouvrement des conditions `c-mec` et `c-cent` est VIDE et l'ordre est SANS OBJET",
+        "region_masquee": "SANS OBJET"
+      },
+      "resolution_demi_largeur": 0.0012802542154242305
+    }
+  },
+  "classes_par_strate_split_half": {
+    "S3": {
+      "Lambda_estime": 0.025520833333333333,
+      "IC_Lambda": [
+        0.008203125,
+        0.04752929687499995
+      ],
+      "epsilon_Lambda": 0.0019627459756577214,
+      "classe_N": "HAUT",
+      "Delta_etoile_estime": 0.37734375,
+      "IC_Delta_etoile": [
+        0.3642767693014706,
+        0.38978247549019607
+      ],
+      "epsilon_etoile": 0.307241881127451,
+      "sigma_Delta": 0.03872189562681232,
+      "P": 120,
+      "classe_C": "c-cent",
+      "epsilon_etoile_par_regle": {
+        "min": {
+          "epsilon_etoile": 0.307241881127451,
+          "statut_de_la_regle": "IMPLÉMENTÉE (opérationnalisation déclarée, non pré-enregistrée)",
+          "classe_C": "c-cent",
+          "rapport_eps_sur_Delta": 0.8142227905655016,
+          "fraction_de_paires_a_signe_non_retournable": 0.0,
+          "plancher_structurel_relatif": 0.8,
+          "plancher_structurel_absolu": 0.301875,
+          "classe_informative_atteignable": true,
+          "classe_informative_inatteignable": false,
+          "ecritures_obligatoires": {
+            "cas": 1,
+            "epsilon_etoile": 0.307241881127451,
+            "deux_n": 0.015625,
+            "declaration": "ε* ≥ 2n : le recouvrement des conditions `c-mec` et `c-cent` est VIDE et l'ordre est SANS OBJET",
+            "region_masquee": "SANS OBJET"
+          }
+        }
+      },
+      "classe_C_par_regle": {
+        "min": "c-cent"
+      },
+      "regle_publiee_en_classe_C": "min",
+      "arbitrage": "les deux règles sont publiées côte à côte ; AUCUNE n'est promue — l'arbitrage est PI",
+      "ecritures_obligatoires": {
+        "cas": 1,
+        "epsilon_etoile": 0.307241881127451,
+        "deux_n": 0.015625,
+        "declaration": "ε* ≥ 2n : le recouvrement des conditions `c-mec` et `c-cent` est VIDE et l'ordre est SANS OBJET",
+        "region_masquee": "SANS OBJET"
+      },
+      "resolution_demi_largeur": 0.019663085937499977
+    },
+    "S2": {
+      "Lambda_estime": -0.0059244791666666664,
+      "IC_Lambda": [
+        -0.008854166666666666,
+        -0.0027994791666666667
+      ],
+      "epsilon_Lambda": 0.001387870989134181,
+      "classe_N": "BAS",
+      "Delta_etoile_estime": 0.3440142463235294,
+      "IC_Delta_etoile": [
+        0.33213828890931374,
+        0.3568362247242647
+      ],
+      "epsilon_etoile": 0.27980755974264704,
+      "sigma_Delta": 0.03789932345448443,
+      "P": 240,
+      "classe_C": "c-cent",
+      "epsilon_etoile_par_regle": {
+        "min": {
+          "epsilon_etoile": 0.27980755974264704,
+          "statut_de_la_regle": "IMPLÉMENTÉE (opérationnalisation déclarée, non pré-enregistrée)",
+          "classe_C": "c-cent",
+          "rapport_eps_sur_Delta": 0.8133603847309888,
+          "fraction_de_paires_a_signe_non_retournable": 0.0,
+          "plancher_structurel_relatif": 0.8,
+          "plancher_structurel_absolu": 0.2752113970588235,
+          "classe_informative_atteignable": true,
+          "classe_informative_inatteignable": false,
+          "ecritures_obligatoires": {
+            "cas": 1,
+            "epsilon_etoile": 0.27980755974264704,
+            "deux_n": 0.015625,
+            "declaration": "ε* ≥ 2n : le recouvrement des conditions `c-mec` et `c-cent` est VIDE et l'ordre est SANS OBJET",
+            "region_masquee": "SANS OBJET"
+          }
+        }
+      },
+      "classe_C_par_regle": {
+        "min": "c-cent"
+      },
+      "regle_publiee_en_classe_C": "min",
+      "arbitrage": "les deux règles sont publiées côte à côte ; AUCUNE n'est promue — l'arbitrage est PI",
+      "ecritures_obligatoires": {
+        "cas": 1,
+        "epsilon_etoile": 0.27980755974264704,
+        "deux_n": 0.015625,
+        "declaration": "ε* ≥ 2n : le recouvrement des conditions `c-mec` et `c-cent` est VIDE et l'ordre est SANS OBJET",
+        "region_masquee": "SANS OBJET"
+      },
+      "resolution_demi_largeur": 0.0030273437499999997
+    },
+    "S1": {
+      "Lambda_estime": 0.006316489361702127,
+      "IC_Lambda": [
+        0.0014044381122155,
+        0.012238099772566681
+      ],
+      "epsilon_Lambda": 0.0006401771500970999,
+      "classe_N": "HAUT",
+      "Delta_etoile_estime": 0.3637277716937839,
+      "IC_Delta_etoile": [
+        0.351313754569261,
+        0.3763315868082431
+      ],
+      "epsilon_etoile": 0.36071194299320203,
+      "sigma_Delta": 0.04284415609517274,
+      "P": 1128,
+      "classe_C": "ind_Δ",
+      "epsilon_etoile_par_regle": {
+        "min": {
+          "epsilon_etoile": 0.36071194299320203,
+          "statut_de_la_regle": "IMPLÉMENTÉE (opérationnalisation déclarée, non pré-enregistrée)",
+          "classe_C": "ind_Δ",
+          "rapport_eps_sur_Delta": 0.9917085553117433,
+          "fraction_de_paires_a_signe_non_retournable": 0.0,
+          "plancher_structurel_relatif": 1.0,
+          "plancher_structurel_absolu": 0.3637277716937839,
+          "classe_informative_atteignable": false,
+          "classe_informative_inatteignable": true,
+          "ecritures_obligatoires": {
+            "cas": 1,
+            "epsilon_etoile": 0.36071194299320203,
+            "deux_n": 0.015625,
+            "declaration": "ε* ≥ 2n : le recouvrement des conditions `c-mec` et `c-cent` est VIDE et l'ordre est SANS OBJET",
+            "region_masquee": "SANS OBJET"
+          }
+        }
+      },
+      "classe_C_par_regle": {
+        "min": "ind_Δ"
+      },
+      "regle_publiee_en_classe_C": "min",
+      "arbitrage": "les deux règles sont publiées côte à côte ; AUCUNE n'est promue — l'arbitrage est PI",
+      "ecritures_obligatoires": {
+        "cas": 1,
+        "epsilon_etoile": 0.36071194299320203,
+        "deux_n": 0.015625,
+        "declaration": "ε* ≥ 2n : le recouvrement des conditions `c-mec` et `c-cent` est VIDE et l'ordre est SANS OBJET",
+        "region_masquee": "SANS OBJET"
+      },
+      "resolution_demi_largeur": 0.005416830830175591
+    },
+    "S0": {
+      "Lambda_estime": -0.005057609860664523,
+      "IC_Lambda": [
+        -0.0068131186530399545,
+        -0.003452459136018681
+      ],
+      "epsilon_Lambda": 0.00035195237569531323,
+      "classe_N": "BAS",
+      "Delta_etoile_estime": 0.3208072768898556,
+      "IC_Delta_etoile": [
+        0.31266284425328794,
+        0.329245922821434
+      ],
+      "epsilon_etoile": 0.3143066765452855,
+      "sigma_Delta": 0.03887261498087157,
+      "P": 3732,
+      "classe_C": "ind_Δ",
+      "epsilon_etoile_par_regle": {
+        "min": {
+          "epsilon_etoile": 0.3143066765452855,
+          "statut_de_la_regle": "IMPLÉMENTÉE (opérationnalisation déclarée, non pré-enregistrée)",
+          "classe_C": "ind_Δ",
+          "rapport_eps_sur_Delta": 0.9797367428582301,
+          "fraction_de_paires_a_signe_non_retournable": 0.0,
+          "plancher_structurel_relatif": 1.0,
+          "plancher_structurel_absolu": 0.3208072768898556,
+          "classe_informative_atteignable": false,
+          "classe_informative_inatteignable": true,
+          "ecritures_obligatoires": {
+            "cas": 1,
+            "epsilon_etoile": 0.3143066765452855,
+            "deux_n": 0.015625,
+            "declaration": "ε* ≥ 2n : le recouvrement des conditions `c-mec` et `c-cent` est VIDE et l'ordre est SANS OBJET",
+            "region_masquee": "SANS OBJET"
+          }
+        }
+      },
+      "classe_C_par_regle": {
+        "min": "ind_Δ"
+      },
+      "regle_publiee_en_classe_C": "min",
+      "arbitrage": "les deux règles sont publiées côte à côte ; AUCUNE n'est promue — l'arbitrage est PI",
+      "ecritures_obligatoires": {
+        "cas": 1,
+        "epsilon_etoile": 0.3143066765452855,
+        "deux_n": 0.015625,
+        "declaration": "ε* ≥ 2n : le recouvrement des conditions `c-mec` et `c-cent` est VIDE et l'ordre est SANS OBJET",
+        "region_masquee": "SANS OBJET"
+      },
+      "resolution_demi_largeur": 0.0016803297585106368
+    }
+  },
+  "classes_par_strate_LOO_sous_ensemble": {
+    "S3": {
+      "Lambda_estime": 0.021223958333333334,
+      "IC_Lambda": [
+        0.005859375,
+        0.042317708333333336
+      ],
+      "epsilon_Lambda": 0.0019627459756577214,
+      "classe_N": "HAUT",
+      "Delta_etoile_estime": 0.38074448529411764,
+      "IC_Delta_etoile": [
+        0.36622931985294127,
+        0.3942248774509804
+      ],
+      "epsilon_etoile": 0.3103787530637255,
+      "sigma_Delta": 0.0394858936689708,
+      "P": 120,
+      "classe_C": "c-cent",
+      "epsilon_etoile_par_regle": {
+        "min": {
+          "epsilon_etoile": 0.3103787530637255,
+          "statut_de_la_regle": "IMPLÉMENTÉE (opérationnalisation déclarée, non pré-enregistrée)",
+          "classe_C": "c-cent",
+          "rapport_eps_sur_Delta": 0.815189096761215,
+          "fraction_de_paires_a_signe_non_retournable": 0.0,
+          "plancher_structurel_relatif": 0.8,
+          "plancher_structurel_absolu": 0.30459558823529415,
+          "classe_informative_atteignable": true,
+          "classe_informative_inatteignable": false,
+          "ecritures_obligatoires": {
+            "cas": 1,
+            "epsilon_etoile": 0.3103787530637255,
+            "deux_n": 0.015625,
+            "declaration": "ε* ≥ 2n : le recouvrement des conditions `c-mec` et `c-cent` est VIDE et l'ordre est SANS OBJET",
+            "region_masquee": "SANS OBJET"
+          }
+        }
+      },
+      "classe_C_par_regle": {
+        "min": "c-cent"
+      },
+      "regle_publiee_en_classe_C": "min",
+      "arbitrage": "les deux règles sont publiées côte à côte ; AUCUNE n'est promue — l'arbitrage est PI",
+      "ecritures_obligatoires": {
+        "cas": 1,
+        "epsilon_etoile": 0.3103787530637255,
+        "deux_n": 0.015625,
+        "declaration": "ε* ≥ 2n : le recouvrement des conditions `c-mec` et `c-cent` est VIDE et l'ordre est SANS OBJET",
+        "region_masquee": "SANS OBJET"
+      },
+      "resolution_demi_largeur": 0.018229166666666668
+    },
+    "S2": {
+      "Lambda_estime": -0.006966145833333334,
+      "IC_Lambda": [
+        -0.0095703125,
+        -0.004231770833333333
+      ],
+      "epsilon_Lambda": 0.001387870989134181,
+      "classe_N": "BAS",
+      "Delta_etoile_estime": 0.3441904105392157,
+      "IC_Delta_etoile": [
+        0.3315360753676471,
+        0.35808823529411765
+      ],
+      "epsilon_etoile": 0.2801878446691176,
+      "sigma_Delta": 0.038381725316254986,
+      "P": 240,
+      "classe_C": "c-cent",
+      "epsilon_etoile_par_regle": {
+        "min": {
+          "epsilon_etoile": 0.2801878446691176,
+          "statut_de_la_regle": "IMPLÉMENTÉE (opérationnalisation déclarée, non pré-enregistrée)",
+          "classe_C": "c-cent",
+          "rapport_eps_sur_Delta": 0.8140489568845618,
+          "fraction_de_paires_a_signe_non_retournable": 0.0,
+          "plancher_structurel_relatif": 0.8,
+          "plancher_structurel_absolu": 0.27535232843137253,
+          "classe_informative_atteignable": true,
+          "classe_informative_inatteignable": false,
+          "ecritures_obligatoires": {
+            "cas": 1,
+            "epsilon_etoile": 0.2801878446691176,
+            "deux_n": 0.015625,
+            "declaration": "ε* ≥ 2n : le recouvrement des conditions `c-mec` et `c-cent` est VIDE et l'ordre est SANS OBJET",
+            "region_masquee": "SANS OBJET"
+          }
+        }
+      },
+      "classe_C_par_regle": {
+        "min": "c-cent"
+      },
+      "regle_publiee_en_classe_C": "min",
+      "arbitrage": "les deux règles sont publiées côte à côte ; AUCUNE n'est promue — l'arbitrage est PI",
+      "ecritures_obligatoires": {
+        "cas": 1,
+        "epsilon_etoile": 0.2801878446691176,
+        "deux_n": 0.015625,
+        "declaration": "ε* ≥ 2n : le recouvrement des conditions `c-mec` et `c-cent` est VIDE et l'ordre est SANS OBJET",
+        "region_masquee": "SANS OBJET"
+      },
+      "resolution_demi_largeur": 0.002669270833333334
+    },
+    "S1": {
+      "Lambda_estime": 0.00401706560283688,
+      "IC_Lambda": [
+        -0.0008641015681051798,
+        0.009526209677419354
+      ],
+      "epsilon_Lambda": 0.0006401771500970999,
+      "classe_N": "ind_L",
+      "Delta_etoile_estime": 0.36507955908427203,
+      "IC_Delta_etoile": [
+        0.3524070053668019,
+        0.3777896758253491
+      ],
+      "epsilon_etoile": 0.3618411825868168,
+      "sigma_Delta": 0.043818354189963896,
+      "P": 1128,
+      "classe_C": "ind_Δ",
+      "epsilon_etoile_par_regle": {
+        "min": {
+          "epsilon_etoile": 0.3618411825868168,
+          "statut_de_la_regle": "IMPLÉMENTÉE (opérationnalisation déclarée, non pré-enregistrée)",
+          "classe_C": "ind_Δ",
+          "rapport_eps_sur_Delta": 0.9911296690902716,
+          "fraction_de_paires_a_signe_non_retournable": 0.0,
+          "plancher_structurel_relatif": 1.0,
+          "plancher_structurel_absolu": 0.36507955908427203,
+          "classe_informative_atteignable": false,
+          "classe_informative_inatteignable": true,
+          "ecritures_obligatoires": {
+            "cas": 1,
+            "epsilon_etoile": 0.3618411825868168,
+            "deux_n": 0.015625,
+            "declaration": "ε* ≥ 2n : le recouvrement des conditions `c-mec` et `c-cent` est VIDE et l'ordre est SANS OBJET",
+            "region_masquee": "SANS OBJET"
+          }
+        }
+      },
+      "classe_C_par_regle": {
+        "min": "ind_Δ"
+      },
+      "regle_publiee_en_classe_C": "min",
+      "arbitrage": "les deux règles sont publiées côte à côte ; AUCUNE n'est promue — l'arbitrage est PI",
+      "ecritures_obligatoires": {
+        "cas": 1,
+        "epsilon_etoile": 0.3618411825868168,
+        "deux_n": 0.015625,
+        "declaration": "ε* ≥ 2n : le recouvrement des conditions `c-mec` et `c-cent` est VIDE et l'ordre est SANS OBJET",
+        "region_masquee": "SANS OBJET"
+      },
+      "resolution_demi_largeur": 0.005195155622762267
+    },
+    "S0": {
+      "Lambda_estime": -0.004881765809217578,
+      "IC_Lambda": [
+        -0.006406557041604109,
+        -0.0033967391304347825
+      ],
+      "epsilon_Lambda": 0.00035195237569531323,
+      "classe_N": "BAS",
+      "Delta_etoile_estime": 0.31971182263098163,
+      "IC_Delta_etoile": [
+        0.31153344356853957,
+        0.328394196079586
+      ],
+      "epsilon_etoile": 0.3132161505653211,
+      "sigma_Delta": 0.03896584829076042,
+      "P": 3732,
+      "classe_C": "ind_Δ",
+      "epsilon_etoile_par_regle": {
+        "min": {
+          "epsilon_etoile": 0.3132161505653211,
+          "statut_de_la_regle": "IMPLÉMENTÉE (opérationnalisation déclarée, non pré-enregistrée)",
+          "classe_C": "ind_Δ",
+          "rapport_eps_sur_Delta": 0.9796827279885799,
+          "fraction_de_paires_a_signe_non_retournable": 0.0,
+          "plancher_structurel_relatif": 1.0,
+          "plancher_structurel_absolu": 0.31971182263098163,
+          "classe_informative_atteignable": false,
+          "classe_informative_inatteignable": true,
+          "ecritures_obligatoires": {
+            "cas": 1,
+            "epsilon_etoile": 0.3132161505653211,
+            "deux_n": 0.015625,
+            "declaration": "ε* ≥ 2n : le recouvrement des conditions `c-mec` et `c-cent` est VIDE et l'ordre est SANS OBJET",
+            "region_masquee": "SANS OBJET"
+          }
+        }
+      },
+      "classe_C_par_regle": {
+        "min": "ind_Δ"
+      },
+      "regle_publiee_en_classe_C": "min",
+      "arbitrage": "les deux règles sont publiées côte à côte ; AUCUNE n'est promue — l'arbitrage est PI",
+      "ecritures_obligatoires": {
+        "cas": 1,
+        "epsilon_etoile": 0.3132161505653211,
+        "deux_n": 0.015625,
+        "declaration": "ε* ≥ 2n : le recouvrement des conditions `c-mec` et `c-cent` est VIDE et l'ordre est SANS OBJET",
+        "region_masquee": "SANS OBJET"
+      },
+      "resolution_demi_largeur": 0.0015049089555846634
+    }
+  },
+  "decomposition_delta_descriptive": {
+    "S3": {
+      "P": 360,
+      "Delta_rem_estime": 0.2248263888888889,
+      "IC_Delta_rem": [
+        0.21315104166666668,
+        0.23541666666666666
+      ],
+      "Delta_add_estime": 0.1504033905228758,
+      "IC_Delta_add": [
+        0.14153633067810462,
+        0.16013071895424835
+      ],
+      "Delta_etoile_estime": 0.3752297794117647,
+      "IC_Delta_etoile": [
+        0.36526143790849674,
+        0.3852559487336601
+      ],
+      "Delta_rem_en_indices": 14.38888888888889,
+      "Delta_add_en_indices": 9.625816993464051,
+      "Delta_etoile_en_indices": 24.014705882352942,
+      "K_eff": 10,
+      "identite_par_paire": {
+        "verdict": "PASS",
+        "ecart_max_en_ULP": 0.0,
+        "tolerance_ULP": 8,
+        "n_paires": 360
+      },
+      "identite_sur_les_estimes": {
+        "verdict": "PASS",
+        "detail": {
+          "Delta_rem": 0.2248263888888889,
+          "Delta_add": 0.1504033905228758,
+          "Delta_etoile": 0.3752297794117647,
+          "somme_Delta_rem_plus_Delta_add": 0.3752297794117647,
+          "ecart_absolu": 0.0,
+          "echelle_ULP": 5.551115123125783e-17,
+          "ecart_en_ULP": 0.0,
+          "tolerance_ULP": 8,
+          "regle": "identité EXACTE en arithmétique réelle ; tout écart au-delà de la tolérance ULP déjà en vigueur est un BUG"
+        }
+      },
+      "definitions": {
+        "Delta_rem": "O_aucun − O_type — le cran RETIRÉ",
+        "Delta_add": "O_plac − O_aucun — le cran AJOUTÉ par la construction du placebo (§8 gelé : la MÊME c·r est soustraite aux deux membres)",
+        "Delta_etoile": "O_plac − O_type — PRIMAIRE GELÉE"
+      },
+      "statut": "DESCRIPTIF — Δ_rem et Δ_add ne modifient aucune classe, aucun seuil, aucune borne ; Δ* reste la primaire gelée",
+      "unite": "fraction p/64 ; la colonne `_en_indices` multiplie par 64",
+      "ecart_avec_la_primaire_gelee": 0.0
+    },
+    "S2": {
+      "P": 540,
+      "Delta_rem_estime": 0.1863136574074074,
+      "IC_Delta_rem": [
+        0.17572265625,
+        0.19701967592592592
+      ],
+      "Delta_add_estime": 0.15368157679738562,
+      "IC_Delta_add": [
+        0.1476885042211329,
+        0.15903301164215689
+      ],
+      "Delta_etoile_estime": 0.339995234204793,
+      "IC_Delta_etoile": [
+        0.32853847528594765,
+        0.35159335001361663
+      ],
+      "Delta_rem_en_indices": 11.924074074074074,
+      "Delta_add_en_indices": 9.83562091503268,
+      "Delta_etoile_en_indices": 21.75969498910675,
+      "K_eff": 10,
+      "identite_par_paire": {
+        "verdict": "PASS",
+        "ecart_max_en_ULP": 0.0,
+        "tolerance_ULP": 8,
+        "n_paires": 540
+      },
+      "identite_sur_les_estimes": {
+        "verdict": "PASS",
+        "detail": {
+          "Delta_rem": 0.1863136574074074,
+          "Delta_add": 0.15368157679738562,
+          "Delta_etoile": 0.339995234204793,
+          "somme_Delta_rem_plus_Delta_add": 0.33999523420479305,
+          "ecart_absolu": 5.551115123125783e-17,
+          "echelle_ULP": 5.551115123125783e-17,
+          "ecart_en_ULP": 1.0,
+          "tolerance_ULP": 8,
+          "regle": "identité EXACTE en arithmétique réelle ; tout écart au-delà de la tolérance ULP déjà en vigueur est un BUG"
+        }
+      },
+      "definitions": {
+        "Delta_rem": "O_aucun − O_type — le cran RETIRÉ",
+        "Delta_add": "O_plac − O_aucun — le cran AJOUTÉ par la construction du placebo (§8 gelé : la MÊME c·r est soustraite aux deux membres)",
+        "Delta_etoile": "O_plac − O_type — PRIMAIRE GELÉE"
+      },
+      "statut": "DESCRIPTIF — Δ_rem et Δ_add ne modifient aucune classe, aucun seuil, aucune borne ; Δ* reste la primaire gelée",
+      "unite": "fraction p/64 ; la colonne `_en_indices` multiplie par 64",
+      "ecart_avec_la_primaire_gelee": 0.0
+    },
+    "S1": {
+      "P": 2160,
+      "Delta_rem_estime": 0.21390335648148148,
+      "IC_Delta_rem": [
+        0.20137204447751322,
+        0.23121384492966526
+      ],
+      "Delta_add_estime": 0.1499919151688453,
+      "IC_Delta_add": [
+        0.14019068844509347,
+        0.15955691445121592
+      ],
+      "Delta_etoile_estime": 0.3638952716503268,
+      "IC_Delta_etoile": [
+        0.3543430500883013,
+        0.3750886656746032
+      ],
+      "Delta_rem_en_indices": 13.689814814814815,
+      "Delta_add_en_indices": 9.5994825708061,
+      "Delta_etoile_en_indices": 23.289297385620916,
+      "K_eff": 10,
+      "identite_par_paire": {
+        "verdict": "PASS",
+        "ecart_max_en_ULP": 0.0,
+        "tolerance_ULP": 8,
+        "n_paires": 2160
+      },
+      "identite_sur_les_estimes": {
+        "verdict": "PASS",
+        "detail": {
+          "Delta_rem": 0.21390335648148148,
+          "Delta_add": 0.1499919151688453,
+          "Delta_etoile": 0.3638952716503268,
+          "somme_Delta_rem_plus_Delta_add": 0.36389527165032676,
+          "ecart_absolu": 5.551115123125783e-17,
+          "echelle_ULP": 5.551115123125783e-17,
+          "ecart_en_ULP": 1.0,
+          "tolerance_ULP": 8,
+          "regle": "identité EXACTE en arithmétique réelle ; tout écart au-delà de la tolérance ULP déjà en vigueur est un BUG"
+        }
+      },
+      "definitions": {
+        "Delta_rem": "O_aucun − O_type — le cran RETIRÉ",
+        "Delta_add": "O_plac − O_aucun — le cran AJOUTÉ par la construction du placebo (§8 gelé : la MÊME c·r est soustraite aux deux membres)",
+        "Delta_etoile": "O_plac − O_type — PRIMAIRE GELÉE"
+      },
+      "statut": "DESCRIPTIF — Δ_rem et Δ_add ne modifient aucune classe, aucun seuil, aucune borne ; Δ* reste la primaire gelée",
+      "unite": "fraction p/64 ; la colonne `_en_indices` multiplie par 64",
+      "ecart_avec_la_primaire_gelee": 0.0
+    },
+    "S0": {
+      "P": 7560,
+      "Delta_rem_estime": 0.16813822751322752,
+      "IC_Delta_rem": [
+        0.16044212029023233,
+        0.17666733332263823
+      ],
+      "Delta_add_estime": 0.15181841833955806,
+      "IC_Delta_add": [
+        0.14636484612727096,
+        0.15737334529569205
+      ],
+      "Delta_etoile_estime": 0.31995664585278555,
+      "IC_Delta_etoile": [
+        0.3120854119996509,
+        0.32828042874889557
+      ],
+      "Delta_rem_en_indices": 10.760846560846561,
+      "Delta_add_en_indices": 9.716378773731716,
+      "Delta_etoile_en_indices": 20.477225334578275,
+      "K_eff": 10,
+      "identite_par_paire": {
+        "verdict": "PASS",
+        "ecart_max_en_ULP": 0.0,
+        "tolerance_ULP": 8,
+        "n_paires": 7560
+      },
+      "identite_sur_les_estimes": {
+        "verdict": "PASS",
+        "detail": {
+          "Delta_rem": 0.16813822751322752,
+          "Delta_add": 0.15181841833955806,
+          "Delta_etoile": 0.31995664585278555,
+          "somme_Delta_rem_plus_Delta_add": 0.3199566458527856,
+          "ecart_absolu": 5.551115123125783e-17,
+          "echelle_ULP": 5.551115123125783e-17,
+          "ecart_en_ULP": 1.0,
+          "tolerance_ULP": 8,
+          "regle": "identité EXACTE en arithmétique réelle ; tout écart au-delà de la tolérance ULP déjà en vigueur est un BUG"
+        }
+      },
+      "definitions": {
+        "Delta_rem": "O_aucun − O_type — le cran RETIRÉ",
+        "Delta_add": "O_plac − O_aucun — le cran AJOUTÉ par la construction du placebo (§8 gelé : la MÊME c·r est soustraite aux deux membres)",
+        "Delta_etoile": "O_plac − O_type — PRIMAIRE GELÉE"
+      },
+      "statut": "DESCRIPTIF — Δ_rem et Δ_add ne modifient aucune classe, aucun seuil, aucune borne ; Δ* reste la primaire gelée",
+      "unite": "fraction p/64 ; la colonne `_en_indices` multiplie par 64",
+      "ecart_avec_la_primaire_gelee": 0.0
+    }
+  },
+  "double_mesure_D26": {
+    "principale": "LOO (bascule §14-2 non déclenchée : n_cell = 60 ≥ 30)",
+    "controle": "split-half",
+    "apparie": "LOO_sous_ensemble — le LOO refait sur EXACTEMENT les paires du split-half, pour que l'écart LOO↔split-half ne se confonde pas avec l'écart entre deux jeux de paires",
+    "regle": "toute divergence de classe entre les deux SE PUBLIE, elle ne se moyenne pas"
+  },
+  "couverture_publiee": {
+    "gpt2|S3": {
+      "eps": {
+        "min": 0.30417024101307183,
+        "produit": 0.3837524254493465
+      },
+      "mesures": {
+        "LOO": 0.3752297794117647,
+        "split-half": 0.37734375
+      }
+    },
+    "gpt2|S2": {
+      "eps": {
+        "min": 0.2764253131808279,
+        "produit": 0.3497688589324619
+      },
+      "mesures": {
+        "LOO": 0.339995234204793,
+        "split-half": 0.3440142463235294
+      }
+    },
+    "gpt2|S1": {
+      "eps": {
+        "min": 0.3616099099919807,
+        "produit": 0.2271189650990604
+      },
+      "mesures": {
+        "LOO": 0.3638952716503268,
+        "split-half": 0.3637277716937839
+      }
+    },
+    "gpt2|S0": {
+      "eps": {
+        "min": 0.31371411655960757,
+        "produit": 0.18533983503333995
+      },
+      "mesures": {
+        "LOO": 0.31995664585278555,
+        "split-half": 0.3208072768898556
+      }
+    }
+  },
+  "anomalie_sigma_pm": {
+    "statut": "NON EXPLIQUÉ",
+    "nature": "DIAGNOSTIQUE (V-diag) — non décisionnelle : ne modifie aucune borne, aucun seuil, aucune classe",
+    "nulle": "σ± = 0.5 (accord de signe au hasard sur l'intersection)",
+    "seuil_de_signalement": "5.0 écarts-types sous 0.5",
+    "n_cellules_signalees": 2,
+    "cellules": [
+      {
+        "cellule": "gpt2|type_loo_sub|S0",
+        "sigma_pm": "1117/2566",
+        "sigma_pm_flottant": 0.4353078721745908,
+        "accord": "1117/2566",
+        "ecarts_types_sous_0.5": -6.55,
+        "sigma_pm_par_taille_d_intersection": {
+          "|A∩B|=1": 0.419008,
+          "|A∩B|=2": 0.41629,
+          "|A∩B|=3": 0.467836,
+          "|A∩B|=4": 0.61,
+          "|A∩B|=5": 0.7,
+          "|A∩B|>=6": "SANS OBJET"
+        }
+      },
+      {
+        "cellule": "gpt2|type|S0",
+        "sigma_pm": "1994/5083",
+        "sigma_pm_flottant": 0.39228801888648435,
+        "accord": "1994/5083",
+        "ecarts_types_sous_0.5": -15.36,
+        "sigma_pm_par_taille_d_intersection": {
+          "|A∩B|=1": 0.386861,
+          "|A∩B|=2": 0.395713,
+          "|A∩B|=3": 0.393393,
+          "|A∩B|=4": 0.411111,
+          "|A∩B|=5": 0.466667,
+          "|A∩B|>=6": "SANS OBJET"
+        }
+      }
+    ],
+    "mecanisme": "AUCUN N'EST PROPOSÉ — nommer l'inconnu est le livrable. Les descripteurs publiés (σ± par taille d'intersection) sont là pour qu'un tour ultérieur puisse instruire, pas pour conclure ici."
+  },
+  "split_half": {
+    "partition": "parité de l'index de l'unité dans sa cellule de capture (opérationnalisation DÉCLARÉE)",
+    "taille_des_moities": [
+      30,
+      30
+    ],
+    "regle_d_estimation": "pour une paire dont les deux membres sont dans la moitié h, μ_type est estimée sur la moitié 1−h — elle ne contient ni a ni b : fuite NULLE par construction",
+    "paires_a_cheval_exclues": 5400,
+    "unite_du_cardinal": "paires, agrégées sur les 6 cellules de capture",
+    "controle_apparie": "type_loo_sub / plac_loo_sub — le LOO refait sur EXACTEMENT le même sous-ensemble de paires",
+    "statut": "CONTRÔLE (double mesure D26) ; le LOO reste PRINCIPAL, la bascule §14-2 ne s'est pas déclenchée (n_cell = 60 ≥ 30)"
+  },
+  "Core": {
+    "Core": [
+      2600,
+      7115
+    ],
+    "taille": 2,
+    "n_unites": 10,
+    "seuil": 9,
+    "distribution_adjacente": {
+      ">=1": 345,
+      ">=2": 136,
+      ">=3": 65,
+      ">=4": 40,
+      ">=5": 25,
+      ">=6": 13,
+      ">=7": 9,
+      ">=8": 5,
+      ">=9": 2,
+      ">=10": 0
+    },
+    "compte_max_sur_S": 9,
+    "statut_de_la_distribution": "DESCRIPTIVE — le seuil ≥ 9 reste pré-enregistré et inchangé ; la distribution est publiée pour qu'un |Core| = 0 ne se lise pas en zéro plat",
+    "nulle": "Bin(10, 64/8192) par indice ; P(≥9) ≈ 1.1e-18 ; un seul indice = signature, p < 1e-13, aucun IC",
+    "portee": "pour cette G, seed 0 (D9) — Core est G-spécifique"
+  },
+  "Core_G": {
+    "Core_G": "1",
+    "Core_G_texte": "1/1",
+    "Core_G_flottant": 1.0,
+    "intersection": 2,
+    "taille_Core": 2
+  },
+  "cellule_de_reference_Core": "T1-A",
+  "appartenance_S": {
+    "0": "Iron",
+    "6": "Silver",
+    "12": "North",
+    "18": "River",
+    "24": "Storm",
+    "30": "Golden",
+    "36": "Copper",
+    "42": "Hollow",
+    "48": "Frost",
+    "54": "Shadow"
+  },
+  "marges_ulp": {
+    "aucun": {
+      "marge_ulp_min": 182199655520.0,
+      "marge_ulp_mediane": 12269151726640.0,
+      "marge_ulp_max": 96134930653296.0,
+      "n_etats": 256,
+      "chemin_nominal": "fp64",
+      "seuil": "SANS OBJET"
+    },
+    "glob": {
+      "marge_ulp_min": 67720607495.0,
+      "marge_ulp_mediane": 4106343997234.0,
+      "marge_ulp_max": 35602047512006.0,
+      "n_etats": 256,
+      "chemin_nominal": "fp64",
+      "seuil": "SANS OBJET"
+    },
+    "type": {
+      "marge_ulp_min": 4358785763.0,
+      "marge_ulp_mediane": 7390602223956.0,
+      "marge_ulp_max": 61793021466871.0,
+      "n_etats": 256,
+      "chemin_nominal": "fp64",
+      "seuil": "SANS OBJET"
+    },
+    "auto": {
+      "marge_ulp_min": 315205783262.0,
+      "marge_ulp_mediane": 7923422786549.0,
+      "marge_ulp_max": 80040134490141.0,
+      "n_etats": 256,
+      "chemin_nominal": "fp64",
+      "seuil": "SANS OBJET"
+    },
+    "plac": {
+      "marge_ulp_min": 84031089648.0,
+      "marge_ulp_mediane": 13741827315827.5,
+      "marge_ulp_max": 61426961545239.0,
+      "n_etats": 256,
+      "chemin_nominal": "fp64",
+      "seuil": "SANS OBJET"
+    }
+  },
+  "cardinal_intra_tige": 150,
+  "cardinal_intra_tige_unite": "paires intra-tige PAR CELLULE DE CAPTURE (il y a 6 cellules) — ce n'est PAS l'unité de `P`",
+  "cardinal_intra_tige_par_strate": {
+    "S3": 60,
+    "S2": 90,
+    "S1": 0,
+    "S0": 0
+  },
+  "cardinal_intra_tige_total_unite_de_P": 900,
+  "cardinal_intra_tige_total_par_strate_unite_de_P": {
+    "S3": 360,
+    "S2": 540,
+    "S1": 0,
+    "S0": 0
+  },
+  "fraction_intra_tige_par_strate_unite_de_P": {
+    "S3": 1.0,
+    "S2": 1.0,
+    "S1": 0.0,
+    "S0": 0.0
+  },
+  "bascule_split_half": {
+    "n_cell_min": 60,
+    "seuil": 30,
+    "bascule": false,
+    "mesure_principale": "LOO",
+    "controle": "split-half",
+    "majorant_du_biais_residuel": 0.017241379310344827,
+    "statut": "pré-enregistrée (§14-2) — jamais un choix après lecture"
+  },
+  "R": 17,
+  "duree_mesure_s": 232.52,
+  "couche_source": {
+    "couche": 6,
+    "source": "COUCHE_REF (§7)"
+  }
+}

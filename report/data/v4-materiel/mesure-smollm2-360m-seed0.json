@@ -1,0 +1,275 @@
+{
+ "command": ".venv\\Scripts\\python eval\\materiel_v4.py",
+ "condition": "mesure-smollm2-360m",
+ "seed": 0,
+ "config": "model=gpt2 layer=6 lam=2.0 eta=0.2 decay=0.001 thr=4.0 prune=512/0.1 hebb_only=False dg=8192/64 gate=keysim dataset=pool_v4",
+ "rerun": true,
+ "motif_rerun": "issues 1,2,3,5,6 - delta mesure (controle fp32), V-surprise appliquee, V-pool/V-t1 instrumentees, enveloppe propre de B0', descriptifs 4.8 produits",
+ "metrics": {
+  "couche_de_reference": 16,
+  "L": 32,
+  "V-L": "PASS",
+  "delta_R1_inv": 0.9833333333333334,
+  "IC_calibrateur": [
+   0.9666666666666666,
+   1.0
+  ],
+  "K_eff_calibrateur": 10,
+  "classe_calibrateur": "N-b",
+  "R1": 1.0,
+  "R1_cle_nulle": 0.016666666666666666,
+  "n_requetes": 180,
+  "D": 0.0,
+  "somme_m": 0,
+  "n_eff": 0,
+  "K_eff_support": 0,
+  "epsilon": null,
+  "distribution_m": [
+   60
+  ],
+  "bande_primaire": "C-ind",
+  "V-compo": "SANS OBJET",
+  "cause_C_ind": {
+   "cause": "famine par SATURATION",
+   "suite": "réduire la dominance de surface",
+   "classe_calibrateur": "N-b"
+  },
+  "phrase_G_bis_licenciee": true,
+  "M1": {
+   "observe": 0.05006284391806437,
+   "attendu_sous_la_nulle": 0.003022905667111425,
+   "centre": 0.04703993825095294,
+   "epsilon_M": 0.014214232131709534,
+   "IC": [
+    0.03282570611924341,
+    0.061254170382662475
+   ],
+   "etat": "+",
+   "signe": 1
+  },
+  "M2": {
+   "observe": -0.040891160521610126,
+   "attendu_sous_la_nulle": 0.007074789450271655,
+   "centre": -0.04796594997188178,
+   "epsilon_M": 0.008034554228149941,
+   "IC": [
+    -0.05600050420003172,
+    -0.039931395743731835
+   ],
+   "etat": "−",
+   "signe": -1
+  },
+  "M3": {
+   "observe": 0.04302592980606257,
+   "attendu_sous_la_nulle": 0.004771861046914285,
+   "centre": 0.03825406875914828,
+   "epsilon_M": 0.007474398907081461,
+   "IC": [
+    0.03077966985206682,
+    0.04572846766622974
+   ],
+   "etat": "+",
+   "signe": 1
+  },
+  "classe_ORD": "ORD-3",
+  "cos_moyen_par_strate": {
+   "S3": 0.7886106507645713,
+   "S2": 0.7385478068465069,
+   "S1": 0.779438967368117,
+   "S0": 0.7364130375620545
+  },
+  "B0": -0.05651302454881361,
+  "epsilon_B0": 0.011742522128018183,
+  "IC_B0": [
+   -0.06825554667683179,
+   -0.04477050242079542
+  ],
+  "B0_prime_centre": -0.0027269687869454166,
+  "B0_prime_observe": 0.007834991998970503,
+  "epsilon_B0_prime": 0.016201269131741303,
+  "IC_B0_prime": [
+   -0.018928237918686718,
+   0.013474300344795886
+  ],
+  "V-leak": "PASS",
+  "V-dtype": "PASS",
+  "delta_chapeau_mesure": 0.004861950874328613,
+  "seuil_2delta": 0.009723901748657227,
+  "marge_de_tete_min": 0.042404,
+  "marge_a_la_coupure_min": 0.042404,
+  "n_tiges_touchees": 0,
+  "constante_ULP_conservatrice": false,
+  "controle_fp32": {
+   "cellules": [
+    "T1-B",
+    "T1-A"
+   ],
+   "device": "cuda",
+   "repli_cpu": false,
+   "motif_repli": "",
+   "duree_s": 1.74,
+   "vram_max_reservee_gio": 2.047,
+   "n_sequences": 264,
+   "regle": "repli fp32 = CHEMIN NOMINAL déclaré avant le run (D21 / 0-51)"
+  },
+  "V-surprise": "FAIL",
+  "signes_M1_par_bande": [
+   1,
+   0,
+   0
+  ],
+  "M1_par_bande": {
+   "bande_0": {
+    "n_paires": 590,
+    "n_paires_par_strate": {
+     "S3": 23,
+     "S2": 28,
+     "S1": 129,
+     "S0": 410
+    },
+    "M1_centre": 0.0714843195287301,
+    "epsilon_M": 0.03151509602938864,
+    "IC": [
+     0.03996922349934147,
+     0.10299941555811874
+    ],
+    "etat": "+",
+    "signe": 1
+   },
+   "bande_1": {
+    "n_paires": 590,
+    "n_paires_par_strate": {
+     "S3": 19,
+     "S2": 31,
+     "S1": 107,
+     "S0": 433
+    },
+    "M1_centre": 0.04425847995698411,
+    "epsilon_M": 0.02660366166062131,
+    "IC": [
+     0.017654818296362805,
+     0.07086214161760543
+    ],
+    "etat": "ind",
+    "signe": 0
+   },
+   "bande_2": {
+    "n_paires": 590,
+    "n_paires_par_strate": {
+     "S3": 18,
+     "S2": 31,
+     "S1": 124,
+     "S0": 417
+    },
+    "M1_centre": 0.027208977284615587,
+    "epsilon_M": 0.023926065359923258,
+    "IC": [
+     0.003282911924692329,
+     0.051135042644538845
+    ],
+    "etat": "ind",
+    "signe": 0
+   }
+  },
+  "M1_retiree": false,
+  "NLL_capture_moyenne_nats": 13.017399279276528,
+  "NLL_tertiles": [
+   12.291316522492304,
+   13.688011831707424
+  ],
+  "NLL_par_strate": {
+   "S3": 13.01739927927653,
+   "S2": 13.017399279276528,
+   "S1": 13.01739927927653,
+   "S0": 13.01739927927653
+  },
+  "descriptif_A3": {
+   "S3": {
+    "cos_brut": 0.7886106507645714,
+    "cos_dg": 0.34010036575297514,
+    "compression": 0.44851028501159623,
+    "n": 60
+   },
+   "S2": {
+    "cos_brut": 0.7404473593941442,
+    "cos_dg": 0.28245002464563757,
+    "compression": 0.4579973347485066,
+    "n": 90
+   },
+   "S1": {
+    "cos_brut": 0.7794389673681171,
+    "cos_dg": 0.32615144642897775,
+    "compression": 0.4532875209391394,
+    "n": 360
+   },
+   "S0": {
+    "cos_brut": 0.7363590674583244,
+    "cos_dg": 0.27577364778136293,
+    "compression": 0.4605854196769614,
+    "n": 1260
+   }
+  },
+  "descriptif_A3_amplitude": 0.012075134665365195,
+  "descriptif_A3_G": {
+   "gelee": true,
+   "seed": 0,
+   "dg_dim": 8192,
+   "dg_topk": 64,
+   "apprise": false,
+   "source_des_hyperparametres": "EngramConfig"
+  },
+  "descriptif_A4_t_moins_1": {
+   "t_moins_1": {
+    "cos_S1": 0.7485681106646855,
+    "cos_S0": 0.7524660612855639,
+    "M3_brut": -0.0038979506208783876,
+    "n_S1": 360,
+    "n_S0": 1260
+   },
+   "t": {
+    "cos_S1": 0.7794389673681171,
+    "cos_S0": 0.7363590674583244,
+    "M3_brut": 0.043079899909792774,
+    "n_S1": 360,
+    "n_S0": 1260
+   },
+   "cardinal_D24b_a_t_moins_1": 14,
+   "paires_intra_tige_exclues": 150,
+   "discriminant": "confondant de COPIE DE TOKEN : la copie doit être bien plus forte à la capture qu'à t−1 ; profil identique aux deux positions ⇒ pas de signature de copie",
+   "statut": "DESCRIPTIF — aucune décision n'en dépend (§4.8)"
+  },
+  "descriptif_P1_moins_P2": {
+   "P1": 1.0,
+   "P2": 1.0,
+   "P1_moins_P2": 0.0,
+   "n_requetes": 60,
+   "type_de_requete": "T1",
+   "lecture_gravee": "valeur positive ou nulle : NON INFORMATIVE ; seule une valeur strictement négative est informative (violerait la monotonie stochastique en σ)",
+   "informatif": false,
+   "statut": "DESCRIPTIF par 0-49 — aucune décision n'en dépend"
+  },
+  "instrumentation": {
+   "profondeur_bootstrap": 0,
+   "rangs_calcules": 1080,
+   "rangs_calcules_dans_un_bootstrap": 0,
+   "quantites_t1": [
+    {
+     "nom": "profil A4 à t−1 (inter-tige)",
+     "n_paires_comparees": 1620,
+     "n_paires_intra_tige": 0,
+     "intra_tige": false
+    },
+    {
+     "nom": "profil A4 à t−1 (inter-tige)",
+     "n_paires_comparees": 1620,
+     "n_paires_intra_tige": 0,
+     "intra_tige": false
+    }
+   ]
+  }
+ },
+ "writes": "sans objet (M jamais instanciee, aucune injection, aucun backprop)",
+ "duration_s": 31.05,
+ "device": "cuda / torch.bfloat16 / VRAM reservee 1.117 Gio (bf16) ; controle fp32 sur cuda VRAM reservee 2.047 Gio",
+ "stdout": "==============================================================================\nv4-MATERIEL - MESURE (le banc D14-S doit avoir rendu E = 0)\nM jamais instanciee - aucune injection - aucun backprop - E3 sans objet\n==============================================================================\n  gpt2 / T1-A : 132 seq., 0.3 s\n  gpt2 / T1-B : 132 seq., 0.06 s\n  gpt2 / T2-A : 132 seq., 0.06 s\n  gpt2 / T2-B : 132 seq., 0.06 s\n  gpt2 / T3-A : 132 seq., 0.05 s\n  gpt2 / T3-B : 132 seq., 0.06 s\n  HuggingFaceTB/SmolLM2-360M / T1-A : 132 seq., 0.32 s\n  HuggingFaceTB/SmolLM2-360M / T1-B : 132 seq., 0.14 s\n  HuggingFaceTB/SmolLM2-360M / T2-A : 132 seq., 0.12 s\n  HuggingFaceTB/SmolLM2-360M / T2-B : 132 seq., 0.12 s\n  HuggingFaceTB/SmolLM2-360M / T3-A : 132 seq., 0.11 s\n  HuggingFaceTB/SmolLM2-360M / T3-B : 132 seq., 0.12 s\n  Qwen/Qwen2.5-1.5B / T1-A : 132 seq., 0.5 s\n  Qwen/Qwen2.5-1.5B / T1-B : 132 seq., 0.31 s\n  Qwen/Qwen2.5-1.5B / T2-A : 132 seq., 0.28 s\n  Qwen/Qwen2.5-1.5B / T2-B : 132 seq., 0.28 s\n  Qwen/Qwen2.5-1.5B / T3-A : 132 seq., 0.27 s\n  Qwen/Qwen2.5-1.5B / T3-B : 132 seq., 0.27 s\n\n--- gpt2 (couche 6) ---\n  device=cuda dtype=torch.bfloat16 VRAM_reservee=0.605 Gio duree=12.97 s forwards=6\n  calibrateur : DR1_inv = 0.9722 IC [0.9389, 1.0] -> N-b (R1 1.0000 / R1_nul 0.0278)\n  primaire    : D = 0.0000 ; somme_m = 0 ; n_eff = 0 ; K_support = 0 ; eps = SANS OBJET ; IC SANS OBJET -> C-ind\n                cause (§6.G) : {'cause': 'famine par SATURATION', 'suite': 'réduire la dominance de surface', 'classe_calibrateur': 'N-b'}\n  M1 : centre +0.06123 eps_M 0.01721 -> +\n  M2 : centre -0.06751 eps_M 0.01061 -> −\n  M3 : centre +0.05647 eps_M 0.01036 -> +\n  ORD : ORD-3 | V-leak : PASS (B0 -0.04526 +/- 0.00724 ; B0' -0.00648 +/- 0.00929 [enveloppe PROPRE])\n  V-dtype : PASS | delta_chapeau MESURE = 0.003271 (2delta = 0.006541 ; marge de tete min 0.10878 ; marge a la coupure min 0.10878 ; tiges touchees 0)\n            controle fp32 : device=cuda repli_cpu=False VRAM_reservee=1.082 Gio duree=1.24 s | constante ULP conservatrice = True\n  NLL capture : moyenne 12.3131 nats ; tertiles [11.71, 12.869]\n  V-surprise : FAIL | signes de M1 par bande de NLL [1, 1, 0] | M1 RETIREE = False\n             bande_0 : n=  590 strates={'S3': 21, 'S2': 27, 'S1': 137, 'S0': 405} centre=+0.07119 eps_M=0.03444 -> +\n             bande_1 : n=  590 strates={'S3': 20, 'S2': 34, 'S1': 95, 'S0': 441} centre=+0.07788 eps_M=0.03429 -> +\n             bande_2 : n=  590 strates={'S3': 19, 'S2': 29, 'S1': 128, 'S0': 414} centre=+0.05400 eps_M=0.02977 -> ind\n  A3 (descriptif) : compression par strate S3=+0.45960, S2=+0.46585, S1=+0.46044, S0=+0.46289 ; amplitude 0.00625\n  A4 (descriptif, INTER-TIGE seulement) : M3_brut a t = +0.06217 ; a t-1 = -0.00005 ; paires intra-tige exclues = 150 ; cardinal t-1 = 14\n  P1-P2 (descriptif) : P1=1.0000 P2=1.0000 difference=+0.0000 ; informatif=False\n\n--- HuggingFaceTB/SmolLM2-360M (couche 16) ---\n  device=cuda dtype=torch.bfloat16 VRAM_reservee=1.117 Gio duree=31.05 s forwards=6\n  calibrateur : DR1_inv = 0.9833 IC [0.9667, 1.0] -> N-b (R1 1.0000 / R1_nul 0.0167)\n  primaire    : D = 0.0000 ; somme_m = 0 ; n_eff = 0 ; K_support = 0 ; eps = SANS OBJET ; IC SANS OBJET -> C-ind\n                cause (§6.G) : {'cause': 'famine par SATURATION', 'suite': 'réduire la dominance de surface', 'classe_calibrateur': 'N-b'}\n  M1 : centre +0.04704 eps_M 0.01421 -> +\n  M2 : centre -0.04797 eps_M 0.00803 -> −\n  M3 : centre +0.03825 eps_M 0.00747 -> +\n  ORD : ORD-3 | V-leak : PASS (B0 -0.05651 +/- 0.01174 ; B0' -0.00273 +/- 0.01620 [enveloppe PROPRE])\n  V-dtype : PASS | delta_chapeau MESURE = 0.004862 (2delta = 0.009724 ; marge de tete min 0.042404 ; marge a la coupure min 0.042404 ; tiges touchees 0)\n            controle fp32 : device=cuda repli_cpu=False VRAM_reservee=2.047 Gio duree=1.74 s | constante ULP conservatrice = False\n  NLL capture : moyenne 13.0174 nats ; tertiles [12.291, 13.688]\n  V-surprise : FAIL | signes de M1 par bande de NLL [1, 0, 0] | M1 RETIREE = False\n             bande_0 : n=  590 strates={'S3': 23, 'S2': 28, 'S1': 129, 'S0': 410} centre=+0.07148 eps_M=0.03152 -> +\n             bande_1 : n=  590 strates={'S3': 19, 'S2': 31, 'S1': 107, 'S0': 433} centre=+0.04426 eps_M=0.02660 -> ind\n             bande_2 : n=  590 strates={'S3': 18, 'S2': 31, 'S1': 124, 'S0': 417} centre=+0.02721 eps_M=0.02393 -> ind\n  A3 (descriptif) : compression par strate S3=+0.44851, S2=+0.45800, S1=+0.45329, S0=+0.46059 ; amplitude 0.01208\n  A4 (descriptif, INTER-TIGE seulement) : M3_brut a t = +0.04308 ; a t-1 = -0.00390 ; paires intra-tige exclues = 150 ; cardinal t-1 = 14\n  P1-P2 (descriptif) : P1=1.0000 P2=1.0000 difference=+0.0000 ; informatif=False\n\n--- Qwen/Qwen2.5-1.5B (couche 14) ---\n  device=cuda dtype=torch.bfloat16 VRAM_reservee=4.01 Gio duree=124.12 s forwards=6\n  calibrateur : DR1_inv = 0.9833 IC [0.9556, 1.0] -> N-b (R1 1.0000 / R1_nul 0.0167)\n  primaire    : D = 0.0000 ; somme_m = 0 ; n_eff = 0 ; K_support = 0 ; eps = SANS OBJET ; IC SANS OBJET -> C-ind\n                cause (§6.G) : {'cause': 'famine par SATURATION', 'suite': 'réduire la dominance de surface', 'classe_calibrateur': 'N-b'}\n  M1 : centre +0.06857 eps_M 0.02010 -> +\n  M2 : centre -0.07050 eps_M 0.01163 -> −\n  M3 : centre +0.05636 eps_M 0.01091 -> +\n  ORD : ORD-3 | V-leak : PASS (B0 -0.07820 +/- 0.01420 ; B0' -0.00393 +/- 0.01942 [enveloppe PROPRE])\n  V-dtype : PASS | delta_chapeau MESURE = 0.005862 (2delta = 0.011725 ; marge de tete min 0.088331 ; marge a la coupure min 0.088331 ; tiges touchees 0)\n            controle fp32 : device=cuda repli_cpu=False VRAM_reservee=7.266 Gio duree=80.69 s | constante ULP conservatrice = False\n  NLL capture : moyenne 13.7712 nats ; tertiles [13.117, 14.556]\n  V-surprise : FAIL | signes de M1 par bande de NLL [1, 0, 0] | M1 RETIREE = False\n             bande_0 : n=  589 strates={'S3': 20, 'S2': 35, 'S1': 121, 'S0': 413} centre=+0.11424 eps_M=0.04361 -> +\n             bande_1 : n=  591 strates={'S3': 19, 'S2': 19, 'S1': 122, 'S0': 431} centre=+0.05952 eps_M=0.04878 -> ind\n             bande_2 : n=  590 strates={'S3': 21, 'S2': 36, 'S1': 117, 'S0': 416} centre=+0.05191 eps_M=0.02600 -> ind\n  A3 (descriptif) : compression par strate S3=+0.43344, S2=+0.41757, S1=+0.42619, S0=+0.40760 ; amplitude 0.02584\n  A4 (descriptif, INTER-TIGE seulement) : M3_brut a t = +0.06289 ; a t-1 = -0.00418 ; paires intra-tige exclues = 150 ; cardinal t-1 = 14\n  P1-P2 (descriptif) : P1=1.0000 P2=1.0000 difference=+0.0000 ; informatif=False\n\nV-joint : SANS OBJET\nportes de schema : {'V-plafond': 'PASS', 'V-calib': 'PASS', 'V-perimetre': 'PASS', 'V-bindur': 'PASS', 'V-pool': 'PASS', 'V-t1': 'PASS', 'V-subst': 'PASS', 'V-ord': 'PASS', 'V-surprise': 'FAIL', 'V-dtype': 'PASS'}\ninstrumentation  : rangs calcules = 1620 ; dont dans un bootstrap = 0 ; quantites a t-1 = 3 (intra-tige : 0)\nduree totale : 196.58 s\nrapport : C:\\Users\\fuzzz\\engram\\experiments\\results\\v4-materiel\\mesure.json\n"
+}

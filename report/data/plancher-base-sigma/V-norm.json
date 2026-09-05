@@ -1,0 +1,36 @@
+{
+  "porte": "V-norm",
+  "verdict": "PASS",
+  "detail": {
+    "modeles_manquants": [],
+    "sans_citation": [],
+    "normalisations_inconnues": [],
+    "configs": {
+      "gpt2": {
+        "model_type": "gpt2",
+        "normalisation": "LayerNorm",
+        "centre_t_il": true,
+        "champ": "layer_norm_epsilon",
+        "ligne_de_config": "\"layer_norm_epsilon\": 1e-05",
+        "reference": "Zhang & Sennrich 2019 — RMSNorm ne centre pas"
+      },
+      "HuggingFaceTB/SmolLM2-360M": {
+        "model_type": "llama",
+        "normalisation": "RMSNorm",
+        "centre_t_il": false,
+        "champ": "rms_norm_eps",
+        "ligne_de_config": "\"rms_norm_eps\": 1e-05",
+        "reference": "Zhang & Sennrich 2019 — RMSNorm ne centre pas"
+      },
+      "Qwen/Qwen2.5-1.5B": {
+        "model_type": "qwen2",
+        "normalisation": "RMSNorm",
+        "centre_t_il": false,
+        "champ": "rms_norm_eps",
+        "ligne_de_config": "\"rms_norm_eps\": 1e-06",
+        "reference": "Zhang & Sennrich 2019 — RMSNorm ne centre pas"
+      }
+    },
+    "regle": "citée par ligne de config, jamais par croyance"
+  }
+}

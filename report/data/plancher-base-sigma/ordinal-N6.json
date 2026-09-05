@@ -1,0 +1,133 @@
+{
+  "enonce": "Delta_Base(S0) >= Delta_Base(S3) (N6)",
+  "borne_de_la_conjonction": "min (0-63) — jamais un produit",
+  "cellules": {
+    "gpt2|aucun": {
+      "Delta_bras_A": 0.37714983856419615,
+      "Delta_bras_B": 0.14667111630235274,
+      "ecart_A_moins_B": 0.2304787222618434,
+      "IC_ecart": [
+        0.1819779853445613,
+        0.26710964455983227
+      ],
+      "borne_de_la_conjonction": "min (0-63) — jamais un produit de p-valeurs par modèle",
+      "K_eff": 10,
+      "B": 10000,
+      "seed": 0,
+      "n_repliques_finies": 10000,
+      "fraction_reechantillons_a_grappe_manquante": 0.9998,
+      "methode_de_quantile": "percentile, np.quantile(method='linear') — type 7 (D24)",
+      "note_14_4": "le bras S3 a R = 1 (vivier singleton) : variance de TIRAGE nulle, il entre comme constante dans la nulle N-état ; le bootstrap de tiges s'applique aux deux bras",
+      "enonce": "Delta_Base(S0) >= Delta_Base(S3) (N6)"
+    },
+    "gpt2|type": {
+      "Delta_bras_A": 0.005003606793888124,
+      "Delta_bras_B": -0.006150061500615006,
+      "ecart_A_moins_B": 0.01115366829450313,
+      "IC_ecart": [
+        5.11580943254159e-06,
+        0.021699169486970617
+      ],
+      "borne_de_la_conjonction": "min (0-63) — jamais un produit de p-valeurs par modèle",
+      "K_eff": 10,
+      "B": 10000,
+      "seed": 0,
+      "n_repliques_finies": 10000,
+      "fraction_reechantillons_a_grappe_manquante": 0.9998,
+      "methode_de_quantile": "percentile, np.quantile(method='linear') — type 7 (D24)",
+      "note_14_4": "le bras S3 a R = 1 (vivier singleton) : variance de TIRAGE nulle, il entre comme constante dans la nulle N-état ; le bootstrap de tiges s'applique aux deux bras",
+      "enonce": "Delta_Base(S0) >= Delta_Base(S3) (N6)"
+    },
+    "HuggingFaceTB/SmolLM2-360M|aucun": {
+      "Delta_bras_A": 0.3058535137903728,
+      "Delta_bras_B": 0.13663230240549828,
+      "ecart_A_moins_B": 0.1692212113848745,
+      "IC_ecart": [
+        0.13664367806197295,
+        0.19956114627063687
+      ],
+      "borne_de_la_conjonction": "min (0-63) — jamais un produit de p-valeurs par modèle",
+      "K_eff": 10,
+      "B": 10000,
+      "seed": 0,
+      "n_repliques_finies": 10000,
+      "fraction_reechantillons_a_grappe_manquante": 0.9998,
+      "methode_de_quantile": "percentile, np.quantile(method='linear') — type 7 (D24)",
+      "note_14_4": "le bras S3 a R = 1 (vivier singleton) : variance de TIRAGE nulle, il entre comme constante dans la nulle N-état ; le bootstrap de tiges s'applique aux deux bras",
+      "enonce": "Delta_Base(S0) >= Delta_Base(S3) (N6)"
+    },
+    "HuggingFaceTB/SmolLM2-360M|type": {
+      "Delta_bras_A": 0.0025419943470556374,
+      "Delta_bras_B": -0.03225806451612903,
+      "ecart_A_moins_B": 0.03480005886318467,
+      "IC_ecart": [
+        0.012068941261683138,
+        0.05615692582041137
+      ],
+      "borne_de_la_conjonction": "min (0-63) — jamais un produit de p-valeurs par modèle",
+      "K_eff": 10,
+      "B": 10000,
+      "seed": 0,
+      "n_repliques_finies": 10000,
+      "fraction_reechantillons_a_grappe_manquante": 0.9998,
+      "methode_de_quantile": "percentile, np.quantile(method='linear') — type 7 (D24)",
+      "note_14_4": "le bras S3 a R = 1 (vivier singleton) : variance de TIRAGE nulle, il entre comme constante dans la nulle N-état ; le bootstrap de tiges s'applique aux deux bras",
+      "enonce": "Delta_Base(S0) >= Delta_Base(S3) (N6)"
+    },
+    "Qwen/Qwen2.5-1.5B|aucun": {
+      "Delta_bras_A": 0.33034532894049623,
+      "Delta_bras_B": 0.14149924389717,
+      "ecart_A_moins_B": 0.18884608504332623,
+      "IC_ecart": [
+        0.12997615363296897,
+        0.2397782531985777
+      ],
+      "borne_de_la_conjonction": "min (0-63) — jamais un produit de p-valeurs par modèle",
+      "K_eff": 10,
+      "B": 10000,
+      "seed": 0,
+      "n_repliques_finies": 10000,
+      "fraction_reechantillons_a_grappe_manquante": 0.9998,
+      "methode_de_quantile": "percentile, np.quantile(method='linear') — type 7 (D24)",
+      "note_14_4": "le bras S3 a R = 1 (vivier singleton) : variance de TIRAGE nulle, il entre comme constante dans la nulle N-état ; le bootstrap de tiges s'applique aux deux bras",
+      "enonce": "Delta_Base(S0) >= Delta_Base(S3) (N6)"
+    },
+    "Qwen/Qwen2.5-1.5B|type": {
+      "Delta_bras_A": 0.0004717262570665719,
+      "Delta_bras_B": -0.02047244094488189,
+      "ecart_A_moins_B": 0.02094416720194846,
+      "IC_ecart": [
+        0.0062336821540885,
+        0.03363311494418786
+      ],
+      "borne_de_la_conjonction": "min (0-63) — jamais un produit de p-valeurs par modèle",
+      "K_eff": 10,
+      "B": 10000,
+      "seed": 0,
+      "n_repliques_finies": 10000,
+      "fraction_reechantillons_a_grappe_manquante": 0.9998,
+      "methode_de_quantile": "percentile, np.quantile(method='linear') — type 7 (D24)",
+      "note_14_4": "le bras S3 a R = 1 (vivier singleton) : variance de TIRAGE nulle, il entre comme constante dans la nulle N-état ; le bootstrap de tiges s'applique aux deux bras",
+      "enonce": "Delta_Base(S0) >= Delta_Base(S3) (N6)"
+    }
+  },
+  "minimum_reel_des_IC_inf_sur_les_six": {
+    "valeur": 5.11580943254159e-06,
+    "cellule": "gpt2|type",
+    "avertissement": "le minimum sur le SEUL bras `aucun` n'est pas le minimum de l'ordinal : les six cellules sont publiées et le min porte sur les six",
+    "largeur_de_l_IC_de_cette_cellule": 0.021694053677538076,
+    "borne_rapportee_a_la_largeur_de_l_IC": 0.00023581620607118143,
+    "borne_en_pourcentage_de_la_largeur": 0.023581620607118145,
+    "resolution_du_percentile_bootstrap": {
+      "B": 10000,
+      "quantile": "percentile type 7 (D24)",
+      "pas_de_percentile_approche": 0.0001
+    },
+    "statut_de_la_conjonction": "ÉQUIVALENCE, pas un ordinal établi — la borne inférieure est à 0.02 % de la largeur de son propre IC, donc DANS LE BRUIT du percentile bootstrap. La lecture licite est « l'ordre n'est pas distinguable de l'égalité à cette résolution », JAMAIS « l'ordinal est établi ».",
+    "interdit_D28": "une borne dans le bruit ne licencie pas un ordinal ; l'effet est borné par 2 × la résolution"
+  },
+  "minimum_par_condition": {
+    "aucun": 0.12997615363296897,
+    "type": 5.11580943254159e-06
+  }
+}
